@@ -38,8 +38,12 @@ class ExternalRejectionOnTitleOrderWdg(BaseRefreshWdg):
         name_input = TextInputWdg(name='name')
         outer_div.add(name_input)
 
-        root_cause_type_wdg = SelectWdg(name='root_cause_types',
-                                        values=ProdSetting.get_seq_by_key('external_rejection_root_cause_types'))
+        root_cause_types = ProdSetting.get_seq_by_key('external_rejection_root_cause_types')
+        root_cause_type_wdg = SelectWdg(name='root_cause_type', label='Root Cause Type')
+
+        for root_cause_type in root_cause_types:
+            root_cause_type_wdg.append_option(root_cause_type, root_cause_type)
+
         outer_div.add(root_cause_type_wdg)
 
         # TODO: Get this list from the schema, not hard coded
