@@ -1,0 +1,44 @@
+External Rejection Reasons
+
+Video - Cropping
+Video - Digital Hits / Macroblocking
+Video - Dropped Frames
+Video - Dropout
+Video - Duplicate Frames
+Video - Interlacing on a Progressive File
+Video - Motion/Image Lag
+Video - Missing Elements
+Video - Corrupt File
+Video - Incorrect Aspect Ratio
+Video - Incorrect Resolution
+Video - Incorrect Pixel Aspect Ratio
+Video - Incorrect Specifications
+Video - Incorrect Head/Tail Format
+Video - Other
+
+Audio - Incorrect Audio Mapping
+Audio - Missing Audio Channel
+Audio - Crackle/Hiss/Pop/Static/Ticks
+Audio - Distortion
+Audio - Dropouts
+Audio - Sync Issue
+Audio - Missing Elements
+Audio - Corrupt/Missing File
+Audio - Incorrect Specifications
+Audio - Other
+
+MetaData - Missing Information
+MetaData - Incorrect Information
+MetaData - Incorrect Formatting
+MetaData - Other
+
+Subtitle - Interlacing on Subtitles
+Subtitle - Incorrect Subtitles
+Subtitle - Sync Issue
+Subtitle - Overlapping Other Text
+Subtitle - Other
+
+Closed Captions - Sync Issue
+Closed Captions - Incorrect CC
+Closed Captions - Overlapping Other Text
+Closed Captions - Other
