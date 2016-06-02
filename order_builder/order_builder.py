@@ -1,4 +1,6 @@
 from tactic.ui.common import BaseRefreshWdg
+from tactic.ui.input import Html5UploadWdg
+from tactic.ui.table import CheckinButtonElementWdg
 from tactic.ui.widget import ButtonNewWdg
 
 from pyasm.search import Search
@@ -153,9 +155,22 @@ class OrderBuilderWdg(BaseRefreshWdg):
             external_rejection_button = ButtonNewWdg(title='External Rejection', icon='RED_BOMB')
             external_rejection_button.add_behavior(self.get_external_rejection_button_behavior())
 
+            # upload_button = Html5UploadWdg()
+            # upload_button = ButtonNewWdg(title='Upload', icon='UPLOAD')
+            # upload_button.add_behavior(self.get_upload_button_behavior())
+
+            # upload_button = CheckinButtonElementWdg()
+
+            note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+            note_button.add_behavior(self.get_add_notes_behavior(title_order.get_search_key()))
+            print(title_order)
+            print(title_order.get_search_key())
+
             title_order_li.add(title_order_name_div)
             title_order_li.add(title_order_description_div)
             title_order_li.add(external_rejection_button)
+            # title_order_li.add(upload_button)
+            title_order_li.add(note_button)
 
             tasks = obu.get_tasks_for_title_order(title_order)
 
@@ -205,6 +220,40 @@ catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }'''
+        }
+
+        return behavior
+
+    @staticmethod
+    def get_upload_button_behavior():
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    spt.api.load_popup('Upload', 'tactic.ui.input.Html5UploadWdg');
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}'''
+        }
+
+        return behavior
+
+    @staticmethod
+    def get_add_notes_behavior(search_key):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    spt.api.load_popup('Add Note', 'tactic.ui.widget.discussion_wdg.DiscussionWdg', {'search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % search_key
         }
 
         return behavior

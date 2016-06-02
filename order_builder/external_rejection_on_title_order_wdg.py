@@ -40,6 +40,7 @@ class ExternalRejectionOnTitleOrderWdg(BaseRefreshWdg):
 
         root_cause_types = ProdSetting.get_seq_by_key('external_rejection_root_cause_types')
         root_cause_type_wdg = SelectWdg(name='root_cause_type', label='Root Cause Type')
+        root_cause_type_wdg.add_empty_option()
 
         for root_cause_type in root_cause_types:
             root_cause_type_wdg.append_option(root_cause_type, root_cause_type)
