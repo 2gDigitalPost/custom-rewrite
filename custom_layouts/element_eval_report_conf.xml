@@ -1,0 +1,1033 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<config>
+    <element_eval_report_conf include_mako='true'>
+        <html>
+            <body>
+                <div class="spt_top">
+<![CDATA[
+<%
+    title = 'TESTING'
+    client_name = 'Netflix'
+%>
+]]>
+                </div>
+                <div>
+                    ${title}
+                </div>
+                <table style="border-collapse: collapse">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <table style="border-collapse: collapse">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <table style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <img src="/source_labels/2GLogo_small4.png"/>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td>
+                                                <table style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td nowrap="nowrap"
+                                                                style="font-size: 12px;padding-left: 4px">
+                                                                <div style="font-weight: bold">2G Digital Post, Inc.</div>
+                                                                <div>280 E.Magnolia Blvd.</div>
+                                                                <div>Burbank, CA 91502</div>
+                                                                <div>310-840-0600</div>
+                                                                <div>www.2gdigitalpost.com</div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td>
+                                <table style="border-collapse: collapse">
+                                    <tbody>
+                                        <tr>
+                                            <td align="center" nowrap="nowrap" valign="center"
+                                                style="padding: 10px;font-size: 40px">
+                                                <b>${client_name}</b>
+                                            </td>
+                                            <td>
+                                                <table style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" type="checkbox" name="marked_APPROVED"
+                                                                       persist="false" style="width: 16px;height: 16px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <b>APPROVED</b>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" checked="1" type="checkbox"
+                                                                       name="marked_REJECTED" persist="false"
+                                                                       style="width: 16px;height: 16px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <b>REJECTED</b>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table class="majtbl" style="border-collapse: collapse">
+                                    <tbody>
+                                        <tr>
+                                            <td>DATE</td>
+                                            <td>OPERATOR</td>
+                                            <td>STYLE</td>
+                                            <td>BAY</td>
+                                            <td>MACHINE #</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" id="timestamp" value="2015-08-29 18:04:04"
+                                                       name="timestamp" style="width: 137px" class="spt_input"/>
+                                            </td>
+                                            <td>
+                                                <input type="text" id="operator" value="Scott Bagley" name="operator"
+                                                       style="width: 150px" class="spt_input"/>
+                                            </td>
+                                            <td class="select_cell">
+                                                <select spt_select_size="20" id="style" name="style_select"
+                                                        style="color: #000;width: 135px;margin: 0px 5px;border: solid 1px #AAA;background: #FFFFFF"
+                                                        class="inputfield input-sm form-control spt_input">
+                                                    <option value="">--Select--</option>
+                                                    <option value="Technical">Technical</option>
+                                                    <option value="Spot QC">Spot QC</option>
+                                                    <option selected="selected" value="Mastering">Mastering</option>
+                                                </select>
+                                            </td>
+                                            <td class="select_cell">
+                                                <select spt_select_size="20" id="bay" name="bay_select"
+                                                        style="color: #000;width: 135px;margin: 0px 5px;border: solid 1px #AAA;background: #FFFFFF"
+                                                        class="inputfield input-sm form-control spt_input">
+                                                    <option value="">--Select--</option>
+                                                    <option value="Bay 1">Bay 1</option>
+                                                    <option value="Bay 2">Bay 2</option>
+                                                    <option selected="selected" value="Bay 3">Bay 3</option>
+                                                    <option value="Bay 4">Bay 4</option>
+                                                    <option value="Bay 5">Bay 5</option>
+                                                    <option value="Bay 6">Bay 6</option>
+                                                    <option value="Bay 7">Bay 7</option>
+                                                    <option value="Bay 8">Bay 8</option>
+                                                    <option value="Bay 9">Bay 9</option>
+                                                    <option value="Bay 10">Bay 10</option>
+                                                    <option value="Bay 11">Bay 11</option>
+                                                    <option value="Bay 12">Bay 12</option>
+                                                </select>
+                                            </td>
+                                            <td class="select_cell">
+                                                <select spt_select_size="20" id="machine_number" name="machine_select"
+                                                        style="color: #000;width: 135px;margin: 0px 5px;border: solid 1px #AAA;background: #FFFFFF"
+                                                        class="inputfield input-sm form-control spt_input">
+                                                    <option value="">--Select--</option>
+                                                    <option value="VTR221">VTR221</option>
+                                                    <option value="VTR222">VTR222</option>
+                                                    <option value="VTR223">VTR223</option>
+                                                    <option value="VTR224">VTR224</option>
+                                                    <option value="VTR225">VTR225</option>
+                                                    <option value="VTR231">VTR231</option>
+                                                    <option value="VTR232">VTR232</option>
+                                                    <option value="VTR233">VTR233</option>
+                                                    <option value="VTR234">VTR234</option>
+                                                    <option value="VTR235">VTR235</option>
+                                                    <option value="VTR251">VTR251</option>
+                                                    <option value="VTR252">VTR252</option>
+                                                    <option value="VTR253">VTR253</option>
+                                                    <option value="VTR254">VTR254</option>
+                                                    <option value="VTR255">VTR255</option>
+                                                    <option value="VTR261">VTR261</option>
+                                                    <option value="VTR262">VTR262</option>
+                                                    <option value="VTR263">VTR263</option>
+                                                    <option value="VTR264">VTR264</option>
+                                                    <option value="VTR265">VTR265</option>
+                                                    <option value="VTR281">VTR281</option>
+                                                    <option value="VTR282">VTR282</option>
+                                                    <option value="VTR283">VTR283</option>
+                                                    <option value="VTR284">VTR284</option>
+                                                    <option value="VTR285">VTR285</option>
+                                                    <option value="FCP01">FCP01</option>
+                                                    <option value="FCP02">FCP02</option>
+                                                    <option value="FCP03">FCP03</option>
+                                                    <option value="FCP04">FCP04</option>
+                                                    <option value="FCP05">FCP05</option>
+                                                    <option value="FCP06">FCP06</option>
+                                                    <option value="FCP07">FCP07</option>
+                                                    <option value="FCP08">FCP08</option>
+                                                    <option value="FCP09">FCP09</option>
+                                                    <option selected="selected" value="FCP10">FCP10</option>
+                                                    <option value="FCP11">FCP11</option>
+                                                    <option value="FCP12">FCP12</option>
+                                                    <option value="Amberfin">Amberfin</option>
+                                                    <option value="Clipster">Clipster</option>
+                                                    <option value="Stradis">Stradis</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table width="85%" style="border-collapse: collapse">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <table style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>TITLE:</td>
+                                                            <td>
+                                                                <input type="text" id="title" value="Longmire: Season 4"
+                                                                       name="title" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                            <td>FORMAT:</td>
+                                                            <td class="select_cell">
+                                                                <select spt_select_size="20" id="format"
+                                                                        name="format_select"
+                                                                        style="color: #000;width: 153px;margin: 0px 5px;border: solid 1px #AAA;background: #FFFFFF"
+                                                                        class="inputfield input-sm form-control spt_input">
+                                                                    <option value="">--Select--</option>
+                                                                    <option value="Electronic/File">Electronic/File
+                                                                    </option>
+                                                                    <option value="File - ProRes">File - ProRes</option>
+                                                                    <option value="File - MXF">File - MXF</option>
+                                                                    <option value="File - MPEG">File - MPEG</option>
+                                                                    <option selected="selected" value="File - WAV">File
+                                                                        - WAV
+                                                                    </option>
+                                                                    <option value="DBC">DBC</option>
+                                                                    <option value="D5">D5</option>
+                                                                    <option value="HDCAM SR">HDCAM SR</option>
+                                                                    <option value="NTSC">NTSC</option>
+                                                                    <option value="PAL">PAL</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>SEASON:</td>
+                                                            <td>
+                                                                <input type="text" id="season" value="" name="season"
+                                                                       style="width: 400px" class="spt_input"/>
+                                                            </td>
+                                                            <td>STANDARD:</td>
+                                                            <td class="select_cell">
+                                                                <select spt_select_size="20" id="standard"
+                                                                        name="standard_select"
+                                                                        style="color: #000;width: 153px;margin: 0px 5px;border: solid 1px #AAA;background: #FFFFFF"
+                                                                        class="inputfield input-sm form-control spt_input">
+                                                                    <option value="">--Select--</option>
+                                                                    <option value="625">625</option>
+                                                                    <option value="525">525</option>
+                                                                    <option value="720">720</option>
+                                                                    <option value="1080 (4:4:4)">1080 (4:4:4)</option>
+                                                                    <option value="1080">1080</option>
+                                                                    <option value="PAL">PAL</option>
+                                                                    <option value="NTSC">NTSC</option>
+                                                                    <option selected="selected" value="-">-</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>EPISODE:</td>
+                                                            <td>
+                                                                <input type="text" id="episode" value="Hector Lives "
+                                                                       name="episode" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                            <td nowrap="nowrap">FRAME RATE:</td>
+                                                            <td class="select_cell">
+                                                                <select spt_select_size="20" id="frame_rate"
+                                                                        name="frame_rate_select"
+                                                                        style="color: #f44;width: 153px;margin: 0px 5px;border: solid 1px #AAA;background: #FFFFFF"
+                                                                        class="inputfield input-sm form-control spt_input">
+                                                                    <option value="">--Select--</option>
+                                                                    <option value="23.98fps">23.98fps</option>
+                                                                    <option value="59.94i">59.94i</option>
+                                                                    <option value="50i">50i</option>
+                                                                    <option value="29.97fps">29.97fps</option>
+                                                                    <option value="24p">24p</option>
+                                                                    <option value="25p">25p</option>
+                                                                    <option value="59.94p">59.94p</option>
+                                                                    <option value="DFTC">DFTC</option>
+                                                                    <option value="NDFTC">NDFTC</option>
+                                                                    <option value="PAL/EBU">PAL/EBU</option>
+                                                                    <option selected="selected" value="-"
+                                                                            style="color: red">-
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>VERSION:</td>
+                                                            <td>
+                                                                <input type="text" id="version" value="" name="version"
+                                                                       style="width: 400px" class="spt_input"/>
+                                                            </td>
+                                                            <td>PO #:</td>
+                                                            <td>
+                                                                <input type="text" id="po_number" value="1149810"
+                                                                       name="po_number" style="width: 151px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">FILE NAME:</td>
+                                                            <td colspan="3">
+                                                                <input type="text" id="file_name"
+                                                                       value="1149810_23976_L_R_C_LFE_LS_RS_LT_RT_reupload_082815_fr_audio.mov  "
+                                                                       name="file_name" style="width: 635px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table class="pgf" style="border-collapse: collapse">
+                                    <tbody>
+                                        <tr>
+                                            <td width="100%" colspan="3">
+                                                <table style="background-color: #4a4a4a; width: 100%; color: #FFFFFF">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td width="500px" align="left">
+                                                                <b>PROGRAM FORMAT</b>
+                                                            </td>
+                                                            <td width="25px" align="left">
+                                                                <b>F</b>
+                                                            </td>
+                                                            <td align="left">
+                                                                <b>VIDEO MEASUREMENTS</b>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top">
+                                                <table nowrap="nowrap" border="1" style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Roll-up (blank)</td>
+                                                            <td>
+                                                                <input type="text" id="roll_up" value="00:00:00:00"
+                                                                       name="roll_up"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar new_str = '';\nentered = entered.replace(/:/g,'');\nfor(var r = 0; r &lt; entered.length; r++){\nif(r % 2 == 0 &amp;&amp; r != 0){\nnew_str = new_str + ':';\n}\nnew_str = new_str + entered[r];\n}\nbvr.src_el.value = new_str;\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 399px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="roll_up_f" value=""
+                                                                       name="roll_up_f" style="width: 20px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Bars/Tone</td>
+                                                            <td>
+                                                                <input type="text" id="bars_tone" value="--"
+                                                                       name="bars_tone"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar new_str = '';\nentered = entered.replace(/:/g,'');\nfor(var r = 0; r &lt; entered.length; r++){\nif(r % 2 == 0 &amp;&amp; r != 0){\nnew_str = new_str + ':';\n}\nnew_str = new_str + entered[r];\n}\nbvr.src_el.value = new_str;\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 399px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="bars_tone_f" value=""
+                                                                       name="bars_tone_f" style="width: 20px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Black/Silence</td>
+                                                            <td>
+                                                                <input type="text" id="black_silence_1" value="--"
+                                                                       name="black_silence_1"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar new_str = '';\nentered = entered.replace(/:/g,'');\nfor(var r = 0; r &lt; entered.length; r++){\nif(r % 2 == 0 &amp;&amp; r != 0){\nnew_str = new_str + ':';\n}\nnew_str = new_str + entered[r];\n}\nbvr.src_el.value = new_str;\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 399px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="black_silence_1_f" value=""
+                                                                       name="black_silence_1_f" style="width: 20px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Slate/Silence</td>
+                                                            <td>
+                                                                <input type="text" id="slate_silence" value="--"
+                                                                       name="slate_silence"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar new_str = '';\nentered = entered.replace(/:/g,'');\nfor(var r = 0; r &lt; entered.length; r++){\nif(r % 2 == 0 &amp;&amp; r != 0){\nnew_str = new_str + ':';\n}\nnew_str = new_str + entered[r];\n}\nbvr.src_el.value = new_str;\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 399px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="slate_silence_f" value=""
+                                                                       name="slate_silence_f" style="width: 20px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Black/Silence</td>
+                                                            <td>
+                                                                <input type="text" id="black_silence_2" value="--"
+                                                                       name="black_silence_2"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar new_str = '';\nentered = entered.replace(/:/g,'');\nfor(var r = 0; r &lt; entered.length; r++){\nif(r % 2 == 0 &amp;&amp; r != 0){\nnew_str = new_str + ':';\n}\nnew_str = new_str + entered[r];\n}\nbvr.src_el.value = new_str;\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 399px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="black_silence_2_f" value=""
+                                                                       name="black_silence_2_f" style="width: 20px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Start of Program</td>
+                                                            <td>
+                                                                <input type="text" id="start_of_program"
+                                                                       value="00:00:01:00" name="start_of_program"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar new_str = '';\nentered = entered.replace(/:/g,'');\nfor(var r = 0; r &lt; entered.length; r++){\nif(r % 2 == 0 &amp;&amp; r != 0){\nnew_str = new_str + ':';\n}\nnew_str = new_str + entered[r];\n}\nbvr.src_el.value = new_str;\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 399px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="start_of_program_f" value=""
+                                                                       name="start_of_program_f" style="width: 20px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">End of Program</td>
+                                                            <td>
+                                                                <input type="text" id="end_of_program"
+                                                                       value="00:57:34:18" name="end_of_program"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar new_str = '';\nentered = entered.replace(/:/g,'');\nfor(var r = 0; r &lt; entered.length; r++){\nif(r % 2 == 0 &amp;&amp; r != 0){\nnew_str = new_str + ':';\n}\nnew_str = new_str + entered[r];\n}\nbvr.src_el.value = new_str;\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 399px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="end_of_program_f" value=""
+                                                                       name="end_of_program_f" style="width: 20px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td>
+                                                <table nowrap="nowrap" border="1" style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Active Video Begins</td>
+                                                            <td>
+                                                                <input type="text" id="active_video_begins" value="--"
+                                                                       name="active_video_begins" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Active Video Ends</td>
+                                                            <td>
+                                                                <input type="text" id="active_video_ends" value="--"
+                                                                       name="active_video_ends" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Horizontal Blanking</td>
+                                                            <td>
+                                                                <input type="text" id="horizontal_blanking" value="--"
+                                                                       name="horizontal_blanking" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Luminance Peak</td>
+                                                            <td>
+                                                                <input type="text" id="video_peak" value="--"
+                                                                       name="video_peak" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Chroma Peak</td>
+                                                            <td>
+                                                                <input type="text" id="chroma_peak" value="--"
+                                                                       name="chroma_peak" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Head Logo</td>
+                                                            <td>
+                                                                <input type="text" id="head_logo" value="NETFLIX"
+                                                                       name="head_logo" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Tail Logo</td>
+                                                            <td>
+                                                                <input type="text" id="tail_logo" value="NETFLIX"
+                                                                       name="tail_logo" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table class="epro" style="border-collapse: collapse">
+                                    <tbody>
+                                        <tr>
+                                            <td width="100%" colspan="3">
+                                                <table style="background-color: #4a4a4a; width: 100%; color: #FFFFFF">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td align="left">
+                                                                <b>ELEMENT PROFILE</b>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <table border="1" style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Total Runtime</td>
+                                                            <td>
+                                                                <input type="text" id="total_runtime" value="57:33"
+                                                                       name="total_runtime"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar new_str = '';\nentered = entered.replace(/:/g,'');\nfor(var r = 0; r &lt; entered.length; r++){\nif(r % 2 == 0 &amp;&amp; r != 0){\nnew_str = new_str + ':';\n}\nnew_str = new_str + entered[r];\n}\nbvr.src_el.value = new_str;\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 400px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">TV/Feature/Trailer</td>
+                                                            <td>
+                                                                <input type="text" id="tv_feature_trailer" value="TV"
+                                                                       name="tv_feature_trailer" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Video Aspect Ratio</td>
+                                                            <td class="select_cell">
+                                                                <select spt_select_size="20" id="aspect_ratio"
+                                                                        name="aspect_ratio_select"
+                                                                        style="color: #000;width: 380px;margin: 0px 5px;border: solid 1px #AAA;background: #FFFFFF"
+                                                                        class="inputfield input-sm form-control spt_input">
+                                                                    <option value="">--Select--</option>
+                                                                    <option value="16x9 1.33">16x9 1.33</option>
+                                                                    <option value="16x9 1.33 Pan &amp; Scan">16x9 1.33
+                                                                        Pan &amp; Scan
+                                                                    </option>
+                                                                    <option value="16x9 1.78 Anamorphic">16x9 1.78
+                                                                        Anamorphic
+                                                                    </option>
+                                                                    <option selected="selected"
+                                                                            value="16x9 1.78 Full Frame">16x9 1.78 Full
+                                                                        Frame
+                                                                    </option>
+                                                                    <option value="16x9 1.85 Letterbox">16x9 1.85
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="16x9 1.85 Matted">16x9 1.85 Matted
+                                                                    </option>
+                                                                    <option value="16x9 1.85 Matted Anamorphic">16x9
+                                                                        1.85 Matted Anamorphic
+                                                                    </option>
+                                                                    <option value="16x9 2.00 Letterbox">16x9 2.00
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="16x9 2.10 Letterbox">16x9 2.10
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="16x9 2.20 Letterbox">16x9 2.20
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="16x9 2.35 Anamorphic">16x9 2.35
+                                                                        Anamorphic
+                                                                    </option>
+                                                                    <option value="16x9 2.35 Letterbox">16x9 2.35
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="16x9 2.40 Letterbox">16x9 2.40
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="16x9 2.55 Letterbox">16x9 2.55
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="4x3 1.33 Full Frame">4x3 1.33 Full
+                                                                        Frame
+                                                                    </option>
+                                                                    <option value="4x3 1.78 Letterbox">4x3 1.78
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="4x3 1.85 Letterbox">4x3 1.85
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="4x3 2.35 Letterbox">4x3 2.35
+                                                                        Letterbox
+                                                                    </option>
+                                                                    <option value="4x3 2.40 Letterbox">4x3 2.40
+                                                                        Letterbox
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Textless @ Tail</td>
+                                                            <td>
+                                                                <input type="text" id="textless_at_tail" value="--"
+                                                                       name="textless_at_tail" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Notices</td>
+                                                            <td>
+                                                                <input type="text" id="notices" value="--"
+                                                                       name="notices" style="width: 400px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Label</td>
+                                                            <td class="select_cell">
+                                                                <select spt_select_size="20" id="label" name="label"
+                                                                        style="color: #000;width: 380px;margin: 0px 5px;border: solid 1px #AAA;background: #FFFFFF"
+                                                                        class="inputfield input-sm form-control spt_input">
+                                                                    <option value="">--Select--</option>
+                                                                    <option value="Good">Good</option>
+                                                                    <option value="Fair">Fair</option>
+                                                                    <option value="Poor">Poor</option>
+                                                                    <option selected="selected" value="-">-</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td>
+                                                <table nowrap="nowrap" border="1" style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Language</td>
+                                                            <td>
+                                                                <input type="text" id="language" value="Parisian French"
+                                                                       name="language" style="width: 424px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">(CC)/Subtitles</td>
+                                                            <td>
+                                                                <input type="text" id="cc_subtitles" value="--"
+                                                                       name="cc_subtitles" style="width: 424px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">VITC</td>
+                                                            <td>
+                                                                <input type="text" id="vitc" value="--" name="vitc"
+                                                                       style="width: 424px" class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Source Barcode</td>
+                                                            <td>
+                                                                <input type="text" id="record_vendor" value="--"
+                                                                       name="record_vendor" style="width: 424px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Element QC Barcode</td>
+                                                            <td>
+                                                                <input type="text" id="vendor_id" value="--"
+                                                                       name="vendor_id" style="width: 424px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td nowrap="nowrap">Record Date</td>
+                                                            <td nowrap="nowrap">
+                                                                <div show_time="false" id="record_date"
+                                                                     spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\nvar orig_bvr = bvr.bvr;\nvar event = orig_bvr.type;\nvar match = bvr.bvr_match_class;\nif (!match) {\nspt.alert(\&quot;No match class defined for relay behavior\&quot;);\nreturn;\n}\nvar event_key = event + \&quot;:relay(.\&quot; + match + \&quot;)\&quot;;\nvar func = function(evt, src_el) {\nvar bvr = orig_bvr;\nbvr.src_el = src_el;\neval(bvr.cbjs_action);\n};\nbvr.src_el.addEvent(event_key, func);\n&quot;, &quot;bvr&quot;: {&quot;date_format&quot;: &quot;&quot;, &quot;name&quot;: &quot;record_date&quot;, &quot;time_input_default&quot;: &quot;&quot;, &quot;bvr_match_class&quot;: &quot;spt_calendar_day&quot;, &quot;cbjs_action&quot;: &quot;\n            var top = spt.get_parent(bvr.src_el, '.spt_calendar_top');\n            var input_top = spt.get_parent(bvr.src_el, '.calendar_input_top');\n            //spt.hide( top );\n             \n            var value = bvr.src_el.getAttribute('spt_date');\n            if (bvr.date_format &amp;&amp; value) {\n                var date_obj = new Date().parse(value)\n                value = date_obj.format(bvr.date_format);\n               \n            }\n\n            var el = input_top.getElement('.spt_calendar_input');\n            var old_value = el.value;\n            el.value = value;\n\n            var layout = bvr.src_el.getParent(\&quot;.spt_layout\&quot;);\n            var version = layout ? layout.getAttribute(\&quot;spt_version\&quot;): 1;\n\n           \n            var show_time = input_top.getAttribute(\&quot;show_time\&quot;);\n            if (show_time == 'true') {\n                // keep the time (FIXME: this is not right because AM/PM\n                // introduces uncertainty in what all the parts are\n                var parts = old_value.split(\&quot; \&quot;);\n                var time;\n                if (parts.length == 3) {\n                    time = parts[1] + \&quot; \&quot; + parts[2];\n                }\n                else if (parts.length == 2) {\n                    if (parts[1] == 'AM' || parts[1] == 'PM') {\n                        time = parts[0] + \&quot; \&quot; + parts[1];\n                    }\n                    else {\n                        time = parts[1];\n                    }\n                }\n                else if (bvr.time_input_default) {\n                    time = bvr.time_input_default;\n                }\n                else {\n                    time = \&quot;12:00\&quot;;\n                }\n                parts = value.split(\&quot; \&quot;);\n                var date = parts[0];\n\n                value = date + \&quot; \&quot; + time;\n                var class_name = 'tactic.ui.widget.CalendarTimeWdg';\n                var options = {\n                    name: bvr.name,\n                    date: value,\n                    date_format: bvr.date_format,\n                };\n\n                var kwargs = {fade: false, show_loading: false};\n\n                spt.panel.load(top, class_name, options, null, kwargs);\n            }\n            else {\n                spt.hide( top );\n                if (bvr.time_input_default) {\n                    value = value + ' ' + bvr.time_input_default;\n                    el.value = value;\n                }\n                var version = layout ? layout.getAttribute(\&quot;spt_version\&quot;): 1;\n                if (version == \&quot;2\&quot;) {\n                    spt.table.set_layout(layout);\n                    spt.table.accept_edit(top, value);\n                } else {\n                    // A CellEditWdg containing a Calendar widget will be a detached PUW, so use 'spt.get_parent()'\n                    var td = spt.get_parent( el, '.spt_table_td' );\n                    if( td ) {\n                        // don't set the td 'spt_input_value' here! Not necessary and might be more complex widget!\n                        el.spt_text_edit_wdg.accept_edit = true;\n                        spt.dg_table.edit_cell_cbk(el, spt.kbd.special_keys_map.ENTER);\n                    } else {\n                        el.spt_text_edit_wdg.accept_edit = true;\n                        spt.validation.direct_input_element_check( el );\n                    }\n                }\n            }\n            &quot;, &quot;type&quot;: &quot;click&quot;}, &quot;type&quot;: &quot;load&quot;, &quot;bvr_match_class&quot;: &quot;spt_calendar_day&quot;}]"
+                                                                     spt_bvr_type_list="[{&quot;type&quot;: &quot;load&quot;}]"
+                                                                     class="SPT_BVR calendar_input_top ">
+                                                                    <div>
+                                                                        <div style="position: relative"
+                                                                             class="spt_input_text_top spt_text_top">
+                                                                            <div>
+                                                                                <div class="input-group">
+                                                                                    <span class="input-group-addon">
+                                                                                        <div style="display: inline">
+                                                                                            <span style="opacity: 0.6;font-size: 16;margin-right: 3px"
+                                                                                                  class="glyphicon glyphicon-calendar"></span>
+                                                                                        </div>
+                                                                                    </span>
+                                                                                    <input autocomplete="off"
+                                                                                           type="text"
+                                                                                           current_val="2015-08-29 00:00:00"
+                                                                                           name="record_date"
+                                                                                           value="2015-08-29 00:00:00"
+                                                                                           spt_bvr_list="[{&quot;bgcolor2&quot;: &quot;#e5e5e5&quot;, &quot;bgcolor&quot;: &quot;#FFFFFF&quot;, &quot;type&quot;: &quot;blur&quot;, &quot;cbjs_action&quot;: &quot;\nif (bvr.src_el.hasClass('spt_input_validation_failed')) {\nreturn;\n}\nvar value = bvr.src_el.value;\nvar last_value = bvr.src_el.getAttribute(\&quot;spt_last_value\&quot;);\nif (value == \&quot;\&quot;) {\nbvr.src_el.setStyle(\&quot;background\&quot;, bvr.bgcolor);\n}\nelse if (!last_value &amp;&amp; last_value != value) {\nbvr.src_el.setStyle(\&quot;background\&quot;, bvr.bgcolor2);\n}\nelse {\nbvr.src_el.setStyle(\&quot;background\&quot;, bvr.bgcolor);\n}\nbvr.src_el.setAttribute(\&quot;spt_last_value\&quot;, value);\n//spt.input.set_success(bvr.src_el);\nif (spt.input.set_error)\nspt.input.set_error(bvr.src_el);\n&quot;},{&quot;cbjs_action&quot;: &quot;var el = bvr.src_el.getParent('.calendar_input_top').getElement('.spt_calendar_top'); \nif (!el)  {\nel = spt.calendar.get(); \nel.setStyle(\&quot;width\&quot;, \&quot;200px\&quot;);\nvar top = bvr.src_el.getParent('.calendar_input_top');\ntop.appendChild(el);\nel.position({position: 'upperleft', relativeTo: bvr.src_el, offset: {x:0, y:0}});\n}\nspt.show(el);\nspt.body.add_focus_element(el); \n//evt.stopPropagation();\n&quot;, &quot;type&quot;: &quot;focus&quot;},{&quot;type&quot;: &quot;keyboard&quot;, &quot;kbd_handler_name&quot;: &quot;CalendarInputKeyboard&quot;}]"
+                                                                                           spt_bvr_type_list="[{&quot;type&quot;: &quot;blur&quot;},{&quot;type&quot;: &quot;focus&quot;},{&quot;type&quot;: &quot;keyboard&quot;}]"
+                                                                                           style="text-left: center;color: #000;height: 30;padding: 5px;width: 380;background: #FFFFFF"
+                                                                                           class="spt_text_input form-control spt_calendar_input SPT_BVR spt_input"
+onclick="javascript:var el = $(this).getParent('.calendar_input_top').getElement('.spt_calendar_top'); if (el) spt.show(el); spt.show(el);spt.body.add_focus_element(el); event.stopPropagation();"/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" id="audio_row"
+                                spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nentered = prompt(\&quot;How many audio channels do you want in this report?\&quot;);\nif(isNaN(entered)){\nalert(entered + \&quot; is not a number. Please only enter numbers here.\&quot;)\n}else{\nwo_code = 'WORK_ORDER281810';\nell_code = 'ELEMENT_EVAL00978';\nbig_els = document.getElementsByClassName('big_ol_element_wdg_' + wo_code);\nbig_el = null;\nfor(var r = 0; r &lt; big_els.length; r++){\nif(big_els[r].getAttribute('element_code') == ell_code){\nbig_el = big_els[r];\n}\n}\naudio_table = big_el.getElementById('audio_table');\nelement_eval_code = audio_table.getAttribute('code');\nsend_data = {'code': element_eval_code, 'wo_code': wo_code, 'channels': entered, 'force_it': 'true'};\nspt.api.load_panel(audio_table, 'qc_reports.ElementEvalAudioWdg', send_data);\n}\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;click_up&quot;}]"
+                                spt_bvr_type_list="[{&quot;type&quot;: &quot;click_up&quot;}]"
+                                style="color: #FFFFFF;cursor: pointer;background-color: #4a4a4a;width: 100%"
+                                class="SPT_BVR">
+                                <b>AUDIO CONFIGURATION - click to change number of channels</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td wo_code="WORK_ORDER281810" code="ELEMENT_EVAL00978" id="audio_table">
+                                <table channels="8" id="audio_information" style="border-collapse: collapse">
+                                    <tbody>
+                                        <tr>
+                                            <td valign="top">
+                                                <table border="1" class="atable" style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Channel</td>
+                                                            <td>Content</td>
+                                                            <td>Tone</td>
+                                                            <td>Peak</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <input old_val="1" code="ELEMENT_EVAL_AUDIO08205"
+                                                                       name="channel-0" value="1" type="text"
+                                                                       id="channel-0"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar old_val = bvr.src_el.getAttribute('old_val');\nif(isNaN(entered)){\nalert(entered + \&quot; is not a number. Please only enter numbers here.\&quot;)\nbvr.src_el.value = old_val;\n}else{\nbvr.src_el.setAttribute('old_val',entered);\n}\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 68px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="Left" code="ELEMENT_EVAL_AUDIO08205"
+                                                                       name="content-0" value="Left" type="text"
+                                                                       id="content-0" style="width: 132px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="" code="ELEMENT_EVAL_AUDIO08205"
+                                                                       name="tone-0" value="" type="text" id="tone-0"
+                                                                       style="width: 68px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="-5dBfs" code="ELEMENT_EVAL_AUDIO08205"
+                                                                       name="peak-0" value="-5dBfs" type="text"
+                                                                       id="peak-0" style="width: 68px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <input old_val="2" code="ELEMENT_EVAL_AUDIO08206"
+                                                                       name="channel-1" value="2" type="text"
+                                                                       id="channel-1"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar old_val = bvr.src_el.getAttribute('old_val');\nif(isNaN(entered)){\nalert(entered + \&quot; is not a number. Please only enter numbers here.\&quot;)\nbvr.src_el.value = old_val;\n}else{\nbvr.src_el.setAttribute('old_val',entered);\n}\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 68px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="Right" code="ELEMENT_EVAL_AUDIO08206"
+                                                                       name="content-1" value="Right" type="text"
+                                                                       id="content-1" style="width: 132px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="" code="ELEMENT_EVAL_AUDIO08206"
+                                                                       name="tone-1" value="" type="text" id="tone-1"
+                                                                       style="width: 68px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="-5dBfs" code="ELEMENT_EVAL_AUDIO08206"
+                                                                       name="peak-1" value="-5dBfs" type="text"
+                                                                       id="peak-1" style="width: 68px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <input old_val="3" code="ELEMENT_EVAL_AUDIO08207"
+                                                                       name="channel-2" value="3" type="text"
+                                                                       id="channel-2"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar old_val = bvr.src_el.getAttribute('old_val');\nif(isNaN(entered)){\nalert(entered + \&quot; is not a number. Please only enter numbers here.\&quot;)\nbvr.src_el.value = old_val;\n}else{\nbvr.src_el.setAttribute('old_val',entered);\n}\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 68px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="Center" code="ELEMENT_EVAL_AUDIO08207"
+                                                                       name="content-2" value="Center" type="text"
+                                                                       id="content-2" style="width: 132px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="" code="ELEMENT_EVAL_AUDIO08207"
+                                                                       name="tone-2" value="" type="text" id="tone-2"
+                                                                       style="width: 68px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="-5dBfs" code="ELEMENT_EVAL_AUDIO08207"
+                                                                       name="peak-2" value="-5dBfs" type="text"
+                                                                       id="peak-2" style="width: 68px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td valign="top">
+                                                <table border="1" class="atable" style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Channel</td>
+                                                            <td>Content</td>
+                                                            <td>Tone</td>
+                                                            <td>Peak</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <input old_val="4" code="ELEMENT_EVAL_AUDIO08208"
+                                                                       name="channel-3" value="4" type="text"
+                                                                       id="channel-3"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar old_val = bvr.src_el.getAttribute('old_val');\nif(isNaN(entered)){\nalert(entered + \&quot; is not a number. Please only enter numbers here.\&quot;)\nbvr.src_el.value = old_val;\n}else{\nbvr.src_el.setAttribute('old_val',entered);\n}\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 68px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="LFE" code="ELEMENT_EVAL_AUDIO08208"
+                                                                       name="content-3" value="LFE" type="text"
+                                                                       id="content-3" style="width: 132px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="" code="ELEMENT_EVAL_AUDIO08208"
+                                                                       name="tone-3" value="" type="text" id="tone-3"
+                                                                       style="width: 68px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="-5dBfs" code="ELEMENT_EVAL_AUDIO08208"
+                                                                       name="peak-3" value="-5dBfs" type="text"
+                                                                       id="peak-3" style="width: 68px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <input old_val="5" code="ELEMENT_EVAL_AUDIO08209"
+                                                                       name="channel-4" value="5" type="text"
+                                                                       id="channel-4"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar old_val = bvr.src_el.getAttribute('old_val');\nif(isNaN(entered)){\nalert(entered + \&quot; is not a number. Please only enter numbers here.\&quot;)\nbvr.src_el.value = old_val;\n}else{\nbvr.src_el.setAttribute('old_val',entered);\n}\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 68px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="Left Surround"
+                                                                       code="ELEMENT_EVAL_AUDIO08209" name="content-4"
+                                                                       value="Left Surround" type="text" id="content-4"
+                                                                       style="width: 132px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="" code="ELEMENT_EVAL_AUDIO08209"
+                                                                       name="tone-4" value="" type="text" id="tone-4"
+                                                                       style="width: 68px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="-10dBfs" code="ELEMENT_EVAL_AUDIO08209"
+                                                                       name="peak-4" value="-10dBfs" type="text"
+                                                                       id="peak-4" style="width: 68px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <input old_val="6" code="ELEMENT_EVAL_AUDIO08210"
+                                                                       name="channel-5" value="6" type="text"
+                                                                       id="channel-5"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar old_val = bvr.src_el.getAttribute('old_val');\nif(isNaN(entered)){\nalert(entered + \&quot; is not a number. Please only enter numbers here.\&quot;)\nbvr.src_el.value = old_val;\n}else{\nbvr.src_el.setAttribute('old_val',entered);\n}\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 68px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="Right Surround"
+                                                                       code="ELEMENT_EVAL_AUDIO08210" name="content-5"
+                                                                       value="Right Surround" type="text" id="content-5"
+                                                                       style="width: 132px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="" code="ELEMENT_EVAL_AUDIO08210"
+                                                                       name="tone-5" value="" type="text" id="tone-5"
+                                                                       style="width: 68px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="-5dBfs" code="ELEMENT_EVAL_AUDIO08210"
+                                                                       name="peak-5" value="-5dBfs" type="text"
+                                                                       id="peak-5" style="width: 68px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td valign="top">
+                                                <table border="1" class="atable" style="border-collapse: collapse">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Channel</td>
+                                                            <td>Content</td>
+                                                            <td>Tone</td>
+                                                            <td>Peak</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <input old_val="7" code="ELEMENT_EVAL_AUDIO08211"
+                                                                       name="channel-6" value="7" type="text"
+                                                                       id="channel-6"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar old_val = bvr.src_el.getAttribute('old_val');\nif(isNaN(entered)){\nalert(entered + \&quot; is not a number. Please only enter numbers here.\&quot;)\nbvr.src_el.value = old_val;\n}else{\nbvr.src_el.setAttribute('old_val',entered);\n}\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 68px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="Stereo Left"
+                                                                       code="ELEMENT_EVAL_AUDIO08211" name="content-6"
+                                                                       value="Stereo Left" type="text" id="content-6"
+                                                                       style="width: 132px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="" code="ELEMENT_EVAL_AUDIO08211"
+                                                                       name="tone-6" value="" type="text" id="tone-6"
+                                                                       style="width: 68px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="-6dBfs" code="ELEMENT_EVAL_AUDIO08211"
+                                                                       name="peak-6" value="-6dBfs" type="text"
+                                                                       id="peak-6" style="width: 68px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <input old_val="8" code="ELEMENT_EVAL_AUDIO08212"
+                                                                       name="channel-7" value="8" type="text"
+                                                                       id="channel-7"
+                                                                       spt_bvr_list="[{&quot;cbjs_action&quot;: &quot;\ntry{\nvar entered = bvr.src_el.value;\nvar old_val = bvr.src_el.getAttribute('old_val');\nif(isNaN(entered)){\nalert(entered + \&quot; is not a number. Please only enter numbers here.\&quot;)\nbvr.src_el.value = old_val;\n}else{\nbvr.src_el.setAttribute('old_val',entered);\n}\n}\ncatch(err){\nspt.app_busy.hide();\nspt.alert(spt.exception.handler(err));\n}\n&quot;, &quot;css_class&quot;: &quot;clickme&quot;, &quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       spt_bvr_type_list="[{&quot;type&quot;: &quot;keyup&quot;}]"
+                                                                       style="width: 68px" class="SPT_BVR spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="Stereo Right"
+                                                                       code="ELEMENT_EVAL_AUDIO08212" name="content-7"
+                                                                       value="Stereo Right" type="text" id="content-7"
+                                                                       style="width: 132px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="" code="ELEMENT_EVAL_AUDIO08212"
+                                                                       name="tone-7" value="" type="text" id="tone-7"
+                                                                       style="width: 68px" class="spt_input"/>
+                                                            </td>
+                                                            <td>
+                                                                <input old_val="-6dBfs" code="ELEMENT_EVAL_AUDIO08212"
+                                                                       name="peak-7" value="-6dBfs" type="text"
+                                                                       id="peak-7" style="width: 68px"
+                                                                       class="spt_input"/>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #4a4a4a; width: 55%" id="darkrow">
+                            <td>
+                                <b>
+                                    <font color="#FFFFFF">GENERAL COMMENTS</font>
+                                </b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <textarea cols="194" rows="10" class="description" id="description">Rejected Due to
+                                    Various Audio Issues
+                                </textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </body>
+        </html>
+    </element_eval_report_conf>
+</config>

@@ -58,11 +58,16 @@ class OrderBuilderWdg(BaseRefreshWdg):
         else:
             description_div.add('No description available')
 
+        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+        note_button.add_behavior(self.get_add_notes_behavior(self.order_sobject.get_search_key()))
+
         # Add the divs to the outer_div for display
         order_div.add(order_name_div)
         order_div.add(client_name_div)
         order_div.add(po_number_div)
         order_div.add(description_div)
+        order_div.add(note_button)
+        order_div.add(HtmlElement.br)
 
         return order_div
 
@@ -163,8 +168,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(self.get_add_notes_behavior(title_order.get_search_key()))
-            print(title_order)
-            print(title_order.get_search_key())
 
             title_order_li.add(title_order_name_div)
             title_order_li.add(title_order_description_div)
@@ -191,18 +194,20 @@ class OrderBuilderWdg(BaseRefreshWdg):
         return title_order_list
 
     @staticmethod
-    def get_add_titles_behavior():
+    def get_add_titles_behavior(order_code):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
 try {
-    spt.api.load_popup('Add Title to Order', 'order_builder.InsertTitleInOrderWdg');
+    var order_code = '%s';
+
+    spt.api.load_popup('Add Title to Order', 'order_builder.InsertTitleInOrderWdg', {'code': order_code});
 }
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
-}'''
+}''' % order_code
         }
 
         return behavior
@@ -260,7 +265,7 @@ catch(err) {
 
     def get_add_titles_button(self):
         add_titles_button = ButtonNewWdg(title='Add Title', icon='ADD')
-        add_titles_button.add_behavior(self.get_add_titles_behavior())
+        add_titles_button.add_behavior(self.get_add_titles_behavior(self.order_code))
 
         return add_titles_button
 
@@ -268,7 +273,11 @@ catch(err) {
         outer_div = DivWdg()
         outer_div.add_class('order-builder')
 
-        outer_div.add(self.setup_order_information())
+        order_div = DivWdg()
+
+        # outer_div.add(self.setup_order_information())
+        order_div.add(self.setup_order_information())
+        outer_div.add(order_div)
 
         title_orders_div = DivWdg()
         title_orders_div.add_style('display', 'inline-block')

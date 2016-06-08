@@ -5,6 +5,8 @@ from pyasm.widget import SelectWdg
 
 from pyasm.web import HtmlElement
 
+from tactic_client_lib import tactic_server_stub
+
 
 TASK_COLORS = {
     "Assignment":      "#ffc500",
@@ -157,3 +159,55 @@ def get_tasks_for_title_order(title_order):
     task_search.add_parent_filter(title_order)
 
     return task_search.get_sobjects()
+
+
+def get_server():
+    """
+
+    :return:
+    """
+    try:
+        server = tactic_server_stub.TacticServerStub.get()
+    except tactic_server_stub.TacticApiException as e:
+        # TODO: get a server object some other way
+        raise e
+
+    return server
+
+
+def get_base_url(server=None, project='twog'):
+    """
+    Gets the base url for tactic. This would be used to get the
+    beginning of a custom url (like for the order_builder).
+
+    Note: the server from the browser already has .2gdigital.com
+
+    :param server: a TacticServerStub object
+    :param project: the project as a string
+    :return: the base url as a string
+    """
+    if not server:
+        server = get_server()
+
+    url = 'http://{0}/tactic/{1}/'.format(server.server_name, project)
+    return url
+
+
+def get_order_builder_url(order_code, server=None, project='twog'):
+    """
+    Gets the order builder url for the given order code.
+    Note that this does not format it as a hyperlink.
+
+    Ex. get_order_builder_url('ORDER12345')
+    -> 'http://tactic01.2gdigital.com/tactic/twog/order_builder/ORDER12345'
+
+    :param order_code: the order code as a string
+    :param server: a tactic server stub object
+    :param project: the project as a string
+    :return: a url to the order builder page
+    """
+    if not server:
+        server = get_server()
+
+    base_url = get_base_url(server, project)
+    return "{0}order_builder/{1}".format(base_url, order_code)
