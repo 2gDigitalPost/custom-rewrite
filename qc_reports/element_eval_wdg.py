@@ -4,7 +4,7 @@ from tactic.ui.widget import CalendarInputWdg
 
 from pyasm.prod.biz import ProdSetting
 from pyasm.web import Table, DivWdg, SpanWdg
-from pyasm.widget import SelectWdg, TextWdg, CheckboxWdg
+from pyasm.widget import SelectWdg, CheckboxWdg
 
 
 def get_bay_select():
@@ -25,11 +25,11 @@ def get_machine_select():
     machine_sel.add_style('width', '135px')
     machine_sel.add_empty_option()
 
-    for m in ('VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234', 'VTR235',
+    for machine in ('VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234', 'VTR235',
               'VTR251', 'VTR252', 'VTR253', 'VTR254', 'VTR255', 'VTR261', 'VTR262', 'VTR263', 'VTR264', 'VTR265',
               'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03', 'FCP04', 'FCP05', 'FCP06',
               'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin', 'Clipster', 'Stradis'):
-        machine_sel.append_option(m, m)
+        machine_sel.append_option(machine, machine)
 
     return machine_sel
 
@@ -40,8 +40,8 @@ def get_style_select():
     style_sel.add_style('width: 135px;')
     style_sel.add_empty_option()
 
-    for s in ('Technical', 'Spot QC', 'Mastering'):
-        style_sel.append_option(s, s)
+    for style in ('Technical', 'Spot QC', 'Mastering'):
+        style_sel.append_option(style, style)
 
     return style_sel
 
@@ -222,31 +222,243 @@ def get_record_date_calendar_wdg():
     return record_date_calendar_wdg
 
 
-class ElementEvalWdg(BaseTableElementWdg):
+def set_image_and_address(main_wdg):
+    image_cell = '<img src="/opt/spt/custom/qc_reports/2GLogo_small4.png"/>'
+    image_div = DivWdg()
+    image_div.add(image_cell)
+    image_div.add_style('float', 'left')
+    image_div.add_style('margin', '5px')
 
-    def init(my):
-        my.frame_rates = ProdSetting.get_seq_by_key('frame_rates')
-        my.aspect_ratios = ['16x9 1.33',
-                            '16x9 1.33 Pan & Scan',
-                            '16x9 1.78 Anamorphic',
-                            '16x9 1.78 Full Frame',
-                            '16x9 1.85 Letterbox',
-                            '16x9 1.85 Matted',
-                            '16x9 1.85 Matted Anamorphic',
-                            '16x9 2.00 Letterbox',
-                            '16x9 2.10 Letterbox',
-                            '16x9 2.20 Letterbox',
-                            '16x9 2.35 Anamorphic',
-                            '16x9 2.35 Letterbox',
-                            '16x9 2.40 Letterbox',
-                            '16x9 2.55 Letterbox',
-                            '4x3 1.33 Full Frame',
-                            '4x3 1.78 Letterbox',
-                            '4x3 1.85 Letterbox',
-                            '4x3 2.35 Letterbox',
-                            '4x3 2.40 Letterbox']
-        my.element = None
-        my.element_lines = None
+    address_div = DivWdg()
+
+    address_name_div = DivWdg('2G Digital Post, Inc.')
+    address_name_div.add_style('font-weight', 'bold')
+
+    address_street_div = DivWdg('280 E. Magnolia Blvd.')
+    address_city_div = DivWdg('Burbank, CA 91502')
+    address_phone_div = DivWdg('310-840-0600')
+    address_url_div = DivWdg('www.2gdigitalpost.com')
+
+    [address_div.add(div) for div in [address_name_div, address_street_div, address_city_div, address_phone_div,
+                                      address_url_div]]
+    address_div.add_style('display', 'inline-block')
+
+    main_wdg.add(image_div)
+    main_wdg.add(address_div)
+
+
+def get_image_div():
+    image_cell = '<img src="/opt/spt/custom/qc_reports/2GLogo_small4.png"/>'
+    image_div = DivWdg()
+    image_div.add(image_cell)
+    image_div.add_style('float', 'left')
+    image_div.add_style('margin', '5px')
+
+    return image_div
+
+
+def get_address_div():
+    address_div = DivWdg()
+
+    address_name_div = DivWdg('2G Digital Post, Inc.')
+    address_name_div.add_style('font-weight', 'bold')
+
+    address_street_div = DivWdg('280 E. Magnolia Blvd.')
+    address_city_div = DivWdg('Burbank, CA 91502')
+    address_phone_div = DivWdg('310-840-0600')
+    address_url_div = DivWdg('www.2gdigitalpost.com')
+
+    [address_div.add(div) for div in [address_name_div, address_street_div, address_city_div, address_phone_div,
+                                      address_url_div]]
+    address_div.add_style('display', 'inline-block')
+
+    return address_div
+
+
+def get_client_name(client_name):
+    client_name_div = DivWdg(client_name)
+    client_name_div.add_style('font-size', '40px')
+    client_name_div.add_style('display', 'inline-block')
+    client_name_div.add_style('padding', '10px')
+
+    return client_name_div
+
+
+def get_approved_rejected_checkboxes(conclusion):
+    acr_s = ['APPROVED', 'REJECTED']
+    acr = Table()
+    acr.add_style('display', 'inline-block')
+
+    for mark in acr_s:
+        acr.add_row()
+        acr1 = CheckboxWdg('marked_%s' % mark)
+
+        if mark in conclusion:
+            acr1.set_value(True)
+        else:
+            acr1.set_value(False)
+
+        acr.add_cell(acr1)
+        acr.add_cell('<b>{0}</b>'.format(mark))
+
+    return acr
+
+
+def get_operator_section():
+    operator_table = Table()
+    operator_table.add_attr('class', 'operator_table')
+    operator_table.add_row()
+    operator_table.add_header('DATE')
+    operator_table.add_header('OPERATOR')
+    operator_table.add_header('STYLE')
+    operator_table.add_header('BAY')
+    operator_table.add_header('MACHINE #')
+    operator_table.add_row()
+
+    operator_table.add_cell(get_text_input_wdg('timestamp'))
+    operator_table.add_cell(get_text_input_wdg('operator'))
+    operator_table.add_cell(get_style_select())
+    operator_table.add_cell(get_bay_select())
+    operator_table.add_cell(get_machine_select())
+
+    return operator_table
+
+
+def get_title_section():
+    section_div = DivWdg()
+
+    section_div.add(get_title_input_wdg())
+    section_div.add(get_format_section())
+
+    return section_div
+
+
+def get_season_section():
+    section_div = DivWdg()
+
+    section_div.add(get_season_input_wdg())
+    section_div.add(get_standard_section())
+
+    return section_div
+
+
+def get_episode_section():
+    section_div = DivWdg()
+
+    section_div.add(get_episode_input_wdg())
+    section_div.add(get_frame_rate_section())
+
+    return section_div
+
+
+def get_version_section():
+    section_div = DivWdg()
+
+    section_div.add(get_version_input_wdg())
+    section_div.add(get_po_number_section())
+
+    return section_div
+
+
+def get_file_name_section():
+    section_div = DivWdg()
+
+    section_div.add(get_file_name_input_wdg())
+
+    return section_div
+
+
+def get_program_format_table():
+    program_format_table = Table()
+    program_format_table.add_style('float', 'left')
+
+    program_format_table.add_row()
+    program_format_table.add_header('Program Format')
+    program_format_table.add_header()
+    program_format_table.add_header('F')
+
+    text_input_name_id_pairs = [
+        ('Roll-up (blank)', 'roll_up_blank'),
+        ('Bars/Tone', 'bars_tone'),
+        ('Black/Silence', 'black_silence_1'),
+        ('Slate/Silence', 'slate_silence'),
+        ('Black/Silence', 'black_silence_2'),
+        ('Start of Program', 'start_of_program'),
+        ('End of Program', 'end_of_program')
+    ]
+
+    setup_program_format_table_rows(program_format_table, text_input_name_id_pairs)
+
+    return program_format_table
+
+
+def get_video_measurements_table():
+    video_measurements_table = Table()
+
+    video_measurements_table.add_row()
+    video_measurements_table.add_header('Video Measurements')
+
+    text_input_name_id_pairs = [
+        ('Active Video Begins', 'active_video_begins'),
+        ('Active Video Ends', 'active_video_ends'),
+        ('Horizontal Blanking', 'horizontal_blanking'),
+        ('Luminance Peak', 'luminance_peak'),
+        ('Chroma Peak', 'chroma_peak'),
+        ('Head Logo', 'head_logo'),
+        ('Tail Logo', 'tail_logo')
+    ]
+
+    setup_video_measurements_table_rows(video_measurements_table, text_input_name_id_pairs)
+
+    return video_measurements_table
+
+
+def get_element_profile_table():
+    element_profile_table = Table()
+
+    element_profile_table.add_row()
+    element_profile_table.add_header('Element Profile')
+
+    element_profile_table.add_row()
+    element_profile_table.add_cell('Total Runtime')
+    element_profile_table.add_cell(get_text_input_wdg('total_runtime', 300))
+    element_profile_table.add_cell('Language')
+    element_profile_table.add_cell(get_text_input_wdg('language', 300))
+
+    element_profile_table.add_row()
+    element_profile_table.add_cell('TV/Feature/Trailer')
+    element_profile_table.add_cell(get_text_input_wdg('tv_feature_trailer', 300))
+    element_profile_table.add_cell('(CC)/Subtitles')
+    element_profile_table.add_cell(get_text_input_wdg('cc_subtitles', 300))
+
+    element_profile_table.add_row()
+    element_profile_table.add_cell('Video Aspect Ratio')
+    element_profile_table.add_cell(get_video_aspect_ratio_select_wdg())
+    element_profile_table.add_cell('VITC')
+    element_profile_table.add_cell(get_text_input_wdg('vitc', 300))
+
+    element_profile_table.add_row()
+    element_profile_table.add_cell('Textless @ Tail')
+    element_profile_table.add_cell(get_text_input_wdg('textless_tail', 300))
+    element_profile_table.add_cell('Source Barcode')
+    element_profile_table.add_cell(get_text_input_wdg('source_barcode', 300))
+
+    element_profile_table.add_row()
+    element_profile_table.add_cell('Notices')
+    element_profile_table.add_cell(get_text_input_wdg('notices', 300))
+    element_profile_table.add_cell('Element QC Barcode')
+    element_profile_table.add_cell(get_text_input_wdg('element_qc_barcode', 300))
+
+    element_profile_table.add_row()
+    element_profile_table.add_cell('Video Aspect Ratio')
+    element_profile_table.add_cell(get_label_select_wdg())
+    element_profile_table.add_cell('Record Date')
+    element_profile_table.add_cell(get_record_date_calendar_wdg())
+
+    return element_profile_table
+
+
+class ElementEvalWdg(BaseTableElementWdg):
 
     @staticmethod
     def get_save_bvr(wo_code, ell_code):
@@ -914,291 +1126,25 @@ class ElementEvalWdg(BaseTableElementWdg):
          ''' % (wo_code, ell_code)}
         return behavior
 
-    def txtbox(my, name, width=200, js=False):
-        txt = TextWdg(name)
-        txt.add_attr('id', name)
-        txt.add_style('width: {0}px;'.format(width))
-        txt.set_value(my.element.get(name))
-
-        if js:
-            txt.add_behavior(my.get_add_dots())
-
-        return txt
-
-    def set_other_reports_table(self, other_reports, table_title):
-        other_reports_table = Table()
-
-        if other_reports:
-            other_reports_table.add_style('width', '100%')
-            other_reports_table.add_style('border', '1px solid gray')
-            other_reports_table.add_style('margin', '3px')
-
-            other_reports_table.add_row()
-
-            title_cell = other_reports_table.add_cell(table_title)
-            title_cell.add_style('font-weight', 'bold')
-            title_cell.add_style('text-decoration', 'underline')
-            title_cell.add_style('text-align', 'center')
-            title_cell.add_style('padding', '4px')
-
-            columns = ('Code', 'Language', 'Operator', 'Conclusion', 'Format', 'Standard', 'Frame Rate', 'Timestamp')
-            header_row = other_reports_table.add_row()
-
-            for column in columns:
-                header_cell = other_reports_table.add_header(data=column, row=header_row)
-                header_cell.add_style('border', '1px solid gray')
-                header_cell.add_style('padding', '4px')
-
-            for report in other_reports:
-                code = report.get('code')
-                work_order_code = report.get('work_order_code')
-                language = report.get('language')
-                operator = report.get('operator')
-                conclusion = report.get('conclusion')
-                file_format = report.get('format')
-                standard = report.get('standard')
-                frame_rate = report.get('frame_rate')
-                timestamp = report.get('timestamp')
-
-                click_row = other_reports_table.add_row()
-                click_row.add_attr('element_code', code)
-                click_row.add_attr('work_order_code', work_order_code)
-                click_row.add_style('cursor', 'pointer')
-                click_row.add_behavior(self.get_click_row(work_order_code, code))
-
-                for cell_data in [code, language, operator, conclusion, file_format, standard, frame_rate, timestamp]:
-                    table_body_cell = other_reports_table.add_cell(data=cell_data, row=click_row)
-                    table_body_cell.add_style('border', '1px solid gray')
-                    table_body_cell.add_style('padding', '4px')
-
-        return other_reports_table
-
-    @staticmethod
-    def set_image_and_address(main_wdg):
-        image_cell = '<img src="/opt/spt/custom/qc_reports/2GLogo_small4.png"/>'
-        image_div = DivWdg()
-        image_div.add(image_cell)
-        image_div.add_style('float', 'left')
-        image_div.add_style('margin', '5px')
-
-        address_div = DivWdg()
-
-        address_name_div = DivWdg('2G Digital Post, Inc.')
-        address_name_div.add_style('font-weight', 'bold')
-
-        address_street_div = DivWdg('280 E. Magnolia Blvd.')
-
-        address_city_div = DivWdg('Burbank, CA 91502')
-
-        address_phone_div = DivWdg('310-840-0600')
-
-        address_url_div = DivWdg('www.2gdigitalpost.com')
-
-        [address_div.add(div) for div in [address_name_div, address_street_div, address_city_div, address_phone_div,
-                                          address_url_div]]
-        address_div.add_style('display', 'inline-block')
-
-        main_wdg.add(image_div)
-        main_wdg.add(address_div)
-
-    @staticmethod
-    def get_client_name(client_name):
-        client_name_div = DivWdg(client_name)
-        client_name_div.add_style('font-size', '40px')
-        client_name_div.add_style('display', 'inline-block')
-        client_name_div.add_style('padding', '10px')
-
-        return client_name_div
-
-    @staticmethod
-    def get_approved_rejected_checkboxes(conclusion):
-        acr_s = ['APPROVED', 'REJECTED']
-        acr = Table()
-        for mark in acr_s:
-            acr.add_row()
-            acr1 = CheckboxWdg('marked_%s' % mark)
-
-            if mark in conclusion:
-                acr1.set_value(True)
-            else:
-                acr1.set_value(False)
-
-            acr.add_cell(acr1)
-            acr.add_cell('<b>{0}</b>'.format(mark))
-
-        return acr
-
-    @staticmethod
-    def get_operator_section():
-        operator_table = Table()
-        operator_table.add_attr('class', 'operator_table')
-        operator_table.add_row()
-        operator_table.add_header('DATE')
-        operator_table.add_header('OPERATOR')
-        operator_table.add_header('STYLE')
-        operator_table.add_header('BAY')
-        operator_table.add_header('MACHINE #')
-        operator_table.add_row()
-
-        operator_table.add_cell(get_text_input_wdg('timestamp'))
-        operator_table.add_cell(get_text_input_wdg('operator'))
-        operator_table.add_cell(get_style_select())
-        operator_table.add_cell(get_bay_select())
-        operator_table.add_cell(get_machine_select())
-
-        return operator_table
-
-    @staticmethod
-    def get_title_section():
-        section_div = DivWdg()
-
-        section_div.add(get_title_input_wdg())
-        section_div.add(get_format_section())
-
-        return section_div
-
-    @staticmethod
-    def get_season_section():
-        section_div = DivWdg()
-
-        section_div.add(get_season_input_wdg())
-        section_div.add(get_standard_section())
-
-        return section_div
-
-    @staticmethod
-    def get_episode_section():
-        section_div = DivWdg()
-
-        section_div.add(get_episode_input_wdg())
-        section_div.add(get_frame_rate_section())
-
-        return section_div
-
-    @staticmethod
-    def get_version_section():
-        section_div = DivWdg()
-
-        section_div.add(get_version_input_wdg())
-        section_div.add(get_po_number_section())
-
-        return section_div
-
-    @staticmethod
-    def get_file_name_section():
-        section_div = DivWdg()
-
-        section_div.add(get_file_name_input_wdg())
-
-        return section_div
-
-    @staticmethod
-    def get_program_format_table():
-        program_format_table = Table()
-        program_format_table.add_style('float', 'left')
-
-        program_format_table.add_row()
-        program_format_table.add_header('Program Format')
-        program_format_table.add_header()
-        program_format_table.add_header('F')
-
-        text_input_name_id_pairs = [
-            ('Roll-up (blank)', 'roll_up_blank'),
-            ('Bars/Tone', 'bars_tone'),
-            ('Black/Silence', 'black_silence_1'),
-            ('Slate/Silence', 'slate_silence'),
-            ('Black/Silence', 'black_silence_2'),
-            ('Start of Program', 'start_of_program'),
-            ('End of Program', 'end_of_program')
-        ]
-
-        setup_program_format_table_rows(program_format_table, text_input_name_id_pairs)
-
-        return program_format_table
-
-    @staticmethod
-    def get_video_measurements_table():
-        video_measurements_table = Table()
-
-        video_measurements_table.add_row()
-        video_measurements_table.add_header('Video Measurements')
-
-        text_input_name_id_pairs = [
-            ('Active Video Begins', 'active_video_begins'),
-            ('Active Video Ends', 'active_video_ends'),
-            ('Horizontal Blanking', 'horizontal_blanking'),
-            ('Luminance Peak', 'luminance_peak'),
-            ('Chroma Peak', 'chroma_peak'),
-            ('Head Logo', 'head_logo'),
-            ('Tail Logo', 'tail_logo')
-        ]
-
-        setup_video_measurements_table_rows(video_measurements_table, text_input_name_id_pairs)
-
-        return video_measurements_table
-
-    @staticmethod
-    def get_element_profile_table():
-        element_profile_table = Table()
-
-        element_profile_table.add_row()
-        element_profile_table.add_header('Element Profile')
-
-        element_profile_table.add_row()
-        element_profile_table.add_cell('Total Runtime')
-        element_profile_table.add_cell(get_text_input_wdg('total_runtime', 300))
-        element_profile_table.add_cell('Language')
-        element_profile_table.add_cell(get_text_input_wdg('language', 300))
-
-        element_profile_table.add_row()
-        element_profile_table.add_cell('TV/Feature/Trailer')
-        element_profile_table.add_cell(get_text_input_wdg('tv_feature_trailer', 300))
-        element_profile_table.add_cell('(CC)/Subtitles')
-        element_profile_table.add_cell(get_text_input_wdg('cc_subtitles', 300))
-
-        element_profile_table.add_row()
-        element_profile_table.add_cell('Video Aspect Ratio')
-        element_profile_table.add_cell(get_video_aspect_ratio_select_wdg())
-        element_profile_table.add_cell('VITC')
-        element_profile_table.add_cell(get_text_input_wdg('vitc', 300))
-
-        element_profile_table.add_row()
-        element_profile_table.add_cell('Textless @ Tail')
-        element_profile_table.add_cell(get_text_input_wdg('textless_tail', 300))
-        element_profile_table.add_cell('Source Barcode')
-        element_profile_table.add_cell(get_text_input_wdg('source_barcode', 300))
-
-        element_profile_table.add_row()
-        element_profile_table.add_cell('Notices')
-        element_profile_table.add_cell(get_text_input_wdg('notices', 300))
-        element_profile_table.add_cell('Element QC Barcode')
-        element_profile_table.add_cell(get_text_input_wdg('element_qc_barcode', 300))
-
-        element_profile_table.add_row()
-        element_profile_table.add_cell('Video Aspect Ratio')
-        element_profile_table.add_cell(get_label_select_wdg())
-        element_profile_table.add_cell('Record Date')
-        element_profile_table.add_cell(get_record_date_calendar_wdg())
-
-        return element_profile_table
-
-
     def get_display(self):
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
 
-        self.set_image_and_address(main_wdg)
-        main_wdg.add(self.get_client_name('Netflix'))
-        main_wdg.add(self.get_approved_rejected_checkboxes('APPROVED'))
-        main_wdg.add(self.get_operator_section())
-        main_wdg.add(self.get_title_section())
-        main_wdg.add(self.get_season_section())
-        main_wdg.add(self.get_episode_section())
-        main_wdg.add(self.get_version_section())
-        main_wdg.add(self.get_file_name_section())
+        # self.set_image_and_address(main_wdg)
+        main_wdg.add(get_image_div())
+        main_wdg.add(get_address_div())
+        main_wdg.add(get_client_name('Netflix'))
+        main_wdg.add(get_approved_rejected_checkboxes('APPROVED'))
 
-        main_wdg.add(self.get_program_format_table())
-        main_wdg.add(self.get_video_measurements_table())
-        main_wdg.add(self.get_element_profile_table())
+        main_wdg.add(get_operator_section())
+        main_wdg.add(get_title_section())
+        main_wdg.add(get_season_section())
+        main_wdg.add(get_episode_section())
+        main_wdg.add(get_version_section())
+        main_wdg.add(get_file_name_section())
+
+        main_wdg.add(get_program_format_table())
+        main_wdg.add(get_video_measurements_table())
+        main_wdg.add(get_element_profile_table())
 
         return main_wdg
