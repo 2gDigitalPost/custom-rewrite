@@ -1,4 +1,5 @@
 from tactic.ui.common import BaseTableElementWdg
+from tactic.ui.input import TextInputWdg
 
 from pyasm.prod.biz import ProdSetting
 from pyasm.web import Table, DivWdg, SpanWdg
@@ -13,8 +14,6 @@ def get_bay_select():
 
     for i in range(1, 13):
         bay_sel.append_option('Bay %s' % i, 'Bay %s' % i)
-    # if my.element.get('bay') not in [None, '']:
-    #     bay_sel.set_value(my.element.get('bay'))
 
     return bay_sel
 
@@ -30,8 +29,6 @@ def get_machine_select():
               'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03', 'FCP04', 'FCP05', 'FCP06',
               'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin', 'Clipster', 'Stradis'):
         machine_sel.append_option(m, m)
-    # if my.element.get('machine_number') not in [None, '']:
-    #     machine_sel.set_value(my.element.get('machine_number'))
 
     return machine_sel
 
@@ -44,14 +41,12 @@ def get_style_select():
 
     for s in ('Technical', 'Spot QC', 'Mastering'):
         style_sel.append_option(s, s)
-    # if my.element.get('style') not in [None, '']:
-    #     style_sel.set_value(my.element.get('style'))
 
     return style_sel
 
 
 def get_text_input_wdg(name, width=200):
-    textbox_wdg = TextWdg(name)
+    textbox_wdg = TextInputWdg()
     textbox_wdg.set_id(name)
     textbox_wdg.add_style('width', '{0}px'.format(width))
 
@@ -86,8 +81,6 @@ def get_format_select_wdg():
     for file_format in ('Electronic/File', 'File - ProRes', 'File - MXF', 'File - MPEG', 'File - WAV', 'DBC', 'D5',
                         'HDCAM SR', 'NTSC', 'PAL'):
         format_sel.append_option(file_format, file_format)
-    # if my.element.get('format') not in [None, '']:
-        # format_sel.set_value(my.element.get('format'))
 
     return format_sel
 
@@ -159,6 +152,62 @@ def get_file_name_input_wdg():
     section_span.add(get_text_input_wdg('file_name', 600))
 
     return section_span
+
+
+def setup_program_format_table_rows(program_format_table, text_input_name_id_pairs):
+
+    for text_input_name_id_pair in text_input_name_id_pairs:
+        program_format_table.add_row()
+
+        text_input_name = str(text_input_name_id_pair[0])
+        text_input_id = str(text_input_name_id_pair[1])
+
+        program_format_table.add_cell(text_input_name)
+        program_format_table.add_cell(get_text_input_wdg(text_input_id, 300))
+        program_format_table.add_cell(get_text_input_wdg(text_input_id + '_f', 30))
+
+
+def setup_video_measurements_table_rows(video_measurements_table, text_input_name_id_pairs):
+
+    for text_input_name_id_pair in text_input_name_id_pairs:
+        video_measurements_table.add_row()
+
+        text_input_name = str(text_input_name_id_pair[0])
+        text_input_id = str(text_input_name_id_pair[1])
+
+        video_measurements_table.add_cell(text_input_name)
+        video_measurements_table.add_cell(get_text_input_wdg(text_input_id, 300))
+
+
+def get_video_aspect_ratio_select_wdg():
+    video_aspect_ratio_sel = SelectWdg('video_aspect_ratio_select')
+    video_aspect_ratio_sel.set_id('video_aspect_ratio')
+    video_aspect_ratio_sel.add_style('width', '300px')
+    video_aspect_ratio_sel.add_style('display', 'inline-block')
+    video_aspect_ratio_sel.add_empty_option()
+
+    for video_aspect_ratio in ('16x9 1.33', '16x9 1.33 Pan & Scan', '16x9 1.78 Anamorphic', '16x9 1.78 Full Frame',
+                               '16x9 1.85 Letterbox', '16x9 1.85 Matted', '16x9 1.85 Matted Anamorphic',
+                               '16x9 2.00 Letterbox', '16x9 2.10 Letterbox', '16x9 2.20 Letterbox',
+                               '16x9 2.35 Anamorphic', '16x9 2.35 Letterbox', '16x9 2.40 Letterbox',
+                               '16x9 2.55 Letterbox', '4x3 1.33 Full Frame', '4x3 1.78 Letterbox', '4x3 1.85 Letterbox',
+                               '4x3 2.35 Letterbox', '4x3 2.40 Letterbox'):
+        video_aspect_ratio_sel.append_option(video_aspect_ratio, video_aspect_ratio)
+
+    return video_aspect_ratio_sel
+
+
+def get_label_select_wdg():
+    label_select_wdg = SelectWdg('video_aspect_ratio_select')
+    label_select_wdg.set_id('video_aspect_ratio')
+    label_select_wdg.add_style('width', '300px')
+    label_select_wdg.add_style('display', 'inline-block')
+    label_select_wdg.add_empty_option()
+
+    for label in ('Good', 'Fair', 'Poor'):
+        label_select_wdg.append_option(label, label)
+
+    return label_select_wdg
 
 
 class ElementEvalWdg(BaseTableElementWdg):
@@ -1023,7 +1072,6 @@ class ElementEvalWdg(BaseTableElementWdg):
 
         return section_div
 
-
     @staticmethod
     def get_file_name_section():
         section_div = DivWdg()
@@ -1031,6 +1079,84 @@ class ElementEvalWdg(BaseTableElementWdg):
         section_div.add(get_file_name_input_wdg())
 
         return section_div
+
+    @staticmethod
+    def get_program_format_table():
+        program_format_table = Table()
+        program_format_table.add_style('float', 'left')
+
+        program_format_table.add_row()
+        program_format_table.add_header('Program Format')
+        program_format_table.add_header()
+        program_format_table.add_header('F')
+
+        text_input_name_id_pairs = [
+            ('Roll-up (blank)', 'roll_up_blank'),
+            ('Bars/Tone', 'bars_tone'),
+            ('Black/Silence', 'black_silence_1'),
+            ('Slate/Silence', 'slate_silence'),
+            ('Black/Silence', 'black_silence_2'),
+            ('Start of Program', 'start_of_program'),
+            ('End of Program', 'end_of_program')
+        ]
+
+        setup_program_format_table_rows(program_format_table, text_input_name_id_pairs)
+
+        return program_format_table
+
+    @staticmethod
+    def get_video_measurements_table():
+        video_measurements_table = Table()
+
+        video_measurements_table.add_row()
+        video_measurements_table.add_header('Video Measurements')
+
+        text_input_name_id_pairs = [
+            ('Active Video Begins', 'active_video_begins'),
+            ('Active Video Ends', 'active_video_ends'),
+            ('Horizontal Blanking', 'horizontal_blanking'),
+            ('Luminance Peak', 'luminance_peak'),
+            ('Chroma Peak', 'chroma_peak'),
+            ('Head Logo', 'head_logo'),
+            ('Tail Logo', 'tail_logo')
+        ]
+
+        setup_video_measurements_table_rows(video_measurements_table, text_input_name_id_pairs)
+
+        return video_measurements_table
+
+    @staticmethod
+    def get_element_profile_table():
+        element_profile_table = Table()
+
+        element_profile_table.add_row()
+        element_profile_table.add_header('Element Profile')
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Total Runtime')
+        element_profile_table.add_cell(get_text_input_wdg('total_runtime', 300))
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('TV/Feature/Trailer')
+        element_profile_table.add_cell(get_text_input_wdg('tv_feature_trailer', 300))
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Video Aspect Ratio')
+        element_profile_table.add_cell(get_video_aspect_ratio_select_wdg())
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Textless @ Tail')
+        element_profile_table.add_cell(get_text_input_wdg('textless_tail', 300))
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Notices')
+        element_profile_table.add_cell(get_text_input_wdg('notices', 300))
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Video Aspect Ratio')
+        element_profile_table.add_cell(get_label_select_wdg())
+
+        return element_profile_table
 
 
     def get_display(self):
@@ -1046,5 +1172,9 @@ class ElementEvalWdg(BaseTableElementWdg):
         main_wdg.add(self.get_episode_section())
         main_wdg.add(self.get_version_section())
         main_wdg.add(self.get_file_name_section())
+
+        main_wdg.add(self.get_program_format_table())
+        main_wdg.add(self.get_video_measurements_table())
+        main_wdg.add(self.get_element_profile_table())
 
         return main_wdg
