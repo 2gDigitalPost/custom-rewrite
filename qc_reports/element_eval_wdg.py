@@ -1,13 +1,13 @@
 from tactic.ui.common import BaseTableElementWdg
 
 from pyasm.prod.biz import ProdSetting
-from pyasm.web import Table, DivWdg
+from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, TextWdg, CheckboxWdg
 
 
 def get_bay_select():
     bay_sel = SelectWdg('bay_select')
-    bay_sel.add_attr('id', 'bay')
+    bay_sel.set_id('bay')
     bay_sel.add_style('width', '135px')
     bay_sel.add_empty_option()
 
@@ -21,15 +21,14 @@ def get_bay_select():
 
 def get_machine_select():
     machine_sel = SelectWdg('machine_select')
-    machine_sel.add_attr('id', 'machine_number')
-    machine_sel.add_style('width: 135px;')
+    machine_sel.set_id('machine_number')
+    machine_sel.add_style('width', '135px')
     machine_sel.add_empty_option()
 
-    for m in ('VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234',
-                       'VTR235', 'VTR251', 'VTR252', 'VTR253', 'VTR254', 'VTR255', 'VTR261', 'VTR262', 'VTR263',
-                       'VTR264', 'VTR265', 'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03',
-                       'FCP04', 'FCP05', 'FCP06', 'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin',
-                       'Clipster', 'Stradis'):
+    for m in ('VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234', 'VTR235',
+              'VTR251', 'VTR252', 'VTR253', 'VTR254', 'VTR255', 'VTR261', 'VTR262', 'VTR263', 'VTR264', 'VTR265',
+              'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03', 'FCP04', 'FCP05', 'FCP06',
+              'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin', 'Clipster', 'Stradis'):
         machine_sel.append_option(m, m)
     # if my.element.get('machine_number') not in [None, '']:
     #     machine_sel.set_value(my.element.get('machine_number'))
@@ -39,7 +38,7 @@ def get_machine_select():
 
 def get_style_select():
     style_sel = SelectWdg('style_select')
-    style_sel.add_attr('id', 'style')
+    style_sel.set_id('style')
     style_sel.add_style('width: 135px;')
     style_sel.add_empty_option()
 
@@ -60,51 +59,112 @@ def get_text_input_wdg(name, width=200):
 
 
 def get_title_input_wdg():
-    section_div = DivWdg()
+    section_span = SpanWdg()
 
-    section_div.add('Title: ')
-    section_div.add(get_text_input_wdg('title', 400))
+    section_span.add('Title: ')
+    section_span.add(get_text_input_wdg('title', 400))
 
-    return section_div
+    return section_span
 
 
 def get_format_section():
-    section_div = DivWdg()
+    section_span = SpanWdg()
 
-    section_div.add('Format: ')
-    section_div.add(get_format_select_wdg())
+    section_span.add('Format: ')
+    section_span.add(get_format_select_wdg())
 
-    return section_div
+    return section_span
 
 
 def get_format_select_wdg():
     format_sel = SelectWdg('format_select')
-    format_sel.add_attr('id', 'format')
-    format_sel.add_style('width: 153px;')
-    format_sel.append_option('--Select--', '')
-    for f in ('Electronic/File', 'File - ProRes', 'File - MXF', 'File - MPEG', 'File - WAV', 'DBC', 'D5', 'HDCAM SR',
-              'NTSC', 'PAL'):
-        format_sel.append_option(f, f)
+    format_sel.set_id('format')
+    format_sel.add_style('width', '153px')
+    format_sel.add_style('display', 'inline-block')
+    format_sel.add_empty_option()
+
+    for file_format in ('Electronic/File', 'File - ProRes', 'File - MXF', 'File - MPEG', 'File - WAV', 'DBC', 'D5',
+                        'HDCAM SR', 'NTSC', 'PAL'):
+        format_sel.append_option(file_format, file_format)
     # if my.element.get('format') not in [None, '']:
         # format_sel.set_value(my.element.get('format'))
 
     return format_sel
 
 
+def get_season_input_wdg():
+    section_span = SpanWdg()
+
+    section_span.add('Season: ')
+    section_span.add(get_text_input_wdg('season', 400))
+
+    return section_span
+
+
+def get_standard_section():
+    standard_select = SelectWdg('standard_select')
+    standard_select.set_id('standard')
+    standard_select.add_style('width', '153px')
+    standard_select.add_style('display', 'inline-block')
+    standard_select.add_empty_option()
+
+    for standard in ('625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC', '-'):
+        standard_select.append_option(standard, standard)
+
+
+def get_episode_input_wdg():
+    section_span = SpanWdg()
+
+    section_span.add('Episode: ')
+    section_span.add(get_text_input_wdg('episode', 400))
+
+    return section_span
+
+
+def get_frame_rate_section():
+    frame_rate_select = SelectWdg('frame_rate_select')
+    frame_rate_select.set_id('frame_rate')
+    frame_rate_select.add_style('width', '153px')
+    frame_rate_select.add_style('display', 'inline-block')
+    frame_rate_select.add_empty_option()
+
+    for frame_rate in ProdSetting.get_seq_by_key('frame_rates'):
+        frame_rate_select.append_option(frame_rate, frame_rate)
+
+    return frame_rate_select
+
+
+def get_version_input_wdg():
+    section_span = SpanWdg()
+
+    section_span.add('Version: ')
+    section_span.add(get_text_input_wdg('version', 400))
+
+    return section_span
+
+
+def get_po_number_section():
+    section_span = SpanWdg()
+
+    section_span.add('PO #: ')
+    section_span.add(get_text_input_wdg('po_number', 100))
+
+    return section_span
+
+
+def get_file_name_input_wdg():
+    section_span = SpanWdg()
+
+    section_span.add('File Name: ')
+    section_span.add(get_text_input_wdg('file_name', 600))
+
+    return section_span
+
 
 class ElementEvalWdg(BaseTableElementWdg):
 
     def init(my):
-        nothing = 'true'
-        my.formats = ['Electronic/File', 'File - ProRes', 'File - MXF', 'File - MPEG', 'File - WAV','DBC', 'D5',
-                      'HDCAM SR', 'NTSC', 'PAL']
         my.frame_rates = ProdSetting.get_seq_by_key('frame_rates')
-        my.machines = ['VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234',
-                       'VTR235', 'VTR251', 'VTR252', 'VTR253', 'VTR254', 'VTR255', 'VTR261', 'VTR262', 'VTR263',
-                       'VTR264', 'VTR265', 'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03',
-                       'FCP04', 'FCP05', 'FCP06', 'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin',
-                       'Clipster', 'Stradis']
-        my.styles = ['Technical', 'Spot QC', 'Mastering']
         my.aspect_ratios = ['16x9 1.33',
                             '16x9 1.33 Pan & Scan',
                             '16x9 1.78 Anamorphic',
@@ -124,7 +184,6 @@ class ElementEvalWdg(BaseTableElementWdg):
                             '4x3 1.85 Letterbox',
                             '4x3 2.35 Letterbox',
                             '4x3 2.40 Letterbox']
-        my.standards = ['625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC', '-']
         my.element = None
         my.element_lines = None
 
@@ -882,7 +941,7 @@ class ElementEvalWdg(BaseTableElementWdg):
         main_wdg.add(address_div)
 
     @staticmethod
-    def get_client_name(main_wdg, client_name):
+    def get_client_name(client_name):
         client_name_div = DivWdg(client_name)
         client_name_div.add_style('font-size', '40px')
         client_name_div.add_style('display', 'inline-block')
@@ -891,7 +950,7 @@ class ElementEvalWdg(BaseTableElementWdg):
         return client_name_div
 
     @staticmethod
-    def get_approved_rejected_checkboxes(main_wdg, conclusion):
+    def get_approved_rejected_checkboxes(conclusion):
         acr_s = ['APPROVED', 'REJECTED']
         acr = Table()
         for mark in acr_s:
@@ -910,23 +969,23 @@ class ElementEvalWdg(BaseTableElementWdg):
 
     @staticmethod
     def get_operator_section():
-        majtbl = Table()
-        majtbl.add_attr('class', 'majtbl')
-        majtbl.add_row()
-        majtbl.add_header('DATE')
-        majtbl.add_header('OPERATOR')
-        majtbl.add_header('STYLE')
-        majtbl.add_header('BAY')
-        majtbl.add_header('MACHINE #')
-        majtbl.add_row()
+        operator_table = Table()
+        operator_table.add_attr('class', 'operator_table')
+        operator_table.add_row()
+        operator_table.add_header('DATE')
+        operator_table.add_header('OPERATOR')
+        operator_table.add_header('STYLE')
+        operator_table.add_header('BAY')
+        operator_table.add_header('MACHINE #')
+        operator_table.add_row()
 
-        majtbl.add_cell(get_text_input_wdg('timestamp'))
-        majtbl.add_cell(get_text_input_wdg('operator'))
-        majtbl.add_cell(get_style_select())
-        majtbl.add_cell(get_bay_select())
-        majtbl.add_cell(get_machine_select())
+        operator_table.add_cell(get_text_input_wdg('timestamp'))
+        operator_table.add_cell(get_text_input_wdg('operator'))
+        operator_table.add_cell(get_style_select())
+        operator_table.add_cell(get_bay_select())
+        operator_table.add_cell(get_machine_select())
 
-        return majtbl
+        return operator_table
 
     @staticmethod
     def get_title_section():
@@ -937,14 +996,55 @@ class ElementEvalWdg(BaseTableElementWdg):
 
         return section_div
 
+    @staticmethod
+    def get_season_section():
+        section_div = DivWdg()
+
+        section_div.add(get_season_input_wdg())
+        section_div.add(get_standard_section())
+
+        return section_div
+
+    @staticmethod
+    def get_episode_section():
+        section_div = DivWdg()
+
+        section_div.add(get_episode_input_wdg())
+        section_div.add(get_frame_rate_section())
+
+        return section_div
+
+    @staticmethod
+    def get_version_section():
+        section_div = DivWdg()
+
+        section_div.add(get_version_input_wdg())
+        section_div.add(get_po_number_section())
+
+        return section_div
+
+
+    @staticmethod
+    def get_file_name_section():
+        section_div = DivWdg()
+
+        section_div.add(get_file_name_input_wdg())
+
+        return section_div
+
+
     def get_display(self):
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
 
         self.set_image_and_address(main_wdg)
-        main_wdg.add(self.get_client_name(main_wdg, 'Netflix'))
-        main_wdg.add(self.get_approved_rejected_checkboxes(main_wdg, 'APPROVED'))
+        main_wdg.add(self.get_client_name('Netflix'))
+        main_wdg.add(self.get_approved_rejected_checkboxes('APPROVED'))
         main_wdg.add(self.get_operator_section())
         main_wdg.add(self.get_title_section())
+        main_wdg.add(self.get_season_section())
+        main_wdg.add(self.get_episode_section())
+        main_wdg.add(self.get_version_section())
+        main_wdg.add(self.get_file_name_section())
 
         return main_wdg
