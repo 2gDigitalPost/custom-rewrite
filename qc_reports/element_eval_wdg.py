@@ -1,5 +1,6 @@
 from tactic.ui.common import BaseTableElementWdg
 from tactic.ui.input import TextInputWdg
+from tactic.ui.widget import CalendarInputWdg
 
 from pyasm.prod.biz import ProdSetting
 from pyasm.web import Table, DivWdg, SpanWdg
@@ -208,6 +209,17 @@ def get_label_select_wdg():
         label_select_wdg.append_option(label, label)
 
     return label_select_wdg
+
+
+def get_record_date_calendar_wdg():
+    record_date_calendar_wdg = CalendarInputWdg("record_date")
+    record_date_calendar_wdg.set_option('show_activator', 'true')
+    record_date_calendar_wdg.set_option('show_time', 'false')
+    record_date_calendar_wdg.set_option('width', '300px')
+    record_date_calendar_wdg.set_option('id', 'record_date')
+    record_date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
+
+    return record_date_calendar_wdg
 
 
 class ElementEvalWdg(BaseTableElementWdg):
@@ -1135,26 +1147,38 @@ class ElementEvalWdg(BaseTableElementWdg):
         element_profile_table.add_row()
         element_profile_table.add_cell('Total Runtime')
         element_profile_table.add_cell(get_text_input_wdg('total_runtime', 300))
+        element_profile_table.add_cell('Language')
+        element_profile_table.add_cell(get_text_input_wdg('language', 300))
 
         element_profile_table.add_row()
         element_profile_table.add_cell('TV/Feature/Trailer')
         element_profile_table.add_cell(get_text_input_wdg('tv_feature_trailer', 300))
+        element_profile_table.add_cell('(CC)/Subtitles')
+        element_profile_table.add_cell(get_text_input_wdg('cc_subtitles', 300))
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Video Aspect Ratio')
         element_profile_table.add_cell(get_video_aspect_ratio_select_wdg())
+        element_profile_table.add_cell('VITC')
+        element_profile_table.add_cell(get_text_input_wdg('vitc', 300))
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Textless @ Tail')
         element_profile_table.add_cell(get_text_input_wdg('textless_tail', 300))
+        element_profile_table.add_cell('Source Barcode')
+        element_profile_table.add_cell(get_text_input_wdg('source_barcode', 300))
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Notices')
         element_profile_table.add_cell(get_text_input_wdg('notices', 300))
+        element_profile_table.add_cell('Element QC Barcode')
+        element_profile_table.add_cell(get_text_input_wdg('element_qc_barcode', 300))
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Video Aspect Ratio')
         element_profile_table.add_cell(get_label_select_wdg())
+        element_profile_table.add_cell('Record Date')
+        element_profile_table.add_cell(get_record_date_calendar_wdg())
 
         return element_profile_table
 
