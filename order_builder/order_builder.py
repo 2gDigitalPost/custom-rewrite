@@ -166,12 +166,16 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             # upload_button = CheckinButtonElementWdg()
 
+            element_evaluation_button = ButtonNewWdg(title='Element Evaluation', icon='REPORT')
+            element_evaluation_button.add_behavior(self.get_element_evaluation_button_behavior(title_order.get('title_code')))
+
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(self.get_add_notes_behavior(title_order.get_search_key()))
 
             title_order_li.add(title_order_name_div)
             title_order_li.add(title_order_description_div)
             title_order_li.add(external_rejection_button)
+            title_order_li.add(element_evaluation_button)
             # title_order_li.add(upload_button)
             title_order_li.add(note_button)
 
@@ -247,6 +251,23 @@ catch(err) {
         return behavior
 
     @staticmethod
+    def get_element_evaluation_button_behavior(title_code):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    spt.api.load_popup('Element Evaluation', 'qc_reports.ElementEvalWdg', {'title_code': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+        }''' % title_code
+        }
+
+        return behavior
+
+    @staticmethod
     def get_add_notes_behavior(search_key):
         behavior = {
             'css_class': 'clickme',
@@ -275,7 +296,6 @@ catch(err) {
 
         order_div = DivWdg()
 
-        # outer_div.add(self.setup_order_information())
         order_div.add(self.setup_order_information())
         outer_div.add(order_div)
 

@@ -2,7 +2,6 @@ from tactic.ui.common import BaseTableElementWdg
 from tactic.ui.input import TextInputWdg, TextAreaInputWdg
 from tactic.ui.widget import CalendarInputWdg
 
-from pyasm.prod.biz import ProdSetting
 from pyasm.search import Search
 from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, CheckboxWdg
@@ -47,22 +46,15 @@ def get_style_select():
     return style_sel
 
 
-def get_text_input_wdg(name, width=200):
+def get_text_input_wdg(name, width=200, text=None):
     textbox_wdg = TextInputWdg()
     textbox_wdg.set_id(name)
     textbox_wdg.add_style('width', '{0}px'.format(width))
 
+    if text:
+        textbox_wdg.set_value(text)
+
     return textbox_wdg
-
-
-def get_title_input_wdg():
-    section_span = SpanWdg()
-    section_span.add_style('display', 'inline-block')
-
-    section_span.add('Title: ')
-    section_span.add(get_text_input_wdg('title', 400))
-
-    return section_span
 
 
 def get_format_section():
@@ -348,15 +340,6 @@ def get_operator_section():
     return operator_table
 
 
-def get_title_section():
-    section_div = DivWdg()
-
-    section_div.add(get_title_input_wdg())
-    section_div.add(get_format_section())
-
-    return section_div
-
-
 def get_season_section():
     section_div = DivWdg()
 
@@ -514,7 +497,27 @@ def get_general_comments_section():
     return general_comments_div
 
 
+def get_audio_configuration_add_behavior():
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+
+        '''
+                }
+
+    return behavior
+
+
+
 class ElementEvalWdg(BaseTableElementWdg):
+
+    def init(self):
+        self.title_code = self.get_kwargs().get('title_code')
+
+        title_sobject_search = Search('twog/title')
+        title_sobject_search.add_code_filter(self.title_code)
+        self.title_sobject = title_sobject_search.get_sobject()
 
     @staticmethod
     def get_save_bvr(wo_code, ell_code):
@@ -1182,6 +1185,29 @@ class ElementEvalWdg(BaseTableElementWdg):
          ''' % (wo_code, ell_code)}
         return behavior
 
+    def get_title_section(self):
+        section_div = DivWdg()
+
+        section_div.add(self.get_title_input_wdg())
+        section_div.add(get_format_section())
+
+        return section_div
+
+    def get_title_input_wdg(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        section_span.add('Title: ')
+
+        if self.title_sobject:
+            prefilled_text = self.title_sobject.get('name')
+        else:
+            prefilled_text = None
+
+        section_span.add(get_text_input_wdg('title', 400, prefilled_text))
+
+        return section_span
+
     def get_display(self):
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
@@ -1193,7 +1219,7 @@ class ElementEvalWdg(BaseTableElementWdg):
         main_wdg.add(get_approved_rejected_checkboxes('APPROVED'))
 
         main_wdg.add(get_operator_section())
-        main_wdg.add(get_title_section())
+        main_wdg.add(self.get_title_section())
         main_wdg.add(get_season_section())
         main_wdg.add(get_episode_section())
         main_wdg.add(get_version_section())
