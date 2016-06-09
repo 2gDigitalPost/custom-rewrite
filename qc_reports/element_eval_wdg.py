@@ -1,8 +1,9 @@
 from tactic.ui.common import BaseTableElementWdg
-from tactic.ui.input import TextInputWdg
+from tactic.ui.input import TextInputWdg, TextAreaInputWdg
 from tactic.ui.widget import CalendarInputWdg
 
 from pyasm.prod.biz import ProdSetting
+from pyasm.search import Search
 from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, CheckboxWdg
 
@@ -56,6 +57,7 @@ def get_text_input_wdg(name, width=200):
 
 def get_title_input_wdg():
     section_span = SpanWdg()
+    section_span.add_style('display', 'inline-block')
 
     section_span.add('Title: ')
     section_span.add(get_text_input_wdg('title', 400))
@@ -88,6 +90,7 @@ def get_format_select_wdg():
 
 def get_season_input_wdg():
     section_span = SpanWdg()
+    section_span.add_style('display', 'inline-block')
 
     section_span.add('Season: ')
     section_span.add(get_text_input_wdg('season', 400))
@@ -96,6 +99,10 @@ def get_season_input_wdg():
 
 
 def get_standard_section():
+    section_span = SpanWdg()
+
+    section_span.add('Standard: ')
+
     standard_select = SelectWdg('standard_select')
     standard_select.set_id('standard')
     standard_select.add_style('width', '153px')
@@ -105,9 +112,14 @@ def get_standard_section():
     for standard in ('625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC', '-'):
         standard_select.append_option(standard, standard)
 
+    section_span.add(standard_select)
+
+    return section_span
+
 
 def get_episode_input_wdg():
     section_span = SpanWdg()
+    section_span.add_style('display', 'inline-block')
 
     section_span.add('Episode: ')
     section_span.add(get_text_input_wdg('episode', 400))
@@ -116,20 +128,31 @@ def get_episode_input_wdg():
 
 
 def get_frame_rate_section():
+    section_span = SpanWdg()
+
+    section_span.add('Frame Rate: ')
+
     frame_rate_select = SelectWdg('frame_rate_select')
     frame_rate_select.set_id('frame_rate')
     frame_rate_select.add_style('width', '153px')
     frame_rate_select.add_style('display', 'inline-block')
     frame_rate_select.add_empty_option()
 
-    for frame_rate in ProdSetting.get_seq_by_key('frame_rates'):
+    frame_rate_search = Search('twog/frame_rate')
+    frame_rates = frame_rate_search.get_sobjects()
+    frame_rates = [frame_rate.get_value('name') for frame_rate in frame_rates]
+
+    for frame_rate in frame_rates:
         frame_rate_select.append_option(frame_rate, frame_rate)
 
-    return frame_rate_select
+    section_span.add(frame_rate_select)
+
+    return section_span
 
 
 def get_version_input_wdg():
     section_span = SpanWdg()
+    section_span.add_style('display', 'inline-block')
 
     section_span.add('Version: ')
     section_span.add(get_text_input_wdg('version', 400))
@@ -139,6 +162,7 @@ def get_version_input_wdg():
 
 def get_po_number_section():
     section_span = SpanWdg()
+    section_span.add_style('display', 'inline-block')
 
     section_span.add('PO #: ')
     section_span.add(get_text_input_wdg('po_number', 100))
@@ -456,6 +480,38 @@ def get_element_profile_table():
     element_profile_table.add_cell(get_record_date_calendar_wdg())
 
     return element_profile_table
+
+
+def get_audio_configuration_table():
+    audio_configuration_table = Table()
+
+    audio_configuration_table.add_row()
+    audio_configuration_table.add_header('Audio Configuration')
+
+    audio_configuration_table.add_row()
+    audio_configuration_table.add_header('Channel')
+    audio_configuration_table.add_header('Content')
+    audio_configuration_table.add_header('Tone')
+    audio_configuration_table.add_header('Peak')
+
+    for iterator in range(8):
+        audio_configuration_table.add_row()
+        audio_configuration_table.add_cell(get_text_input_wdg('channel-{0}'.format(iterator), 150))
+        audio_configuration_table.add_cell(get_text_input_wdg('content-{0}'.format(iterator), 150))
+        audio_configuration_table.add_cell(get_text_input_wdg('tone-{0}'.format(iterator), 150))
+        audio_configuration_table.add_cell(get_text_input_wdg('peak-{0}'.format(iterator), 150))
+
+    return audio_configuration_table
+
+
+def get_general_comments_section():
+    general_comments_div = DivWdg()
+    general_comments_wdg = TextAreaInputWdg()
+
+    general_comments_div.add('General Comments')
+    general_comments_div.add(general_comments_wdg)
+
+    return general_comments_div
 
 
 class ElementEvalWdg(BaseTableElementWdg):
@@ -1146,5 +1202,7 @@ class ElementEvalWdg(BaseTableElementWdg):
         main_wdg.add(get_program_format_table())
         main_wdg.add(get_video_measurements_table())
         main_wdg.add(get_element_profile_table())
+        main_wdg.add(get_audio_configuration_table())
+        main_wdg.add(get_general_comments_section())
 
         return main_wdg
