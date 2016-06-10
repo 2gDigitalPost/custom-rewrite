@@ -181,7 +181,6 @@ def setup_program_format_table_rows(program_format_table, text_input_name_id_pai
 
         program_format_table.add_cell(text_input_name)
         program_format_table.add_cell(get_text_input_wdg(text_input_id, 300))
-        program_format_table.add_cell(get_text_input_wdg(text_input_id + '_f', 30))
 
 
 def setup_video_measurements_table_rows(video_measurements_table, text_input_name_id_pairs):
@@ -264,7 +263,7 @@ def set_image_and_address(main_wdg):
 
 
 def get_image_div():
-    image_cell = '<img src="/opt/spt/custom/qc_reports/2GLogo_small4.png"/>'
+    image_cell = '<img src="/reports/2GLogo_small4.png"/>'
     image_div = DivWdg()
     image_div.add(image_cell)
     image_div.add_style('float', 'left')
@@ -382,7 +381,6 @@ def get_program_format_table():
     program_format_table.add_row()
     program_format_table.add_header('Program Format')
     program_format_table.add_header()
-    program_format_table.add_header('F')
 
     text_input_name_id_pairs = [
         ('Roll-up (blank)', 'roll_up_blank'),
@@ -518,6 +516,18 @@ class ElementEvalWdg(BaseTableElementWdg):
         title_sobject_search = Search('twog/title')
         title_sobject_search.add_code_filter(self.title_code)
         self.title_sobject = title_sobject_search.get_sobject()
+
+    @staticmethod
+    def reload():
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+
+            '''
+        }
+
+        return behavior
 
     @staticmethod
     def get_save_bvr(wo_code, ell_code):
