@@ -1,12 +1,21 @@
 from tactic.ui.common import BaseTableElementWdg
 from tactic.ui.input import TextInputWdg, TextAreaInputWdg
-from tactic.ui.widget import CalendarInputWdg
+from tactic.ui.widget import CalendarInputWdg, ButtonNewWdg
 
 from pyasm.search import Search
 from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, CheckboxWdg
 
 
+def get_date_calendar_wdg():
+    record_date_calendar_wdg = CalendarInputWdg("date")
+    record_date_calendar_wdg.set_option('show_activator', 'true')
+    record_date_calendar_wdg.set_option('show_time', 'false')
+    record_date_calendar_wdg.set_option('width', '300px')
+    record_date_calendar_wdg.set_option('id', 'date')
+    record_date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
+
+    return record_date_calendar_wdg
 def get_bay_select():
     bay_sel = SelectWdg('bay_select')
     bay_sel.set_id('bay')
@@ -49,6 +58,7 @@ def get_style_select():
 def get_text_input_wdg(name, width=200, text=None):
     textbox_wdg = TextInputWdg()
     textbox_wdg.set_id(name)
+    textbox_wdg.set_name(name)
     textbox_wdg.add_style('width', '{0}px'.format(width))
 
     if text:
@@ -214,8 +224,8 @@ def get_video_aspect_ratio_select_wdg():
 
 
 def get_label_select_wdg():
-    label_select_wdg = SelectWdg('video_aspect_ratio_select')
-    label_select_wdg.set_id('video_aspect_ratio')
+    label_select_wdg = SelectWdg('label')
+    label_select_wdg.set_id('label')
     label_select_wdg.add_style('width', '300px')
     label_select_wdg.add_style('display', 'inline-block')
     label_select_wdg.add_empty_option()
@@ -235,31 +245,6 @@ def get_record_date_calendar_wdg():
     record_date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
 
     return record_date_calendar_wdg
-
-
-def set_image_and_address(main_wdg):
-    image_cell = '<img src="/opt/spt/custom/qc_reports/2GLogo_small4.png"/>'
-    image_div = DivWdg()
-    image_div.add(image_cell)
-    image_div.add_style('float', 'left')
-    image_div.add_style('margin', '5px')
-
-    address_div = DivWdg()
-
-    address_name_div = DivWdg('2G Digital Post, Inc.')
-    address_name_div.add_style('font-weight', 'bold')
-
-    address_street_div = DivWdg('280 E. Magnolia Blvd.')
-    address_city_div = DivWdg('Burbank, CA 91502')
-    address_phone_div = DivWdg('310-840-0600')
-    address_url_div = DivWdg('www.2gdigitalpost.com')
-
-    [address_div.add(div) for div in [address_name_div, address_street_div, address_city_div, address_phone_div,
-                                      address_url_div]]
-    address_div.add_style('display', 'inline-block')
-
-    main_wdg.add(image_div)
-    main_wdg.add(address_div)
 
 
 def get_image_div():
@@ -330,7 +315,7 @@ def get_operator_section():
     operator_table.add_header('MACHINE #')
     operator_table.add_row()
 
-    operator_table.add_cell(get_text_input_wdg('timestamp'))
+    operator_table.add_cell(get_date_calendar_wdg())
     operator_table.add_cell(get_text_input_wdg('operator'))
     operator_table.add_cell(get_style_select())
     operator_table.add_cell(get_bay_select())
@@ -455,7 +440,7 @@ def get_element_profile_table():
     element_profile_table.add_cell(get_text_input_wdg('element_qc_barcode', 300))
 
     element_profile_table.add_row()
-    element_profile_table.add_cell('Video Aspect Ratio')
+    element_profile_table.add_cell('Label')
     element_profile_table.add_cell(get_label_select_wdg())
     element_profile_table.add_cell('Record Date')
     element_profile_table.add_cell(get_record_date_calendar_wdg())
@@ -518,12 +503,112 @@ class ElementEvalWdg(BaseTableElementWdg):
         self.title_sobject = title_sobject_search.get_sobject()
 
     @staticmethod
-    def reload():
+    def get_reload_behavior():
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
+try {
 
+    // First row values
+    var date = document.getElementsByName("date")[0].value;
+    var operator = document.getElementsByName("operator")[0].value;
+    var style = document.getElementById("style").value;
+    var bay = document.getElementById("bay").value;
+    var machine_number = document.getElementById("machine_number").value;
+
+    // Title section values
+    var title = document.getElementsByName("title")[0].value;
+    var format = document.getElementById("format").value;
+    var season = document.getElementsByName("season")[0].value;
+    var standard = document.getElementById("standard").value;
+    var episode = document.getElementsByName("episode")[0].value;
+    var frame_rate = document.getElementById("frame_rate").value;
+    var version = document.getElementsByName("version")[0].value;
+    var po_number = document.getElementsByName("po_number")[0].value;
+    var file_name = document.getElementsByName("file_name")[0].value;
+
+    // Program Format values
+    var roll_up_blank = document.getElementsByName("roll_up_blank")[0].value;
+    var bars_tone = document.getElementsByName("bars_tone")[0].value;
+    var black_silence_1 = document.getElementsByName("black_silence_1")[0].value;
+    var slate_silence = document.getElementsByName("slate_silence")[0].value;
+    var black_silence_2 = document.getElementsByName("black_silence_2")[0].value;
+    var start_of_program = document.getElementsByName("start_of_program")[0].value;
+    var end_of_program = document.getElementsByName("end_of_program")[0].value;
+
+    // Video Measurements values
+    var active_video_begins = document.getElementsByName("active_video_begins")[0].value;
+    var active_video_ends = document.getElementsByName("active_video_ends")[0].value;
+    var horizontal_blanking = document.getElementsByName("horizontal_blanking")[0].value;
+    var luminance_peak = document.getElementsByName("luminance_peak")[0].value;
+    var chroma_peak = document.getElementsByName("chroma_peak")[0].value;
+    var head_logo = document.getElementsByName("head_logo")[0].value;
+    var tail_logo = document.getElementsByName("tail_logo")[0].value;
+
+    // Element Profile values
+    var total_runtime = document.getElementsByName("total_runtime")[0].value;
+    var language = document.getElementsByName("language")[0].value;
+    var tv_feature_trailer = document.getElementsByName("tv_feature_trailer")[0].value;
+    var cc_subtitles = document.getElementsByName("cc_subtitles")[0].value;
+    var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
+    var vitc = document.getElementsByName("vitc")[0].value;
+    var textless_tail = document.getElementsByName("textless_tail")[0].value;
+    var source_barcode = document.getElementsByName("source_barcode")[0].value;
+    var notices = document.getElementsByName("notices")[0].value;
+    var element_qc_barcode = document.getElementsByName("element_qc_barcode")[0].value;
+    var label = document.getElementById("label").value;
+    var record_date = document.getElementsByName("record_date")[0].value;
+
+    var qc_report_object = {
+        'date': date,
+        'operator': operator,
+        'style': style,
+        'bay': bay,
+        'machine_number': machine_number,
+        'title': title,
+        'format': format,
+        'season': season,
+        'standard': standard,
+        'episode': episode,
+        'frame_rate': frame_rate,
+        'version': version,
+        'po_number': po_number,
+        'file_name': file_name,
+        'roll_up_blank': roll_up_blank,
+        'bars_tone': bars_tone,
+        'black_silence_1': black_silence_1,
+        'slate_silence': slate_silence,
+        'black_silence_2': black_silence_2,
+        'start_of_program': start_of_program,
+        'end_of_program': end_of_program,
+        'active_video_begins': active_video_begins,
+        'active_video_ends': active_video_ends,
+        'horizontal_blanking': horizontal_blanking,
+        'luminance_peak': luminance_peak,
+        'chroma_peak': chroma_peak,
+        'head_logo': head_logo,
+        'tail_logo': tail_logo,
+        'total_runtime': total_runtime,
+        'language': language,
+        'tv_feature_trailer': tv_feature_trailer,
+        'cc_subtitles': cc_subtitles,
+        'video_aspect_ratio': video_aspect_ratio,
+        'vitc': vitc,
+        'textless_tail': textless_tail,
+        'source_barcode': source_barcode,
+        'notices': notices,
+        'element_qc_barcode': element_qc_barcode,
+        'label': label,
+        'record_date': record_date
+    };
+
+    console.log(qc_report_object);
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
             '''
         }
 
@@ -1221,6 +1306,11 @@ class ElementEvalWdg(BaseTableElementWdg):
     def get_display(self):
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
+
+        save_button = ButtonNewWdg(title='Save', icon='SAVE')
+        save_button.add_behavior(self.get_reload_behavior())
+
+        main_wdg.add(save_button)
 
         # self.set_image_and_address(main_wdg)
         main_wdg.add(get_image_div())
