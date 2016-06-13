@@ -7,54 +7,6 @@ from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, CheckboxWdg
 
 
-def get_date_calendar_wdg():
-    record_date_calendar_wdg = CalendarInputWdg("date")
-    record_date_calendar_wdg.set_option('show_activator', 'true')
-    record_date_calendar_wdg.set_option('show_time', 'false')
-    record_date_calendar_wdg.set_option('width', '300px')
-    record_date_calendar_wdg.set_option('id', 'date')
-    record_date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
-
-    return record_date_calendar_wdg
-def get_bay_select():
-    bay_sel = SelectWdg('bay_select')
-    bay_sel.set_id('bay')
-    bay_sel.add_style('width', '135px')
-    bay_sel.add_empty_option()
-
-    for i in range(1, 13):
-        bay_sel.append_option('Bay %s' % i, 'Bay %s' % i)
-
-    return bay_sel
-
-
-def get_machine_select():
-    machine_sel = SelectWdg('machine_select')
-    machine_sel.set_id('machine_number')
-    machine_sel.add_style('width', '135px')
-    machine_sel.add_empty_option()
-
-    for machine in ('VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234', 'VTR235',
-              'VTR251', 'VTR252', 'VTR253', 'VTR254', 'VTR255', 'VTR261', 'VTR262', 'VTR263', 'VTR264', 'VTR265',
-              'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03', 'FCP04', 'FCP05', 'FCP06',
-              'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin', 'Clipster', 'Stradis'):
-        machine_sel.append_option(machine, machine)
-
-    return machine_sel
-
-
-def get_style_select():
-    style_sel = SelectWdg('style_select')
-    style_sel.set_id('style')
-    style_sel.add_style('width: 135px;')
-    style_sel.add_empty_option()
-
-    for style in ('Technical', 'Spot QC', 'Mastering'):
-        style_sel.append_option(style, style)
-
-    return style_sel
-
-
 def get_text_input_wdg(name, width=200, text=None):
     textbox_wdg = TextInputWdg()
     textbox_wdg.set_id(name)
@@ -65,144 +17,6 @@ def get_text_input_wdg(name, width=200, text=None):
         textbox_wdg.set_value(text)
 
     return textbox_wdg
-
-
-def get_format_section():
-    section_span = SpanWdg()
-
-    section_span.add('Format: ')
-    section_span.add(get_format_select_wdg())
-
-    return section_span
-
-
-def get_format_select_wdg():
-    format_sel = SelectWdg('format_select')
-    format_sel.set_id('format')
-    format_sel.add_style('width', '153px')
-    format_sel.add_style('display', 'inline-block')
-    format_sel.add_empty_option()
-
-    for file_format in ('Electronic/File', 'File - ProRes', 'File - MXF', 'File - MPEG', 'File - WAV', 'DBC', 'D5',
-                        'HDCAM SR', 'NTSC', 'PAL'):
-        format_sel.append_option(file_format, file_format)
-
-    return format_sel
-
-
-def get_season_input_wdg():
-    section_span = SpanWdg()
-    section_span.add_style('display', 'inline-block')
-
-    section_span.add('Season: ')
-    section_span.add(get_text_input_wdg('season', 400))
-
-    return section_span
-
-
-def get_standard_section():
-    section_span = SpanWdg()
-
-    section_span.add('Standard: ')
-
-    standard_select = SelectWdg('standard_select')
-    standard_select.set_id('standard')
-    standard_select.add_style('width', '153px')
-    standard_select.add_style('display', 'inline-block')
-    standard_select.add_empty_option()
-
-    for standard in ('625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC', '-'):
-        standard_select.append_option(standard, standard)
-
-    section_span.add(standard_select)
-
-    return section_span
-
-
-def get_episode_input_wdg():
-    section_span = SpanWdg()
-    section_span.add_style('display', 'inline-block')
-
-    section_span.add('Episode: ')
-    section_span.add(get_text_input_wdg('episode', 400))
-
-    return section_span
-
-
-def get_frame_rate_section():
-    section_span = SpanWdg()
-
-    section_span.add('Frame Rate: ')
-
-    frame_rate_select = SelectWdg('frame_rate_select')
-    frame_rate_select.set_id('frame_rate')
-    frame_rate_select.add_style('width', '153px')
-    frame_rate_select.add_style('display', 'inline-block')
-    frame_rate_select.add_empty_option()
-
-    frame_rate_search = Search('twog/frame_rate')
-    frame_rates = frame_rate_search.get_sobjects()
-    frame_rates = [frame_rate.get_value('name') for frame_rate in frame_rates]
-
-    for frame_rate in frame_rates:
-        frame_rate_select.append_option(frame_rate, frame_rate)
-
-    section_span.add(frame_rate_select)
-
-    return section_span
-
-
-def get_version_input_wdg():
-    section_span = SpanWdg()
-    section_span.add_style('display', 'inline-block')
-
-    section_span.add('Version: ')
-    section_span.add(get_text_input_wdg('version', 400))
-
-    return section_span
-
-
-def get_po_number_section():
-    section_span = SpanWdg()
-    section_span.add_style('display', 'inline-block')
-
-    section_span.add('PO #: ')
-    section_span.add(get_text_input_wdg('po_number', 100))
-
-    return section_span
-
-
-def get_file_name_input_wdg():
-    section_span = SpanWdg()
-
-    section_span.add('File Name: ')
-    section_span.add(get_text_input_wdg('file_name', 600))
-
-    return section_span
-
-
-def setup_program_format_table_rows(program_format_table, text_input_name_id_pairs):
-
-    for text_input_name_id_pair in text_input_name_id_pairs:
-        program_format_table.add_row()
-
-        text_input_name = str(text_input_name_id_pair[0])
-        text_input_id = str(text_input_name_id_pair[1])
-
-        program_format_table.add_cell(text_input_name)
-        program_format_table.add_cell(get_text_input_wdg(text_input_id, 300))
-
-
-def setup_video_measurements_table_rows(video_measurements_table, text_input_name_id_pairs):
-
-    for text_input_name_id_pair in text_input_name_id_pairs:
-        video_measurements_table.add_row()
-
-        text_input_name = str(text_input_name_id_pair[0])
-        text_input_id = str(text_input_name_id_pair[1])
-
-        video_measurements_table.add_cell(text_input_name)
-        video_measurements_table.add_cell(get_text_input_wdg(text_input_id, 300))
 
 
 def get_video_aspect_ratio_select_wdg():
@@ -304,150 +118,6 @@ def get_approved_rejected_checkboxes(conclusion):
     return acr
 
 
-def get_operator_section():
-    operator_table = Table()
-    operator_table.add_attr('class', 'operator_table')
-    operator_table.add_row()
-    operator_table.add_header('DATE')
-    operator_table.add_header('OPERATOR')
-    operator_table.add_header('STYLE')
-    operator_table.add_header('BAY')
-    operator_table.add_header('MACHINE #')
-    operator_table.add_row()
-
-    operator_table.add_cell(get_date_calendar_wdg())
-    operator_table.add_cell(get_text_input_wdg('operator'))
-    operator_table.add_cell(get_style_select())
-    operator_table.add_cell(get_bay_select())
-    operator_table.add_cell(get_machine_select())
-
-    return operator_table
-
-
-def get_season_section():
-    section_div = DivWdg()
-
-    section_div.add(get_season_input_wdg())
-    section_div.add(get_standard_section())
-
-    return section_div
-
-
-def get_episode_section():
-    section_div = DivWdg()
-
-    section_div.add(get_episode_input_wdg())
-    section_div.add(get_frame_rate_section())
-
-    return section_div
-
-
-def get_version_section():
-    section_div = DivWdg()
-
-    section_div.add(get_version_input_wdg())
-    section_div.add(get_po_number_section())
-
-    return section_div
-
-
-def get_file_name_section():
-    section_div = DivWdg()
-
-    section_div.add(get_file_name_input_wdg())
-
-    return section_div
-
-
-def get_program_format_table():
-    program_format_table = Table()
-    program_format_table.add_style('float', 'left')
-
-    program_format_table.add_row()
-    program_format_table.add_header('Program Format')
-    program_format_table.add_header()
-
-    text_input_name_id_pairs = [
-        ('Roll-up (blank)', 'roll_up_blank'),
-        ('Bars/Tone', 'bars_tone'),
-        ('Black/Silence', 'black_silence_1'),
-        ('Slate/Silence', 'slate_silence'),
-        ('Black/Silence', 'black_silence_2'),
-        ('Start of Program', 'start_of_program'),
-        ('End of Program', 'end_of_program')
-    ]
-
-    setup_program_format_table_rows(program_format_table, text_input_name_id_pairs)
-
-    return program_format_table
-
-
-def get_video_measurements_table():
-    video_measurements_table = Table()
-
-    video_measurements_table.add_row()
-    video_measurements_table.add_header('Video Measurements')
-
-    text_input_name_id_pairs = [
-        ('Active Video Begins', 'active_video_begins'),
-        ('Active Video Ends', 'active_video_ends'),
-        ('Horizontal Blanking', 'horizontal_blanking'),
-        ('Luminance Peak', 'luminance_peak'),
-        ('Chroma Peak', 'chroma_peak'),
-        ('Head Logo', 'head_logo'),
-        ('Tail Logo', 'tail_logo')
-    ]
-
-    setup_video_measurements_table_rows(video_measurements_table, text_input_name_id_pairs)
-
-    return video_measurements_table
-
-
-def get_element_profile_table():
-    element_profile_table = Table()
-
-    element_profile_table.add_row()
-    element_profile_table.add_header('Element Profile')
-
-    element_profile_table.add_row()
-    element_profile_table.add_cell('Total Runtime')
-    element_profile_table.add_cell(get_text_input_wdg('total_runtime', 300))
-    element_profile_table.add_cell('Language')
-    element_profile_table.add_cell(get_text_input_wdg('language', 300))
-
-    element_profile_table.add_row()
-    element_profile_table.add_cell('TV/Feature/Trailer')
-    element_profile_table.add_cell(get_text_input_wdg('tv_feature_trailer', 300))
-    element_profile_table.add_cell('(CC)/Subtitles')
-    element_profile_table.add_cell(get_text_input_wdg('cc_subtitles', 300))
-
-    element_profile_table.add_row()
-    element_profile_table.add_cell('Video Aspect Ratio')
-    element_profile_table.add_cell(get_video_aspect_ratio_select_wdg())
-    element_profile_table.add_cell('VITC')
-    element_profile_table.add_cell(get_text_input_wdg('vitc', 300))
-
-    element_profile_table.add_row()
-    element_profile_table.add_cell('Textless @ Tail')
-    element_profile_table.add_cell(get_text_input_wdg('textless_tail', 300))
-    element_profile_table.add_cell('Source Barcode')
-    element_profile_table.add_cell(get_text_input_wdg('source_barcode', 300))
-
-    element_profile_table.add_row()
-    element_profile_table.add_cell('Notices')
-    element_profile_table.add_cell(get_text_input_wdg('notices', 300))
-    element_profile_table.add_cell('Element QC Barcode')
-    element_profile_table.add_cell(get_text_input_wdg('element_qc_barcode', 300))
-
-    element_profile_table.add_row()
-    element_profile_table.add_cell('Label')
-    element_profile_table.add_cell(get_label_select_wdg())
-    element_profile_table.add_cell('Record Date')
-    element_profile_table.add_cell(get_record_date_calendar_wdg())
-
-    return element_profile_table
-
-
 def get_audio_configuration_table():
     audio_configuration_table = Table()
 
@@ -496,11 +166,56 @@ def get_audio_configuration_add_behavior():
 class ElementEvalWdg(BaseTableElementWdg):
 
     def init(self):
-        self.title_code = self.get_kwargs().get('title_code')
+        report_data = self.get_kwargs().get('report_data')
 
-        title_sobject_search = Search('twog/title')
-        title_sobject_search.add_code_filter(self.title_code)
-        self.title_sobject = title_sobject_search.get_sobject()
+        if report_data:
+            self.date = report_data.get('date')
+            self.operator = report_data.get('operator')
+            self.style_sel = report_data.get('style') # self.style is already used in the super class
+            self.bay = report_data.get('bay')
+            self.machine_number = report_data.get('machine_number')
+            self.title_data = report_data.get('title') # self.title is already used in the super class
+            self.format_data = report_data.get('format') # 'format' is a reserved word in Python
+            self.season = report_data.get('season')
+            self.standard = report_data.get('standard')
+            self.episode = report_data.get('episode')
+            self.frame_rate = report_data.get('frame_rate')
+            self.version = report_data.get('version')
+            self.po_number = report_data.get('po_number')
+            self.file_name = report_data.get('file_name')
+            self.roll_up_blank = report_data.get('roll_up_blank')
+            self.bars_tone = report_data.get('bars_tone')
+            self.black_silence_1 = report_data.get('black_silence_1')
+            self.slate_silence = report_data.get('slate_silence')
+            self.black_silence_2 = report_data.get('black_silence_2')
+            self.start_of_program = report_data.get('start_of_program')
+            self.end_of_program = report_data.get('end_of_program')
+            self.active_video_begins = report_data.get('active_video_begins')
+            self.active_video_ends = report_data.get('active_video_ends')
+            self.horizontal_blanking = report_data.get('horizontal_blanking')
+            self.luminance_peak = report_data.get('luminance_peak')
+            self.chroma_peak = report_data.get('chroma_peak')
+            self.head_logo = report_data.get('head_logo')
+            self.tail_logo = report_data.get('tail_logo')
+            self.total_runtime = report_data.get('total_runtime')
+            self.language = report_data.get('language')
+            self.tv_feature_trailer = report_data.get('tv_feature_trailer')
+            self.cc_subtitles = report_data.get('cc_subtitles')
+            self.video_aspect_ratio = report_data.get('video_aspect_ratio')
+            self.vitc = report_data.get('vitc')
+            self.textless_tail = report_data.get('textless_tail')
+            self.source_barcode = report_data.get('source_barcode')
+            self.notices = report_data.get('notices')
+            self.element_qc_barcode = report_data.get('element_qc_barcode')
+            self.label = report_data.get('label')
+            self.record_date = report_data.get('record_date')
+
+        else:
+            self.title_code = self.get_kwargs().get('title_code')
+
+            title_sobject_search = Search('twog/title')
+            title_sobject_search.add_code_filter(self.title_code)
+            self.title_sobject = title_sobject_search.get_sobject()
 
     @staticmethod
     def get_reload_behavior():
@@ -604,6 +319,8 @@ try {
     };
 
     console.log(qc_report_object);
+
+    spt.api.load_popup('Element Evaluation', 'qc_reports.ElementEvalWdg', {'report_data': qc_report_object});
 }
 catch(err) {
     spt.app_busy.hide();
@@ -1280,11 +997,103 @@ catch(err) {
          ''' % (wo_code, ell_code)}
         return behavior
 
+    def get_operator_section(self):
+        operator_table = Table()
+        operator_table.add_attr('class', 'operator_table')
+        operator_table.add_row()
+        operator_table.add_header('DATE')
+        operator_table.add_header('OPERATOR')
+        operator_table.add_header('STYLE')
+        operator_table.add_header('BAY')
+        operator_table.add_header('MACHINE #')
+        operator_table.add_row()
+
+        operator_table.add_cell(self.get_date_calendar_wdg())
+
+        try:
+            operator_table.add_cell(get_text_input_wdg('operator', text=self.operator))
+        except AttributeError:
+            operator_table.add_cell(get_text_input_wdg('operator'))
+
+        operator_table.add_cell(self.get_style_select())
+        operator_table.add_cell(self.get_bay_select())
+        operator_table.add_cell(self.get_machine_select())
+
+        return operator_table
+
+    def get_date_calendar_wdg(self):
+        date_calendar_wdg = CalendarInputWdg("date")
+        date_calendar_wdg.set_option('show_activator', 'true')
+        date_calendar_wdg.set_option('show_time', 'false')
+        date_calendar_wdg.set_option('width', '300px')
+        date_calendar_wdg.set_option('id', 'date')
+        date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
+
+        try:
+            date = self.date
+            date_calendar_wdg.set_value(date)
+        except AttributeError:
+            pass
+
+        return date_calendar_wdg
+
+    def get_style_select(self):
+        style_sel = SelectWdg('style_select')
+        style_sel.set_id('style')
+        style_sel.add_style('width: 135px;')
+        style_sel.add_empty_option()
+
+        for style in ('Technical', 'Spot QC', 'Mastering'):
+            style_sel.append_option(style, style)
+
+        try:
+            style_sel.set_value(self.style_sel)
+        except AttributeError:
+            pass
+
+        return style_sel
+
+    def get_bay_select(self):
+        bay_sel = SelectWdg('bay_select')
+        bay_sel.set_id('bay')
+        bay_sel.add_style('width', '135px')
+        bay_sel.add_empty_option()
+
+        for i in range(1, 13):
+            bay_sel.append_option('Bay %s' % i, 'Bay %s' % i)
+
+        try:
+            bay_sel.set_value(self.bay)
+        except AttributeError:
+            pass
+
+        return bay_sel
+
+    def get_machine_select(self):
+        machine_sel = SelectWdg('machine_select')
+        machine_sel.set_id('machine_number')
+        machine_sel.add_style('width', '135px')
+        machine_sel.add_empty_option()
+
+        for machine in (
+        'VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234', 'VTR235',
+        'VTR251', 'VTR252', 'VTR253', 'VTR254', 'VTR255', 'VTR261', 'VTR262', 'VTR263', 'VTR264', 'VTR265',
+        'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03', 'FCP04', 'FCP05', 'FCP06',
+        'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin', 'Clipster', 'Stradis'):
+            machine_sel.append_option(machine, machine)
+
+        try:
+            machine_sel.set_value(self.machine_number)
+        except AttributeError:
+            pass
+
+        return machine_sel
+
     def get_title_section(self):
         section_div = DivWdg()
 
         section_div.add(self.get_title_input_wdg())
-        section_div.add(get_format_section())
+        section_div.add(self.get_format_section())
 
         return section_div
 
@@ -1294,14 +1103,318 @@ catch(err) {
 
         section_span.add('Title: ')
 
-        if self.title_sobject:
-            prefilled_text = self.title_sobject.get('name')
-        else:
-            prefilled_text = None
+        try:
+            prefilled_text = self.title_data
+        except AttributeError:
+            if self.title_sobject:
+                prefilled_text = self.title_sobject.get('name')
+            else:
+                prefilled_text = None
 
         section_span.add(get_text_input_wdg('title', 400, prefilled_text))
 
         return section_span
+
+    def get_format_section(self):
+        section_span = SpanWdg()
+
+        section_span.add('Format: ')
+        section_span.add(self.get_format_select_wdg())
+
+        return section_span
+
+    def get_format_select_wdg(self):
+        format_sel = SelectWdg('format_select')
+        format_sel.set_id('format')
+        format_sel.add_style('width', '153px')
+        format_sel.add_style('display', 'inline-block')
+        format_sel.add_empty_option()
+
+        for file_format in ('Electronic/File', 'File - ProRes', 'File - MXF', 'File - MPEG', 'File - WAV', 'DBC', 'D5',
+                            'HDCAM SR', 'NTSC', 'PAL'):
+            format_sel.append_option(file_format, file_format)
+
+        try:
+            format_sel.set_value(self.format_data)
+        except AttributeError:
+            pass
+
+        return format_sel
+
+    def get_season_section(self):
+        section_div = DivWdg()
+
+        section_div.add(self.get_season_input_wdg())
+        section_div.add(self.get_standard_section())
+
+        return section_div
+
+    def get_season_input_wdg(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        section_span.add('Season: ')
+
+        try:
+            prefilled_text = self.season
+        except AttributeError:
+            if self.title_sobject:
+                prefilled_text = self.title_sobject.get('season')
+            else:
+                prefilled_text = None
+
+        section_span.add(get_text_input_wdg('season', 400, prefilled_text))
+
+        return section_span
+
+    def get_standard_section(self):
+        section_span = SpanWdg()
+
+        section_span.add('Standard: ')
+
+        standard_select = SelectWdg('standard_select')
+        standard_select.set_id('standard')
+        standard_select.add_style('width', '153px')
+        standard_select.add_style('display', 'inline-block')
+        standard_select.add_empty_option()
+
+        for standard in ('625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC', '-'):
+            standard_select.append_option(standard, standard)
+
+        try:
+            standard_select.set_value(self.standard)
+        except AttributeError:
+            pass
+
+        section_span.add(standard_select)
+
+        return section_span
+
+    def get_episode_section(self):
+        section_div = DivWdg()
+
+        section_div.add(self.get_episode_input_wdg())
+        section_div.add(self.get_frame_rate_section())
+
+        return section_div
+
+    def get_episode_input_wdg(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        section_span.add('Episode: ')
+
+        try:
+            prefilled_text = self.episode
+        except AttributeError:
+            if self.title_sobject:
+                prefilled_text = self.title_sobject.get('episode')
+            else:
+                prefilled_text = None
+
+        section_span.add(get_text_input_wdg('episode', 400, prefilled_text))
+
+        return section_span
+
+    def get_frame_rate_section(self):
+        section_span = SpanWdg()
+
+        section_span.add('Frame Rate: ')
+
+        frame_rate_select = SelectWdg('frame_rate_select')
+        frame_rate_select.set_id('frame_rate')
+        frame_rate_select.add_style('width', '153px')
+        frame_rate_select.add_style('display', 'inline-block')
+        frame_rate_select.add_empty_option()
+
+        frame_rate_search = Search('twog/frame_rate')
+        frame_rates = frame_rate_search.get_sobjects()
+        frame_rates = [frame_rate.get_value('name') for frame_rate in frame_rates]
+
+        for frame_rate in frame_rates:
+            frame_rate_select.append_option(frame_rate, frame_rate)
+
+        try:
+            frame_rate_select.set_value(self.frame_rate)
+        except AttributeError:
+            pass
+
+        section_span.add(frame_rate_select)
+
+        return section_span
+
+    def get_version_section(self):
+        section_div = DivWdg()
+
+        section_div.add(self.get_version_input_wdg())
+        section_div.add(self.get_po_number_section())
+
+        return section_div
+
+    def get_version_input_wdg(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        section_span.add('Version: ')
+
+        try:
+            prefilled_text = self.version
+        except AttributeError:
+            if self.title_sobject:
+                prefilled_text = self.title_sobject.get('version')
+            else:
+                prefilled_text = None
+
+        section_span.add(get_text_input_wdg('version', 400, prefilled_text))
+
+        return section_span
+
+    def get_po_number_section(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        section_span.add('PO #: ')
+
+        try:
+            prefilled_text = self.po_number
+        except AttributeError:
+            if self.title_sobject:
+                prefilled_text = self.title_sobject.get('po_number')
+            else:
+                prefilled_text = None
+
+        section_span.add(get_text_input_wdg('po_number', 100, prefilled_text))
+
+        return section_span
+
+    def get_file_name_section(self):
+        section_div = DivWdg()
+
+        section_div.add(self.get_file_name_input_wdg())
+
+        return section_div
+
+    def get_file_name_input_wdg(self):
+        section_span = SpanWdg()
+
+        section_span.add('File Name: ')
+
+        try:
+            prefilled_text = self.file_name
+        except AttributeError:
+            if self.title_sobject:
+                prefilled_text = self.title_sobject.get('file_name')
+            else:
+                prefilled_text = None
+
+        section_span.add(get_text_input_wdg('file_name', 600, prefilled_text))
+
+        return section_span
+
+    def get_program_format_table(self):
+        program_format_table = Table()
+        program_format_table.add_style('float', 'left')
+
+        program_format_table.add_row()
+        program_format_table.add_header('Program Format')
+        program_format_table.add_header()
+
+        text_input_name_id_pairs = [
+            ('Roll-up (blank)', 'roll_up_blank'),
+            ('Bars/Tone', 'bars_tone'),
+            ('Black/Silence', 'black_silence_1'),
+            ('Slate/Silence', 'slate_silence'),
+            ('Black/Silence', 'black_silence_2'),
+            ('Start of Program', 'start_of_program'),
+            ('End of Program', 'end_of_program')
+        ]
+
+        self.setup_table_rows_with_input_boxes(program_format_table, text_input_name_id_pairs)
+
+        return program_format_table
+
+    def setup_table_rows_with_input_boxes(self, program_format_table, text_input_name_id_pairs):
+
+        for text_input_name_id_pair in text_input_name_id_pairs:
+            program_format_table.add_row()
+
+            text_input_name = str(text_input_name_id_pair[0])
+            text_input_id = str(text_input_name_id_pair[1])
+
+            program_format_table.add_cell(text_input_name)
+
+            # Check if the input value is specified in this object
+            prefilled_text = getattr(self, text_input_id, None)
+
+            # If no value, check the title_sobject (if it's not there either, prefilled_text will still be None
+            if not prefilled_text and self.title_sobject:
+                prefilled_text = self.title_sobject.get(text_input_name_id_pair)
+
+            program_format_table.add_cell(get_text_input_wdg(text_input_id, 300, prefilled_text))
+
+    def get_video_measurements_table(self):
+        video_measurements_table = Table()
+
+        video_measurements_table.add_row()
+        video_measurements_table.add_header('Video Measurements')
+
+        text_input_name_id_pairs = [
+            ('Active Video Begins', 'active_video_begins'),
+            ('Active Video Ends', 'active_video_ends'),
+            ('Horizontal Blanking', 'horizontal_blanking'),
+            ('Luminance Peak', 'luminance_peak'),
+            ('Chroma Peak', 'chroma_peak'),
+            ('Head Logo', 'head_logo'),
+            ('Tail Logo', 'tail_logo')
+        ]
+
+        self.setup_table_rows_with_input_boxes(video_measurements_table, text_input_name_id_pairs)
+
+        return video_measurements_table
+
+    def get_element_profile_table(self):
+        element_profile_table = Table()
+
+        element_profile_table.add_row()
+        element_profile_table.add_header('Element Profile')
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Total Runtime')
+        element_profile_table.add_cell(get_text_input_wdg('total_runtime', 300))
+        element_profile_table.add_cell('Language')
+        element_profile_table.add_cell(get_text_input_wdg('language', 300))
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('TV/Feature/Trailer')
+        element_profile_table.add_cell(get_text_input_wdg('tv_feature_trailer', 300))
+        element_profile_table.add_cell('(CC)/Subtitles')
+        element_profile_table.add_cell(get_text_input_wdg('cc_subtitles', 300))
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Video Aspect Ratio')
+        element_profile_table.add_cell(get_video_aspect_ratio_select_wdg())
+        element_profile_table.add_cell('VITC')
+        element_profile_table.add_cell(get_text_input_wdg('vitc', 300))
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Textless @ Tail')
+        element_profile_table.add_cell(get_text_input_wdg('textless_tail', 300))
+        element_profile_table.add_cell('Source Barcode')
+        element_profile_table.add_cell(get_text_input_wdg('source_barcode', 300))
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Notices')
+        element_profile_table.add_cell(get_text_input_wdg('notices', 300))
+        element_profile_table.add_cell('Element QC Barcode')
+        element_profile_table.add_cell(get_text_input_wdg('element_qc_barcode', 300))
+
+        element_profile_table.add_row()
+        element_profile_table.add_cell('Label')
+        element_profile_table.add_cell(get_label_select_wdg())
+        element_profile_table.add_cell('Record Date')
+        element_profile_table.add_cell(get_record_date_calendar_wdg())
+
+        return element_profile_table
 
     def get_display(self):
         # This will be the main <div> that everything else goes into
@@ -1318,16 +1431,16 @@ catch(err) {
         main_wdg.add(get_client_name('Netflix'))
         main_wdg.add(get_approved_rejected_checkboxes('APPROVED'))
 
-        main_wdg.add(get_operator_section())
+        main_wdg.add(self.get_operator_section())
         main_wdg.add(self.get_title_section())
-        main_wdg.add(get_season_section())
-        main_wdg.add(get_episode_section())
-        main_wdg.add(get_version_section())
-        main_wdg.add(get_file_name_section())
+        main_wdg.add(self.get_season_section())
+        main_wdg.add(self.get_episode_section())
+        main_wdg.add(self.get_version_section())
+        main_wdg.add(self.get_file_name_section())
 
-        main_wdg.add(get_program_format_table())
-        main_wdg.add(get_video_measurements_table())
-        main_wdg.add(get_element_profile_table())
+        main_wdg.add(self.get_program_format_table())
+        main_wdg.add(self.get_video_measurements_table())
+        main_wdg.add(self.get_element_profile_table())
         main_wdg.add(get_audio_configuration_table())
         main_wdg.add(get_general_comments_section())
 
