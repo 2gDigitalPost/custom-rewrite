@@ -319,8 +319,6 @@ try {
         'record_date': record_date
     };
 
-    console.log(qc_report_object);
-
     var board_table = document.getElementById('element_eval_panel');
 
     spt.app_busy.show("Refreshing...");
@@ -1421,11 +1419,6 @@ catch(err) {
         main_wdg = DivWdg()
         main_wdg.set_id('element_eval_panel')
 
-        save_button = ButtonNewWdg(title='Save', icon='SAVE')
-        save_button.add_behavior(self.get_reload_behavior())
-
-        main_wdg.add(save_button)
-
         # self.set_image_and_address(main_wdg)
         main_wdg.add(get_image_div())
         main_wdg.add(get_address_div())
@@ -1443,6 +1436,13 @@ catch(err) {
         main_wdg.add(self.get_video_measurements_table())
         main_wdg.add(self.get_element_profile_table())
         main_wdg.add(get_audio_configuration_table())
+
+        add_row_button = ButtonNewWdg(title='Add Row', icon='ADD')
+        add_row_button.add_class('add_row_button')
+        add_row_button.add_behavior(self.get_reload_behavior())
+
+        main_wdg.add(add_row_button)
+
         main_wdg.add(get_general_comments_section())
 
         return main_wdg

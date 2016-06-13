@@ -6,6 +6,7 @@ from ConfigParser import SafeConfigParser
 
 from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.support.ui import Select
 
 
 class ElementEvalTest(unittest.TestCase):
@@ -51,7 +52,171 @@ class ElementEvalTest(unittest.TestCase):
         element_eval_header = self.browser.find_element_by_class_name('spt_tab_header_label')
         self.assertEqual('Report', element_eval_header.text)
 
+    def test_reload_page_keeps_input_values(self):
+        self.browser.get(self.target_website)
 
+        time.sleep(5)
+
+        # Open up the Element Evaluation (QC Report) page
+        element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
+        element_eval_link.click()
+
+        time.sleep(2)
+
+        # Some values to pass into the input widgets
+        operator_field_input = 'Test Operator'
+        title_field_input = 'Test Title'
+        season_field_input = 'Test Season'
+        episode_field_input = 'Test Episode'
+        version_field_input = 'Test Version'
+        po_number_field_input = 'Test PO Number'
+        file_name_field_input = 'Test File Name'
+        roll_up_blank_field_input = 'Test Roll Up Blank'
+        bars_tone_field_input = 'Test Bars/Tone'
+        black_silence_1_field_input = 'Test Black/Silence (1)'
+        slate_silence_field_input = 'Test Slate/Silence'
+        black_silence_2_field_input = 'Test Black/Silence (2)'
+        start_of_program_field_input = 'Test Start of Program'
+        end_of_program_field_input = 'Test End of Program'
+        active_video_begins_field_input = 'Test Active Video Begins'
+        active_video_ends_field_input = 'Test Active Video Ends'
+        horizontal_blanking_field_input = 'Test Horizontal Blanking'
+        luminance_peak_field_input = 'Test Luminance Peak'
+        chroma_peak_field_input = 'Test Chroma Peak'
+        head_logo_field_input = 'Test Head Logo'
+        tail_logo_field_input = 'Test Tail Logo'
+        total_runtime_field_input = 'Test Total Runtime'
+        tv_feature_trailer_field_input = 'Test TV/Feature/Trailer'
+        textless_tail_field_input = 'Test Textless @ Tail'
+        notices_field_input = 'Test Notices'
+        language_field_input = 'Test Language'
+        cc_subtitles_field_input = 'Test CC/Subtitles'
+        vitc_field_input = 'Test VITC'
+        source_barcode_field_input = 'Test Source Barcode'
+        element_qc_barcode_field_input = 'Test Element QC Barcode'
+
+        # Send the input values to all the input widgets on the page
+        self.browser.find_element_by_name('operator').send_keys(operator_field_input)
+        self.browser.find_element_by_name('title_data').send_keys(title_field_input)
+        self.browser.find_element_by_name('season').send_keys(season_field_input)
+        self.browser.find_element_by_name('episode').send_keys(episode_field_input)
+        self.browser.find_element_by_name('version').send_keys(version_field_input)
+        self.browser.find_element_by_name('po_number').send_keys(po_number_field_input)
+        self.browser.find_element_by_name('file_name').send_keys(file_name_field_input)
+        self.browser.find_element_by_name('roll_up_blank').send_keys(roll_up_blank_field_input)
+        self.browser.find_element_by_name('bars_tone').send_keys(bars_tone_field_input)
+        self.browser.find_element_by_name('black_silence_1').send_keys(black_silence_1_field_input)
+        self.browser.find_element_by_name('slate_silence').send_keys(slate_silence_field_input)
+        self.browser.find_element_by_name('black_silence_2').send_keys(black_silence_2_field_input)
+        self.browser.find_element_by_name('start_of_program').send_keys(start_of_program_field_input)
+        self.browser.find_element_by_name('end_of_program').send_keys(end_of_program_field_input)
+        self.browser.find_element_by_name('active_video_begins').send_keys(active_video_begins_field_input)
+        self.browser.find_element_by_name('active_video_ends').send_keys(active_video_ends_field_input)
+        self.browser.find_element_by_name('horizontal_blanking').send_keys(horizontal_blanking_field_input)
+        self.browser.find_element_by_name('luminance_peak').send_keys(luminance_peak_field_input)
+        self.browser.find_element_by_name('chroma_peak').send_keys(chroma_peak_field_input)
+        self.browser.find_element_by_name('head_logo').send_keys(head_logo_field_input)
+        self.browser.find_element_by_name('tail_logo').send_keys(tail_logo_field_input)
+        self.browser.find_element_by_name('total_runtime').send_keys(total_runtime_field_input)
+        self.browser.find_element_by_name('tv_feature_trailer').send_keys(tv_feature_trailer_field_input)
+        self.browser.find_element_by_name('textless_tail').send_keys(textless_tail_field_input)
+        self.browser.find_element_by_name('notices').send_keys(notices_field_input)
+        self.browser.find_element_by_name('language').send_keys(language_field_input)
+        self.browser.find_element_by_name('cc_subtitles').send_keys(cc_subtitles_field_input)
+        self.browser.find_element_by_name('vitc').send_keys(vitc_field_input)
+        self.browser.find_element_by_name('source_barcode').send_keys(source_barcode_field_input)
+        self.browser.find_element_by_name('element_qc_barcode').send_keys(element_qc_barcode_field_input)
+
+        # Also select values for all the select widgets
+        style_select_option = 'Technical'
+        style_select = Select(self.browser.find_element_by_id('style'))
+        style_select.select_by_visible_text(style_select_option)
+
+        bay_select_option = 'Bay 3'
+        bay_select = Select(self.browser.find_element_by_id('bay'))
+        bay_select.select_by_visible_text(bay_select_option)
+
+        machine_select_option = 'VTR233'
+        machine_select = Select(self.browser.find_element_by_id('machine_number'))
+        machine_select.select_by_visible_text(machine_select_option)
+
+        format_select_option = 'File - WAV'
+        format_select = Select(self.browser.find_element_by_id('format'))
+        format_select.select_by_visible_text(format_select_option)
+
+        standard_select_option = 'PAL'
+        standard_select = Select(self.browser.find_element_by_id('standard'))
+        standard_select.select_by_visible_text(standard_select_option)
+
+        frame_rate_select_option = '24p'
+        frame_rate_select = Select(self.browser.find_element_by_id('frame_rate'))
+        frame_rate_select.select_by_visible_text(frame_rate_select_option)
+
+        video_aspect_ratio_select_option = '4x3 2.35 Letterbox'
+        video_aspect_ratio_select = Select(self.browser.find_element_by_id('video_aspect_ratio'))
+        video_aspect_ratio_select.select_by_visible_text(video_aspect_ratio_select_option)
+
+        label_select_option = 'Fair'
+        label_select = Select(self.browser.find_element_by_id('label'))
+        label_select.select_by_visible_text(label_select_option)
+
+        # Find the button that refreshes the page (the add row button in this case) and click it
+        add_row_button = self.browser.find_element_by_class_name('add_row_button')
+        add_row_button.click()
+
+        # Give the page a few seconds to reload
+        time.sleep(2)
+
+        # Now check all the input values, and make sure they're the same as what was put in before
+        self.assertEqual(operator_field_input, self.browser.find_element_by_name('operator').get_attribute('value'))
+        self.assertEqual(title_field_input, self.browser.find_element_by_name('title_data').get_attribute('value'))
+        self.assertEqual(season_field_input, self.browser.find_element_by_name('season').get_attribute('value'))
+        self.assertEqual(episode_field_input, self.browser.find_element_by_name('episode').get_attribute('value'))
+        self.assertEqual(version_field_input, self.browser.find_element_by_name('version').get_attribute('value'))
+        self.assertEqual(po_number_field_input, self.browser.find_element_by_name('po_number').get_attribute('value'))
+        self.assertEqual(file_name_field_input, self.browser.find_element_by_name('file_name').get_attribute('value'))
+        self.assertEqual(roll_up_blank_field_input, self.browser.find_element_by_name('roll_up_blank').get_attribute('value'))
+        self.assertEqual(bars_tone_field_input, self.browser.find_element_by_name('bars_tone').get_attribute('value'))
+        self.assertEqual(black_silence_1_field_input, self.browser.find_element_by_name('black_silence_1').get_attribute('value'))
+        self.assertEqual(slate_silence_field_input, self.browser.find_element_by_name('slate_silence').get_attribute('value'))
+        self.assertEqual(black_silence_2_field_input, self.browser.find_element_by_name('black_silence_2').get_attribute('value'))
+        self.assertEqual(start_of_program_field_input, self.browser.find_element_by_name('start_of_program').get_attribute('value'))
+        self.assertEqual(end_of_program_field_input, self.browser.find_element_by_name('end_of_program').get_attribute('value'))
+        self.assertEqual(active_video_begins_field_input, self.browser.find_element_by_name('active_video_begins').get_attribute('value'))
+        self.assertEqual(active_video_ends_field_input, self.browser.find_element_by_name('active_video_ends').get_attribute('value'))
+        self.assertEqual(horizontal_blanking_field_input, self.browser.find_element_by_name('horizontal_blanking').get_attribute('value'))
+        self.assertEqual(luminance_peak_field_input, self.browser.find_element_by_name('luminance_peak').get_attribute('value'))
+        self.assertEqual(chroma_peak_field_input, self.browser.find_element_by_name('chroma_peak').get_attribute('value'))
+        self.assertEqual(head_logo_field_input, self.browser.find_element_by_name('head_logo').get_attribute('value'))
+        self.assertEqual(tail_logo_field_input, self.browser.find_element_by_name('tail_logo').get_attribute('value'))
+        self.assertEqual(total_runtime_field_input, self.browser.find_element_by_name('total_runtime').get_attribute('value'))
+        self.assertEqual(tv_feature_trailer_field_input, self.browser.find_element_by_name('tv_feature_trailer').get_attribute('value'))
+        self.assertEqual(textless_tail_field_input, self.browser.find_element_by_name('textless_tail').get_attribute('value'))
+        self.assertEqual(notices_field_input, self.browser.find_element_by_name('notices').get_attribute('value'))
+        self.assertEqual(language_field_input, self.browser.find_element_by_name('language').get_attribute('value'))
+        self.assertEqual(cc_subtitles_field_input, self.browser.find_element_by_name('cc_subtitles').get_attribute('value'))
+        self.assertEqual(vitc_field_input, self.browser.find_element_by_name('vitc').get_attribute('value'))
+        self.assertEqual(source_barcode_field_input, self.browser.find_element_by_name('source_barcode').get_attribute('value'))
+        self.assertEqual(element_qc_barcode_field_input, self.browser.find_element_by_name('element_qc_barcode').get_attribute('value'))
+
+        # Also check the select widgets and make sure they are what was selected
+        style_select = Select(self.browser.find_element_by_id('style'))
+        bay_select = Select(self.browser.find_element_by_id('bay'))
+        machine_select = Select(self.browser.find_element_by_id('machine_number'))
+        format_select = Select(self.browser.find_element_by_id('format'))
+        standard_select = Select(self.browser.find_element_by_id('standard'))
+        frame_rate_select = Select(self.browser.find_element_by_id('frame_rate'))
+        video_aspect_ratio_select = Select(self.browser.find_element_by_id('video_aspect_ratio'))
+        label_select = Select(self.browser.find_element_by_id('label'))
+
+        self.assertEqual(style_select_option, style_select.first_selected_option.text)
+        self.assertEqual(bay_select_option, bay_select.first_selected_option.text)
+        self.assertEqual(machine_select_option, machine_select.first_selected_option.text)
+        self.assertEqual(format_select_option, format_select.first_selected_option.text)
+        self.assertEqual(standard_select_option, standard_select.first_selected_option.text)
+        self.assertEqual(frame_rate_select_option, frame_rate_select.first_selected_option.text)
+        self.assertEqual(video_aspect_ratio_select_option, video_aspect_ratio_select.first_selected_option.text)
+        self.assertEqual(label_select_option, label_select.first_selected_option.text)
 
 
 if __name__ == '__main__':
