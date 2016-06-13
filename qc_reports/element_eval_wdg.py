@@ -19,37 +19,6 @@ def get_text_input_wdg(name, width=200, text=None):
     return textbox_wdg
 
 
-def get_video_aspect_ratio_select_wdg():
-    video_aspect_ratio_sel = SelectWdg('video_aspect_ratio_select')
-    video_aspect_ratio_sel.set_id('video_aspect_ratio')
-    video_aspect_ratio_sel.add_style('width', '300px')
-    video_aspect_ratio_sel.add_style('display', 'inline-block')
-    video_aspect_ratio_sel.add_empty_option()
-
-    for video_aspect_ratio in ('16x9 1.33', '16x9 1.33 Pan & Scan', '16x9 1.78 Anamorphic', '16x9 1.78 Full Frame',
-                               '16x9 1.85 Letterbox', '16x9 1.85 Matted', '16x9 1.85 Matted Anamorphic',
-                               '16x9 2.00 Letterbox', '16x9 2.10 Letterbox', '16x9 2.20 Letterbox',
-                               '16x9 2.35 Anamorphic', '16x9 2.35 Letterbox', '16x9 2.40 Letterbox',
-                               '16x9 2.55 Letterbox', '4x3 1.33 Full Frame', '4x3 1.78 Letterbox', '4x3 1.85 Letterbox',
-                               '4x3 2.35 Letterbox', '4x3 2.40 Letterbox'):
-        video_aspect_ratio_sel.append_option(video_aspect_ratio, video_aspect_ratio)
-
-    return video_aspect_ratio_sel
-
-
-def get_label_select_wdg():
-    label_select_wdg = SelectWdg('label')
-    label_select_wdg.set_id('label')
-    label_select_wdg.add_style('width', '300px')
-    label_select_wdg.add_style('display', 'inline-block')
-    label_select_wdg.add_empty_option()
-
-    for label in ('Good', 'Fair', 'Poor'):
-        label_select_wdg.append_option(label, label)
-
-    return label_select_wdg
-
-
 def get_record_date_calendar_wdg():
     record_date_calendar_wdg = CalendarInputWdg("record_date")
     record_date_calendar_wdg.set_option('show_activator', 'true')
@@ -1273,9 +1242,9 @@ catch(err) {
 
         section_span.add('PO #: ')
 
-        try:
+        if hasattr(self, 'po_number'):
             prefilled_text = self.po_number
-        except AttributeError:
+        else:
             if self.title_sobject:
                 prefilled_text = self.title_sobject.get('po_number')
             else:
@@ -1297,9 +1266,9 @@ catch(err) {
 
         section_span.add('File Name: ')
 
-        try:
+        if hasattr(self, 'file_name'):
             prefilled_text = self.file_name
-        except AttributeError:
+        else:
             if self.title_sobject:
                 prefilled_text = self.title_sobject.get('file_name')
             else:
@@ -1390,7 +1359,7 @@ catch(err) {
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Video Aspect Ratio')
-        element_profile_table.add_cell(get_video_aspect_ratio_select_wdg())
+        element_profile_table.add_cell(self.get_video_aspect_ratio_select_wdg())
         element_profile_table.add_cell('VITC')
         element_profile_table.add_cell(self.get_text_input_wdg('vitc', 300))
 
@@ -1408,11 +1377,47 @@ catch(err) {
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Label')
-        element_profile_table.add_cell(get_label_select_wdg())
+        element_profile_table.add_cell(self.get_label_select_wdg())
         element_profile_table.add_cell('Record Date')
         element_profile_table.add_cell(get_record_date_calendar_wdg())
 
         return element_profile_table
+
+    def get_video_aspect_ratio_select_wdg(self):
+        video_aspect_ratio_sel = SelectWdg('video_aspect_ratio_select')
+        video_aspect_ratio_sel.set_id('video_aspect_ratio')
+        video_aspect_ratio_sel.add_style('width', '300px')
+        video_aspect_ratio_sel.add_style('display', 'inline-block')
+        video_aspect_ratio_sel.add_empty_option()
+
+        for video_aspect_ratio in ('16x9 1.33', '16x9 1.33 Pan & Scan', '16x9 1.78 Anamorphic', '16x9 1.78 Full Frame',
+                                   '16x9 1.85 Letterbox', '16x9 1.85 Matted', '16x9 1.85 Matted Anamorphic',
+                                   '16x9 2.00 Letterbox', '16x9 2.10 Letterbox', '16x9 2.20 Letterbox',
+                                   '16x9 2.35 Anamorphic', '16x9 2.35 Letterbox', '16x9 2.40 Letterbox',
+                                   '16x9 2.55 Letterbox', '4x3 1.33 Full Frame', '4x3 1.78 Letterbox',
+                                   '4x3 1.85 Letterbox',
+                                   '4x3 2.35 Letterbox', '4x3 2.40 Letterbox'):
+            video_aspect_ratio_sel.append_option(video_aspect_ratio, video_aspect_ratio)
+
+        if hasattr(self, 'video_aspect_ratio'):
+            video_aspect_ratio_sel.set_value(self.video_aspect_ratio)
+
+        return video_aspect_ratio_sel
+
+    def get_label_select_wdg(self):
+        label_select_wdg = SelectWdg('label')
+        label_select_wdg.set_id('label')
+        label_select_wdg.add_style('width', '300px')
+        label_select_wdg.add_style('display', 'inline-block')
+        label_select_wdg.add_empty_option()
+
+        for label in ('Good', 'Fair', 'Poor'):
+            label_select_wdg.append_option(label, label)
+
+        if hasattr(self, 'label'):
+            label_select_wdg.set_value(self.label)
+
+        return label_select_wdg
 
     def get_display(self):
         # This will be the main <div> that everything else goes into
