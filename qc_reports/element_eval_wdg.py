@@ -165,7 +165,10 @@ def get_audio_configuration_add_behavior():
 class ElementEvalWdg(BaseTableElementWdg):
 
     def init(self):
+        print(self.get_kwargs())
+
         report_data = self.get_kwargs().get('report_data')
+        print(report_data)
 
         if report_data:
             self.date = report_data.get('date')
@@ -173,7 +176,7 @@ class ElementEvalWdg(BaseTableElementWdg):
             self.style_sel = report_data.get('style') # self.style is already used in the super class
             self.bay = report_data.get('bay')
             self.machine_number = report_data.get('machine_number')
-            self.title_data = report_data.get('title') # self.title is already used in the super class
+            self.title_data = report_data.get('title_data') # self.title is already used in the super class
             self.format_data = report_data.get('format') # 'format' is a reserved word in Python
             self.season = report_data.get('season')
             self.standard = report_data.get('standard')
@@ -231,7 +234,7 @@ try {
     var machine_number = document.getElementById("machine_number").value;
 
     // Title section values
-    var title = document.getElementsByName("title")[0].value;
+    var title_data = document.getElementsByName("title_data")[0].value;
     var format = document.getElementById("format").value;
     var season = document.getElementsByName("season")[0].value;
     var standard = document.getElementById("standard").value;
@@ -279,7 +282,7 @@ try {
         'style': style,
         'bay': bay,
         'machine_number': machine_number,
-        'title': title,
+        'title_data': title_data,
         'format': format,
         'season': season,
         'standard': standard,
@@ -318,7 +321,11 @@ try {
 
     console.log(qc_report_object);
 
-    spt.api.load_popup('Element Evaluation', 'qc_reports.ElementEvalWdg', {'report_data': qc_report_object});
+    var board_table = document.getElementById('element_eval_panel');
+
+    spt.app_busy.show("Refreshing...");
+    spt.api.load_panel(board_table, 'qc_reports.ElementEvalWdg', {'report_data': qc_report_object});
+    spt.app_busy.hide();
 }
 catch(err) {
     spt.app_busy.hide();
@@ -1084,11 +1091,11 @@ catch(err) {
         machine_sel.add_style('width', '135px')
         machine_sel.add_empty_option()
 
-        for machine in (
-        'VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234', 'VTR235',
-        'VTR251', 'VTR252', 'VTR253', 'VTR254', 'VTR255', 'VTR261', 'VTR262', 'VTR263', 'VTR264', 'VTR265',
-        'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03', 'FCP04', 'FCP05', 'FCP06',
-        'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin', 'Clipster', 'Stradis'):
+        for machine in ('VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234',
+                        'VTR235', 'VTR251', 'VTR252', 'VTR253', 'VTR254', 'VTR255', 'VTR261', 'VTR262', 'VTR263',
+                        'VTR264', 'VTR265', 'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03',
+                        'FCP04', 'FCP05', 'FCP06', 'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin',
+                        'Clipster', 'Stradis'):
             machine_sel.append_option(machine, machine)
 
         try:
@@ -1112,7 +1119,7 @@ catch(err) {
 
         section_span.add('Title: ')
 
-        section_span.add(self.get_text_input_wdg('title', 400))
+        section_span.add(self.get_text_input_wdg('title_data', 400))
 
         return section_span
 
@@ -1412,6 +1419,7 @@ catch(err) {
     def get_display(self):
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
+        main_wdg.set_id('element_eval_panel')
 
         save_button = ButtonNewWdg(title='Save', icon='SAVE')
         save_button.add_behavior(self.get_reload_behavior())
