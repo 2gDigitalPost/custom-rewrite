@@ -5,6 +5,7 @@ import time
 from ConfigParser import SafeConfigParser
 
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.support.ui import Select
 
@@ -44,7 +45,7 @@ class ElementEvalTest(unittest.TestCase):
     def test_load_element_eval_page(self):
         self.browser.get(self.target_website)
 
-        time.sleep(5)
+        time.sleep(3)
 
         element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
         element_eval_link.click()
@@ -55,7 +56,7 @@ class ElementEvalTest(unittest.TestCase):
     def test_reload_page_keeps_input_values(self):
         self.browser.get(self.target_website)
 
-        time.sleep(5)
+        time.sleep(3)
 
         # Open up the Element Evaluation (QC Report) page
         element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
@@ -217,6 +218,76 @@ class ElementEvalTest(unittest.TestCase):
         self.assertEqual(frame_rate_select_option, frame_rate_select.first_selected_option.text)
         self.assertEqual(video_aspect_ratio_select_option, video_aspect_ratio_select.first_selected_option.text)
         self.assertEqual(label_select_option, label_select.first_selected_option.text)
+
+    def test_add_and_remove_row_buttons(self):
+        self.browser.get(self.target_website)
+
+        time.sleep(3)
+
+        # Open up the Element Evaluation (QC Report) page
+        element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
+        element_eval_link.click()
+
+        time.sleep(2)
+
+        # Get the number of rows currently on the audio config table
+        # Two rows are dedicated to the table headers, so don't count those
+        original_row_count = len(self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
+
+        # Start with the add row button
+        add_row_button = self.browser.find_element_by_class_name('add_row_button')
+        add_row_button.click()
+
+        # Give the page a few seconds to reload
+        time.sleep(2)
+
+        # Count the new number of rows, and assert that it's one more than we had
+        new_row_count = len(self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
+        self.assertEqual(original_row_count + 1, new_row_count)
+
+        # Now the subtract button
+        subtract_row_button = self.browser.find_element_by_class_name('subtract_row_button')
+        subtract_row_button.click()
+
+        # Give the page a few seconds to reload
+        time.sleep(2)
+
+        # Count the new number of rows, and assert that it's one less than we had (back to the original count)
+        new_row_count = len(self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
+        self.assertEqual(original_row_count, new_row_count)
+
+    def test_cannot_remove_all_audio_config_rows(self):
+        self.browser.get(self.target_website)
+
+        time.sleep(3)
+
+        # Open up the Element Evaluation (QC Report) page
+        element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
+        element_eval_link.click()
+
+        time.sleep(2)
+
+        # Get the number of rows currently on the audio config table
+        # Two rows are dedicated to the table headers, so don't count those
+        original_row_count = len(self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
+
+        # Iterate down from the row count to one
+        for x in range(original_row_count, 1, -1):
+            # Click the subtract button
+            subtract_row_button = self.browser.find_element_by_class_name('subtract_row_button')
+            subtract_row_button.click()
+
+            # Give the page a few seconds to reload
+            time.sleep(2)
+
+        # Make sure the button is not visible
+        try:
+            subtract_row_button = self.browser.find_element_by_class_name('subtract_row_button')
+            subtract_button_is_visible = True
+        except NoSuchElementException:
+            subtract_button_is_visible = False
+
+        self.assertFalse(subtract_button_is_visible)
 
 
 if __name__ == '__main__':

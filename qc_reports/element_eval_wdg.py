@@ -1445,6 +1445,28 @@ catch(err) {
 
         return audio_configuration_table
 
+    def get_add_subtract_row_buttons(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        add_row_button = ButtonNewWdg(title='Add Row', icon='ADD')
+        add_row_button.add_class('add_row_button')
+        add_row_button.add_behavior(self.get_add_audio_configuration_line_behavior())
+
+        section_span.add(add_row_button)
+
+        # Check if we're down to one line on the table. If so, don't show the subtract button
+        if hasattr(self, 'audio_configuration_lines') and self.audio_configuration_lines > 1:
+            # TODO: Find a proper icon for subtract (not sure if one exists by default)
+            subtract_row_button = ButtonNewWdg(title='Remove Row', icon='REMOVE')
+            subtract_row_button.add_class('subtract_row_button')
+            subtract_row_button.add_behavior(self.get_add_audio_configuration_line_behavior(-1))
+
+            section_span.add(subtract_row_button)
+
+        return section_span
+
+
     def get_display(self):
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
@@ -1468,17 +1490,7 @@ catch(err) {
         main_wdg.add(self.get_element_profile_table())
         main_wdg.add(self.get_audio_configuration_table())
 
-        add_row_button = ButtonNewWdg(title='Add Row', icon='ADD')
-        add_row_button.add_class('add_row_button')
-        add_row_button.add_behavior(self.get_add_audio_configuration_line_behavior())
-
-        # TODO: Find a proper icon for subtract (not sure if one exists, and if it does I don't know what it's called)
-        subtract_row_button = ButtonNewWdg(title='Remove Row', icon='REMOVE')
-        subtract_row_button.add_class('subtract_row_button')
-        subtract_row_button.add_behavior(self.get_add_audio_configuration_line_behavior(-1))
-
-        main_wdg.add(add_row_button)
-        main_wdg.add(subtract_row_button)
+        main_wdg.add(self.get_add_subtract_row_buttons())
 
         main_wdg.add(get_general_comments_section())
 
