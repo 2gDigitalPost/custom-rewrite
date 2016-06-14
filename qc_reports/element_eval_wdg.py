@@ -87,28 +87,6 @@ def get_approved_rejected_checkboxes(conclusion):
     return acr
 
 
-def get_audio_configuration_table():
-    audio_configuration_table = Table()
-
-    audio_configuration_table.add_row()
-    audio_configuration_table.add_header('Audio Configuration')
-
-    audio_configuration_table.add_row()
-    audio_configuration_table.add_header('Channel')
-    audio_configuration_table.add_header('Content')
-    audio_configuration_table.add_header('Tone')
-    audio_configuration_table.add_header('Peak')
-
-    for iterator in range(8):
-        audio_configuration_table.add_row()
-        audio_configuration_table.add_cell(get_text_input_wdg('channel-{0}'.format(iterator), 150))
-        audio_configuration_table.add_cell(get_text_input_wdg('content-{0}'.format(iterator), 150))
-        audio_configuration_table.add_cell(get_text_input_wdg('tone-{0}'.format(iterator), 150))
-        audio_configuration_table.add_cell(get_text_input_wdg('peak-{0}'.format(iterator), 150))
-
-    return audio_configuration_table
-
-
 def get_general_comments_section():
     general_comments_div = DivWdg()
     general_comments_wdg = TextAreaInputWdg()
@@ -134,10 +112,7 @@ def get_audio_configuration_add_behavior():
 class ElementEvalWdg(BaseTableElementWdg):
 
     def init(self):
-        print(self.get_kwargs())
-
         report_data = self.get_kwargs().get('report_data')
-        print(report_data)
 
         if report_data:
             self.date = report_data.get('date')
@@ -180,6 +155,8 @@ class ElementEvalWdg(BaseTableElementWdg):
             self.element_qc_barcode = report_data.get('element_qc_barcode')
             self.label = report_data.get('label')
             self.record_date = report_data.get('record_date')
+
+            self.audio_configuration_lines = int(report_data.get('audio_configuration_lines', 8))
         else:
             self.title_code = self.get_kwargs().get('title_code')
 
@@ -187,8 +164,16 @@ class ElementEvalWdg(BaseTableElementWdg):
             title_sobject_search.add_code_filter(self.title_code)
             self.title_sobject = title_sobject_search.get_sobject()
 
+            self.audio_configuration_lines = 8
+
     @staticmethod
-    def get_reload_behavior():
+    def get_add_audio_configuration_line_behavior(number_of_lines=1):
+        """
+        :param number_of_lines: Number of lines to add (or subtract if negative)
+        :return: Javascript behavior
+        """
+        # TODO: Better docstring here
+
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -245,6 +230,24 @@ try {
     var label = document.getElementById("label").value;
     var record_date = document.getElementsByName("record_date")[0].value;
 
+    // Get the number of lines in the audio configuration table
+    var audio_configuration_table = document.getElementById('audio_configuration_table');
+    var audio_configuration_table_rows = audio_configuration_table.getElementsByTagName("tr");
+
+    // Two rows always exist for the table headers, so subtract that
+    var number_of_audio_configuration_lines = audio_configuration_table_rows.length - 2;
+
+    // Get the number of lines to add (or subtract)
+    var number_of_lines_to_add = Number('%s');
+
+    // Finally, get the new number to pass into the kwargs. If the number is less than or equal to 1, set it to 1
+    // (don't want to allow less than one row to be displayed)
+    var audio_configuration_lines = number_of_audio_configuration_lines + number_of_lines_to_add;
+
+    if (audio_configuration_lines < 1) {
+        audio_configuration_lines = 1;
+    }
+
     var qc_report_object = {
         'date': date,
         'operator': operator,
@@ -285,7 +288,8 @@ try {
         'notices': notices,
         'element_qc_barcode': element_qc_barcode,
         'label': label,
-        'record_date': record_date
+        'record_date': record_date,
+        'audio_configuration_lines': audio_configuration_lines
     };
 
     var board_table = document.getElementById('element_eval_panel');
@@ -298,7 +302,7 @@ catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }
-            '''
+            ''' % number_of_lines
         }
 
         return behavior
@@ -1419,6 +1423,28 @@ catch(err) {
 
         return label_select_wdg
 
+    def get_audio_configuration_table(self):
+        audio_configuration_table = Table()
+        audio_configuration_table.set_id('audio_configuration_table')
+
+        audio_configuration_table.add_row()
+        audio_configuration_table.add_header('Audio Configuration')
+
+        audio_configuration_table.add_row()
+        audio_configuration_table.add_header('Channel')
+        audio_configuration_table.add_header('Content')
+        audio_configuration_table.add_header('Tone')
+        audio_configuration_table.add_header('Peak')
+
+        for iterator in range(self.audio_configuration_lines):
+            audio_configuration_table.add_row()
+            audio_configuration_table.add_cell(get_text_input_wdg('channel-{0}'.format(iterator), 150))
+            audio_configuration_table.add_cell(get_text_input_wdg('content-{0}'.format(iterator), 150))
+            audio_configuration_table.add_cell(get_text_input_wdg('tone-{0}'.format(iterator), 150))
+            audio_configuration_table.add_cell(get_text_input_wdg('peak-{0}'.format(iterator), 150))
+
+        return audio_configuration_table
+
     def get_display(self):
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
@@ -1440,13 +1466,19 @@ catch(err) {
         main_wdg.add(self.get_program_format_table())
         main_wdg.add(self.get_video_measurements_table())
         main_wdg.add(self.get_element_profile_table())
-        main_wdg.add(get_audio_configuration_table())
+        main_wdg.add(self.get_audio_configuration_table())
 
         add_row_button = ButtonNewWdg(title='Add Row', icon='ADD')
         add_row_button.add_class('add_row_button')
-        add_row_button.add_behavior(self.get_reload_behavior())
+        add_row_button.add_behavior(self.get_add_audio_configuration_line_behavior())
+
+        # TODO: Find a proper icon for subtract (not sure if one exists, and if it does I don't know what it's called)
+        subtract_row_button = ButtonNewWdg(title='Remove Row', icon='REMOVE')
+        subtract_row_button.add_class('subtract_row_button')
+        subtract_row_button.add_behavior(self.get_add_audio_configuration_line_behavior(-1))
 
         main_wdg.add(add_row_button)
+        main_wdg.add(subtract_row_button)
 
         main_wdg.add(get_general_comments_section())
 
