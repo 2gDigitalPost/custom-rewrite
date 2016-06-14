@@ -42,27 +42,24 @@ class ElementEvalTest(unittest.TestCase):
 
         submit_field.submit()
 
-    def test_load_element_eval_page(self):
+    def load_element_eval_page(self):
         self.browser.get(self.target_website)
 
         time.sleep(3)
 
         element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
         element_eval_link.click()
+
+        time.sleep(2)
+
+    def test_load_element_eval_page(self):
+        self.load_element_eval_page()
 
         element_eval_header = self.browser.find_element_by_class_name('spt_tab_header_label')
         self.assertEqual('Report', element_eval_header.text)
 
     def test_reload_page_keeps_input_values(self):
-        self.browser.get(self.target_website)
-
-        time.sleep(3)
-
-        # Open up the Element Evaluation (QC Report) page
-        element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
-        element_eval_link.click()
-
-        time.sleep(2)
+        self.load_element_eval_page()
 
         # Some values to pass into the input widgets
         operator_field_input = 'Test Operator'
@@ -176,29 +173,46 @@ class ElementEvalTest(unittest.TestCase):
         self.assertEqual(version_field_input, self.browser.find_element_by_name('version').get_attribute('value'))
         self.assertEqual(po_number_field_input, self.browser.find_element_by_name('po_number').get_attribute('value'))
         self.assertEqual(file_name_field_input, self.browser.find_element_by_name('file_name').get_attribute('value'))
-        self.assertEqual(roll_up_blank_field_input, self.browser.find_element_by_name('roll_up_blank').get_attribute('value'))
+        self.assertEqual(roll_up_blank_field_input,
+                         self.browser.find_element_by_name('roll_up_blank').get_attribute('value'))
         self.assertEqual(bars_tone_field_input, self.browser.find_element_by_name('bars_tone').get_attribute('value'))
-        self.assertEqual(black_silence_1_field_input, self.browser.find_element_by_name('black_silence_1').get_attribute('value'))
-        self.assertEqual(slate_silence_field_input, self.browser.find_element_by_name('slate_silence').get_attribute('value'))
-        self.assertEqual(black_silence_2_field_input, self.browser.find_element_by_name('black_silence_2').get_attribute('value'))
-        self.assertEqual(start_of_program_field_input, self.browser.find_element_by_name('start_of_program').get_attribute('value'))
-        self.assertEqual(end_of_program_field_input, self.browser.find_element_by_name('end_of_program').get_attribute('value'))
-        self.assertEqual(active_video_begins_field_input, self.browser.find_element_by_name('active_video_begins').get_attribute('value'))
-        self.assertEqual(active_video_ends_field_input, self.browser.find_element_by_name('active_video_ends').get_attribute('value'))
-        self.assertEqual(horizontal_blanking_field_input, self.browser.find_element_by_name('horizontal_blanking').get_attribute('value'))
-        self.assertEqual(luminance_peak_field_input, self.browser.find_element_by_name('luminance_peak').get_attribute('value'))
-        self.assertEqual(chroma_peak_field_input, self.browser.find_element_by_name('chroma_peak').get_attribute('value'))
+        self.assertEqual(black_silence_1_field_input,
+                         self.browser.find_element_by_name('black_silence_1').get_attribute('value'))
+        self.assertEqual(slate_silence_field_input,
+                         self.browser.find_element_by_name('slate_silence').get_attribute('value'))
+        self.assertEqual(black_silence_2_field_input,
+                         self.browser.find_element_by_name('black_silence_2').get_attribute('value'))
+        self.assertEqual(start_of_program_field_input,
+                         self.browser.find_element_by_name('start_of_program').get_attribute('value'))
+        self.assertEqual(end_of_program_field_input,
+                         self.browser.find_element_by_name('end_of_program').get_attribute('value'))
+        self.assertEqual(active_video_begins_field_input,
+                         self.browser.find_element_by_name('active_video_begins').get_attribute('value'))
+        self.assertEqual(active_video_ends_field_input,
+                         self.browser.find_element_by_name('active_video_ends').get_attribute('value'))
+        self.assertEqual(horizontal_blanking_field_input,
+                         self.browser.find_element_by_name('horizontal_blanking').get_attribute('value'))
+        self.assertEqual(luminance_peak_field_input,
+                         self.browser.find_element_by_name('luminance_peak').get_attribute('value'))
+        self.assertEqual(chroma_peak_field_input,
+                         self.browser.find_element_by_name('chroma_peak').get_attribute('value'))
         self.assertEqual(head_logo_field_input, self.browser.find_element_by_name('head_logo').get_attribute('value'))
         self.assertEqual(tail_logo_field_input, self.browser.find_element_by_name('tail_logo').get_attribute('value'))
-        self.assertEqual(total_runtime_field_input, self.browser.find_element_by_name('total_runtime').get_attribute('value'))
-        self.assertEqual(tv_feature_trailer_field_input, self.browser.find_element_by_name('tv_feature_trailer').get_attribute('value'))
-        self.assertEqual(textless_tail_field_input, self.browser.find_element_by_name('textless_tail').get_attribute('value'))
+        self.assertEqual(total_runtime_field_input,
+                         self.browser.find_element_by_name('total_runtime').get_attribute('value'))
+        self.assertEqual(tv_feature_trailer_field_input,
+                         self.browser.find_element_by_name('tv_feature_trailer').get_attribute('value'))
+        self.assertEqual(textless_tail_field_input,
+                         self.browser.find_element_by_name('textless_tail').get_attribute('value'))
         self.assertEqual(notices_field_input, self.browser.find_element_by_name('notices').get_attribute('value'))
         self.assertEqual(language_field_input, self.browser.find_element_by_name('language').get_attribute('value'))
-        self.assertEqual(cc_subtitles_field_input, self.browser.find_element_by_name('cc_subtitles').get_attribute('value'))
+        self.assertEqual(cc_subtitles_field_input,
+                         self.browser.find_element_by_name('cc_subtitles').get_attribute('value'))
         self.assertEqual(vitc_field_input, self.browser.find_element_by_name('vitc').get_attribute('value'))
-        self.assertEqual(source_barcode_field_input, self.browser.find_element_by_name('source_barcode').get_attribute('value'))
-        self.assertEqual(element_qc_barcode_field_input, self.browser.find_element_by_name('element_qc_barcode').get_attribute('value'))
+        self.assertEqual(source_barcode_field_input,
+                         self.browser.find_element_by_name('source_barcode').get_attribute('value'))
+        self.assertEqual(element_qc_barcode_field_input,
+                         self.browser.find_element_by_name('element_qc_barcode').get_attribute('value'))
 
         # Also check the select widgets and make sure they are what was selected
         style_select = Select(self.browser.find_element_by_id('style'))
@@ -220,19 +234,12 @@ class ElementEvalTest(unittest.TestCase):
         self.assertEqual(label_select_option, label_select.first_selected_option.text)
 
     def test_add_and_remove_row_buttons(self):
-        self.browser.get(self.target_website)
-
-        time.sleep(3)
-
-        # Open up the Element Evaluation (QC Report) page
-        element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
-        element_eval_link.click()
-
-        time.sleep(2)
+        self.load_element_eval_page()
 
         # Get the number of rows currently on the audio config table
         # Two rows are dedicated to the table headers, so don't count those
-        original_row_count = len(self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
+        original_row_count = len(
+            self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
 
         # Start with the add row button
         add_row_button = self.browser.find_element_by_class_name('add_row_button')
@@ -242,7 +249,8 @@ class ElementEvalTest(unittest.TestCase):
         time.sleep(2)
 
         # Count the new number of rows, and assert that it's one more than we had
-        new_row_count = len(self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
+        new_row_count = len(
+            self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
         self.assertEqual(original_row_count + 1, new_row_count)
 
         # Now the subtract button
@@ -253,23 +261,17 @@ class ElementEvalTest(unittest.TestCase):
         time.sleep(2)
 
         # Count the new number of rows, and assert that it's one less than we had (back to the original count)
-        new_row_count = len(self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
+        new_row_count = len(
+            self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
         self.assertEqual(original_row_count, new_row_count)
 
     def test_cannot_remove_all_audio_config_rows(self):
-        self.browser.get(self.target_website)
-
-        time.sleep(3)
-
-        # Open up the Element Evaluation (QC Report) page
-        element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
-        element_eval_link.click()
-
-        time.sleep(2)
+        self.load_element_eval_page()
 
         # Get the number of rows currently on the audio config table
         # Two rows are dedicated to the table headers, so don't count those
-        original_row_count = len(self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
+        original_row_count = len(
+            self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
 
         # Iterate down from the row count to one
         for x in range(original_row_count, 1, -1):
@@ -303,6 +305,91 @@ class ElementEvalTest(unittest.TestCase):
             subtract_button_is_visible = False
 
         self.assertTrue(subtract_button_is_visible)
+
+    def test_reload_page_keeps_audio_config_values(self):
+        self.load_element_eval_page()
+
+        # Get the number of rows currently on the audio config table
+        # Two rows are dedicated to the table headers, so don't count those
+        original_row_count = len(
+            self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 2
+
+        # Input test values in the boxes
+        for row in range(original_row_count):
+            channel_text = 'Channel {0}'.format(row)
+            content_text = 'Content {0}'.format(row)
+            tone_text = 'Tone {0}'.format(row)
+            peak_text = 'Peak {0}'.format(row)
+
+            channel_input = self.browser.find_element_by_name('channel-{0}'.format(row))
+            content_input = self.browser.find_element_by_name('content-{0}'.format(row))
+            tone_input = self.browser.find_element_by_name('tone-{0}'.format(row))
+            peak_input = self.browser.find_element_by_name('peak-{0}'.format(row))
+
+            channel_input.send_keys(channel_text)
+            content_input.send_keys(content_text)
+            tone_input.send_keys(tone_text)
+            peak_input.send_keys(peak_text)
+
+        # Click the add row button
+        self.browser.find_element_by_class_name('add_row_button').click()
+
+        time.sleep(2)
+
+        # Check if the text inputs still have their values (the last row won't have anything)
+        for row in range(original_row_count):
+            channel_text = 'Channel {0}'.format(row)
+            content_text = 'Content {0}'.format(row)
+            tone_text = 'Tone {0}'.format(row)
+            peak_text = 'Peak {0}'.format(row)
+
+            self.assertEqual(channel_text, self.browser.find_element_by_name(
+                'channel-{0}'.format(row)).get_attribute('value'))
+            self.assertEqual(content_text, self.browser.find_element_by_name(
+                'content-{0}'.format(row)).get_attribute('value'))
+            self.assertEqual(tone_text, self.browser.find_element_by_name(
+                'tone-{0}'.format(row)).get_attribute('value'))
+            self.assertEqual(peak_text, self.browser.find_element_by_name(
+                'peak-{0}'.format(row)).get_attribute('value'))
+
+        # Make sure the added row's values are blank, and not "None"
+        self.assertEqual('',
+                         self.browser.find_element_by_name('channel-{0}'.format(original_row_count)).get_attribute(
+                             'value'))
+        self.assertEqual('',
+                         self.browser.find_element_by_name('content-{0}'.format(original_row_count)).get_attribute(
+                             'value'))
+        self.assertEqual('',
+                         self.browser.find_element_by_name('tone-{0}'.format(original_row_count)).get_attribute(
+                             'value'))
+        self.assertEqual('',
+                         self.browser.find_element_by_name('peak-{0}'.format(original_row_count)).get_attribute(
+                             'value'))
+
+        # Now verify that when a row is removed, it's original contents are removed as well.
+        # Start by removing two rows
+        self.browser.find_element_by_class_name('subtract_row_button').click()
+        time.sleep(2)
+        self.browser.find_element_by_class_name('subtract_row_button').click()
+        time.sleep(2)
+
+        # Add a row back in
+        self.browser.find_element_by_class_name('add_row_button').click()
+        time.sleep(2)
+
+        # Now verify the last row is empty
+        last_row_index = len(
+            self.browser.find_elements_by_xpath("//table[@id='audio_configuration_table']/tbody/tr")) - 3
+
+        self.assertEqual('',
+                         self.browser.find_element_by_name('channel-{0}'.format(last_row_index)).get_attribute('value'))
+        self.assertEqual('',
+                         self.browser.find_element_by_name('content-{0}'.format(last_row_index)).get_attribute('value'))
+        self.assertEqual('',
+                         self.browser.find_element_by_name('tone-{0}'.format(last_row_index)).get_attribute('value'))
+        self.assertEqual('',
+                         self.browser.find_element_by_name('peak-{0}'.format(last_row_index)).get_attribute('value'))
+
 
 
 if __name__ == '__main__':

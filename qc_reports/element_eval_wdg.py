@@ -157,6 +157,8 @@ class ElementEvalWdg(BaseTableElementWdg):
             self.record_date = report_data.get('record_date')
 
             self.audio_configuration_lines = int(report_data.get('audio_configuration_lines', 8))
+
+            self.audio_configuration_lines_values = report_data.get('audio_configuration_lines_values')
         else:
             self.title_code = self.get_kwargs().get('title_code')
 
@@ -248,6 +250,15 @@ try {
         audio_configuration_lines = 1;
     }
 
+    var audio_configuration_lines_values = {};
+
+    for (var i = 0; i < number_of_audio_configuration_lines; i++) {
+        audio_configuration_lines_values['channel-' + String(i)] = document.getElementsByName("channel-" + String(i))[0].value;
+        audio_configuration_lines_values['content-' + String(i)] = document.getElementsByName("content-" + String(i))[0].value;
+        audio_configuration_lines_values['tone-' + String(i)] = document.getElementsByName("tone-" + String(i))[0].value;
+        audio_configuration_lines_values['peak-' + String(i)] = document.getElementsByName("peak-" + String(i))[0].value;
+    }
+
     var qc_report_object = {
         'date': date,
         'operator': operator,
@@ -289,7 +300,8 @@ try {
         'element_qc_barcode': element_qc_barcode,
         'label': label,
         'record_date': record_date,
-        'audio_configuration_lines': audio_configuration_lines
+        'audio_configuration_lines': audio_configuration_lines,
+        'audio_configuration_lines_values': audio_configuration_lines_values
     };
 
     var board_table = document.getElementById('element_eval_panel');
@@ -307,672 +319,6 @@ catch(err) {
 
         return behavior
 
-    @staticmethod
-    def get_save_bvr(wo_code, ell_code):
-        behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
-                        function loop_dict(dictionary){
-                            //var keys = [];
-                            for (var key in dictionary) {
-                              if (dictionary.hasOwnProperty(key)) {
-                                //keys.push(key);
-                                alert(key + ': ' + dictionary[key]);
-                              }
-                            }
-                        }
-                        try{
-                          wo_code = '%s';
-                          ell_code = '%s';
-                          top_els = document.getElementsByClassName('printable_element_form_' + wo_code);
-                          top_el = null;
-                          for(var r = 0; r < top_els.length; r++){
-                              if(top_els[r].getAttribute('element_code') == ell_code){
-                                  top_el = top_els[r];
-                              }
-                          }
-                          big_els = document.getElementsByClassName('big_ol_element_wdg_' + wo_code);
-                          big_el = null;
-                          for(var r = 0; r < big_els.length; r++){
-                              if(big_els[r].getAttribute('element_code') == ell_code){
-                                  big_el = big_els[r];
-                              }
-                          }
-                          element_code_old = top_el.getAttribute('element_code');
-                          var server = TacticServerStub.get();
-                          whole_status = '';
-                          stat_els = top_el.getElementsByClassName('spt_input');
-                          for(var r = 0; r < stat_els.length; r++){
-                              name = stat_els[r].getAttribute('name');
-                              if(name.indexOf('marked_') != -1 && stat_els[r].getAttribute('type') == 'checkbox'){
-                                  if(stat_els[r].checked){
-                                      if(whole_status == ''){
-                                          whole_status = name.replace('marked_','');
-                                      }else{
-                                          whole_status = whole_status + ',' + name.replace('marked_','');
-                                      }
-                                  }
-                              }
-                          }
-                          if(whole_status == ''){
-                              spt.alert('You must first tell us if it was Approved, Rejected, or if there is a Special Condition. Do This by using the checkboxes in the upper-right');
-                          }else{
-                              spt.app_busy.show('Saving this report...');
-                              work_order = server.eval("@SOBJECT(twog/work_order['code','" + wo_code + "'])")[0];
-                              sources = server.eval("@SOBJECT(twog/title_origin['title_code','" + work_order.title_code + "'])");
-                              source_codes = '';
-                              for(var r = 0; r < sources.length; r++){
-                                  if(source_codes == ''){
-                                      source_codes = sources[r].source_code;
-                                  }else{
-                                      source_codes = source_codes + ',' + sources[r].source_code;
-                                  }
-                              }
-                              new_data_fields = ['description','timestamp','operator','bay','machine_number','client_name','title','season','episode','version','style','format','standard','po_number','style','aspect_ratio','frame_rate','roll_up','bars_tone','black_silence_1','slate_silence','black_silence_2','start_of_program','end_of_program','roll_up_f','bars_tone_f','black_silence_1_f','slate_silence_f','black_silence_2_f','start_of_program_f','end_of_program_f','active_video_begins','active_video_ends','horizontal_blanking','video_peak','chroma_peak','total_runtime','tv_feature_trailer','textless_at_tail','cc_subtitles','vitc','record_date','language','label','head_logo','tail_logo','notices','record_vendor','vendor_id','file_name'];
-                              new_data = {};
-                              for(var r = 0; r < new_data_fields.length; r++){
-                                  the_field = new_data_fields[r];
-                                  the_element = top_el.getElementById(the_field);
-                                  if(the_element != null){
-                                    new_data[the_field] = the_element.value;
-                                  }
-                              }
-                              decs = ['dec_a1','dec_a2','dec_a3','dec_a4','dec_b1','dec_b2','dec_b3','dec_b4','dec_c1','dec_c2','dec_c3','dec_c4','dec_d1','dec_d2','dec_d3','dec_d4'];
-                              for(var r = 0; r < decs.length; r++){
-                                  new_data[decs[r]] = '';
-                              }
-                              date_els = top_el.getElementsByClassName('spt_calendar_input');
-                              record_date_el = null;
-                              for(var w = 0; w < date_els.length; w++){
-                                  if(date_els[w].name == 'record_date'){
-                                      record_date_el = date_els[w];
-                                  }
-                              }
-                              record_date = record_date_el.value;
-                              new_data['record_date'] = record_date;
-                              new_data['login'] = new_data['operator'];
-                              new_data['client_code'] = work_order.client_code;
-                              new_data['title_code'] = work_order.title_code;
-                              new_data['order_code'] = work_order.order_code;
-                              new_data['work_order_code'] = wo_code;
-                              new_data['conclusion'] = whole_status;
-                              new_data['source_code'] = source_codes;
-                              new_data['wo_name'] = work_order.process;
-                              new_data['type'] = '';
-                              new_data['title_type'] = '';
-                              new_data['setup'] = '';
-                              new_data['vertical_blanking'] = '';
-                              new_data['timecodes'] = '';
-                              new_data['comp_mne_sync'] = '';
-                              new_data['comp_mne_phase'] = '';
-                              new_data['missing_mne'] = '';
-                              new_data['average_dialogue'] = '';
-                              new_data['ltc'] = '';
-                              new_data['control_track'] = '';
-                              new_element_eval = null;
-                              if(element_code_old == ''){
-                                  new_element_eval = server.insert('twog/element_eval', new_data);
-                              }else{
-                                  new_element_eval = server.update(server.build_search_key('twog/element_eval', element_code_old), new_data);
-                              }
-                              if(new_element_eval.code != ''){
-                                  lines = big_el.getElementsByClassName('element_lines');
-                                  for(var r = 0; r < lines.length; r++){
-                                      if(lines[r].style.display != 'none'){
-                                          rowct = lines[r].getAttribute('line');
-                                          old_code = lines[r].getAttribute('code');
-                                          timecode_in = big_el.getElementById('timecode_in-' + rowct).value;
-                                          field_in = big_el.getElementById('field_in-' + rowct).value;
-                                          timecode_out = big_el.getElementById('timecode_out-' + rowct).value;
-                                          field_out = big_el.getElementById('field_out-' + rowct).value;
-                                          //media_type = big_el.getElementById('media_type-' + rowct).value;
-                                          description_ele = big_el.getElementById('description-' + rowct);
-                                          description_style = '';
-                                          if(description_ele.style.fontWeight == 'bold'){
-                                              description_style = 'b';
-                                          }
-                                          if(description_ele.style.fontStyle == 'italic'){
-                                              description_style = description_style + 'i';
-                                          }
-                                          description = description_ele.value;
-                                          type_code = big_el.getElementById('type_code-' + rowct).value;
-                                          scale = big_el.getElementById('scale-' + rowct).value;
-                                          in_source = big_el.getElementById('in_source-' + rowct).value;
-                                          in_safe = big_el.getElementById('in_safe-' + rowct).value;
-                                          sector_or_channel = big_el.getElementById('sector_or_channel-' + rowct).value;
-                                          ordering = big_el.getElementById('ordering-' + rowct);
-                                          element_line = {'description': description, 'login': new_data['operator'], 'element_eval_code': new_element_eval.code, 'order_code': work_order.order_code, 'title_code': work_order.title_code, 'work_order_code': wo_code, 'timecode_in': timecode_in, 'field_in': field_in, 'timecode_out': timecode_out, 'field_out': field_out, 'type_code': type_code, 'scale': scale, 'sector_or_channel': sector_or_channel, 'in_source': in_source, 'in_safe': in_safe, 'source_code': source_codes, 'description_style': description_style}
-                                          if(ordering){
-                                              oval = ordering.value;
-                                              if(oval == null){
-                                                  oval = '';
-                                              }
-                                              element_line['ordering'] = oval;
-                                          }
-                                          //loop_dict(element_line);
-                                          if(description != '' && timecode_in != ''){
-                                              if(old_code == ''){
-                                                  server.insert('twog/element_eval_lines', element_line);
-                                              }else{
-                                                  server.update(server.build_search_key('twog/element_eval_lines', old_code), element_line);
-                                              }
-                                          }
-                                      }
-                                  }
-                                  //This needs to be for the barcode lines
-                                  bcs = big_el.getElementsByClassName('element_barcodes');
-                                  for(var r = 0; r < bcs.length; r++){
-                                      if(bcs[r].style.display != 'none'){
-                                          rowct = bcs[r].getAttribute('line');
-                                          old_code = bcs[r].getAttribute('code');
-                                          barcode = big_el.getElementById('barcode-' + rowct).value;
-                                          program_start = big_el.getElementById('program_start-' + rowct).value;
-                                          f1 = big_el.getElementById('f1-' + rowct).value;
-                                          program_end = big_el.getElementById('program_end-' + rowct).value;
-                                          f2 = big_el.getElementById('f2-' + rowct).value;
-                                          length = big_el.getElementById('length-' + rowct).value;
-                                          label_info = big_el.getElementById('label_info-' + rowct).value;
-                                          slate_info = big_el.getElementById('slate_info-' + rowct).value;
-                                          element_line = {'barcode': barcode, 'program_start': program_start, 'f1': f1, 'program_end': program_end, 'f2': f2, 'length': length, 'label_info': label_info, 'slate_info': slate_info, 'element_eval_code': new_element_eval.code}
-                                          if(barcode != '' && program_start != ''){
-                                              if(old_code == ''){
-                                                  server.insert('twog/element_eval_barcodes', element_line);
-                                              }else{
-                                                  server.update(server.build_search_key('twog/element_eval_barcodes', old_code), element_line);
-                                              }
-                                          }
-                                      }
-                                  }
-                                  //barcode lines end
-                                  audio_information_el = big_el.getElementById('audio_information');
-                                  num_o_channels = Number(audio_information_el.getAttribute('channels'));
-                                  for(var r = 0; r < num_o_channels; r++){
-                                      rowct = r;
-                                      channel_el = big_el.getElementById('channel-' + rowct);
-                                      old_code = channel_el.getAttribute('code');
-                                      channel = channel_el.value;
-                                      content = big_el.getElementById('content-' + rowct).value;
-                                      tone = big_el.getElementById('tone-' + rowct).value;
-                                      peak = big_el.getElementById('peak-' + rowct).value;
-                                      audio_line = {'channel': channel, 'content': content, 'tone': tone, 'peak': peak, 'element_eval_code': new_element_eval.code};
-                                      if(channel != '' && content != ''){
-                                          if(old_code == ''){
-                                              server.insert('twog/element_eval_audio', audio_line);
-                                          }else{
-                                              server.update(server.build_search_key('twog/element_eval_audio', old_code), audio_line);
-                                          }
-                                      }
-                                  }
-                                  var class_name = 'qc_reports.element_eval_wdg.ElementEvalWdg';
-                                  kwargs = {'code': wo_code, 'element_code': new_element_eval.code, 'channels': num_o_channels}
-                                  //spt.popup.close(spt.popup.get_popup(bvr.src_el));
-                                  //spt.panel.load_popup('Element Evaluation for ' + wo_code, class_name, kwargs);
-                                  spt.tab.add_new('ElementEvalWdg_qc_report_for_' + wo_code,'Element Evaluation for ' + wo_code, class_name, kwargs);
-                              }
-                              spt.app_busy.hide();
-                          }
-                }
-                catch(err){
-                          spt.app_busy.hide();
-                          spt.alert(spt.exception.handler(err));
-                }
-         ''' % (wo_code, ell_code)}
-        return behavior
-
-    @staticmethod
-    def get_clone_report(wo_code, el_code):
-        behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
-                        try{
-                          var work_order_code = '%s';
-                          var report_code = '%s';
-                          var class_name = 'qc_reports.QCReportClonerWdg';
-                          kwargs = {'wo_code': work_order_code, 'report_code': report_code, 'type': 'element'}
-                          //spt.popup.close(spt.popup.get_popup(bvr.src_el));
-                          spt.app_busy.show("Collecting related qc work orders...");
-                          spt.panel.load_popup('Clone Report To ... ', class_name, kwargs);
-                          spt.app_busy.hide();
-                }
-                catch(err){
-                          spt.app_busy.hide();
-                          spt.alert(spt.exception.handler(err));
-                }
-         ''' % (wo_code, el_code)}
-        return behavior
-
-    @staticmethod
-    def get_print_bvr(wo_code, el_code, type):
-        behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
-                        function replaceAll(find, replace, str) {
-                          find = find.replace('[','\\\[').replace(']','\\\]').replace('+','\\\+');
-                          return str.replace(new RegExp(find, 'g'), replace);
-                        }
-                        function printExternal(url) {
-                            var printWindow = window.open( url, 'Print', 'toolbar=1,location=1,directories=1,status=1,menubar=1,scrollbars=0,resizable=0');
-                            printWindow.addEventListener('load', function(){
-                                printWindow.print();
-                                //printWindow.close();
-                            }, true);
-                        }
-                        try{
-                          wo_code = '%s';
-                          element_code = '%s';
-                          type = '%s';
-                          top_els = document.getElementsByClassName('printable_element_form_' + wo_code);
-                          top_el = null;
-                          for(var r = 0; r < top_els.length; r++){
-                              if(top_els[r].getAttribute('element_code') == element_code){
-                                  top_el = top_els[r];
-                              }
-                          }
-                          title = top_el.getElementById('title').value;
-                          episode = top_el.getElementById('episode').value;
-                          language = top_el.getElementById('language').value;
-                          file_name_str = replaceAll(' ','_',title);
-                          if(episode != '' && episode != null){
-                              file_name_str = file_name_str + '__' + replaceAll(' ','_',episode);
-                          }
-                          if(language == '' || language == null){
-                              language = 'None_Set';
-                          }
-                          whole_status = '';
-                          stat_els = top_el.getElementsByClassName('spt_input');
-                          for(var r = 0; r < stat_els.length; r++){
-                              name = stat_els[r].getAttribute('name');
-                              if(name.indexOf('marked_') != -1 && stat_els[r].getAttribute('type') == 'checkbox'){
-                                  if(stat_els[r].checked){
-                                      if(whole_status == ''){
-                                          whole_status = name.replace('marked_','');
-                                      }else{
-                                          whole_status = whole_status + '_' + name.replace('marked_','');
-                                      }
-                                  }
-                              }
-                          }
-                          file_name_str = file_name_str + '__' + replaceAll(' ','_',language) + '__' + whole_status;
-                          file_name_str = replaceAll("\\\'",'',file_name_str);
-                          file_name_str = replaceAll("\\\-",'_',file_name_str);
-                          file_name_str = replaceAll("\\\.",'',file_name_str);
-                          file_name_str = replaceAll("\\\,",'',file_name_str);
-                          file_name_str = replaceAll("\\\!",'',file_name_str);
-                          file_name_str = replaceAll("\\\?",'',file_name_str);
-                          file_name_str = replaceAll("\\\^",'',file_name_str);
-                          file_name_str = replaceAll("\\\#",'',file_name_str);
-                          file_name_str = replaceAll("\\\&",'_and_',file_name_str);
-                          file_name_str = replaceAll("\\\(",'',file_name_str);
-                          file_name_str = replaceAll("\\\)",'',file_name_str);
-                          file_name_str = replaceAll("\\\*",'',file_name_str);
-                          file_name_str = replaceAll("\\\%s",'',file_name_str);
-                          file_name_str = replaceAll("\\\$",'',file_name_str);
-                          file_name_str = replaceAll("\\\@",'',file_name_str);
-                          file_name_str = replaceAll("\\\~",'',file_name_str);
-                          file_name_str = replaceAll("\\\`",'',file_name_str);
-                          file_name_str = replaceAll("\\\:",'',file_name_str);
-                          file_name_str = replaceAll("\\\;",'',file_name_str);
-                          file_name_str = replaceAll('\\\"','',file_name_str);
-                          file_name_str = replaceAll('\\\<','',file_name_str);
-                          file_name_str = replaceAll('\\\>','',file_name_str);
-                          file_name_str = replaceAll('\\\/','',file_name_str);
-                          file_name_str = replaceAll('\\\|','',file_name_str);
-                          file_name_str = replaceAll('\\\}','',file_name_str);
-                          file_name_str = replaceAll('\\\{','',file_name_str);
-                          file_name_str = replaceAll('\\\=','',file_name_str);
-                          var server = TacticServerStub.get();
-                          lines = top_el.getElementsByClassName('element_lines');
-                          for(var r = 0; r < lines.length; r++){
-                              linect = lines[r].getAttribute('line');
-                              tc = top_el.getElementById('timecode_in-' + linect);
-                              if(tc.value == '' || tc.value == null){
-                                  lines[r].style.display = 'none';
-                              }
-                              ord = top_el.getElementById('ordering-' + linect);
-                              if(ord){
-                                  ord.style.display = 'none';
-                              }
-                              killer = top_el.getElementById('killer-' + linect);
-                              if(killer){
-                                  killer.style.display = 'none';
-                              }
-                              descriptioner = top_el.getElementById('description-' + linect);
-                              if(descriptioner){
-                                  descriptioner.setAttribute('width', '520px');
-                                  descriptioner.style.width = '520px';
-                              }
-                          }
-                          bcs = top_el.getElementsByClassName('element_barcodes');
-                          for(var r = 0; r < bcs.length; r++){
-                              linect = bcs[r].getAttribute('line');
-                              tc = top_el.getElementById('barcode-' + linect);
-                              if(tc.value == '' || tc.value == null){
-                                  bcs[r].style.display = 'none';
-                              }else{
-                                  cells = bcs[r].getElementsByTagName('td');
-                                  for(var w = 0; w < cells.length; w++){
-                                      if(cells[w].innerHTML == '<b>X</b>'){
-                                          cells[w].style.display = 'none';
-                                      }
-                                  }
-                              }
-                          }
-                          sels = top_el.getElementsByClassName('select_cell');
-                          for(var r = 0; r < sels.length; r++){
-                              select_el = sels[r].getElementsByTagName('select')[0];
-                              offset_width = select_el.offsetWidth;
-                              value = select_el.value;
-                              sels[r].innerHTML = '<input type="text" value="' + value + '" style="width: ' + offset_width + ';"/>';
-                          }
-                          tc_shifter = top_el.getElementById('tc_shifter');
-                          tc_shifter.style.display = 'none';
-                          description_el = top_el.getElementById('description');
-                          description_el.setAttribute('cols','110');
-                          darkrow = top_el.getElementById('darkrow');
-                          darkrow.setAttribute('width','110px');
-                          audio_row = top_el.getElementById('audio_row');
-                          audio_row.innerHTML = audio_row.innerHTML.replace('- click to change number of channels','');
-                          top_els = document.getElementsByClassName('printable_element_form_' + wo_code);
-                          top_el = null;
-                          for(var r = 0; r < top_els.length; r++){
-                              if(top_els[r].getAttribute('element_code') == element_code){
-                                  top_el = top_els[r];
-                              }
-                          }
-                          new_html = top_el.innerHTML;
-
-                          thing = server.execute_cmd('qc_reports.PrintQCReportWdg', {'html': '<table>' + new_html + '</table>','preppend_file_name': file_name_str, 'type': ''});
-                          var url = '/qc_reports/work_orders/' + file_name_str + '.html';
-                          printExternal(url);
-                          if(element_code != '' && element_code != null){
-                              //close, then reload page
-                              var class_name = 'qc_reports.element_eval_wdg.ElementEvalWdg';
-                              kwargs = {'code': wo_code, 'element_code': element_code}
-                              spt.tab.add_new('ElementEvalWdg_qc_report_for_' + wo_code,'Element Evaluation for ' + wo_code, class_name, kwargs);
-                          }
-                }
-                catch(err){
-                          spt.app_busy.hide();
-                          spt.alert(spt.exception.handler(err));
-                }
-         ''' % (wo_code, el_code, type, '%')}
-        return behavior
-
-    @staticmethod
-    def get_new_print_bvr(wo_code, el_code, type):
-        behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
-                        function replaceAll(find, replace, str) {
-                          find = find.replace('[','\\\[').replace(']','\\\]').replace('+','\\\+');
-                          return str.replace(new RegExp(find, 'g'), replace);
-                        }
-                        function printExternal(url) {
-                            var printWindow = window.open( url, 'Print', 'toolbar=1,location=1,directories=1,status=1,menubar=1,scrollbars=0,resizable=0');
-                            printWindow.addEventListener('load', function(){
-                                printWindow.print();
-                                //printWindow.close();
-                            }, true);
-                        }
-                        try{
-                          wo_code = '%s';
-                          element_code = '%s';
-                          type = '%s';
-                          top_els = document.getElementsByClassName('printable_element_form_' + wo_code);
-                          top_el = null;
-                          for(var r = 0; r < top_els.length; r++){
-                              if(top_els[r].getAttribute('element_code') == element_code){
-                                  top_el = top_els[r];
-                              }
-                          }
-                          title = top_el.getElementById('title').value;
-                          episode = top_el.getElementById('episode').value;
-                          language = top_el.getElementById('language').value;
-                          file_name_str = replaceAll(' ','_',title);
-                          if(episode != '' && episode != null){
-                              file_name_str = file_name_str + '__' + replaceAll(' ','_',episode);
-                          }
-                          if(language == '' || language == null){
-                              language = 'None_Set';
-                          }
-                          whole_status = '';
-                          stat_els = top_el.getElementsByClassName('spt_input');
-                          for(var r = 0; r < stat_els.length; r++){
-                              name = stat_els[r].getAttribute('name');
-                              if(name.indexOf('marked_') != -1 && stat_els[r].getAttribute('type') == 'checkbox'){
-                                  if(stat_els[r].checked){
-                                      if(whole_status == ''){
-                                          whole_status = name.replace('marked_','');
-                                      }else{
-                                          whole_status = whole_status + '_' + name.replace('marked_','');
-                                      }
-                                  }
-                              }
-                          }
-                          file_name_str = file_name_str + '__' + replaceAll(' ','_',language) + '__' + whole_status;
-                          file_name_str = replaceAll("\\\'",'',file_name_str);
-                          file_name_str = replaceAll("\\\-",'_',file_name_str);
-                          file_name_str = replaceAll("\\\.",'',file_name_str);
-                          file_name_str = replaceAll("\\\,",'',file_name_str);
-                          file_name_str = replaceAll("\\\!",'',file_name_str);
-                          file_name_str = replaceAll("\\\?",'',file_name_str);
-                          file_name_str = replaceAll("\\\^",'',file_name_str);
-                          file_name_str = replaceAll("\\\#",'',file_name_str);
-                          file_name_str = replaceAll("\\\&",'_and_',file_name_str);
-                          file_name_str = replaceAll("\\\(",'',file_name_str);
-                          file_name_str = replaceAll("\\\)",'',file_name_str);
-                          file_name_str = replaceAll("\\\*",'',file_name_str);
-                          file_name_str = replaceAll("\\\%s",'',file_name_str);
-                          file_name_str = replaceAll("\\\$",'',file_name_str);
-                          file_name_str = replaceAll("\\\@",'',file_name_str);
-                          file_name_str = replaceAll("\\\~",'',file_name_str);
-                          file_name_str = replaceAll("\\\`",'',file_name_str);
-                          file_name_str = replaceAll("\\\:",'',file_name_str);
-                          file_name_str = replaceAll("\\\;",'',file_name_str);
-                          file_name_str = replaceAll('\\\"','',file_name_str);
-                          file_name_str = replaceAll('\\\<','',file_name_str);
-                          file_name_str = replaceAll('\\\>','',file_name_str);
-                          file_name_str = replaceAll('\\\/','',file_name_str);
-                          file_name_str = replaceAll('\\\|','',file_name_str);
-                          file_name_str = replaceAll('\\\}','',file_name_str);
-                          file_name_str = replaceAll('\\\{','',file_name_str);
-                          file_name_str = replaceAll('\\\=','',file_name_str);
-                          var server = TacticServerStub.get();
-                          lines = top_el.getElementsByClassName('element_lines');
-                          for(var r = 0; r < lines.length; r++){
-                              linect = lines[r].getAttribute('line');
-                              tc = top_el.getElementById('timecode_in-' + linect);
-                              if(tc.value == '' || tc.value == null){
-                                  lines[r].style.display = 'none';
-                              }
-                              ord = top_el.getElementById('ordering-' + linect);
-                              if(ord){
-                                  ord.style.display = 'none';
-                              }
-                              killer = top_el.getElementById('killer-' + linect);
-                              if(killer){
-                                  killer.style.display = 'none';
-                              }
-                              descriptioner = top_el.getElementById('description-' + linect);
-                              if(descriptioner){
-                                    value = descriptioner.value;
-
-                                    var newDiv = document.createElement('div');
-                                    newDiv.innerHTML = value;
-                                    newDiv.style.width = '520px';
-                                    newDiv.style.borderWidth = '1px';
-                                    newDiv.style.borderStyle = 'solid';
-                                    newDiv.style.borderColor = 'gray';
-
-                                    descriptioner.parentNode.insertBefore(newDiv, descriptioner);
-
-                                    descriptioner.parentNode.removeChild(descriptioner);
-                              }
-                          }
-                          bcs = top_el.getElementsByClassName('element_barcodes');
-                          for(var r = 0; r < bcs.length; r++){
-                              linect = bcs[r].getAttribute('line');
-                              tc = top_el.getElementById('barcode-' + linect);
-                              if(tc.value == '' || tc.value == null){
-                                  bcs[r].style.display = 'none';
-                              }else{
-                                  cells = bcs[r].getElementsByTagName('td');
-                                  for(var w = 0; w < cells.length; w++){
-                                      if(cells[w].innerHTML == '<b>X</b>'){
-                                          cells[w].style.display = 'none';
-                                      }
-                                  }
-                              }
-                          }
-                          sels = top_el.getElementsByClassName('select_cell');
-                          for(var r = 0; r < sels.length; r++){
-                              select_el = sels[r].getElementsByTagName('select')[0];
-                              offset_width = select_el.offsetWidth;
-                              value = select_el.value;
-                              sels[r].innerHTML = '<input type="text" value="' + value + '" style="width: ' + offset_width + ';"/>';
-                          }
-                          tc_shifter = top_el.getElementById('tc_shifter');
-                          tc_shifter.style.display = 'none';
-                          description_el = top_el.getElementById('description');
-                          description_el.setAttribute('cols','110');
-                          darkrow = top_el.getElementById('darkrow');
-                          darkrow.setAttribute('width','110px');
-                          audio_row = top_el.getElementById('audio_row');
-                          audio_row.innerHTML = audio_row.innerHTML.replace('- click to change number of channels','');
-                          top_els = document.getElementsByClassName('printable_element_form_' + wo_code);
-                          top_el = null;
-                          for(var r = 0; r < top_els.length; r++){
-                              if(top_els[r].getAttribute('element_code') == element_code){
-                                  top_el = top_els[r];
-                              }
-                          }
-                          new_html = top_el.innerHTML;
-
-                          thing = server.execute_cmd('qc_reports.PrintQCReportWdg', {'html': '<table>' + new_html + '</table>','preppend_file_name': file_name_str, 'type': ''});
-                          var url = '/qc_reports/work_orders/' + file_name_str + '.html';
-                          printExternal(url);
-                          if(element_code != '' && element_code != null){
-                              //close, then reload page
-                              var class_name = 'qc_reports.element_eval_wdg.ElementEvalWdg';
-                              kwargs = {'code': wo_code, 'element_code': element_code}
-                              spt.tab.add_new('ElementEvalWdg_qc_report_for_' + wo_code,'Element Evaluation for ' + wo_code, class_name, kwargs);
-                          }
-                }
-                catch(err){
-                          spt.app_busy.hide();
-                          spt.alert(spt.exception.handler(err));
-                }
-         ''' % (wo_code, el_code, type, '%')}
-        return behavior
-
-    @staticmethod
-    def get_click_row(wo_code, el_code):
-        behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
-                        try{
-                          var work_order_code = '%s';
-                          var element_code = '%s';
-                          var class_name = 'qc_reports.element_eval_wdg.ElementEvalWdg';
-                          kwargs = {'code': work_order_code, 'element_code': element_code}
-                          //spt.popup.close(spt.popup.get_popup(bvr.src_el));
-                          //spt.panel.load_popup('Element Evaluation for ' + work_order_code, class_name, kwargs);
-                          spt.tab.add_new('ElementEvalWdg_qc_report_for_' + work_order_code,'Element Evaluation for ' + work_order_code, class_name, kwargs);
-                }
-                catch(err){
-                          spt.app_busy.hide();
-                          spt.alert(spt.exception.handler(err));
-                }
-         ''' % (wo_code, el_code)}
-        return behavior
-
-    @staticmethod
-    def get_add_dots():
-        behavior = {'css_class': 'clickme', 'type': 'keyup', 'cbjs_action': '''
-                try{
-                    var entered = bvr.src_el.value;
-                    var new_str = '';
-                    entered = entered.replace(/:/g,'');
-                    for(var r = 0; r < entered.length; r++){
-                        if(r % 2 == 0 && r != 0){
-                            new_str = new_str + ':';
-                        }
-                        new_str = new_str + entered[r];
-                    }
-                    bvr.src_el.value = new_str;
-                }
-                catch(err){
-                          spt.app_busy.hide();
-                          spt.alert(spt.exception.handler(err));
-                }
-         '''}
-        return behavior
-
-    @staticmethod
-    def get_delete_report(wo_code, el_code):
-        behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
-                        try{
-                          var work_order_code = '%s';
-                          var element_code = '%s';
-                          if(confirm("Are you sure you want to delete this report?")){
-                              if(confirm("Checking again. You really want to delete this report?")){
-                                  var server = TacticServerStub.get();
-                                  server.retire_sobject(server.build_search_key('twog/element_eval', element_code));
-                                  var class_name = 'qc_reports.element_eval_wdg.ElementEvalWdg';
-                                  kwargs = {'code': work_order_code}
-                                  //spt.popup.close(spt.popup.get_popup(bvr.src_el));
-                                  //spt.panel.load_popup('Element Evaluation for ' + work_order_code, class_name, kwargs);
-                                  spt.tab.add_new('ElementEvalWdg_qc_report_for_' + work_order_code,'Element Evaluation for ' + work_order_code, class_name, kwargs);
-                              }
-                          }
-                }
-                catch(err){
-                          spt.app_busy.hide();
-                          spt.alert(spt.exception.handler(err));
-                }
-         ''' % (wo_code, el_code)}
-        return behavior
-
-    @staticmethod
-    def get_change_channels(wo_code, ell_code):
-        behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
-                        try{
-                          entered = prompt("How many audio channels do you want in this report?");
-                          if(isNaN(entered)){
-                              alert(entered + " is not a number. Please only enter numbers here.")
-                          }else{
-                              wo_code = '%s';
-                              ell_code = '%s';
-                              big_els = document.getElementsByClassName('big_ol_element_wdg_' + wo_code);
-                              big_el = null;
-                              for(var r = 0; r < big_els.length; r++){
-                                  if(big_els[r].getAttribute('element_code') == ell_code){
-                                      big_el = big_els[r];
-                                  }
-                              }
-                              audio_table = big_el.getElementById('audio_table');
-                              element_eval_code = audio_table.getAttribute('code');
-                              send_data = {'code': element_eval_code, 'wo_code': wo_code, 'channels': entered, 'force_it': 'true'};
-                              spt.api.load_panel(audio_table, 'qc_reports.ElementEvalAudioWdg', send_data);
-                          }
-                }
-                catch(err){
-                          spt.app_busy.hide();
-                          spt.alert(spt.exception.handler(err));
-                }
-         ''' % (wo_code, ell_code)}
-        return behavior
-
-    @staticmethod
-    def launch_tc_shifter(wo_code, ell_code):
-        behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
-                        try{
-                          wo_code = '%s';
-                          ell_code = '%s';
-                          var class_name = 'qc_reports.ReportTimecodeShifterWdg';
-                          kwargs = {
-                                           'wo_code': wo_code,
-                                           'ell_code': ell_code
-                                   };
-                          spt.panel.load_popup('Timecode Shifter', class_name, kwargs);
-                }
-                catch(err){
-                          spt.app_busy.hide();
-                          spt.alert(spt.exception.handler(err));
-                }
-         ''' % (wo_code, ell_code)}
-        return behavior
-
     def get_text_input_wdg(self, name, width=200):
         textbox_wdg = TextInputWdg()
         textbox_wdg.set_id(name)
@@ -984,6 +330,20 @@ catch(err) {
         else:
             if self.title_sobject:
                 textbox_wdg.set_value(self.title_sobject.get(name))
+
+        return textbox_wdg
+
+    def get_text_input_wdg_for_audio_config(self, name, width=200):
+        textbox_wdg = TextInputWdg()
+        textbox_wdg.set_id(name)
+        textbox_wdg.set_name(name)
+        textbox_wdg.add_style('width', '{0}px'.format(width))
+
+        if hasattr(self, 'audio_configuration_lines_values'):
+            textbox_wdg.set_value(self.audio_configuration_lines_values.get(name, ''))
+        else:
+            if self.title_sobject:
+                textbox_wdg.set_value(self.title_sobject.get('audio_configuration_lines_values').get(name, ''))
 
         return textbox_wdg
 
@@ -1438,10 +798,15 @@ catch(err) {
 
         for iterator in range(self.audio_configuration_lines):
             audio_configuration_table.add_row()
-            audio_configuration_table.add_cell(get_text_input_wdg('channel-{0}'.format(iterator), 150))
-            audio_configuration_table.add_cell(get_text_input_wdg('content-{0}'.format(iterator), 150))
-            audio_configuration_table.add_cell(get_text_input_wdg('tone-{0}'.format(iterator), 150))
-            audio_configuration_table.add_cell(get_text_input_wdg('peak-{0}'.format(iterator), 150))
+
+            audio_configuration_table.add_cell(
+                self.get_text_input_wdg_for_audio_config('channel-{0}'.format(iterator), 150))
+            audio_configuration_table.add_cell(
+                self.get_text_input_wdg_for_audio_config('content-{0}'.format(iterator), 150))
+            audio_configuration_table.add_cell(
+                self.get_text_input_wdg_for_audio_config('tone-{0}'.format(iterator), 150))
+            audio_configuration_table.add_cell(
+                self.get_text_input_wdg_for_audio_config('peak-{0}'.format(iterator), 150))
 
         return audio_configuration_table
 
