@@ -282,12 +282,27 @@ class ElementEvalTest(unittest.TestCase):
 
         # Make sure the button is not visible
         try:
-            subtract_row_button = self.browser.find_element_by_class_name('subtract_row_button')
+            self.browser.find_element_by_class_name('subtract_row_button')
             subtract_button_is_visible = True
         except NoSuchElementException:
             subtract_button_is_visible = False
 
         self.assertFalse(subtract_button_is_visible)
+
+        # Now check if the subtract button is added back when another row is added. Start by adding a row.
+        add_row_button = self.browser.find_element_by_class_name('add_row_button')
+        add_row_button.click()
+
+        time.sleep(2)
+
+        # Make sure the button is visible
+        try:
+            self.browser.find_element_by_class_name('subtract_row_button')
+            subtract_button_is_visible = True
+        except NoSuchElementException:
+            subtract_button_is_visible = False
+
+        self.assertTrue(subtract_button_is_visible)
 
 
 if __name__ == '__main__':
