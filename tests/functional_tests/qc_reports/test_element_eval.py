@@ -391,6 +391,5 @@ class ElementEvalTest(unittest.TestCase):
                          self.browser.find_element_by_name('peak-{0}'.format(last_row_index)).get_attribute('value'))
 
 
-
 if __name__ == '__main__':
     unittest.main()

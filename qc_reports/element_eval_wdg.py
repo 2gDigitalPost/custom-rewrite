@@ -7,18 +7,6 @@ from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, CheckboxWdg
 
 
-def get_text_input_wdg(name, width=200, text=None):
-    textbox_wdg = TextInputWdg()
-    textbox_wdg.set_id(name)
-    textbox_wdg.set_name(name)
-    textbox_wdg.add_style('width', '{0}px'.format(width))
-
-    if text:
-        textbox_wdg.set_value(text)
-
-    return textbox_wdg
-
-
 def get_record_date_calendar_wdg():
     record_date_calendar_wdg = CalendarInputWdg("record_date")
     record_date_calendar_wdg.set_option('show_activator', 'true')
@@ -95,18 +83,6 @@ def get_general_comments_section():
     general_comments_div.add(general_comments_wdg)
 
     return general_comments_div
-
-
-def get_audio_configuration_add_behavior():
-    behavior = {
-        'css_class': 'clickme',
-        'type': 'click_up',
-        'cbjs_action': '''
-
-        '''
-                }
-
-    return behavior
 
 
 class ElementEvalWdg(BaseTableElementWdg):
@@ -534,16 +510,7 @@ catch(err) {
         section_span.add_style('display', 'inline-block')
 
         section_span.add('Episode: ')
-
-        try:
-            prefilled_text = self.episode
-        except AttributeError:
-            if self.title_sobject:
-                prefilled_text = self.title_sobject.get('episode')
-            else:
-                prefilled_text = None
-
-        section_span.add(get_text_input_wdg('episode', 400, prefilled_text))
+        section_span.add(self.get_text_input_wdg('episode', 400))
 
         return section_span
 
@@ -587,16 +554,7 @@ catch(err) {
         section_span.add_style('display', 'inline-block')
 
         section_span.add('Version: ')
-
-        try:
-            prefilled_text = self.version
-        except AttributeError:
-            if self.title_sobject:
-                prefilled_text = self.title_sobject.get('version')
-            else:
-                prefilled_text = None
-
-        section_span.add(get_text_input_wdg('version', 400, prefilled_text))
+        section_span.add(self.get_text_input_wdg('version', 400))
 
         return section_span
 
@@ -605,16 +563,7 @@ catch(err) {
         section_span.add_style('display', 'inline-block')
 
         section_span.add('PO #: ')
-
-        if hasattr(self, 'po_number'):
-            prefilled_text = self.po_number
-        else:
-            if self.title_sobject:
-                prefilled_text = self.title_sobject.get('po_number')
-            else:
-                prefilled_text = None
-
-        section_span.add(get_text_input_wdg('po_number', 100, prefilled_text))
+        section_span.add(self.get_text_input_wdg('po_number', 100))
 
         return section_span
 
@@ -629,16 +578,7 @@ catch(err) {
         section_span = SpanWdg()
 
         section_span.add('File Name: ')
-
-        if hasattr(self, 'file_name'):
-            prefilled_text = self.file_name
-        else:
-            if self.title_sobject:
-                prefilled_text = self.title_sobject.get('file_name')
-            else:
-                prefilled_text = None
-
-        section_span.add(get_text_input_wdg('file_name', 600, prefilled_text))
+        section_span.add(self.get_text_input_wdg('file_name', 600))
 
         return section_span
 
@@ -664,24 +604,16 @@ catch(err) {
 
         return program_format_table
 
-    def setup_table_rows_with_input_boxes(self, program_format_table, text_input_name_id_pairs):
+    def setup_table_rows_with_input_boxes(self, table, text_input_name_id_pairs):
 
         for text_input_name_id_pair in text_input_name_id_pairs:
-            program_format_table.add_row()
+            table.add_row()
 
             text_input_name = str(text_input_name_id_pair[0])
             text_input_id = str(text_input_name_id_pair[1])
 
-            program_format_table.add_cell(text_input_name)
-
-            # Check if the input value is specified in this object
-            prefilled_text = getattr(self, text_input_id, None)
-
-            # If no value, check the title_sobject (if it's not there either, prefilled_text will still be None
-            if not prefilled_text and self.title_sobject:
-                prefilled_text = self.title_sobject.get(text_input_name_id_pair)
-
-            program_format_table.add_cell(get_text_input_wdg(text_input_id, 300, prefilled_text))
+            table.add_cell(text_input_name)
+            table.add_cell(self.get_text_input_wdg(text_input_id, 300))
 
     def get_video_measurements_table(self):
         video_measurements_table = Table()
