@@ -4,18 +4,7 @@ from tactic.ui.widget import CalendarInputWdg, ButtonNewWdg
 
 from pyasm.search import Search
 from pyasm.web import Table, DivWdg, SpanWdg
-from pyasm.widget import SelectWdg, CheckboxWdg
-
-
-def get_record_date_calendar_wdg():
-    record_date_calendar_wdg = CalendarInputWdg("record_date")
-    record_date_calendar_wdg.set_option('show_activator', 'true')
-    record_date_calendar_wdg.set_option('show_time', 'false')
-    record_date_calendar_wdg.set_option('width', '300px')
-    record_date_calendar_wdg.set_option('id', 'record_date')
-    record_date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
-
-    return record_date_calendar_wdg
+from pyasm.widget import SelectWdg, CheckboxWdg, TextAreaWdg
 
 
 def get_image_div():
@@ -75,16 +64,6 @@ def get_approved_rejected_checkboxes(conclusion):
     return acr
 
 
-def get_general_comments_section():
-    general_comments_div = DivWdg()
-    general_comments_wdg = TextAreaInputWdg()
-
-    general_comments_div.add('General Comments')
-    general_comments_div.add(general_comments_wdg)
-
-    return general_comments_div
-
-
 class ElementEvalWdg(BaseTableElementWdg):
 
     def init(self):
@@ -131,10 +110,9 @@ class ElementEvalWdg(BaseTableElementWdg):
             self.element_qc_barcode = report_data.get('element_qc_barcode')
             self.label = report_data.get('label')
             self.record_date = report_data.get('record_date')
-
             self.audio_configuration_lines = int(report_data.get('audio_configuration_lines', 8))
-
             self.audio_configuration_lines_values = report_data.get('audio_configuration_lines_values')
+            self.general_comments = report_data.get('general_comments')
         else:
             self.title_code = self.get_kwargs().get('title_code')
 
@@ -143,6 +121,22 @@ class ElementEvalWdg(BaseTableElementWdg):
             self.title_sobject = title_sobject_search.get_sobject()
 
             self.audio_configuration_lines = 8
+
+    @staticmethod
+    def get_save_behavior():
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+
+}
+catch (err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
+'''
+        }
 
     @staticmethod
     def get_add_audio_configuration_line_behavior(number_of_lines=1):
@@ -207,6 +201,9 @@ try {
     var element_qc_barcode = document.getElementsByName("element_qc_barcode")[0].value;
     var label = document.getElementById("label").value;
     var record_date = document.getElementsByName("record_date")[0].value;
+
+    // General comments
+    var general_comments = document.getElementById("general_comments").value;
 
     // Get the number of lines in the audio configuration table
     var audio_configuration_table = document.getElementById('audio_configuration_table');
@@ -277,7 +274,8 @@ try {
         'label': label,
         'record_date': record_date,
         'audio_configuration_lines': audio_configuration_lines,
-        'audio_configuration_lines_values': audio_configuration_lines_values
+        'audio_configuration_lines_values': audio_configuration_lines_values,
+        'general_comments': general_comments
     };
 
     var board_table = document.getElementById('element_eval_panel');
@@ -485,7 +483,7 @@ catch(err) {
         standard_select.add_style('display', 'inline-block')
         standard_select.add_empty_option()
 
-        for standard in ('625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC', '-'):
+        for standard in ('625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC'):
             standard_select.append_option(standard, standard)
 
         try:
@@ -675,7 +673,7 @@ catch(err) {
         element_profile_table.add_cell('Label')
         element_profile_table.add_cell(self.get_label_select_wdg())
         element_profile_table.add_cell('Record Date')
-        element_profile_table.add_cell(get_record_date_calendar_wdg())
+        element_profile_table.add_cell(self.get_record_date_calendar_wdg())
 
         return element_profile_table
 
@@ -714,6 +712,19 @@ catch(err) {
             label_select_wdg.set_value(self.label)
 
         return label_select_wdg
+
+    def get_record_date_calendar_wdg(self):
+        record_date_calendar_wdg = CalendarInputWdg("record_date")
+        record_date_calendar_wdg.set_option('show_activator', 'true')
+        record_date_calendar_wdg.set_option('show_time', 'false')
+        record_date_calendar_wdg.set_option('width', '300px')
+        record_date_calendar_wdg.set_option('id', 'record_date')
+        record_date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
+
+        if hasattr(self, 'record_date'):
+            record_date_calendar_wdg.set_value(self.record_date)
+
+        return record_date_calendar_wdg
 
     def get_audio_configuration_table(self):
         audio_configuration_table = Table()
@@ -763,6 +774,19 @@ catch(err) {
 
         return section_span
 
+    def get_general_comments_section(self):
+        general_comments_div = DivWdg()
+        general_comments_wdg = TextAreaWdg()
+        general_comments_wdg.set_id('general_comments')
+        general_comments_wdg.set_input_prefix('test')
+
+        if hasattr(self, 'general_comments'):
+            general_comments_wdg.set_value(self.general_comments)
+
+        general_comments_div.add('General Comments')
+        general_comments_div.add(general_comments_wdg)
+
+        return general_comments_div
 
     def get_display(self):
         # This will be the main <div> that everything else goes into
@@ -789,6 +813,6 @@ catch(err) {
 
         main_wdg.add(self.get_add_subtract_row_buttons())
 
-        main_wdg.add(get_general_comments_section())
+        main_wdg.add(self.get_general_comments_section())
 
         return main_wdg

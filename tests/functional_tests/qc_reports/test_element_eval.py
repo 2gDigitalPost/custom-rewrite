@@ -1,6 +1,7 @@
 import unittest
 import os
 import time
+import datetime
 
 from ConfigParser import SafeConfigParser
 
@@ -62,6 +63,7 @@ class ElementEvalTest(unittest.TestCase):
         self.load_element_eval_page()
 
         # Some values to pass into the input widgets
+        date_field_input = datetime.date.today().strftime('%m-%d-%Y')
         operator_field_input = 'Test Operator'
         title_field_input = 'Test Title'
         season_field_input = 'Test Season'
@@ -92,8 +94,11 @@ class ElementEvalTest(unittest.TestCase):
         vitc_field_input = 'Test VITC'
         source_barcode_field_input = 'Test Source Barcode'
         element_qc_barcode_field_input = 'Test Element QC Barcode'
+        record_date_field_input = datetime.date.today().strftime('%m-%d-%Y')
+        general_comments_field_input = 'This is a test.'
 
         # Send the input values to all the input widgets on the page
+        self.browser.find_element_by_name('date').send_keys(date_field_input)
         self.browser.find_element_by_name('operator').send_keys(operator_field_input)
         self.browser.find_element_by_name('title_data').send_keys(title_field_input)
         self.browser.find_element_by_name('season').send_keys(season_field_input)
@@ -124,6 +129,8 @@ class ElementEvalTest(unittest.TestCase):
         self.browser.find_element_by_name('vitc').send_keys(vitc_field_input)
         self.browser.find_element_by_name('source_barcode').send_keys(source_barcode_field_input)
         self.browser.find_element_by_name('element_qc_barcode').send_keys(element_qc_barcode_field_input)
+        self.browser.find_element_by_name('record_date').send_keys(record_date_field_input)
+        self.browser.find_element_by_id('general_comments').send_keys(general_comments_field_input)
 
         # Also select values for all the select widgets
         style_select_option = 'Technical'
@@ -166,6 +173,7 @@ class ElementEvalTest(unittest.TestCase):
         time.sleep(2)
 
         # Now check all the input values, and make sure they're the same as what was put in before
+        self.assertEqual(date_field_input, self.browser.find_element_by_name('date').get_attribute('value'))
         self.assertEqual(operator_field_input, self.browser.find_element_by_name('operator').get_attribute('value'))
         self.assertEqual(title_field_input, self.browser.find_element_by_name('title_data').get_attribute('value'))
         self.assertEqual(season_field_input, self.browser.find_element_by_name('season').get_attribute('value'))
@@ -213,6 +221,10 @@ class ElementEvalTest(unittest.TestCase):
                          self.browser.find_element_by_name('source_barcode').get_attribute('value'))
         self.assertEqual(element_qc_barcode_field_input,
                          self.browser.find_element_by_name('element_qc_barcode').get_attribute('value'))
+        self.assertEqual(record_date_field_input,
+                         self.browser.find_element_by_name('record_date').get_attribute('value'))
+        self.assertEqual(general_comments_field_input,
+                         self.browser.find_element_by_id('general_comments').get_attribute('value'))
 
         # Also check the select widgets and make sure they are what was selected
         style_select = Select(self.browser.find_element_by_id('style'))
