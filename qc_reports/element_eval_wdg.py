@@ -1,5 +1,6 @@
+from qc_reports.element_eval_lines_wdg import ElementEvalLinesWdg
 from tactic.ui.common import BaseTableElementWdg
-from tactic.ui.input import TextInputWdg, TextAreaInputWdg
+from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import CalendarInputWdg, ButtonNewWdg
 
 from pyasm.search import Search
@@ -70,6 +71,8 @@ class ElementEvalWdg(BaseTableElementWdg):
         report_data = self.get_kwargs().get('report_data')
 
         if report_data:
+            self.client = report_data.get('client')
+            self.status = report_data.get('status')
             self.date = report_data.get('date')
             self.operator = report_data.get('operator')
             self.style_sel = report_data.get('style') # self.style is already used in the super class
@@ -151,8 +154,11 @@ catch (err) {
             'type': 'click_up',
             'cbjs_action': '''
 try {
+    // Client row values
+    var client = document.getElementById("client").value;
+    var status = document.getElementById("status").value;
 
-    // First row values
+    // Operator row values
     var date = document.getElementsByName("date")[0].value;
     var operator = document.getElementsByName("operator")[0].value;
     var style = document.getElementById("style").value;
@@ -233,6 +239,8 @@ try {
     }
 
     var qc_report_object = {
+        'client': client,
+        'status': status,
         'date': date,
         'operator': operator,
         'style': style,
@@ -321,6 +329,57 @@ catch(err) {
 
         return textbox_wdg
 
+    def get_client_section(self):
+        section_div = DivWdg()
+
+        client_span = SpanWdg()
+        client_span.add_style('display', 'inline-block')
+        client_span.add('Client: ')
+        client_span.add(self.get_client_select())
+
+        status_span = SpanWdg()
+        status_span.add_style('display', 'inline-block')
+        status_span.add('Status: ')
+        status_span.add(self.get_status_select())
+
+        section_div.add(client_span)
+        section_div.add(status_span)
+
+        return section_div
+
+    def get_client_select(self):
+        client_sel = SelectWdg('client_select')
+        client_sel.set_id('client')
+        client_sel.add_style('width', '135px')
+        client_sel.add_empty_option()
+
+        client_search = Search('twog/client')
+        clients = client_search.get_sobjects()
+
+        for client in clients:
+            client_sel.append_option(client.get_value('name'), client.get_code())
+
+        if hasattr(self, 'client'):
+            client_sel.set_value(self.client)
+
+        return client_sel
+
+    def get_status_select(self):
+        status_sel = SelectWdg('status_select')
+        status_sel.set_id('status')
+        status_sel.add_style('width', '135px')
+        status_sel.add_empty_option()
+
+        statuses = ('Approved', 'Rejected')
+
+        for status in statuses:
+            status_sel.append_option(status, status)
+
+        if hasattr(self, 'status'):
+            status_sel.set_value(self.status)
+
+        return status_sel
+
     def get_operator_section(self):
         operator_table = Table()
         operator_table.add_attr('class', 'operator_table')
@@ -396,12 +455,11 @@ catch(err) {
         machine_sel.add_style('width', '135px')
         machine_sel.add_empty_option()
 
-        for machine in ('VTR221', 'VTR222', 'VTR223', 'VTR224', 'VTR225', 'VTR231', 'VTR232', 'VTR233', 'VTR234',
-                        'VTR235', 'VTR251', 'VTR252', 'VTR253', 'VTR254', 'VTR255', 'VTR261', 'VTR262', 'VTR263',
-                        'VTR264', 'VTR265', 'VTR281', 'VTR282', 'VTR283', 'VTR284', 'VTR285', 'FCP01', 'FCP02', 'FCP03',
-                        'FCP04', 'FCP05', 'FCP06', 'FCP07', 'FCP08', 'FCP09', 'FCP10', 'FCP11', 'FCP12', 'Amberfin',
-                        'Clipster', 'Stradis'):
-            machine_sel.append_option(machine, machine)
+        machine_search = Search('twog/machine')
+        machines = machine_search.get_sobjects()
+
+        for machine in machines:
+            machine_sel.append_option(machine.get_value('name'), machine.get_code())
 
         try:
             machine_sel.set_value(self.machine_number)
@@ -788,16 +846,15 @@ catch(err) {
 
         return general_comments_div
 
+    def get_element_eval_lines_wdg(self):
+        return ElementEvalLinesWdg()
+
     def get_display(self):
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
         main_wdg.set_id('element_eval_panel')
 
-        # self.set_image_and_address(main_wdg)
-        main_wdg.add(get_image_div())
-        main_wdg.add(get_address_div())
-        main_wdg.add(get_client_name('Netflix'))
-        main_wdg.add(get_approved_rejected_checkboxes('APPROVED'))
+        main_wdg.add(self.get_client_section())
 
         main_wdg.add(self.get_operator_section())
         main_wdg.add(self.get_title_section())
@@ -814,5 +871,7 @@ catch(err) {
         main_wdg.add(self.get_add_subtract_row_buttons())
 
         main_wdg.add(self.get_general_comments_section())
+
+        main_wdg.add(self.get_element_eval_lines_wdg())
 
         return main_wdg
