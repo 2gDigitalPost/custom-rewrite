@@ -3,7 +3,7 @@ from tactic.ui.widget import ButtonNewWdg
 from tactic.ui.common import BaseTableElementWdg
 
 from pyasm.prod.biz import ProdSetting
-from pyasm.web import SpanWdg, Table
+from pyasm.web import DivWdg, SpanWdg, Table
 from pyasm.widget import SelectWdg
 
 
@@ -45,7 +45,15 @@ class ElementEvalLinesWdg(BaseTableElementWdg):
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
+try {
+    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
 
+    spt.api.load_panel(element_eval_lines_table, 'qc_reports.ElementEvalLinesWdg');
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
 '''
         }
 
@@ -110,28 +118,6 @@ class ElementEvalLinesWdg(BaseTableElementWdg):
 
         return timecode_textbox
 
-    def get_in_safe_select_wdg(self, current_row):
-        in_safe_select_wdg = SelectWdg('in_safe')
-        in_safe_select_wdg.set_id('in-safe-{0}'.format(current_row))
-        in_safe_select_wdg.add_empty_option()
-
-        in_safe_select_wdg.append_option('Yes', True)
-        in_safe_select_wdg.append_option('No', False)
-
-        return in_safe_select_wdg
-
-    def get_type_code_select_wdg(self, current_row):
-        type_code_select_wdg = SelectWdg('type_code')
-        type_code_select_wdg.set_id('type-code-{0}'.format(current_row))
-        type_code_select_wdg.add_empty_option()
-
-        type_code_select_wdg.append_option('Film', 'film')
-        type_code_select_wdg.append_option('Video', 'video')
-        type_code_select_wdg.append_option('Telecine', 'telecine')
-        type_code_select_wdg.append_option('Audio', 'audio')
-
-        return type_code_select_wdg
-
     def get_select_wdg(self, name, options):
         select_wdg = SelectWdg(name)
         select_wdg.set_id(name)
@@ -186,7 +172,7 @@ class ElementEvalLinesWdg(BaseTableElementWdg):
         table.add_cell(self.get_select_wdg('in_safe-{0}'.format(current_row), in_safe_options))
         table.add_cell(self.get_timecode_textbox('timecode-out-{0}'.format(current_row), 100))
         table.add_cell(self.get_text_input_wdg('field-out-{0}'.format(current_row), 30))
-        table.add_cell(self.get_select_wdg('type_code-{0}'.format(current_row), type_code_options))
+        table.add_cell(self.get_select_wdg('type-code-{0}'.format(current_row), type_code_options))
         table.add_cell(self.get_select_wdg('scale-{0}'.format(current_row), scale_select_options))
         table.add_cell(self.get_text_input_wdg('sector-or-channel-{0}'.format(current_row), 100))
         table.add_cell(self.get_select_wdg('in_source-{0}'.format(current_row), in_source_options))
@@ -208,4 +194,8 @@ class ElementEvalLinesWdg(BaseTableElementWdg):
 
         table.add_cell(self.get_add_row_button())
 
-        return table
+        main_div = DivWdg()
+        main_div.set_id('element_eval_lines_table')
+        main_div.add(table)
+
+        return main_div

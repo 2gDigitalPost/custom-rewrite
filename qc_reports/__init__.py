@@ -1,1 +1,2 @@
 from element_eval_wdg import ElementEvalWdg
+from element_eval_lines_wdg import ElementEvalLinesWdg
