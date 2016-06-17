@@ -35,10 +35,12 @@ class ElementEvalLinesWdg(BaseTableElementWdg):
     def init(self):
         self.report_lines = self.get_kwargs().get('report_lines')
 
+
+
         if self.report_lines:
-            pass
+            self.number_of_lines = len(self.report_lines)
         else:
-            pass
+            self.number_of_lines = 1
 
     def get_add_row_behavior(self):
         behavior = {
@@ -47,8 +49,45 @@ class ElementEvalLinesWdg(BaseTableElementWdg):
             'cbjs_action': '''
 try {
     var element_eval_lines_table = document.getElementById('element_eval_lines_table');
+    var element_eval_lines_table_rows = element_eval_lines_table.getElementsByTagName('tr');
 
-    spt.api.load_panel(element_eval_lines_table, 'qc_reports.ElementEvalLinesWdg');
+    // One 'tr' is the header, so ignore that
+    var number_of_lines = element_eval_lines_table_rows.length - 1;
+
+    var lines = [];
+
+    for (var i = 0; i < number_of_lines; i++) {
+        var timecode_in_value = document.getElementsByName("timecode-in-" + String(i))[0].value;
+        var field_in_value = document.getElementsByName("field-in-" + String(i))[0].value;
+        var description_value = document.getElementsByName("description-" + String(i))[0].value;
+        var in_safe_value = document.getElementById("in_safe-" + String(i)).value;
+        var timecode_out_value = document.getElementsByName("timecode-out-" + String(i))[0].value;
+        var field_out_value = document.getElementsByName("field-out-" + String(i))[0].value;
+        var type_code_value = document.getElementById("type-code-" + String(i)).value;
+        var scale_value = document.getElementById("scale-" + String(i)).value;
+        var sector_or_channel_value = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        var in_source_value = document.getElementById("in_source-" + String(i))[0].value;
+
+        var line_data = {
+            'timecode_in': timecode_in_value,
+            'field_in': field_in_value,
+            'description': description_value,
+            'in_safe': in_safe_value,
+            'timecode_out': timecode_out_value,
+            'field_out': field_out_value,
+            'type_code': type_code_value,
+            'scale': scale_value,
+            'sector_or_channel': sector_or_channel_value,
+            'in_source': in_source_value
+        };
+
+        lines.push(line_data);
+    }
+
+    // Refresh the widget
+    var element_eval_lines_div = document.getElementById('element_eval_lines_div');
+
+    spt.api.load_panel(element_eval_lines_div, 'qc_reports.ElementEvalLinesWdg', {'report_lines': lines});
 }
 catch(err) {
     spt.app_busy.hide();
@@ -64,7 +103,17 @@ catch(err) {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
+try {
+    if(confirm("Do you really want to delete this line?)) {
+        var server = TacticServerStub.get();
 
+        server.retire_sobject(server.build_search_key('twog/element_evaluation_line', code));
+    }
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
 '''
         }
 
@@ -91,8 +140,6 @@ catch(err) {
         table.add_header("Scale")
         table.add_header("Sector/Ch")
         table.add_header("In Source")
-
-        table.add_row()
 
     def get_text_input_wdg(self, name, width=200):
         textbox_wdg = TextInputWdg()
@@ -157,6 +204,8 @@ catch(err) {
         return span_wdg
 
     def add_row(self, table, current_row, data=None):
+        table.add_row()
+
         in_safe_options = [('Yes', True), ('No', False)]
         type_code_options = [('Film', 'film'), ('Video', 'video'), ('Telecine', 'telecine'), ('Audio', 'audio')]
         scale_select_options = [('1', '1'), ('2', '2'), ('3', '3'), ('FYI', 'fyi')]
@@ -180,6 +229,7 @@ catch(err) {
 
     def get_display(self):
         table = Table()
+        table.set_id('element_eval_lines_table')
 
         self.set_header_rows(table)
 
@@ -195,7 +245,7 @@ catch(err) {
         table.add_cell(self.get_add_row_button())
 
         main_div = DivWdg()
-        main_div.set_id('element_eval_lines_table')
+        main_div.set_id('element_eval_lines_div')
         main_div.add(table)
 
         return main_div

@@ -1,3 +1,4 @@
+from qc_reports.audio_configuration_lines_wdg import AudioLinesTableWdg
 from qc_reports.element_eval_lines_wdg import ElementEvalLinesWdg
 from tactic.ui.common import BaseTableElementWdg
 from tactic.ui.input import TextInputWdg
@@ -70,14 +71,20 @@ class ElementEvalWdg(BaseTableElementWdg):
     def init(self):
         report_data = self.get_kwargs().get('report_data')
 
-        if report_data:
+        self.code = self.get_kwargs().get('code')
+
+        self.code = 'ELEMENT_EVALUATION00002'
+
+        if self.code:
+            self.get_sobject_from_kwargs()
+        elif report_data:
             self.client = report_data.get('client')
             self.status = report_data.get('status')
             self.date = report_data.get('date')
             self.operator = report_data.get('operator')
             self.style_sel = report_data.get('style') # self.style is already used in the super class
             self.bay = report_data.get('bay')
-            self.machine_number = report_data.get('machine_number')
+            self.machine = report_data.get('machine')
             self.title_data = report_data.get('title_data') # self.title is already used in the super class
             self.format_data = report_data.get('format') # 'format' is a reserved word in Python
             self.season = report_data.get('season')
@@ -113,7 +120,6 @@ class ElementEvalWdg(BaseTableElementWdg):
             self.element_qc_barcode = report_data.get('element_qc_barcode')
             self.label = report_data.get('label')
             self.record_date = report_data.get('record_date')
-            self.audio_configuration_lines = int(report_data.get('audio_configuration_lines', 8))
             self.audio_configuration_lines_values = report_data.get('audio_configuration_lines_values')
             self.general_comments = report_data.get('general_comments')
         else:
@@ -125,30 +131,7 @@ class ElementEvalWdg(BaseTableElementWdg):
 
             self.audio_configuration_lines = 8
 
-    @staticmethod
-    def get_save_behavior():
-        behavior = {
-            'css_class': 'clickme',
-            'type': 'click_up',
-            'cbjs_action': '''
-try {
-
-}
-catch (err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}
-'''
-        }
-
-    @staticmethod
-    def get_add_audio_configuration_line_behavior(number_of_lines=1):
-        """
-        :param number_of_lines: Number of lines to add (or subtract if negative)
-        :return: Javascript behavior
-        """
-        # TODO: Better docstring here
-
+    def get_save_behavior(self):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -163,7 +146,7 @@ try {
     var operator = document.getElementsByName("operator")[0].value;
     var style = document.getElementById("style").value;
     var bay = document.getElementById("bay").value;
-    var machine_number = document.getElementById("machine_number").value;
+    var machine = document.getElementById("machine").value;
 
     // Title section values
     var title_data = document.getElementsByName("title_data")[0].value;
@@ -211,33 +194,6 @@ try {
     // General comments
     var general_comments = document.getElementById("general_comments").value;
 
-    // Get the number of lines in the audio configuration table
-    var audio_configuration_table = document.getElementById('audio_configuration_table');
-    var audio_configuration_table_rows = audio_configuration_table.getElementsByTagName("tr");
-
-    // Two rows always exist for the table headers, so subtract that
-    var number_of_audio_configuration_lines = audio_configuration_table_rows.length - 2;
-
-    // Get the number of lines to add (or subtract)
-    var number_of_lines_to_add = Number('%s');
-
-    // Finally, get the new number to pass into the kwargs. If the number is less than or equal to 1, set it to 1
-    // (don't want to allow less than one row to be displayed)
-    var audio_configuration_lines = number_of_audio_configuration_lines + number_of_lines_to_add;
-
-    if (audio_configuration_lines < 1) {
-        audio_configuration_lines = 1;
-    }
-
-    var audio_configuration_lines_values = {};
-
-    for (var i = 0; i < number_of_audio_configuration_lines; i++) {
-        audio_configuration_lines_values['channel-' + String(i)] = document.getElementsByName("channel-" + String(i))[0].value;
-        audio_configuration_lines_values['content-' + String(i)] = document.getElementsByName("content-" + String(i))[0].value;
-        audio_configuration_lines_values['tone-' + String(i)] = document.getElementsByName("tone-" + String(i))[0].value;
-        audio_configuration_lines_values['peak-' + String(i)] = document.getElementsByName("peak-" + String(i))[0].value;
-    }
-
     var qc_report_object = {
         'client': client,
         'status': status,
@@ -245,8 +201,8 @@ try {
         'operator': operator,
         'style': style,
         'bay': bay,
-        'machine_number': machine_number,
-        'title_data': title_data,
+        'machine': machine,
+        'title': title_data,
         'format': format,
         'season': season,
         'standard': standard,
@@ -281,14 +237,15 @@ try {
         'element_qc_barcode': element_qc_barcode,
         'label': label,
         'record_date': record_date,
-        'audio_configuration_lines': audio_configuration_lines,
-        'audio_configuration_lines_values': audio_configuration_lines_values,
         'general_comments': general_comments
     };
 
     var board_table = document.getElementById('element_eval_panel');
 
+    var server = TacticServerStub.get();
+
     spt.app_busy.show("Refreshing...");
+    server.insert('twog/element_evaluation', qc_report_object);
     spt.api.load_panel(board_table, 'qc_reports.ElementEvalWdg', {'report_data': qc_report_object});
     spt.app_busy.hide();
 }
@@ -296,10 +253,11 @@ catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }
-            ''' % number_of_lines
+            '''
         }
 
         return behavior
+
 
     def get_text_input_wdg(self, name, width=200):
         textbox_wdg = TextInputWdg()
@@ -312,20 +270,6 @@ catch(err) {
         else:
             if self.title_sobject:
                 textbox_wdg.set_value(self.title_sobject.get(name))
-
-        return textbox_wdg
-
-    def get_text_input_wdg_for_audio_config(self, name, width=200):
-        textbox_wdg = TextInputWdg()
-        textbox_wdg.set_id(name)
-        textbox_wdg.set_name(name)
-        textbox_wdg.add_style('width', '{0}px'.format(width))
-
-        if hasattr(self, 'audio_configuration_lines_values'):
-            textbox_wdg.set_value(self.audio_configuration_lines_values.get(name, ''))
-        else:
-            if self.title_sobject:
-                textbox_wdg.set_value(self.title_sobject.get('audio_configuration_lines_values').get(name, ''))
 
         return textbox_wdg
 
@@ -388,7 +332,7 @@ catch(err) {
         operator_table.add_header('OPERATOR')
         operator_table.add_header('STYLE')
         operator_table.add_header('BAY')
-        operator_table.add_header('MACHINE #')
+        operator_table.add_header('MACHINE')
         operator_table.add_row()
 
         operator_table.add_cell(self.get_date_calendar_wdg())
@@ -451,7 +395,7 @@ catch(err) {
 
     def get_machine_select(self):
         machine_sel = SelectWdg('machine_select')
-        machine_sel.set_id('machine_number')
+        machine_sel.set_id('machine')
         machine_sel.add_style('width', '135px')
         machine_sel.add_empty_option()
 
@@ -462,7 +406,7 @@ catch(err) {
             machine_sel.append_option(machine.get_value('name'), machine.get_code())
 
         try:
-            machine_sel.set_value(self.machine_number)
+            machine_sel.set_value(self.machine)
         except AttributeError:
             pass
 
@@ -784,54 +728,6 @@ catch(err) {
 
         return record_date_calendar_wdg
 
-    def get_audio_configuration_table(self):
-        audio_configuration_table = Table()
-        audio_configuration_table.set_id('audio_configuration_table')
-
-        audio_configuration_table.add_row()
-        audio_configuration_table.add_header('Audio Configuration')
-
-        audio_configuration_table.add_row()
-        audio_configuration_table.add_header('Channel')
-        audio_configuration_table.add_header('Content')
-        audio_configuration_table.add_header('Tone')
-        audio_configuration_table.add_header('Peak')
-
-        for iterator in range(self.audio_configuration_lines):
-            audio_configuration_table.add_row()
-
-            audio_configuration_table.add_cell(
-                self.get_text_input_wdg_for_audio_config('channel-{0}'.format(iterator), 150))
-            audio_configuration_table.add_cell(
-                self.get_text_input_wdg_for_audio_config('content-{0}'.format(iterator), 150))
-            audio_configuration_table.add_cell(
-                self.get_text_input_wdg_for_audio_config('tone-{0}'.format(iterator), 150))
-            audio_configuration_table.add_cell(
-                self.get_text_input_wdg_for_audio_config('peak-{0}'.format(iterator), 150))
-
-        return audio_configuration_table
-
-    def get_add_subtract_row_buttons(self):
-        section_span = SpanWdg()
-        section_span.add_style('display', 'inline-block')
-
-        add_row_button = ButtonNewWdg(title='Add Row', icon='ADD')
-        add_row_button.add_class('add_row_button')
-        add_row_button.add_behavior(self.get_add_audio_configuration_line_behavior())
-
-        section_span.add(add_row_button)
-
-        # Check if we're down to one line on the table. If so, don't show the subtract button
-        if hasattr(self, 'audio_configuration_lines') and self.audio_configuration_lines > 1:
-            # TODO: Find a proper icon for subtract (not sure if one exists by default)
-            subtract_row_button = ButtonNewWdg(title='Remove Row', icon='REMOVE')
-            subtract_row_button.add_class('subtract_row_button')
-            subtract_row_button.add_behavior(self.get_add_audio_configuration_line_behavior(-1))
-
-            section_span.add(subtract_row_button)
-
-        return section_span
-
     def get_general_comments_section(self):
         general_comments_div = DivWdg()
         general_comments_wdg = TextAreaWdg()
@@ -846,8 +742,17 @@ catch(err) {
 
         return general_comments_div
 
-    def get_element_eval_lines_wdg(self):
-        return ElementEvalLinesWdg()
+    def get_save_button(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        save_button = ButtonNewWdg(title='Add Row', icon='SAVE')
+        save_button.add_class('save_button')
+        save_button.add_behavior(self.get_save_behavior())
+
+        section_span.add(save_button)
+
+        return section_span
 
     def get_display(self):
         # This will be the main <div> that everything else goes into
@@ -866,12 +771,15 @@ catch(err) {
         main_wdg.add(self.get_program_format_table())
         main_wdg.add(self.get_video_measurements_table())
         main_wdg.add(self.get_element_profile_table())
-        main_wdg.add(self.get_audio_configuration_table())
 
-        main_wdg.add(self.get_add_subtract_row_buttons())
+        if hasattr(self, 'code'):
+            main_wdg.add(AudioLinesTableWdg(element_evaluation_code=self.code))
 
         main_wdg.add(self.get_general_comments_section())
 
-        main_wdg.add(self.get_element_eval_lines_wdg())
+        if hasattr(self, 'code'):
+            main_wdg.add(ElementEvalLinesWdg())
+
+        main_wdg.add(self.get_save_button())
 
         return main_wdg
