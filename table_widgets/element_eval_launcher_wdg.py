@@ -15,7 +15,7 @@ class ElementEvalLauncherWdg(BaseTableElementWdg):
 try {
     var element_eval_code = '%s';
 
-    spt.api.load_tab('Element Evaluation', 'qc_reports.ElementEvalWdg', {'code': element_eval_code});
+    spt.api.load_tab('Element Evaluation', 'qc_reports.ElementEvalWdg', {'search_type': 'twog/element_evaluation', 'code': element_eval_code});
 }
 catch(err){
     spt.app_busy.hide();

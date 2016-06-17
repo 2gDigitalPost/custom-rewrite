@@ -69,67 +69,52 @@ def get_approved_rejected_checkboxes(conclusion):
 class ElementEvalWdg(BaseTableElementWdg):
 
     def init(self):
-        report_data = self.get_kwargs().get('report_data')
+        self.element_eval_sobject = self.get_sobject_from_kwargs()
 
-        self.code = self.get_kwargs().get('code')
-
-        self.code = 'ELEMENT_EVALUATION00002'
-
-        if self.code:
-            self.get_sobject_from_kwargs()
-        elif report_data:
-            self.client = report_data.get('client')
-            self.status = report_data.get('status')
-            self.date = report_data.get('date')
-            self.operator = report_data.get('operator')
-            self.style_sel = report_data.get('style') # self.style is already used in the super class
-            self.bay = report_data.get('bay')
-            self.machine = report_data.get('machine')
-            self.title_data = report_data.get('title_data') # self.title is already used in the super class
-            self.format_data = report_data.get('format') # 'format' is a reserved word in Python
-            self.season = report_data.get('season')
-            self.standard = report_data.get('standard')
-            self.episode = report_data.get('episode')
-            self.frame_rate = report_data.get('frame_rate')
-            self.version = report_data.get('version')
-            self.po_number = report_data.get('po_number')
-            self.file_name = report_data.get('file_name')
-            self.roll_up_blank = report_data.get('roll_up_blank')
-            self.bars_tone = report_data.get('bars_tone')
-            self.black_silence_1 = report_data.get('black_silence_1')
-            self.slate_silence = report_data.get('slate_silence')
-            self.black_silence_2 = report_data.get('black_silence_2')
-            self.start_of_program = report_data.get('start_of_program')
-            self.end_of_program = report_data.get('end_of_program')
-            self.active_video_begins = report_data.get('active_video_begins')
-            self.active_video_ends = report_data.get('active_video_ends')
-            self.horizontal_blanking = report_data.get('horizontal_blanking')
-            self.luminance_peak = report_data.get('luminance_peak')
-            self.chroma_peak = report_data.get('chroma_peak')
-            self.head_logo = report_data.get('head_logo')
-            self.tail_logo = report_data.get('tail_logo')
-            self.total_runtime = report_data.get('total_runtime')
-            self.language = report_data.get('language')
-            self.tv_feature_trailer = report_data.get('tv_feature_trailer')
-            self.cc_subtitles = report_data.get('cc_subtitles')
-            self.video_aspect_ratio = report_data.get('video_aspect_ratio')
-            self.vitc = report_data.get('vitc')
-            self.textless_tail = report_data.get('textless_tail')
-            self.source_barcode = report_data.get('source_barcode')
-            self.notices = report_data.get('notices')
-            self.element_qc_barcode = report_data.get('element_qc_barcode')
-            self.label = report_data.get('label')
-            self.record_date = report_data.get('record_date')
-            self.audio_configuration_lines_values = report_data.get('audio_configuration_lines_values')
-            self.general_comments = report_data.get('general_comments')
-        else:
-            self.title_code = self.get_kwargs().get('title_code')
-
-            title_sobject_search = Search('twog/title')
-            title_sobject_search.add_code_filter(self.title_code)
-            self.title_sobject = title_sobject_search.get_sobject()
-
-            self.audio_configuration_lines = 8
+        if self.element_eval_sobject:
+            self.title_data = self.element_eval_sobject.get('title') # self.title is already used in the super class
+            self.client = self.element_eval_sobject.get('client')
+            self.status = self.element_eval_sobject.get('status')
+            self.date = self.element_eval_sobject.get('date')
+            self.operator = self.element_eval_sobject.get('operator')
+            self.style_sel = self.element_eval_sobject.get('style') # self.style is already used in the super class
+            self.bay = self.element_eval_sobject.get('bay')
+            self.machine = self.element_eval_sobject.get('machine')
+            self.format_data = self.element_eval_sobject.get('format') # 'format' is a reserved word in Python
+            self.season = self.element_eval_sobject.get('season')
+            self.standard = self.element_eval_sobject.get('standard')
+            self.episode = self.element_eval_sobject.get('episode')
+            self.frame_rate = self.element_eval_sobject.get('frame_rate')
+            self.version = self.element_eval_sobject.get('version')
+            self.po_number = self.element_eval_sobject.get('po_number')
+            self.file_name = self.element_eval_sobject.get('file_name')
+            self.roll_up_blank = self.element_eval_sobject.get('roll_up_blank')
+            self.bars_tone = self.element_eval_sobject.get('bars_tone')
+            self.black_silence_1 = self.element_eval_sobject.get('black_silence_1')
+            self.slate_silence = self.element_eval_sobject.get('slate_silence')
+            self.black_silence_2 = self.element_eval_sobject.get('black_silence_2')
+            self.start_of_program = self.element_eval_sobject.get('start_of_program')
+            self.end_of_program = self.element_eval_sobject.get('end_of_program')
+            self.active_video_begins = self.element_eval_sobject.get('active_video_begins')
+            self.active_video_ends = self.element_eval_sobject.get('active_video_ends')
+            self.horizontal_blanking = self.element_eval_sobject.get('horizontal_blanking')
+            self.luminance_peak = self.element_eval_sobject.get('luminance_peak')
+            self.chroma_peak = self.element_eval_sobject.get('chroma_peak')
+            self.head_logo = self.element_eval_sobject.get('head_logo')
+            self.tail_logo = self.element_eval_sobject.get('tail_logo')
+            self.total_runtime = self.element_eval_sobject.get('total_runtime')
+            self.language = self.element_eval_sobject.get('language')
+            self.tv_feature_trailer = self.element_eval_sobject.get('tv_feature_trailer')
+            self.cc_subtitles = self.element_eval_sobject.get('cc_subtitles')
+            self.video_aspect_ratio = self.element_eval_sobject.get('video_aspect_ratio')
+            self.vitc = self.element_eval_sobject.get('vitc')
+            self.textless_tail = self.element_eval_sobject.get('textless_tail')
+            self.source_barcode = self.element_eval_sobject.get('source_barcode')
+            self.notices = self.element_eval_sobject.get('notices')
+            self.element_qc_barcode = self.element_eval_sobject.get('element_qc_barcode')
+            self.label = self.element_eval_sobject.get('label')
+            self.record_date = self.element_eval_sobject.get('record_date')
+            self.general_comments = self.element_eval_sobject.get('general_comments')
 
     def get_save_behavior(self):
         behavior = {
@@ -267,9 +252,6 @@ catch(err) {
 
         if hasattr(self, name):
             textbox_wdg.set_value(getattr(self, name))
-        else:
-            if self.title_sobject:
-                textbox_wdg.set_value(self.title_sobject.get(name))
 
         return textbox_wdg
 
@@ -772,12 +754,12 @@ catch(err) {
         main_wdg.add(self.get_video_measurements_table())
         main_wdg.add(self.get_element_profile_table())
 
-        if hasattr(self, 'code'):
-            main_wdg.add(AudioLinesTableWdg(element_evaluation_code=self.code))
+        if hasattr(self, 'element_eval_sobject') and self.element_eval_sobject:
+            main_wdg.add(AudioLinesTableWdg(element_evaluation_code=self.element_eval_sobject.get_code()))
 
         main_wdg.add(self.get_general_comments_section())
 
-        if hasattr(self, 'code'):
+        if hasattr(self, 'element_eval_sobject') and self.element_eval_sobject:
             main_wdg.add(ElementEvalLinesWdg())
 
         main_wdg.add(self.get_save_button())

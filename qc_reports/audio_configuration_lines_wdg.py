@@ -174,22 +174,19 @@ class AudioLinesTableWdg(BaseTableElementWdg):
 
         if self.element_evaluation_code:
             lines_search = Search('twog/element_evaluation_line')
-            lines_search.add_filter('element_evaluation', self.element_evaluation_code)
+            lines_search.add_filter('element_evaluation_code', self.element_evaluation_code)
             self.lines = lines_search.get_sobjects()
         else:
             self.lines = []
 
-    def get_text_input_wdg_for_audio_config(self, name, width=200):
+    def get_text_input_wdg_for_audio_config(self, name, width=200, line_data=None):
         textbox_wdg = TextInputWdg()
         textbox_wdg.set_id(name)
         textbox_wdg.set_name(name)
         textbox_wdg.add_style('width', '{0}px'.format(width))
 
-        # if hasattr(self, 'audio_configuration_lines_values'):
-        #     textbox_wdg.set_value(self.lines.get(name, ''))
-        # else:
-        #     if self.title_sobject:
-        #         textbox_wdg.set_value(self.title_sobject.get('audio_configuration_lines_values').get(name, ''))
+        if line_data:
+            textbox_wdg.set_value(line_data)
 
         return textbox_wdg
 
@@ -233,12 +230,12 @@ class AudioLinesTableWdg(BaseTableElementWdg):
             current_row.add_attr('code', line.get_code())
 
             audio_configuration_table.add_cell(
-                self.get_text_input_wdg_for_audio_config('channel-{0}'.format(iterator), 150))
+                self.get_text_input_wdg_for_audio_config('channel-{0}'.format(iterator), 150, line.get_value('channel')))
             audio_configuration_table.add_cell(
-                self.get_text_input_wdg_for_audio_config('content-{0}'.format(iterator), 150))
+                self.get_text_input_wdg_for_audio_config('content-{0}'.format(iterator), 150, line.get_value('content')))
             audio_configuration_table.add_cell(
-                self.get_text_input_wdg_for_audio_config('tone-{0}'.format(iterator), 150))
+                self.get_text_input_wdg_for_audio_config('tone-{0}'.format(iterator), 150, line.get_value('tone')))
             audio_configuration_table.add_cell(
-                self.get_text_input_wdg_for_audio_config('peak-{0}'.format(iterator), 150))
+                self.get_text_input_wdg_for_audio_config('peak-{0}'.format(iterator), 150, line.get_value('peak')))
 
         return audio_configuration_table
