@@ -72,6 +72,7 @@ class ElementEvalWdg(BaseTableElementWdg):
         self.element_eval_sobject = self.get_sobject_from_kwargs()
 
         if self.element_eval_sobject:
+            self.name = self.element_eval_sobject.get('name')
             self.title_data = self.element_eval_sobject.get('title') # self.title is already used in the super class
             self.client = self.element_eval_sobject.get('client')
             self.status = self.element_eval_sobject.get('status')
@@ -122,6 +123,9 @@ class ElementEvalWdg(BaseTableElementWdg):
             'type': 'click_up',
             'cbjs_action': '''
 try {
+    // Name of the report
+    var name = document.getElementsByName("name")[0].value;
+
     // Client row values
     var client = document.getElementById("client").value;
     var status = document.getElementById("status").value;
@@ -180,6 +184,7 @@ try {
     var general_comments = document.getElementById("general_comments").value;
 
     var qc_report_object = {
+        'name': name,
         'client': client,
         'status': status,
         'date': date,
@@ -232,6 +237,7 @@ try {
     spt.app_busy.show("Refreshing...");
     server.insert('twog/element_evaluation', qc_report_object);
     spt.api.load_panel(board_table, 'qc_reports.ElementEvalWdg', {'report_data': qc_report_object});
+
     spt.app_busy.hide();
 }
 catch(err) {
@@ -243,7 +249,6 @@ catch(err) {
 
         return behavior
 
-
     def get_text_input_wdg(self, name, width=200):
         textbox_wdg = TextInputWdg()
         textbox_wdg.set_id(name)
@@ -254,6 +259,16 @@ catch(err) {
             textbox_wdg.set_value(getattr(self, name))
 
         return textbox_wdg
+
+    def get_name_section(self):
+        section_div = DivWdg()
+
+        name_wdg = self.get_text_input_wdg('name')
+
+        section_div.add('Name: ')
+        section_div.add(name_wdg)
+
+        return section_div
 
     def get_client_section(self):
         section_div = DivWdg()
@@ -728,7 +743,7 @@ catch(err) {
         section_span = SpanWdg()
         section_span.add_style('display', 'inline-block')
 
-        save_button = ButtonNewWdg(title='Add Row', icon='SAVE')
+        save_button = ButtonNewWdg(title='Save', icon='SAVE')
         save_button.add_class('save_button')
         save_button.add_behavior(self.get_save_behavior())
 
@@ -740,6 +755,8 @@ catch(err) {
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
         main_wdg.set_id('element_eval_panel')
+
+        main_wdg.add(self.get_name_section())
 
         main_wdg.add(self.get_client_section())
 
@@ -760,7 +777,7 @@ catch(err) {
         main_wdg.add(self.get_general_comments_section())
 
         if hasattr(self, 'element_eval_sobject') and self.element_eval_sobject:
-            main_wdg.add(ElementEvalLinesWdg())
+            main_wdg.add(ElementEvalLinesWdg(element_evaluation_code=self.element_eval_sobject.get_code()))
 
         main_wdg.add(self.get_save_button())
 

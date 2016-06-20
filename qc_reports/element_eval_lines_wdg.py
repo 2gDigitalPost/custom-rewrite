@@ -3,6 +3,7 @@ from tactic.ui.widget import ButtonNewWdg
 from tactic.ui.common import BaseTableElementWdg
 
 from pyasm.prod.biz import ProdSetting
+from pyasm.search import Search
 from pyasm.web import DivWdg, SpanWdg, Table
 from pyasm.widget import SelectWdg
 
@@ -33,21 +34,38 @@ catch(err) {
 
 class ElementEvalLinesWdg(BaseTableElementWdg):
     def init(self):
-        self.report_lines = self.get_kwargs().get('report_lines')
+        self.element_evaluation_code = self.kwargs.get('element_evaluation_code')
 
-
-
-        if self.report_lines:
-            self.number_of_lines = len(self.report_lines)
+        if self.element_evaluation_code:
+            lines_search = Search('twog/element_evaluation_line')
+            lines_search.add_filter('element_evaluation_code', self.element_evaluation_code)
+            self.lines = lines_search.get_sobjects()
         else:
-            self.number_of_lines = 1
+            self.lines = []
 
     def get_add_row_behavior(self):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
+function getTableRowsWithAttribute(attribute)
+{
+  var matchingElements = [];
+  var allElements = document.getElementsByTagName('tr');
+  for (var i = 0, n = allElements.length; i < n; i++)
+  {
+    if (allElements[i].getAttribute(attribute) !== null)
+    {
+      // Element exists with attribute. Add to array.
+      matchingElements.push(allElements[i]);
+    }
+  }
+  return matchingElements;
+}
+
 try {
+    var element_evaluation_code = '%s';
+
     var element_eval_lines_table = document.getElementById('element_eval_lines_table');
     var element_eval_lines_table_rows = element_eval_lines_table.getElementsByTagName('tr');
 
@@ -93,7 +111,7 @@ catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }
-'''
+''' % self.element_evaluation_code
         }
 
         return behavior
@@ -152,6 +170,18 @@ catch(err) {
 
         return textbox_wdg
 
+    @staticmethod
+    def get_text_input_wdg_for_element_eval_lines(name, width=200, line_data=None):
+        textbox_wdg = TextInputWdg()
+        textbox_wdg.set_id(name)
+        textbox_wdg.set_name(name)
+        textbox_wdg.add_style('width', '{0}px'.format(width))
+
+        if line_data:
+            textbox_wdg.set_value(line_data)
+
+        return textbox_wdg
+
     def get_timecode_textbox(self, name, width=200):
         timecode_textbox = TextInputWdg()
         timecode_textbox.set_id(name)
@@ -165,7 +195,8 @@ catch(err) {
 
         return timecode_textbox
 
-    def get_select_wdg(self, name, options):
+    @staticmethod
+    def get_select_wdg(name, options, value=None):
         select_wdg = SelectWdg(name)
         select_wdg.set_id(name)
         select_wdg.add_empty_option()
@@ -175,6 +206,9 @@ catch(err) {
             value = option_set[1]
 
             select_wdg.append_option(label, value)
+
+        if value:
+            select_wdg.set_value(value)
 
         return select_wdg
 
@@ -203,8 +237,11 @@ catch(err) {
 
         return span_wdg
 
-    def add_row(self, table, current_row, data=None):
-        table.add_row()
+    def get_display(self):
+        table = Table()
+        table.set_id('element_eval_lines_table')
+
+        self.set_header_rows(table)
 
         in_safe_options = [('Yes', True), ('No', False)]
         type_code_options = [('Film', 'film'), ('Video', 'video'), ('Telecine', 'telecine'), ('Audio', 'audio')]
@@ -215,32 +252,46 @@ catch(err) {
                              ('Approved by Client', 'approved_by_client'), ('Approved as is', 'approved_as_is'),
                              ('Approved by Territory', 'approved_by_territory')]
 
-        table.add_cell(self.get_timecode_textbox('timecode-in-{0}'.format(current_row), 100))
-        table.add_cell(self.get_text_input_wdg('field-in-{0}'.format(current_row), 30))
-        table.add_cell(self.get_text_input_wdg('description-{0}'.format(current_row), 450))
-        table.add_cell(self.get_select_wdg('in_safe-{0}'.format(current_row), in_safe_options))
-        table.add_cell(self.get_timecode_textbox('timecode-out-{0}'.format(current_row), 100))
-        table.add_cell(self.get_text_input_wdg('field-out-{0}'.format(current_row), 30))
-        table.add_cell(self.get_select_wdg('type-code-{0}'.format(current_row), type_code_options))
-        table.add_cell(self.get_select_wdg('scale-{0}'.format(current_row), scale_select_options))
-        table.add_cell(self.get_text_input_wdg('sector-or-channel-{0}'.format(current_row), 100))
-        table.add_cell(self.get_select_wdg('in_source-{0}'.format(current_row), in_source_options))
-        table.add_cell(self.get_remove_row_button(current_row))
+        for iterator, line in enumerate(self.lines):
+            current_row = table.add_row()
+            current_row.add_attr('code', line.get_code())
 
-    def get_display(self):
-        table = Table()
-        table.set_id('element_eval_lines_table')
-
-        self.set_header_rows(table)
-
-        current_row = 0
-
-        if self.report_lines:
-            for report_line in self.report_lines:
-                self.add_row(table, current_row, report_line)
-                current_row += 1
-
-        self.add_row(table, current_row)
+            table.add_cell(
+                self.get_text_input_wdg_for_element_eval_lines('timecode-in-{0}'.format(iterator), 150,
+                                                               line.get_value('timecode_in'))
+            )
+            table.add_cell(
+                self.get_text_input_wdg_for_element_eval_lines('field-in-{0}'.format(iterator), 30,
+                                                               line.get_value('field_in'))
+            )
+            table.add_cell(
+                self.get_text_input_wdg_for_element_eval_lines('description-{0}'.format(iterator), 150,
+                                                               line.get_value('description'))
+            )
+            table.add_cell(
+                self.get_select_wdg('in-safe-{0}'.format(iterator), in_safe_options, line.get_value('in_safe'))
+            )
+            table.add_cell(
+                self.get_text_input_wdg_for_element_eval_lines('timecode-out-{0}'.format(iterator), 150,
+                                                               line.get_value('timecode_out'))
+            )
+            table.add_cell(
+                self.get_text_input_wdg_for_element_eval_lines('field-out-{0}'.format(iterator), 30,
+                                                               line.get_value('field_out'))
+            )
+            table.add_cell(
+                self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options, line.get_value('type_code'))
+            )
+            table.add_cell(
+                self.get_select_wdg('scale-{0}'.format(iterator), scale_select_options, line.get_value('scale'))
+            )
+            table.add_cell(
+                self.get_text_input_wdg_for_element_eval_lines('sector-or-channel-{0}'.format(iterator), 150,
+                                                               line.get_value('sector_or_channel'))
+            )
+            table.add_cell(
+                self.get_select_wdg('in-source-{0}'.format(iterator), in_source_options, line.get_value('in_source'))
+            )
 
         table.add_cell(self.get_add_row_button())
 
