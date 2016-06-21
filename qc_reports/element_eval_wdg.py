@@ -117,7 +117,144 @@ class ElementEvalWdg(BaseTableElementWdg):
             self.record_date = self.element_eval_sobject.get('record_date')
             self.general_comments = self.element_eval_sobject.get('general_comments')
 
-    def get_save_behavior(self):
+    @staticmethod
+    def get_save_behavior(sobject_code):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    var code = '%s';
+
+    var server = TacticServerStub.get();
+    var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+
+    // Name of the report
+    var name = document.getElementsByName("name")[0].value;
+
+    // Client row values
+    var client = document.getElementById("client").value;
+    var status = document.getElementById("status").value;
+
+    // Operator row values
+    var date = document.getElementsByName("date")[0].value;
+    var operator = document.getElementsByName("operator")[0].value;
+    var style = document.getElementById("style").value;
+    var bay = document.getElementById("bay").value;
+    var machine = document.getElementById("machine").value;
+
+    // Title section values
+    var title_data = document.getElementsByName("title_data")[0].value;
+    var format = document.getElementById("format").value;
+    var season = document.getElementsByName("season")[0].value;
+    var standard = document.getElementById("standard").value;
+    var episode = document.getElementsByName("episode")[0].value;
+    var frame_rate = document.getElementById("frame_rate").value;
+    var version = document.getElementsByName("version")[0].value;
+    var po_number = document.getElementsByName("po_number")[0].value;
+    var file_name = document.getElementsByName("file_name")[0].value;
+
+    // Program Format values
+    var roll_up_blank = document.getElementsByName("roll_up_blank")[0].value;
+    var bars_tone = document.getElementsByName("bars_tone")[0].value;
+    var black_silence_1 = document.getElementsByName("black_silence_1")[0].value;
+    var slate_silence = document.getElementsByName("slate_silence")[0].value;
+    var black_silence_2 = document.getElementsByName("black_silence_2")[0].value;
+    var start_of_program = document.getElementsByName("start_of_program")[0].value;
+    var end_of_program = document.getElementsByName("end_of_program")[0].value;
+
+    // Video Measurements values
+    var active_video_begins = document.getElementsByName("active_video_begins")[0].value;
+    var active_video_ends = document.getElementsByName("active_video_ends")[0].value;
+    var horizontal_blanking = document.getElementsByName("horizontal_blanking")[0].value;
+    var luminance_peak = document.getElementsByName("luminance_peak")[0].value;
+    var chroma_peak = document.getElementsByName("chroma_peak")[0].value;
+    var head_logo = document.getElementsByName("head_logo")[0].value;
+    var tail_logo = document.getElementsByName("tail_logo")[0].value;
+
+    // Element Profile values
+    var total_runtime = document.getElementsByName("total_runtime")[0].value;
+    var language = document.getElementsByName("language")[0].value;
+    var tv_feature_trailer = document.getElementsByName("tv_feature_trailer")[0].value;
+    var cc_subtitles = document.getElementsByName("cc_subtitles")[0].value;
+    var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
+    var vitc = document.getElementsByName("vitc")[0].value;
+    var textless_tail = document.getElementsByName("textless_tail")[0].value;
+    var source_barcode = document.getElementsByName("source_barcode")[0].value;
+    var notices = document.getElementsByName("notices")[0].value;
+    var element_qc_barcode = document.getElementsByName("element_qc_barcode")[0].value;
+    var label = document.getElementById("label").value;
+    var record_date = document.getElementsByName("record_date")[0].value;
+
+    // General comments
+    var general_comments = document.getElementById("general_comments").value;
+
+    var qc_report_object = {
+        'name': name,
+        'client': client,
+        'status': status,
+        'date': date,
+        'operator': operator,
+        'style': style,
+        'bay': bay,
+        'machine': machine,
+        'title': title_data,
+        'format': format,
+        'season': season,
+        'standard': standard,
+        'episode': episode,
+        'frame_rate': frame_rate,
+        'version': version,
+        'po_number': po_number,
+        'file_name': file_name,
+        'roll_up_blank': roll_up_blank,
+        'bars_tone': bars_tone,
+        'black_silence_1': black_silence_1,
+        'slate_silence': slate_silence,
+        'black_silence_2': black_silence_2,
+        'start_of_program': start_of_program,
+        'end_of_program': end_of_program,
+        'active_video_begins': active_video_begins,
+        'active_video_ends': active_video_ends,
+        'horizontal_blanking': horizontal_blanking,
+        'luminance_peak': luminance_peak,
+        'chroma_peak': chroma_peak,
+        'head_logo': head_logo,
+        'tail_logo': tail_logo,
+        'total_runtime': total_runtime,
+        'language': language,
+        'tv_feature_trailer': tv_feature_trailer,
+        'cc_subtitles': cc_subtitles,
+        'video_aspect_ratio': video_aspect_ratio,
+        'vitc': vitc,
+        'textless_tail': textless_tail,
+        'source_barcode': source_barcode,
+        'notices': notices,
+        'element_qc_barcode': element_qc_barcode,
+        'label': label,
+        'record_date': record_date,
+        'general_comments': general_comments
+    };
+
+    var element_eval_panel = document.getElementById('element_eval_panel');
+
+    spt.app_busy.show("Saving...");
+    server.update(search_key, qc_report_object);
+    spt.api.load_panel(element_eval_panel, 'qc_reports.ElementEvalWdg', {'search_key': search_key});
+
+    spt.app_busy.hide();
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
+            ''' % sobject_code
+        }
+
+        return behavior
+
+    @staticmethod
+    def get_save_as_new_behavior():
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -230,13 +367,13 @@ try {
         'general_comments': general_comments
     };
 
-    var board_table = document.getElementById('element_eval_panel');
+    var element_eval_panel = document.getElementById('element_eval_panel');
 
     var server = TacticServerStub.get();
 
-    spt.app_busy.show("Refreshing...");
-    server.insert('twog/element_evaluation', qc_report_object);
-    spt.api.load_panel(board_table, 'qc_reports.ElementEvalWdg', {'report_data': qc_report_object});
+    spt.app_busy.show("Saving a new Report...");
+    var inserted_sobject = server.insert('twog/element_evaluation', qc_report_object);
+    spt.api.load_panel(element_eval_panel, 'qc_reports.ElementEvalWdg', {'search_key': inserted_sobject['search_key']});
 
     spt.app_busy.hide();
 }
@@ -249,14 +386,14 @@ catch(err) {
 
         return behavior
 
-    def get_text_input_wdg(self, name, width=200):
+    def get_text_input_wdg(self, field_name, width=200):
         textbox_wdg = TextInputWdg()
-        textbox_wdg.set_id(name)
-        textbox_wdg.set_name(name)
+        textbox_wdg.set_id(field_name)
+        textbox_wdg.set_name(field_name)
         textbox_wdg.add_style('width', '{0}px'.format(width))
 
-        if hasattr(self, name):
-            textbox_wdg.set_value(getattr(self, name))
+        if hasattr(self, field_name):
+            textbox_wdg.set_value(getattr(self, field_name))
 
         return textbox_wdg
 
@@ -745,9 +882,21 @@ catch(err) {
 
         save_button = ButtonNewWdg(title='Save', icon='SAVE')
         save_button.add_class('save_button')
-        save_button.add_behavior(self.get_save_behavior())
+        save_button.add_behavior(self.get_save_behavior(self.element_eval_sobject.get_code()))
 
         section_span.add(save_button)
+
+        return section_span
+
+    def get_save_as_new_button(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        save_as_new_button = ButtonNewWdg(title='Save As', icon='NEW')
+        save_as_new_button.add_class('save_as_new_button')
+        save_as_new_button.add_behavior(self.get_save_as_new_behavior())
+
+        section_span.add(save_as_new_button)
 
         return section_span
 
@@ -778,7 +927,8 @@ catch(err) {
 
         if hasattr(self, 'element_eval_sobject') and self.element_eval_sobject:
             main_wdg.add(ElementEvalLinesWdg(element_evaluation_code=self.element_eval_sobject.get_code()))
+            main_wdg.add(self.get_save_button())
 
-        main_wdg.add(self.get_save_button())
+        main_wdg.add(self.get_save_as_new_button())
 
         return main_wdg

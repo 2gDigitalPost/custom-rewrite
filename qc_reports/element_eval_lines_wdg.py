@@ -244,58 +244,61 @@ catch(err) {
         table = Table()
         table.set_id('element_eval_lines_table')
 
-        self.set_header_rows(table)
+        if self.lines:
+            self.set_header_rows(table)
 
-        in_safe_options = [('Yes', True), ('No', False)]
-        type_code_options = [('Film', 'film'), ('Video', 'video'), ('Telecine', 'telecine'), ('Audio', 'audio')]
-        scale_select_options = [('1', '1'), ('2', '2'), ('3', '3'), ('FYI', 'fyi')]
-        in_source_options = [('No', 'no'), ('Yes', 'yes'), ('New', 'new'), ('Approved', 'approved'),
-                             ('Fixed', 'fixed'), ('Not Fixed', 'not_fixed'),
-                             ('Approved by Production', 'approved_by_production'),
-                             ('Approved by Client', 'approved_by_client'), ('Approved as is', 'approved_as_is'),
-                             ('Approved by Territory', 'approved_by_territory')]
+            in_safe_options = [('Yes', True), ('No', False)]
+            type_code_options = [('Film', 'film'), ('Video', 'video'), ('Telecine', 'telecine'), ('Audio', 'audio')]
+            scale_select_options = [('1', '1'), ('2', '2'), ('3', '3'), ('FYI', 'fyi')]
+            in_source_options = [('No', 'no'), ('Yes', 'yes'), ('New', 'new'), ('Approved', 'approved'),
+                                 ('Fixed', 'fixed'), ('Not Fixed', 'not_fixed'),
+                                 ('Approved by Production', 'approved_by_production'),
+                                 ('Approved by Client', 'approved_by_client'), ('Approved as is', 'approved_as_is'),
+                                 ('Approved by Territory', 'approved_by_territory')]
 
-        for iterator, line in enumerate(self.lines):
-            current_row = table.add_row()
-            current_row.add_attr('code', line.get_code())
+            for iterator, line in enumerate(self.lines):
+                current_row = table.add_row()
+                current_row.add_attr('code', line.get_code())
 
-            table.add_cell(
-                self.get_timecode_textbox('timecode-in-{0}'.format(iterator), 150, line.get_value('timecode_in'))
-            )
-            table.add_cell(
-                self.get_text_input_wdg_for_element_eval_lines('field-in-{0}'.format(iterator), 30,
-                                                               line.get_value('field_in'))
-            )
-            table.add_cell(
-                self.get_text_input_wdg_for_element_eval_lines('description-{0}'.format(iterator), 150,
-                                                               line.get_value('description'))
-            )
-            table.add_cell(
-                self.get_select_wdg('in-safe-{0}'.format(iterator), in_safe_options, line.get_value('in_safe'))
-            )
-            table.add_cell(
-                self.get_timecode_textbox('timecode-out-{0}'.format(iterator), 150, line.get_value('timecode_out'))
-            )
-            table.add_cell(
-                self.get_text_input_wdg_for_element_eval_lines('field-out-{0}'.format(iterator), 30,
-                                                               line.get_value('field_out'))
-            )
-            table.add_cell(
-                self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options, line.get_value('type_code'))
-            )
-            table.add_cell(
-                self.get_select_wdg('scale-{0}'.format(iterator), scale_select_options, line.get_value('scale'))
-            )
-            table.add_cell(
-                self.get_text_input_wdg_for_element_eval_lines('sector-or-channel-{0}'.format(iterator), 150,
-                                                               line.get_value('sector_or_channel'))
-            )
-            table.add_cell(
-                self.get_select_wdg('in-source-{0}'.format(iterator), in_source_options, line.get_value('in_source'))
-            )
-            table.add_cell(
-                self.get_remove_row_button(line.get_code())
-            )
+                table.add_cell(
+                    self.get_timecode_textbox('timecode-in-{0}'.format(iterator), 150, line.get_value('timecode_in'))
+                )
+                table.add_cell(
+                    self.get_text_input_wdg_for_element_eval_lines('field-in-{0}'.format(iterator), 30,
+                                                                   line.get_value('field_in'))
+                )
+                table.add_cell(
+                    self.get_text_input_wdg_for_element_eval_lines('description-{0}'.format(iterator), 150,
+                                                                   line.get_value('description'))
+                )
+                table.add_cell(
+                    self.get_select_wdg('in-safe-{0}'.format(iterator), in_safe_options, line.get_value('in_safe'))
+                )
+                table.add_cell(
+                    self.get_timecode_textbox('timecode-out-{0}'.format(iterator), 150, line.get_value('timecode_out'))
+                )
+                table.add_cell(
+                    self.get_text_input_wdg_for_element_eval_lines('field-out-{0}'.format(iterator), 30,
+                                                                   line.get_value('field_out'))
+                )
+                table.add_cell(
+                    self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options, line.get_value('type_code'))
+                )
+                table.add_cell(
+                    self.get_select_wdg('scale-{0}'.format(iterator), scale_select_options, line.get_value('scale'))
+                )
+                table.add_cell(
+                    self.get_text_input_wdg_for_element_eval_lines('sector-or-channel-{0}'.format(iterator), 150,
+                                                                   line.get_value('sector_or_channel'))
+                )
+                table.add_cell(
+                    self.get_select_wdg('in-source-{0}'.format(iterator), in_source_options, line.get_value('in_source'))
+                )
+                table.add_cell(
+                    self.get_remove_row_button(line.get_code())
+                )
+        else:
+            table.add_cell("No Element Evaluation lines exist yet. Add one?")
 
         table.add_cell(self.get_add_row_button())
 
