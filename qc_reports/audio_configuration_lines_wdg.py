@@ -6,7 +6,7 @@ from pyasm.search import Search
 from pyasm.web import SpanWdg, Table
 
 
-def get_add_audio_configuration_line_behavior(code):
+def get_add_audio_configuration_line_behavior(element_eval_code):
     """
     :return: Javascript behavior
     """
@@ -64,13 +64,13 @@ catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }
-        ''' % code
+        ''' % element_eval_code
     }
 
     return behavior
 
 
-def get_remove_audio_configuration_line_behavior():
+def get_remove_audio_configuration_line_behavior(element_eval_code, line_code):
     """
     :return: Javascript behavior
     """
@@ -97,6 +97,7 @@ function getTableRowsWithAttribute(attribute)
 
 try {
     var element_evaluation_code = '%s';
+    var line_code = '%s';
 
     var audio_table = document.getElementById('audio_configuration_table');
     var audio_config_rows = getTableRowsWithAttribute('code');
@@ -128,7 +129,7 @@ catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }
-'''
+''' % (element_eval_code, line_code)
     }
 
     return behavior
@@ -168,13 +169,14 @@ class AudioLinesTableWdg(BaseTableElementWdg):
 
         return section_span
 
-    def get_remove_row_button(self):
+    def get_remove_row_button(self, line_code):
         section_span = SpanWdg()
         section_span.add_style('display', 'inline-block')
 
         remove_row_button = ButtonNewWdg(title='Remove Row', icon='REMOVE')
         remove_row_button.add_class('remove_row_button')
-        remove_row_button.add_behavior(get_remove_audio_configuration_line_behavior())
+        remove_row_button.add_behavior(get_remove_audio_configuration_line_behavior(self.element_evaluation_code,
+                                                                                    line_code))
 
         section_span.add(remove_row_button)
 
@@ -211,7 +213,7 @@ class AudioLinesTableWdg(BaseTableElementWdg):
                 self.get_text_input_wdg_for_audio_config('peak-{0}'.format(iterator), 150, line.get_value('peak'))
             )
             audio_configuration_table.add_cell(
-                self.get_remove_row_button()
+                self.get_remove_row_button(line.get_code())
             )
 
         audio_configuration_table.add(self.get_add_row_button())

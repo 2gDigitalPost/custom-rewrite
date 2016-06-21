@@ -39,7 +39,19 @@ class ElementEvalLinesWdg(BaseTableElementWdg):
         if self.element_evaluation_code:
             lines_search = Search('twog/element_evaluation_line')
             lines_search.add_filter('element_evaluation_code', self.element_evaluation_code)
-            self.lines = lines_search.get_sobjects()
+
+            lines = lines_search.get_sobjects()
+            lines_with_values = []
+            lines_without_values = []
+
+            for line in lines:
+                if line.get_value('timecode_in'):
+                    lines_with_values.append(line)
+                else:
+                    lines_without_values.append(line)
+
+            self.lines = sorted(lines_with_values, key=lambda x: x.get_value('timecode_in'))
+            self.lines.extend(lines_without_values)
         else:
             self.lines = []
 
@@ -161,17 +173,6 @@ catch(err) {
         table.add_header("Sector/Ch")
         table.add_header("In Source")
 
-    def get_text_input_wdg(self, name, width=200):
-        textbox_wdg = TextInputWdg()
-        textbox_wdg.set_id(name)
-        textbox_wdg.set_name(name)
-        textbox_wdg.add_style('width', '{0}px'.format(width))
-
-        if hasattr(self, name):
-            textbox_wdg.set_value(getattr(self, name))
-
-        return textbox_wdg
-
     @staticmethod
     def get_text_input_wdg_for_element_eval_lines(name, width=200, line_data=None):
         textbox_wdg = TextInputWdg()
@@ -198,7 +199,7 @@ catch(err) {
         return timecode_textbox
 
     @staticmethod
-    def get_select_wdg(name, options, value=None):
+    def get_select_wdg(name, options, saved_value=None):
         select_wdg = SelectWdg(name)
         select_wdg.set_id(name)
         select_wdg.add_empty_option()
@@ -209,8 +210,8 @@ catch(err) {
 
             select_wdg.append_option(label, value)
 
-        if value:
-            select_wdg.set_value(value)
+        if saved_value:
+            select_wdg.set_value(saved_value)
 
         return select_wdg
 
