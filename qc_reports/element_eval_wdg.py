@@ -864,6 +864,7 @@ catch(err) {
 
     def get_general_comments_section(self):
         general_comments_div = DivWdg()
+        general_comments_div.add_style('margin', '10px')
         general_comments_wdg = TextAreaWdg()
         general_comments_wdg.set_id('general_comments')
         general_comments_wdg.set_input_prefix('test')
@@ -871,7 +872,9 @@ catch(err) {
         if hasattr(self, 'general_comments'):
             general_comments_wdg.set_value(self.general_comments)
 
-        general_comments_div.add('General Comments')
+        general_comments_text_div = DivWdg('General Comments')
+        general_comments_text_div.add_style('font-weight', 'bold')
+        general_comments_div.add(general_comments_text_div)
         general_comments_div.add(general_comments_wdg)
 
         return general_comments_div

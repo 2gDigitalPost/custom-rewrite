@@ -304,6 +304,7 @@ catch(err) {
 
         main_div = DivWdg()
         main_div.set_id('element_eval_lines_div')
+        main_div.add_style('margin', '10px')
         main_div.add(table)
 
         return main_div

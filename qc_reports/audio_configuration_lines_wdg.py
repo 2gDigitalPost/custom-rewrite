@@ -3,7 +3,7 @@ from tactic.ui.widget import ButtonNewWdg
 from tactic.ui.common import BaseTableElementWdg
 
 from pyasm.search import Search
-from pyasm.web import SpanWdg, Table
+from pyasm.web import DivWdg, SpanWdg, Table
 
 
 def get_add_audio_configuration_line_behavior(element_eval_code):
@@ -152,6 +152,7 @@ class AudioLinesTableWdg(BaseTableElementWdg):
     def get_display(self):
         audio_configuration_table = Table()
         audio_configuration_table.set_id('audio_configuration_table')
+        audio_configuration_table.add_style('margin', '10px')
 
         if self.lines:
             audio_configuration_table.add_row()
@@ -188,4 +189,9 @@ class AudioLinesTableWdg(BaseTableElementWdg):
 
         audio_configuration_table.add(self.get_add_row_button())
 
-        return audio_configuration_table
+        main_div = DivWdg()
+        main_div.set_id('audio_config_lines_div')
+        main_div.add_style('margin', '10px')
+        main_div.add(audio_configuration_table)
+
+        return main_div
