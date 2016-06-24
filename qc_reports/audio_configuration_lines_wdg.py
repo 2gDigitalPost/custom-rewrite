@@ -16,10 +16,10 @@ def get_add_audio_configuration_line_behavior(element_eval_code):
         'css_class': 'clickme',
         'type': 'click_up',
         'cbjs_action': '''
-function getTableRowsWithAttribute(attribute)
+function getTableRowsWithAttribute(table, attribute)
 {
   var matchingElements = [];
-  var allElements = document.getElementsByTagName('tr');
+  var allElements = table.getElementsByTagName('tr');
   for (var i = 0, n = allElements.length; i < n; i++)
   {
     if (allElements[i].getAttribute(attribute) !== null)
@@ -35,7 +35,7 @@ try {
     var element_evaluation_code = '%s';
 
     var audio_table = document.getElementById('audio_configuration_table');
-    var audio_config_rows = getTableRowsWithAttribute('code');
+    var audio_config_rows = getTableRowsWithAttribute(audio_table, 'code');
 
     var server = TacticServerStub.get();
 
@@ -56,8 +56,11 @@ try {
     // Insert a blank line
     server.insert('twog/audio_evaluation_line', {'element_evaluation_code': element_evaluation_code});
 
+    // Refresh the widget
+    var audio_div = document.getElementById('audio_config_lines_div');
+
     spt.app_busy.show("Refreshing...");
-    spt.api.load_panel(audio_table, 'qc_reports.AudioLinesTableWdg', {'element_evaluation_code': element_evaluation_code});
+    spt.api.load_panel(audio_div, 'qc_reports.AudioLinesTableWdg', {'element_evaluation_code': element_evaluation_code});
     spt.app_busy.hide();
 }
 catch(err) {
@@ -88,9 +91,9 @@ try {
     server.retire_sobject(server.build_search_key('twog/audio_evaluation_line', line_code, 'twog'));
 
     // Refresh the widget
-    var audio_table = document.getElementById('audio_configuration_table');
+    var audio_div = document.getElementById('audio_config_lines_div');
 
-    spt.api.load_panel(audio_table, 'qc_reports.AudioLinesTableWdg', {'element_evaluation_code': element_evaluation_code});
+    spt.api.load_panel(audio_div, 'qc_reports.AudioLinesTableWdg', {'element_evaluation_code': element_evaluation_code});
 }
 catch(err) {
     spt.app_busy.hide();

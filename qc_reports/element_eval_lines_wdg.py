@@ -79,7 +79,6 @@ try {
     var element_evaluation_code = '%s';
 
     var element_eval_lines_table = document.getElementById('element_eval_lines_table');
-    // var element_eval_lines_table_rows = element_eval_lines_table.getElementsByTagName('tr');
     var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
 
     var server = TacticServerStub.get();
