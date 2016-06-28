@@ -1,17 +1,61 @@
-from qc_reports.audio_configuration_lines_wdg import AudioLinesTableWdg
-from qc_reports.element_eval_lines_wdg import ElementEvalLinesWdg
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import CalendarInputWdg, ButtonNewWdg
 
 from pyasm.search import Search
 from pyasm.web import Table, DivWdg, SpanWdg
-from pyasm.widget import SelectWdg, CheckboxWdg, TextAreaWdg
+from pyasm.widget import SelectWdg, TextAreaWdg
 
 
 class MetaDataReportWdg(BaseRefreshWdg):
     def init(self):
         self.metadata_report_sobject = self.get_sobject_from_kwargs()
+
+    # TODO: This function is the same as the one in ElementEvalWdg, merge the two into one
+    def get_text_input_wdg(self, field_name, width=200):
+        textbox_wdg = TextInputWdg()
+        textbox_wdg.set_id(field_name)
+        textbox_wdg.set_name(field_name)
+        textbox_wdg.add_style('width', '{0}px'.format(width))
+
+        if hasattr(self, field_name):
+            textbox_wdg.set_value(getattr(self, field_name))
+
+        return textbox_wdg
+
+    # TODO: This function is the same as the one in ElementEvalWdg, merge the two into one
+    def get_date_calendar_wdg(self):
+        date_calendar_wdg = CalendarInputWdg("date")
+        date_calendar_wdg.set_option('show_activator', 'true')
+        date_calendar_wdg.set_option('show_time', 'false')
+        date_calendar_wdg.set_option('width', '300px')
+        date_calendar_wdg.set_option('id', 'date')
+        date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
+
+        try:
+            date = self.date
+            date_calendar_wdg.set_value(date)
+        except AttributeError:
+            pass
+
+        return date_calendar_wdg
+
+    def get_text_area_input_wdg(self, name, id):
+        text_area_wdg = TextAreaWdg()
+        text_area_wdg.set_id(id)
+
+        if hasattr(self, id):
+            text_area_wdg.set_value(self.general_comments)
+
+        text_area_div = DivWdg(name)
+        text_area_div.add_style('font-weight', 'bold')
+
+        section_div = DivWdg()
+        section_div.add_style('margin', '10px')
+        section_div.add(text_area_div)
+        section_div.add(text_area_wdg)
+
+        return section_div
 
     def get_true_false_select_wdg(self, name, width=80):
         """
@@ -109,15 +153,63 @@ class MetaDataReportWdg(BaseRefreshWdg):
 
         return select_wdg
 
+    def get_top_section(self):
+        title_span = SpanWdg()
+        title_span.add("Title")
+        title_span.add(self.get_text_input_wdg('title_data', 400))
+
+        episode_span = SpanWdg()
+        episode_span.add("Episode")
+        episode_span.add(self.get_text_input_wdg('episode', 400))
+
+        cont_span = SpanWdg()
+        cont_span.add("Cont")
+        cont_span.add(self.get_text_input_wdg('cont', 400))
+
+        source_type_span = SpanWdg()
+        source_type_span.add("Source Type")
+        source_type_span.add(self.get_text_input_wdg('source_type', 400))
+
+        left_div = DivWdg()
+        left_div.add_style('float', 'left')
+        left_div.add_style('margin-right', '20px')
+        left_div.add(title_span)
+        left_div.add(episode_span)
+        left_div.add(cont_span)
+        left_div.add(source_type_span)
+
+        qc_operator_span = SpanWdg()
+        qc_operator_span.add('QC Operator')
+        qc_operator_span.add(self.get_text_input_wdg('qc_operator', 400))
+
+        qc_date_span = SpanWdg()
+        qc_date_span.add('QC Date')
+        qc_date_span.add(self.get_date_calendar_wdg())
+
+        trt_feature_span = SpanWdg()
+        trt_feature_span.add('TRT Feature')
+        trt_feature_span.add(self.get_text_input_wdg('trt_feature', 400))
+
+        trt_trailer_preview_span = SpanWdg()
+        trt_trailer_preview_span.add('TRT Trailer/Preview')
+        trt_trailer_preview_span.add(self.get_text_input_wdg('trt_trailer_preview', 400))
+
+        right_div = DivWdg()
+        right_div.add(qc_operator_span)
+        right_div.add(qc_date_span)
+        right_div.add(trt_feature_span)
+        right_div.add(trt_trailer_preview_span)
+
+        section_div = DivWdg()
+        section_div.add(left_div)
+        section_div.add(right_div)
+        section_div.add(self.get_text_area_input_wdg('QC Notes', 'qc_notes'))
+
+        return section_div
+
+
     def get_section_one(self):
         section_div = DivWdg()
-
-        table1 = Table()
-        table1.add_row()
-
-        table1.add_header('')
-        table1.add_header('Feature')
-        table1.add_header('Trailer/Preview')
 
         label_value_pairs_1 = (
             ('Encoding Log Shows No Errors?', 'encoding_log_shows_no_errors'),
@@ -135,8 +227,6 @@ class MetaDataReportWdg(BaseRefreshWdg):
             ('*Cropping Values are Correct (No Inactive Pixels)?', 'cropping_values_correct')
         )
 
-        self.get_section_one_table_one(table1, label_value_pairs_1)
-
         label_value_pairs_2 = (
             ('Trailer does not Contain any Promotional Bumpers?', 'trailer_no_promotional_bumpers'),
             ('Trailer is Same Aspect Ratio as Feature?', 'trailer_same_aspect_ratio'),
@@ -144,27 +234,34 @@ class MetaDataReportWdg(BaseRefreshWdg):
         )
 
         label_value_pairs_3 = (
-            'File Starts @ 00:59:59:00 With Black?', 'file_starts_with_black',
-            'Program Starts @ 1:00:00:00?', 'program_starts',
-            'Program ends with at least one black frame?', 'program_ends_black_frame_feature'
+            ('File Starts @ 00:59:59:00 With Black?', 'file_starts_with_black'),
+            ('Program Starts @ 1:00:00:00?', 'program_starts'),
+            ('Program ends with at least one black frame?', 'program_ends_black_frame_feature')
         )
 
         label_value_pairs_4 = (
-            'File starts @ 1:00:00:00 with fade up/down?', 'file_starts_fade_up_down',
-            'Program begins with at least one black frame?', 'program_ends_black_frame_preview',
-            'Program ends with fade down (with at least once black frame)?', 'program_ends_fade_down'
+            ('File starts @ 1:00:00:00 with fade up/down?', 'file_starts_fade_up_down'),
+            ('Program begins with at least one black frame?', 'program_ends_black_frame_preview'),
+            ('Program ends with fade down (with at least once black frame)?', 'program_ends_fade_down')
         )
 
-
-
-        section_div.add(table1)
+        section_div.add(self.get_section_one_table_one(label_value_pairs_1, label_value_pairs_2))
+        section_div.add(self.get_section_one_table_two(label_value_pairs_3))
+        section_div.add(self.get_section_one_table_three(label_value_pairs_4))
+        section_div.add(self.get_text_area_input_wdg('Video Notes', 'video_notes'))
 
         return section_div
 
-    def get_section_one_table_one(self, table, label_value_pairs):
-        for label_value_pair in label_value_pairs:
-            label = label_value_pair[0]
-            value = label_value_pair[1]
+    def get_section_one_table_one(self, label_value_pairs_1, label_value_pairs_2):
+        table = Table()
+        table.add_row()
+
+        table.add_header('')
+        table.add_header('Feature')
+        table.add_header('Trailer/Preview')
+
+        for label_value_pair in label_value_pairs_1:
+            label, value = label_value_pair
 
             table.add_row()
             table.add_cell(label)
@@ -172,6 +269,45 @@ class MetaDataReportWdg(BaseRefreshWdg):
             for column in ('feature', 'preview'):
                 select_wdg_id = value + '_' + column
                 table.add_cell(self.get_true_false_select_wdg(select_wdg_id))
+
+        for label_value_pair in label_value_pairs_2:
+            label, value = label_value_pair
+
+            table.add_row()
+            table.add_cell(label)
+            table.add_cell()
+            table.add_cell(self.get_true_false_select_wdg(value + '_preview'))
+
+        return table
+
+    def get_section_one_table_two(self, label_value_pairs):
+        table = Table()
+        table.add_style('float', 'left')
+
+        table.add_row()
+        table.add_header('Confirm the build of the feature')
+
+        for label_value_pair in label_value_pairs:
+            label, value = label_value_pair
+
+            table.add_row()
+            table.add_cell(label)
+            table.add_cell(self.get_true_false_select_wdg(value))
+
+        return table
+
+    def get_section_one_table_three(self, label_value_pairs):
+        table = Table()
+
+        table.add_row()
+        table.add_header('Confirm the build of trailer/preview')
+
+        for label_value_pair in label_value_pairs:
+            label, value = label_value_pair
+
+            table.add_row()
+            table.add_cell(label)
+            table.add_cell(self.get_true_false_select_wdg(value))
 
         return table
 
@@ -184,24 +320,24 @@ class MetaDataReportWdg(BaseRefreshWdg):
         audio_bundle_table = self.get_audio_configuration_section_table('Audio Bundle', 'audio_bundle')
 
         preview_trailer_audio_config = self.get_audio_configuration_section_table('Preview/Trailer: Audio Config',
-                                                                                  'preview_trailer_audio_config')
+                                                                                  'preview_trailer_audio_config',
+                                                                                  float_left=False)
 
         section_div.add(feature_audio_config_table)
         section_div.add(audio_bundle_table)
         section_div.add(preview_trailer_audio_config)
 
         section_div.add(self.get_section_two_bottom_table())
+        section_div.add(self.get_text_area_input_wdg('Audio Notes', 'audio_notes'))
 
         return section_div
 
-    def get_section_three(self):
-        section_div = DivWdg()
-
-
-
-    def get_audio_configuration_section_table(self, name, id):
+    def get_audio_configuration_section_table(self, name, id, float_left=True):
         table = Table()
-        table.add_style('float: left')
+
+        if float_left:
+            table.add_style('float: left')
+
         table.add_style('margin', '10px')
         table.add_row()
         table.add_header(name)
@@ -219,6 +355,7 @@ class MetaDataReportWdg(BaseRefreshWdg):
 
     def get_section_two_bottom_table(self):
         table = Table()
+        table.add_style('margin', '10px')
         table.add_row()
 
         table.add_header('')
@@ -239,14 +376,21 @@ class MetaDataReportWdg(BaseRefreshWdg):
             table.add_row()
             table.add_cell(label_value_pair[0])
 
-            for section in ('feature, audio, preview'):
+            for section in ('feature', 'audio', 'preview'):
                 table.add_cell(self.get_true_false_select_wdg(label_value_pair[1] + '_' + section))
 
         return table
 
-    def get_delivery_snapshot_section(self):
+    def get_section_three(self):
         section_div = DivWdg()
 
+        section_div.add(self.get_delivery_snapshot_section())
+        section_div.add(self.get_section_three_subsection_one())
+        section_div.add(self.get_section_three_subsection_two())
+
+        return section_div
+
+    def get_delivery_snapshot_section(self):
         label_value_pairs = (
             ('Feature', 'feature_delivery_snapshot'),
             ('Trailer', 'trailer_delivery_snapshot'),
@@ -258,28 +402,158 @@ class MetaDataReportWdg(BaseRefreshWdg):
             ('Dub Card', 'dub_card_delivery_snapshot')
         )
 
-    def get_section_three_subsection_one(self):
-        section_div = DivWdg()
+        table = Table()
+        table.add_style('float', 'left')
 
+        table.add_row()
+        table.add_header('Delivery Snapshot')
+
+        for label_value_pair in label_value_pairs:
+            label, value = label_value_pair
+
+            table.add_row()
+            table.add_cell(label)
+            table.add_cell(self.get_true_false_select_wdg(value))
+
+        section_div = DivWdg()
+        section_div.add(table)
+
+        return section_div
+
+    def get_section_three_subsection_one(self):
+        label_value_pairs = (
+            ('Forced narrative on feature?', 'forced_narrative_feature',
+             'Does not overlap any credits or other text?', 'overlap_credits_text_1'),
+            ('Forced narrative on trailer?', 'forced_narrative_trailer',
+             'Does not overlap any credits or other text?', 'overlap_credits_text_2'),
+            ('Subtitles on feature?', 'subtitles_on_feature',
+             'Does not overlap any credits or other text?', 'overlap_credits_text_3'),
+            ('Subtitles on trailer?', 'subtitles_on_trailer',
+             'Does not overlap any credits or other text?', 'overlap_credits_text_4'),
+        )
+
+        table = Table()
+
+        for label_value_pair in label_value_pairs:
+            label_1, value_1, label_2, value_2 = label_value_pair
+
+            table.add_row()
+            table.add_cell(label_1)
+            table.add_cell(self.get_true_false_select_wdg(value_1))
+            table.add_cell(label_2)
+            table.add_cell(self.get_true_false_select_wdg(value_2))
+
+        section_div = DivWdg()
+        section_div.add(table)
+
+        return section_div
+
+    def get_section_three_subsection_two(self):
+
+        label_value_pairs = (
+            ('Dub card dimensions match feature?', 'dub_card_dimensions',
+             'CC is in sync with video?', 'cc_in_sync'),
+            ('Dub card FPS matches feature?', 'dub_card_fps',
+             'Subtitles are in sync with video?', 'subtitles_in_sync'),
+            ('Dub card language matches locale?', 'dub_card_language',
+             'Subtitles have correct language?', 'subtitles_correct_language'),
+            ('Dub card duration is 4 to 5 seconds?', 'dub_card_duration', '', ''),
+            ('Dub card contains no audio tracks?', 'dub_card_contains', '', '')
+        )
+
+        label_value_pairs_3 = (
+            ('Dub card text is not cut off when feature cropping values are applied?', 'dub_card_text_not_cut_off')
+        )
+
+        table = Table()
+
+        for label_value_pair in label_value_pairs:
+            label_1, value_1, label_2, value_2 = label_value_pair
+
+            table.add_row()
+            table.add_cell(label_1)
+            table.add_cell(self.get_true_false_select_wdg(value_1))
+
+            table.add_cell(label_2)
+
+            if (value_2):
+                table.add_cell(self.get_true_false_select_wdg(value_2))
+            else:
+                table.add_cell(value_2)
+
+        section_div = DivWdg()
+        section_div.add(table)
+
+        return section_div
+
+    def get_section_four(self):
         label_value_pairs_1 = (
-            ('Forced narrative on feature?', 'forced_narrative_feature'),
-            ('Forced narrative on trailer?', 'forced_narrative_trailer'),
-            ('Subtitles on feature?', 'subtitles_on_feature'),
-            ('Subtitles on trailer?', 'subtitles_on_trailer')
+            ('Image is a JPEG (.jpg extension)?', 'image_is_jpeg_chapter'),
+            ('DPI is 72 or greater?', 'dpi_is_72_chapter'),
+            ('Color profile is RGB?', 'color_profile_rgb_chapter'),
+            ('Same aspect ratio as video?', 'same_aspect_ratio_as_video_chapter'),
+            ('Only active pixels are included (no dirty edges)?', 'only_active_pixels_chapter'),
+            ('Horizontal dimension is at least 640?', 'horizontal_dimension_640_chapter'),
+            ('Each chapter has a thumbnail?', 'each_chapter_thumbnail_chapter')
         )
 
         label_value_pairs_2 = (
-            ('Does not overlap any credits or other text?', 'overlap_credits_text_1'),
-            ('Does not overlap any credits or other text?', 'overlap_credits_text_2'),
-            ('Does not overlap any credits or other text?', 'overlap_credits_text_3'),
-            ('Does not overlap any credits or other text?', 'overlap_credits_text_4')
+            ('Image is a JPEG (.jpg extension)?', 'image_is_jpeg_poster'),
+            ('DPI is 72 or greater?', 'dpi_is_72_poster'),
+            ('Color profile is RGB?', 'color_profile_rgb_poster'),
+            ('Resolution is at least 1400x2100?', 'resolution_poster'),
+            ('Aspect ratio is 2:3?', 'aspect_ratio_poster'),
+            ('Contains key art and title only (no film rating on image)?', 'contains_key_art_poster'),
+            ('No DVD cover, date stamp, URL or promo tagging included?', 'no_promo_poster')
         )
+
+        section_div = DivWdg()
+
+        section_div.add(self.get_section_four_table_one(label_value_pairs_1))
+        section_div.add(self.get_section_four_table_two(label_value_pairs_2))
+
+        return section_div
+
+    def get_section_four_table_one(self, label_value_pairs):
+        table = Table()
+        table.add_style('float', 'left')
+
+        table.add_row()
+        table.add_header('Chapter Thumbnails')
+
+        for label_value_pair in label_value_pairs:
+            label, value = label_value_pair
+
+            table.add_row()
+            table.add_cell(label)
+            table.add_cell(self.get_true_false_select_wdg(value + '_chapter'))
+
+        return table
+
+    def get_section_four_table_two(self, label_value_pairs):
+        table = Table()
+
+        table.add_row()
+        table.add_header('Poster Art (One Sheet)')
+
+        for label_value_pair in label_value_pairs:
+            label, value = label_value_pair
+
+            table.add_row()
+            table.add_cell(label)
+            table.add_cell(self.get_true_false_select_wdg(value + '_poster'))
+
+        return table
 
     def get_display(self):
         main_wdg = DivWdg()
         main_wdg.set_id('metadata_report_wdg')
 
+        main_wdg.add(self.get_top_section())
+
         main_wdg.add(self.get_section_one())
         main_wdg.add(self.get_section_two())
+        main_wdg.add(self.get_section_three())
+        main_wdg.add(self.get_section_four())
 
         return main_wdg

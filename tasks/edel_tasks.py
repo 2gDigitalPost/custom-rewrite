@@ -1,6 +1,7 @@
 from xml.etree import ElementTree
 
 from tactic.ui.common import BaseTableElementWdg
+from tactic.ui.panel import ViewPanelWdg, FastTableLayoutWdg
 from tactic.ui.table import WorkElementWdg
 
 from pyasm.search import Search
@@ -52,10 +53,13 @@ def get_edel_tasks():
     task_search.add_filter('status', 'Complete', '!=')
 
     tasks = task_search.get_sobjects()
+    tasks = [task for task in tasks if task.get_parent()]
 
     final_tasks = []
 
     for task in tasks:
+        print(task.get_value('process'))
+        print(task.get_parent())
         process_search = Search('config/process')
         process_search.add_filter('process', task.get_value('process'))
 
@@ -115,7 +119,10 @@ class EdelTaskWdg(BaseTableElementWdg):
             status_cell = table.add_cell(task.get_value('status'))
 
             title_order = get_title_order_from_code(task.get_value('search_code'))
-            title_order_cell = table.add_cell(title_order.get_value('name'))
+            if (title_order):
+                title_order_cell = table.add_cell(title_order.get_value('name'))
+            else:
+                title_order_cell = table.add_cell()
 
             # work_on_task_cell = table.add_cell(WorkElementWdg(search_key='sthpw/task?code=TASK00000009'))
 
