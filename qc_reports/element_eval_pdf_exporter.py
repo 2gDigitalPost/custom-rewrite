@@ -5,10 +5,16 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
 
 import datetime
+import os
 
 
 def main(report_data):
-    doc = SimpleDocTemplate("Simple_table.pdf", pagesize=letter)
+    file_name = report_data.get('name') + '.pdf'
+    save_location = '/var/www/html/element_evaluations'
+
+    saved_file_path = os.path.join(save_location, file_name)
+
+    doc = SimpleDocTemplate(saved_file_path, pagesize=letter)
 
     elements = []
 

@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from pyasm.command import Command
 
@@ -12,11 +13,16 @@ from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
 class ExportElementEvalCommand(Command):
     def execute(self):
         report_data = self.kwargs.get('report_data')
-        self.export_pdf(get_test_report_data())
+        self.export_pdf(report_data)
 
     @staticmethod
     def export_pdf(report_data):
-        doc = SimpleDocTemplate("Simple_table.pdf", pagesize=letter)
+        file_name = report_data.get('name', 'report') + datetime.datetime.now().strftime('-%m%d%y-%H%M%S') + '.pdf'
+        save_location = '/var/www/html/element_evaluations'
+
+        saved_file_path = os.path.join(save_location, file_name)
+
+        doc = SimpleDocTemplate(saved_file_path, pagesize=letter)
 
         elements = []
 
