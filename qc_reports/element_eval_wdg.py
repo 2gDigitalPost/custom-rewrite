@@ -123,8 +123,120 @@ class ElementEvalWdg(BaseTableElementWdg):
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
+function getTableRowsWithAttribute(table, attribute)
+{
+  var matchingElements = [];
+  var allElements = table.getElementsByTagName('tr');
+  for (var i = 0, n = allElements.length; i < n; i++)
+  {
+    if (allElements[i].getAttribute(attribute) !== null)
+    {
+      // Element exists with attribute. Add to array.
+      matchingElements.push(allElements[i]);
+    }
+  }
+  return matchingElements;
+}
+
+function get_audio_table_data() {
+    var audio_table = document.getElementById('audio_configuration_table');
+    var audio_config_rows = getTableRowsWithAttribute(audio_table, 'code');
+
+    var audio_data = [];
+
+    for (var i = 0; i < audio_config_rows.length; i++) {
+        var audio_line = {};
+
+        audio_line['channel'] = document.getElementsByName("channel-" + String(i))[0].value;
+        audio_line['content'] = document.getElementsByName("content-" + String(i))[0].value;
+        audio_line['tone'] = document.getElementsByName("tone-" + String(i))[0].value;
+        audio_line['peak'] = document.getElementsByName("peak-" + String(i))[0].value;
+
+        audio_data.push(audio_line);
+    }
+
+    return audio_data;
+}
+
+function get_element_eval_lines() {
+    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
+    var element_eval_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
+
+    var element_eval_data = [];
+
+    for (var i = 0; i < element_eval_rows.length; i++) {
+        var element_eval_line = {};
+
+        element_eval_line['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
+        element_eval_line['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
+        element_eval_line['description'] = document.getElementsByName("description-" + String(i))[0].value;
+        element_eval_line['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
+        element_eval_line['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
+        element_eval_line['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
+        element_eval_line['type_code'] = document.getElementById("type-code-" + String(i)).value;
+        element_eval_line['scale'] = document.getElementById("scale-" + String(i)).value;
+        element_eval_line['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        element_eval_line['in_source'] = document.getElementById("in-source-" + String(i)).value;
+
+        element_eval_data.push(element_eval_line);
+    }
+
+    return element_eval_data;
+}
+
+function save_audio_eval_lines(element_evaluation_code) {
+    var audio_table = document.getElementById('audio_configuration_table');
+    var audio_config_rows = getTableRowsWithAttribute(audio_table, 'code');
+
+    var server = TacticServerStub.get();
+
+    for (var i = 0; i < audio_config_rows.length; i++) {
+        var audio_line = {};
+
+        audio_line['channel'] = document.getElementsByName("channel-" + String(i))[0].value;
+        audio_line['content'] = document.getElementsByName("content-" + String(i))[0].value;
+        audio_line['tone'] = document.getElementsByName("tone-" + String(i))[0].value;
+        audio_line['peak'] = document.getElementsByName("peak-" + String(i))[0].value;
+
+        var search_key = server.build_search_key('twog/audio_evaluation_line',
+                                                 audio_config_rows[i].getAttribute('code'), 'twog');
+
+        server.update(search_key, audio_line);
+    }
+}
+
+function save_element_eval_lines(element_evaluation_code) {
+    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
+    var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
+
+    var server = TacticServerStub.get();
+
+    for (var i = 0; i < table_rows.length; i++) {
+        var line_data = {};
+
+        line_data['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
+        line_data['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
+        line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
+        line_data['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
+        line_data['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
+        line_data['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
+        line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
+        line_data['scale'] = document.getElementById("scale-" + String(i)).value;
+        line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
+
+        var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
+                                                 'twog');
+
+        server.update(search_key, line_data);
+    }
+}
+
 try {
     var code = '%s';
+
+    save_audio_eval_lines(code);
+    save_element_eval_lines(code);
 
     var server = TacticServerStub.get();
     var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
@@ -387,7 +499,7 @@ catch(err) {
         return behavior
 
     @staticmethod
-    def get_export_to_pdf_behavior():
+    def get_export_to_pdf_behavior(sobject_code):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -453,129 +565,84 @@ function get_element_eval_lines() {
     return element_eval_data;
 }
 
-try {
-    // Name of the report
-    var name = document.getElementsByName("name_data")[0].value;
+function save_element_eval_report() {
+    var qc_report_object = {};
 
-    // Client row values
-    var client = document.getElementById("client").value;
-    var status = document.getElementById("status").value;
+    qc_report_object['name'] = document.getElementsByName("name_data")[0].value;
+    qc_report_object['client'] = document.getElementById("client").value;
+    qc_report_object['status'] = document.getElementById("status").value;
+    qc_report_object['date'] = document.getElementsByName("date")[0].value;
+    qc_report_object['operator'] = document.getElementsByName("operator")[0].value;
+    qc_report_object['style'] = document.getElementById("style").value;
+    qc_report_object['bay'] = document.getElementById("bay").value;
+    qc_report_object['machine'] = document.getElementById("machine").value;
+    qc_report_object['title'] = document.getElementsByName("title_data")[0].value;
+    qc_report_object['format'] = document.getElementById("format").value;
+    qc_report_object['season'] = document.getElementsByName("season")[0].value;
+    qc_report_object['standard'] = document.getElementById("standard").value;
+    qc_report_object['episode'] = document.getElementsByName("episode")[0].value;
+    qc_report_object['frame_rate'] = document.getElementById("frame_rate").value;
+    qc_report_object['version'] = document.getElementsByName("version")[0].value;
+    qc_report_object['po_number'] = document.getElementsByName("po_number")[0].value;
+    qc_report_object['file_name'] = document.getElementsByName("file_name")[0].value;
+    qc_report_object['roll_up_blank'] = document.getElementsByName("roll_up_blank")[0].value;
+    qc_report_object['bars_tone'] = document.getElementsByName("bars_tone")[0].value;
+    qc_report_object['black_silence_1'] = document.getElementsByName("black_silence_1")[0].value;
+    qc_report_object['slate_silence'] = document.getElementsByName("slate_silence")[0].value;
+    qc_report_object['black_silence_2'] = document.getElementsByName("black_silence_2")[0].value;
+    qc_report_object['start_of_program'] = document.getElementsByName("start_of_program")[0].value;
+    qc_report_object['end_of_program'] = document.getElementsByName("end_of_program")[0].value;
+    qc_report_object['active_video_begins'] = document.getElementsByName("active_video_begins")[0].value;
+    qc_report_object['active_video_ends'] = document.getElementsByName("active_video_ends")[0].value;
+    qc_report_object['horizontal_blanking'] = document.getElementsByName("horizontal_blanking")[0].value;
+    qc_report_object['luminance_peak'] = document.getElementsByName("luminance_peak")[0].value;
+    qc_report_object['chroma_peak'] = document.getElementsByName("chroma_peak")[0].value;
+    qc_report_object['head_logo'] = document.getElementsByName("head_logo")[0].value;
+    qc_report_object['tail_logo'] = document.getElementsByName("tail_logo")[0].value;
+    qc_report_object['total_runtime'] = document.getElementsByName("total_runtime")[0].value;
+    qc_report_object['language'] = document.getElementsByName("language")[0].value;
+    qc_report_object['tv_feature_trailer'] = document.getElementsByName("tv_feature_trailer")[0].value;
+    qc_report_object['cc_subtitles'] = document.getElementsByName("cc_subtitles")[0].value;
+    qc_report_object['video_aspect_ratio'] = document.getElementById("video_aspect_ratio").value;
+    qc_report_object['vitc'] = document.getElementsByName("vitc")[0].value;
+    qc_report_object['textless_tail'] = document.getElementsByName("textless_tail")[0].value;
+    qc_report_object['source_barcode'] = document.getElementsByName("source_barcode")[0].value;
+    qc_report_object['notices'] = document.getElementsByName("notices")[0].value;
+    qc_report_object['element_qc_barcode'] = document.getElementsByName("element_qc_barcode")[0].value;
+    qc_report_object['label'] = document.getElementById("label").value;
+    qc_report_object['record_date'] = document.getElementsByName("record_date")[0].value;
+    qc_report_object['general_comments'] = document.getElementById("general_comments").value;
 
-    // Operator row values
-    var date = document.getElementsByName("date")[0].value;
-    var operator = document.getElementsByName("operator")[0].value;
-    var style = document.getElementById("style").value;
-    var bay = document.getElementById("bay").value;
-    var machine = document.getElementById("machine").value;
-
-    // Title section values
-    var title_data = document.getElementsByName("title_data")[0].value;
-    var format = document.getElementById("format").value;
-    var season = document.getElementsByName("season")[0].value;
-    var standard = document.getElementById("standard").value;
-    var episode = document.getElementsByName("episode")[0].value;
-    var frame_rate = document.getElementById("frame_rate").value;
-    var version = document.getElementsByName("version")[0].value;
-    var po_number = document.getElementsByName("po_number")[0].value;
-    var file_name = document.getElementsByName("file_name")[0].value;
-
-    // Program Format values
-    var roll_up_blank = document.getElementsByName("roll_up_blank")[0].value;
-    var bars_tone = document.getElementsByName("bars_tone")[0].value;
-    var black_silence_1 = document.getElementsByName("black_silence_1")[0].value;
-    var slate_silence = document.getElementsByName("slate_silence")[0].value;
-    var black_silence_2 = document.getElementsByName("black_silence_2")[0].value;
-    var start_of_program = document.getElementsByName("start_of_program")[0].value;
-    var end_of_program = document.getElementsByName("end_of_program")[0].value;
-
-    // Video Measurements values
-    var active_video_begins = document.getElementsByName("active_video_begins")[0].value;
-    var active_video_ends = document.getElementsByName("active_video_ends")[0].value;
-    var horizontal_blanking = document.getElementsByName("horizontal_blanking")[0].value;
-    var luminance_peak = document.getElementsByName("luminance_peak")[0].value;
-    var chroma_peak = document.getElementsByName("chroma_peak")[0].value;
-    var head_logo = document.getElementsByName("head_logo")[0].value;
-    var tail_logo = document.getElementsByName("tail_logo")[0].value;
-
-    // Element Profile values
-    var total_runtime = document.getElementsByName("total_runtime")[0].value;
-    var language = document.getElementsByName("language")[0].value;
-    var tv_feature_trailer = document.getElementsByName("tv_feature_trailer")[0].value;
-    var cc_subtitles = document.getElementsByName("cc_subtitles")[0].value;
-    var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
-    var vitc = document.getElementsByName("vitc")[0].value;
-    var textless_tail = document.getElementsByName("textless_tail")[0].value;
-    var source_barcode = document.getElementsByName("source_barcode")[0].value;
-    var notices = document.getElementsByName("notices")[0].value;
-    var element_qc_barcode = document.getElementsByName("element_qc_barcode")[0].value;
-    var label = document.getElementById("label").value;
-    var record_date = document.getElementsByName("record_date")[0].value;
-
-    // General comments
-    var general_comments = document.getElementById("general_comments").value;
-
-    var audio_configuration_lines = get_audio_table_data();
-
-    var element_eval_lines = get_element_eval_lines();
-
-    var qc_report_object = {
-        'name': name,
-        'client': client,
-        'status': status,
-        'date': date,
-        'operator': operator,
-        'style': style,
-        'bay': bay,
-        'machine': machine,
-        'title': title_data,
-        'format': format,
-        'season': season,
-        'standard': standard,
-        'episode': episode,
-        'frame_rate': frame_rate,
-        'version': version,
-        'po_number': po_number,
-        'file_name': file_name,
-        'roll_up_blank': roll_up_blank,
-        'bars_tone': bars_tone,
-        'black_silence_1': black_silence_1,
-        'slate_silence': slate_silence,
-        'black_silence_2': black_silence_2,
-        'start_of_program': start_of_program,
-        'end_of_program': end_of_program,
-        'active_video_begins': active_video_begins,
-        'active_video_ends': active_video_ends,
-        'horizontal_blanking': horizontal_blanking,
-        'luminance_peak': luminance_peak,
-        'chroma_peak': chroma_peak,
-        'head_logo': head_logo,
-        'tail_logo': tail_logo,
-        'total_runtime': total_runtime,
-        'language': language,
-        'tv_feature_trailer': tv_feature_trailer,
-        'cc_subtitles': cc_subtitles,
-        'video_aspect_ratio': video_aspect_ratio,
-        'vitc': vitc,
-        'textless_tail': textless_tail,
-        'source_barcode': source_barcode,
-        'notices': notices,
-        'element_qc_barcode': element_qc_barcode,
-        'label': label,
-        'record_date': record_date,
-        'general_comments': general_comments,
-        'audio_configuration_lines': audio_configuration_lines,
-        'element_eval_lines': element_eval_lines
-    };
+    console.log(qc_report_object);
 
     var server = TacticServerStub.get();
 
-    server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_data': qc_report_object})
+    spt.app_busy.show("Saving Report...");
+    var inserted_sobject = server.insert('twog/element_evaluation', qc_report_object);
+    spt.api.load_panel(element_eval_panel, 'qc_reports.ElementEvalWdg', {'search_key': inserted_sobject['search_key']});
+
+    // server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_data': qc_report_object});
+    server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': inserted_sobject['search_key']});
 }
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}
-            '''
+var server = TacticServerStub.get();
+
+var code = '%s';
+var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+
+server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': search_key});
+
+// save_element_eval_report();
+
+// try {
+    // spt.confirm("The report's current progress will be saved first. Is that okay?", save_element_eval_report(), null);
+//     save_element_eval_report();
+// }
+// catch(err) {
+//     spt.app_busy.hide();
+//     spt.alert(spt.exception.handler(err));
+// }
+
+            ''' % sobject_code
         }
 
         return behavior
@@ -1102,7 +1169,7 @@ catch(err) {
 
         save_as_new_button = ButtonNewWdg(title='Export to PDF', icon='ARROW_DOWN')
         save_as_new_button.add_class('save_as_new_button')
-        save_as_new_button.add_behavior(self.get_export_to_pdf_behavior())
+        save_as_new_button.add_behavior(self.get_export_to_pdf_behavior(self.element_eval_sobject.get_code()))
 
         section_span.add(save_as_new_button)
 

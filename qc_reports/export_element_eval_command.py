@@ -1,23 +1,115 @@
 import datetime
 import os
+from reportlab.platypus.flowables import HRFlowable
 
 from pyasm.command import Command
+from pyasm.search import Search
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
 
 
+def get_top_table_data(element_eval_sobject):
+    styleSheet = getSampleStyleSheet()
+
+    date = element_eval_sobject.get('date')
+    operator = element_eval_sobject.get('operator')
+    style = element_eval_sobject.get('style')
+    bay = element_eval_sobject.get('bay')
+    machine = element_eval_sobject.get('machine')
+
+    top_table_header = []
+    top_table_data = []
+
+    for data, label in zip((date, operator, style, bay, machine), ('Date', 'Operator', 'Style', 'Bay', 'Machine')):
+        if data:
+            top_table_header.append(Paragraph('<strong>{0}</strong>'.format(label), styleSheet['Heading3']))
+            top_table_data.append(data)
+
+    return [top_table_header, top_table_data]
+
+
+def get_title_table_data(element_eval_sobject):
+    title_table_data = [
+        ['Title:', element_eval_sobject.get('title'), 'Format:', element_eval_sobject.get('format')],
+        ['Season:', element_eval_sobject.get('season'), 'Standard:', element_eval_sobject.get('standard')],
+        ['Episode:', element_eval_sobject.get('episode'), 'Frame Rate:', element_eval_sobject.get('frame_rate')],
+        ['Version:', element_eval_sobject.get('version'), 'PO #:', element_eval_sobject.get('po_number')],
+        ['File Name:', element_eval_sobject.get('file_name')]
+    ]
+
+    return title_table_data
+
+
+def get_audio_configuration_lines(element_eval_code):
+    audio_configuration_table_data = [['Channel', 'Content', 'Tone', 'Peak']]
+
+    audio_configuration_lines_search = Search('twog/audio_evaluation_line')
+    audio_configuration_lines_search.add_filter('element_evaluation_code', element_eval_code)
+    audio_configuration_lines = audio_configuration_lines_search.get_sobjects()
+
+    for line in audio_configuration_lines:
+        line_data = [
+            line.get('channel'),
+            line.get('content'),
+            line.get('tone'),
+            line.get('peak')
+        ]
+
+        audio_configuration_table_data.append(line_data)
+
+    return audio_configuration_table_data
+
+
+def get_element_eval_lines(element_eval_code):
+    styleSheet = getSampleStyleSheet()
+    styleSheet.fontSize = 10
+
+    element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'F', 'Code',
+                                      'Scale', 'Sector/Ch', 'In Source']]
+
+    element_eval_lines_search = Search('twog/element_evaluation_line')
+    element_eval_lines_search.add_filter('element_evaluation_code', element_eval_code)
+    element_eval_lines = element_eval_lines_search.get_sobjects()
+
+    for line in element_eval_lines:
+        description_paragraph_style = ParagraphStyle('description')
+        description_paragraph_style.fontSize = 8
+
+        description_paragraph = Paragraph(line.get('description'), description_paragraph_style)
+
+        line_data = [
+            line.get('timecode_in'),
+            line.get('field_in'),
+            description_paragraph,
+            line.get('in_safe'),
+            line.get('timecode_out'),
+            line.get('field_out'),
+            line.get('type_code'),
+            line.get('scale'),
+            line.get('sector_or_channel'),
+            line.get('in_source')
+        ]
+
+        element_eval_lines_table_data.append(line_data)
+
+    return element_eval_lines_table_data
+
+
 class ExportElementEvalCommand(Command):
     def execute(self):
-        report_data = self.kwargs.get('report_data')
-        self.export_pdf(report_data)
+        report_search_key = self.kwargs.get('report_search_key')
+
+        if report_search_key:
+            self.export_pdf(Search.get_by_search_key(report_search_key))
 
     @staticmethod
-    def export_pdf(report_data):
-        file_name = report_data.get('name', 'report') + datetime.datetime.now().strftime('-%m%d%y-%H%M%S') + '.pdf'
+    def export_pdf(element_eval_sobject):
+        print(element_eval_sobject)
+        file_name = element_eval_sobject.get('name') + datetime.datetime.now().strftime('-%m%d%y-%H%M%S') + '.pdf'
         save_location = '/var/www/html/element_evaluations'
 
         saved_file_path = os.path.join(save_location, file_name)
@@ -51,100 +143,65 @@ class ExportElementEvalCommand(Command):
 
         approved_rejected_table = Table(approved_rejected_table_data)
 
-        P = Paragraph('<strong>{0}</strong>'.format(report_data.get('client')), styleSheet["Heading2"])
+        P = Paragraph('<strong>{0}</strong>'.format(element_eval_sobject.get('client')), styleSheet["Heading2"])
 
         header_table = Table([[I, address_table, P, approved_rejected_table]])
 
         elements.append(header_table)
 
-        top_table_data = [
-            ['Date', 'Operator', 'Style', 'Bay', 'Machine #'],
-            [report_data.get('date'), report_data.get('operator'), report_data.get('style'), report_data.get('bay'),
-             report_data.get('machine_number')]
-        ]
-
-        title_table_data = [
-            ['Title:', report_data.get('title'), 'Format:', report_data.get('format')],
-            ['Season:', report_data.get('season'), 'Standard:', report_data.get('standard')],
-            ['Episode:', report_data.get('episode'), 'Frame Rate:', report_data.get('frame_rate')],
-            ['Version:', report_data.get('version'), 'PO #:', report_data.get('po_number')],
-            ['File Name:', report_data.get('file_name')]
-        ]
+        top_table_data = get_top_table_data(element_eval_sobject)
+        title_table_data = get_title_table_data(element_eval_sobject)
 
         program_format_header = Paragraph('Program Format', styleSheet['Heading3'])
 
         program_format_table_data = [
-            ['Roll-up (blank)', report_data.get('roll_up_blank')],
-            ['Bars/Tone', report_data.get('bars_tone')],
-            ['Black/Silence', report_data.get('black_silence_1')],
-            ['Slate/Silence', report_data.get('slate_silence')],
-            ['Black/Silence', report_data.get('black_silence_2')],
-            ['Start of Program', report_data.get('start_of_program')],
-            ['End of Program', report_data.get('end_of_program')]
+            ['Roll-up (blank)', element_eval_sobject.get('roll_up_blank')],
+            ['Bars/Tone', element_eval_sobject.get('bars_tone')],
+            ['Black/Silence', element_eval_sobject.get('black_silence_1')],
+            ['Slate/Silence', element_eval_sobject.get('slate_silence')],
+            ['Black/Silence', element_eval_sobject.get('black_silence_2')],
+            ['Start of Program', element_eval_sobject.get('start_of_program')],
+            ['End of Program', element_eval_sobject.get('end_of_program')]
         ]
 
         video_measurements_header = Paragraph('Video Measurements', styleSheet['Heading3'])
 
         video_measurements_table_data = [
-            ['Active Video Begins', report_data.get('active_video_begins')],
-            ['Active Video Ends', report_data.get('active_video_ends')],
-            ['Horizontal Blanking', report_data.get('horizontal_blanking')],
-            ['Luminance Peak', report_data.get('luminance_peak')],
-            ['Chroma Peak', report_data.get('chroma_peak')],
-            ['Head Logo', report_data.get('head_logo')],
-            ['Tail Logo', report_data.get('tail_logo')]
+            ['Active Video Begins', element_eval_sobject.get('active_video_begins')],
+            ['Active Video Ends', element_eval_sobject.get('active_video_ends')],
+            ['Horizontal Blanking', element_eval_sobject.get('horizontal_blanking')],
+            ['Luminance Peak', element_eval_sobject.get('luminance_peak')],
+            ['Chroma Peak', element_eval_sobject.get('chroma_peak')],
+            ['Head Logo', element_eval_sobject.get('head_logo')],
+            ['Tail Logo', element_eval_sobject.get('tail_logo')]
         ]
 
         element_profile_header = Paragraph('Element Profile', styleSheet['Heading3'])
 
         element_profile_table_data = [
-            ['Total Runtime', report_data.get('total_runtime'), 'Language', report_data.get('language')],
-            ['TV/Feature/Trailer', report_data.get('tv_feature_trailer'), '(CC)/Subtitles',
-             report_data.get('cc_subtitles')],
-            ['Video Aspect Ratio', report_data.get('video_aspect_ratio'), 'VITC', report_data.get('vitc')],
-            ['Textless @ Tail', report_data.get('textless_tail'), 'Source Barcode', report_data.get('source_barcode')],
-            ['Notices', report_data.get('notices'), 'Element QC Barcode', report_data.get('element_qc_barcode')],
-            ['Label', report_data.get('label'), 'Record Date', report_data.get('record_date')]
+            ['Total Runtime', element_eval_sobject.get('total_runtime'), 'Language', element_eval_sobject.get('language')],
+            ['TV/Feature/Trailer', element_eval_sobject.get('tv_feature_trailer'), '(CC)/Subtitles',
+             element_eval_sobject.get('cc_subtitles')],
+            ['Video Aspect Ratio', element_eval_sobject.get('video_aspect_ratio'), 'VITC', element_eval_sobject.get('vitc')],
+            ['Textless @ Tail', element_eval_sobject.get('textless_tail'), 'Source Barcode', element_eval_sobject.get('source_barcode')],
+            ['Notices', element_eval_sobject.get('notices'), 'Element QC Barcode', element_eval_sobject.get('element_qc_barcode')],
+            ['Label', element_eval_sobject.get('label'), 'Record Date', element_eval_sobject.get('record_date')]
         ]
 
         audio_configuration_header = Paragraph('Audio Configuration', styleSheet['Heading3'])
 
-        audio_configuration_table_data = [['Channel', 'Content', 'Tone', 'Peak']]
+        audio_configuration_table_data = get_audio_configuration_lines(element_eval_sobject.get_code())
 
-        for line in report_data.get('audio_configuration_lines'):
-            line_data = [
-                line.get('channel'),
-                line.get('content'),
-                line.get('tone'),
-                line.get('peak')
-            ]
-
-            audio_configuration_table_data.append(line_data)
-
-        element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'F', 'Code',
-                                          'Scale', 'Sector/Ch', 'In Source']]
-
-        for line in report_data.get('element_eval_lines'):
-            line_data = [
-                line.get('timecode_in'),
-                line.get('field_in'),
-                line.get('description'),
-                line.get('in_safe'),
-                line.get('timecode_out'),
-                line.get('field_out'),
-                line.get('type_code'),
-                line.get('scale'),
-                line.get('sector_or_channel'),
-                line.get('in_source')
-            ]
-
-            element_eval_lines_table_data.append(line_data)
+        element_eval_lines_table_data = get_element_eval_lines(element_eval_sobject.get_code())
 
         general_comments_header = Paragraph('General Comments', styleSheet['Heading3'])
-        general_comments = Paragraph(report_data.get('general_comments'), styleSheet['BodyText'])
+        general_comments = Paragraph(element_eval_sobject.get('general_comments'), styleSheet['BodyText'])
 
         top_table = Table(top_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5)
-        title_table = Table(title_table_data, hAlign='LEFT')
+
+        title_table = Table(title_table_data, hAlign='LEFT', colWidths=[(1 * inch), (2 * inch), (1 * inch),
+                                                                        (2 * inch)])
+
         program_format_table = Table(program_format_table_data, hAlign='LEFT')
         video_measurements_table = Table(video_measurements_table_data, hAlign='LEFT')
         program_format_video_measurements_header_table = Table([[program_format_header, video_measurements_header]])
@@ -152,15 +209,27 @@ class ExportElementEvalCommand(Command):
                                                         hAlign='LEFT')
         element_profile_table = Table(element_profile_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5)
         audio_configuration_table = Table(audio_configuration_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5)
-        element_eval_lines_table = Table(element_eval_lines_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5)
+        element_eval_lines_table = Table(element_eval_lines_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5,
+                                         colWidths=[(.7 * inch), (.19 * inch), (inch * 2.6), (.4 * inch), (.82 * inch),
+                                                    (.19 * inch), (.75 * inch), (.3 * inch), (.55 * inch),
+                                                    (.55 * inch)])
+        element_eval_lines_table.setStyle([('BOX', (0, 0), (-1, -1), 0.2, colors.black),
+                                           ('INNERGRID', (0, 0), (-1, -1), 0.2, colors.black),
+                                           ('FONTSIZE', (0, 0), (-1, -1), 8),
+                                           ('LEFTPADDING', (0, 0), (-1, -1), 1),
+                                           ('RIGHTPADDING', (0, 0), (-1, -1), 1)])
 
         map(lambda x: x.setStyle([
-            ('BOX', (0, 0), (-1, -1), 0.25, colors.black), ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black)
-        ]), [top_table, title_table, program_format_table, video_measurements_table, element_profile_table,
-             audio_configuration_table, element_eval_lines_table])
+            ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black)
+        ]), [program_format_table, video_measurements_table, element_profile_table,
+             audio_configuration_table])
+
+        hrFlowable = HRFlowable(color=colors.gray, width='100%')
 
         elements.append(top_table)
         elements.append(title_table)
+        elements.append(hrFlowable)
         elements.append(program_format_video_measurements_header_table)
         elements.append(program_format_video_measurements_table)
         elements.append(element_profile_header)
@@ -168,7 +237,7 @@ class ExportElementEvalCommand(Command):
         elements.append(audio_configuration_header)
         elements.append(audio_configuration_table)
 
-        if report_data.get('general_comments'):
+        if element_eval_sobject.get('general_comments'):
             elements.append(general_comments_header)
             elements.append(general_comments)
 
@@ -177,8 +246,8 @@ class ExportElementEvalCommand(Command):
         doc.build(elements)
 
 
-def get_test_report_data():
-    report_data = {
+def get_test_element_eval_sobject():
+    element_eval_sobject = {
         'client': 'Test Client',
         'status': 'Approved',
         'date': datetime.date.today().strftime('%m-%d-%Y'),
@@ -406,5 +475,5 @@ def get_test_report_data():
         ]
     }
 
-    return report_data
+    return element_eval_sobject
 
