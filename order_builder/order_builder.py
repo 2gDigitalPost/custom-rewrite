@@ -182,6 +182,9 @@ class OrderBuilderWdg(BaseRefreshWdg):
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(self.get_add_notes_behavior(title_order.get_search_key()))
 
+            instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
+            instructions_button.add_behavior(self.get_instructions_wdg(title_order.get_code()))
+
             title_order_li.add(title_order_name_div)
             title_order_li.add(title_order_description_div)
             title_order_li.add(title_order_priority_div)
@@ -190,6 +193,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             title_order_li.add(element_evaluation_button)
             # title_order_li.add(upload_button)
             title_order_li.add(note_button)
+            title_order_li.add(instructions_button)
 
             tasks = obu.get_tasks_for_title_order(title_order)
 
@@ -292,6 +296,23 @@ catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }''' % search_key
+        }
+
+        return behavior
+
+    @staticmethod
+    def get_instructions_wdg(code):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    spt.api.load_popup('Instructions', 'order_builder.InstructionsWdg', {'title_order_code': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % code
         }
 
         return behavior
