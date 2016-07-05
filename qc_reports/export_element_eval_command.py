@@ -19,7 +19,7 @@ def get_top_table(element_eval_sobject):
     operator = element_eval_sobject.get('operator')
     style = element_eval_sobject.get('style')
     bay = element_eval_sobject.get('bay')
-    machine = element_eval_sobject.get('machine')
+    machine = get_machine_name_from_code(element_eval_sobject.get('machine'))
 
     top_table_header = []
     top_table_data = []
@@ -47,6 +47,22 @@ def get_title_table(element_eval_sobject):
                                                                 (2 * inch)])
 
     return title_table
+
+
+def get_client_name_from_code(code):
+    client_search = Search('twog/client')
+    client_search.add_code_filter(code)
+    client = client_search.get_sobject()
+
+    return client.get('name')
+
+
+def get_machine_name_from_code(code):
+    machine_search = Search('twog/machine')
+    machine_search.add_code_filter(code)
+    machine = machine_search.get_sobject()
+
+    return machine.get('name')
 
 
 def get_audio_configuration_table(element_eval_sobject):
@@ -261,7 +277,8 @@ class ExportElementEvalCommand(Command):
 
         approved_rejected_table = Table(approved_rejected_table_data)
 
-        P = Paragraph('<strong>{0}</strong>'.format(element_eval_sobject.get('client')), styleSheet["Heading2"])
+        client_name = get_client_name_from_code(element_eval_sobject.get('client'))
+        P = Paragraph('<strong>{0}</strong>'.format(client_name), styleSheet["Heading2"])
 
         header_table = Table([[I, address_table, P, approved_rejected_table]])
 
