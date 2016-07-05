@@ -366,11 +366,29 @@ catch(err) {
         return behavior
 
     @staticmethod
-    def get_save_as_new_behavior():
+    def get_save_new_behavior():
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
+
+function getTableRowsWithAttribute(table, attribute)
+{
+    var matchingElements = [];
+    var allElements = table.getElementsByTagName('tr');
+
+    for (var i = 0, n = allElements.length; i < n; i++)
+    {
+        if (allElements[i].getAttribute(attribute) !== null)
+        {
+            // Element exists with attribute. Add to array.
+            matchingElements.push(allElements[i]);
+        }
+    }
+
+    return matchingElements;
+}
+
 try {
     // Name of the report
     var name = document.getElementsByName("name_data")[0].value;
@@ -484,8 +502,224 @@ try {
     var server = TacticServerStub.get();
 
     spt.app_busy.show("Saving a new Report...");
-    var inserted_sobject = server.insert('twog/element_evaluation', qc_report_object);
-    spt.api.load_panel(element_eval_panel, 'qc_reports.ElementEvalWdg', {'search_key': inserted_sobject['search_key']});
+
+    // Save the new Element Evaluation, and get the code that it saved as
+    var inserted_element_evaluation = server.insert('twog/element_evaluation', qc_report_object);
+    var code = inserted_element_evaluation['code'];
+
+    // Finally, get the search key for the new report, and use it to reload the page
+    var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+
+    spt.api.load_panel(element_eval_panel, 'qc_reports.ElementEvalWdg', {'search_key': search_key});
+
+    spt.app_busy.hide();
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
+            '''
+        }
+
+        return behavior
+
+    @staticmethod
+    def get_save_as_new_behavior():
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+
+function getTableRowsWithAttribute(table, attribute)
+{
+    var matchingElements = [];
+    var allElements = table.getElementsByTagName('tr');
+
+    for (var i = 0, n = allElements.length; i < n; i++)
+    {
+        if (allElements[i].getAttribute(attribute) !== null)
+        {
+            // Element exists with attribute. Add to array.
+            matchingElements.push(allElements[i]);
+        }
+    }
+
+    return matchingElements;
+}
+
+try {
+    // Name of the report
+    var name = document.getElementsByName("name_data")[0].value;
+
+    // Client row values
+    var client = document.getElementById("client").value;
+    var status = document.getElementById("status").value;
+
+    // Operator row values
+    var date = document.getElementsByName("date")[0].value;
+    var operator = document.getElementsByName("operator")[0].value;
+    var style = document.getElementById("style").value;
+    var bay = document.getElementById("bay").value;
+    var machine = document.getElementById("machine").value;
+
+    // Title section values
+    var title_data = document.getElementsByName("title_data")[0].value;
+    var format = document.getElementById("format").value;
+    var season = document.getElementsByName("season")[0].value;
+    var standard = document.getElementById("standard").value;
+    var episode = document.getElementsByName("episode")[0].value;
+    var frame_rate = document.getElementById("frame_rate").value;
+    var version = document.getElementsByName("version")[0].value;
+    var po_number = document.getElementsByName("po_number")[0].value;
+    var file_name = document.getElementsByName("file_name")[0].value;
+
+    // Program Format values
+    var roll_up_blank = document.getElementsByName("roll_up_blank")[0].value;
+    var bars_tone = document.getElementsByName("bars_tone")[0].value;
+    var black_silence_1 = document.getElementsByName("black_silence_1")[0].value;
+    var slate_silence = document.getElementsByName("slate_silence")[0].value;
+    var black_silence_2 = document.getElementsByName("black_silence_2")[0].value;
+    var start_of_program = document.getElementsByName("start_of_program")[0].value;
+    var end_of_program = document.getElementsByName("end_of_program")[0].value;
+
+    // Video Measurements values
+    var active_video_begins = document.getElementsByName("active_video_begins")[0].value;
+    var active_video_ends = document.getElementsByName("active_video_ends")[0].value;
+    var horizontal_blanking = document.getElementsByName("horizontal_blanking")[0].value;
+    var luminance_peak = document.getElementsByName("luminance_peak")[0].value;
+    var chroma_peak = document.getElementsByName("chroma_peak")[0].value;
+    var head_logo = document.getElementsByName("head_logo")[0].value;
+    var tail_logo = document.getElementsByName("tail_logo")[0].value;
+
+    // Element Profile values
+    var total_runtime = document.getElementsByName("total_runtime")[0].value;
+    var language = document.getElementsByName("language")[0].value;
+    var tv_feature_trailer = document.getElementsByName("tv_feature_trailer")[0].value;
+    var cc_subtitles = document.getElementsByName("cc_subtitles")[0].value;
+    var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
+    var vitc = document.getElementsByName("vitc")[0].value;
+    var textless_tail = document.getElementsByName("textless_tail")[0].value;
+    var source_barcode = document.getElementsByName("source_barcode")[0].value;
+    var notices = document.getElementsByName("notices")[0].value;
+    var element_qc_barcode = document.getElementsByName("element_qc_barcode")[0].value;
+    var label = document.getElementById("label").value;
+    var record_date = document.getElementsByName("record_date")[0].value;
+
+    // General comments
+    var general_comments = document.getElementById("general_comments").value;
+
+    var qc_report_object = {
+        'name': name,
+        'client': client,
+        'status': status,
+        'date': date,
+        'operator': operator,
+        'style': style,
+        'bay': bay,
+        'machine': machine,
+        'title': title_data,
+        'format': format,
+        'season': season,
+        'standard': standard,
+        'episode': episode,
+        'frame_rate': frame_rate,
+        'version': version,
+        'po_number': po_number,
+        'file_name': file_name,
+        'roll_up_blank': roll_up_blank,
+        'bars_tone': bars_tone,
+        'black_silence_1': black_silence_1,
+        'slate_silence': slate_silence,
+        'black_silence_2': black_silence_2,
+        'start_of_program': start_of_program,
+        'end_of_program': end_of_program,
+        'active_video_begins': active_video_begins,
+        'active_video_ends': active_video_ends,
+        'horizontal_blanking': horizontal_blanking,
+        'luminance_peak': luminance_peak,
+        'chroma_peak': chroma_peak,
+        'head_logo': head_logo,
+        'tail_logo': tail_logo,
+        'total_runtime': total_runtime,
+        'language': language,
+        'tv_feature_trailer': tv_feature_trailer,
+        'cc_subtitles': cc_subtitles,
+        'video_aspect_ratio': video_aspect_ratio,
+        'vitc': vitc,
+        'textless_tail': textless_tail,
+        'source_barcode': source_barcode,
+        'notices': notices,
+        'element_qc_barcode': element_qc_barcode,
+        'label': label,
+        'record_date': record_date,
+        'general_comments': general_comments
+    };
+
+    var element_eval_panel = document.getElementById('element_eval_panel');
+
+    var server = TacticServerStub.get();
+
+    spt.app_busy.show("Saving a new Report...");
+
+    // Save the new Element Evaluation, and get the code that it saved as
+    var inserted_element_evaluation = server.insert('twog/element_evaluation', qc_report_object);
+    var code = inserted_element_evaluation['code'];
+
+    // Using the code gained from the new report, save the audio and element eval lines
+    var audio_table = document.getElementById('audio_configuration_table');
+    var audio_config_rows = getTableRowsWithAttribute(audio_table, 'code');
+
+    for (var i = 0; i < audio_config_rows.length; i++) {
+        var channel = document.getElementsByName("channel-" + String(i))[0].value;
+        var content = document.getElementsByName("content-" + String(i))[0].value;
+        var tone = document.getElementsByName("tone-" + String(i))[0].value;
+        var peak = document.getElementsByName("peak-" + String(i))[0].value;
+
+        // Insert the line
+        // TODO: Insert all lines at once rather than one at a time
+        server.insert('twog/audio_evaluation_line', {'element_evaluation_code': code,
+                                                     'channel': channel,
+                                                     'content': content,
+                                                     'tone': tone,
+                                                     'peak': peak});
+    }
+
+    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
+    var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
+
+    for (var i = 0; i < table_rows.length; i++) {
+        var line_data = {};
+
+        var timecode_in = document.getElementsByName("timecode-in-" + String(i))[0].value;
+        var field_in = document.getElementsByName("field-in-" + String(i))[0].value;
+        var description = document.getElementsByName("description-" + String(i))[0].value;
+        var in_safe = document.getElementById("in-safe-" + String(i)).value;
+        var timecode_out = document.getElementsByName("timecode-out-" + String(i))[0].value;
+        var field_out = document.getElementsByName("field-out-" + String(i))[0].value;
+        var type_code = document.getElementById("type-code-" + String(i)).value;
+        var scale = document.getElementById("scale-" + String(i)).value;
+        var sector_or_channel = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        var in_source = document.getElementById("in-source-" + String(i))[0].value;
+
+        // Insert the line
+        // TODO: Insert all lines at once rather than one at a time
+        server.insert('twog/element_evaluation_line', {'element_evaluation_code': code,
+                                                       'timecode_in': timecode_in,
+                                                       'field_in': field_in,
+                                                       'description': description,
+                                                       'in_safe': in_safe,
+                                                       'timecode_out': timecode_out,
+                                                       'field_out': field_out,
+                                                       'type_code': type_code,
+                                                       'scale': scale,
+                                                       'sector_or_channel': sector_or_channel,
+                                                       'in_source': in_source});
+    }
+
+    // Finally, get the search key for the new report, and use it to reload the page
+    var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+
+    spt.api.load_panel(element_eval_panel, 'qc_reports.ElementEvalWdg', {'search_key': search_key});
 
     spt.app_busy.hide();
 }
@@ -630,18 +864,6 @@ var code = '%s';
 var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
 
 server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': search_key});
-
-// save_element_eval_report();
-
-// try {
-    // spt.confirm("The report's current progress will be saved first. Is that okay?", save_element_eval_report(), null);
-//     save_element_eval_report();
-// }
-// catch(err) {
-//     spt.app_busy.hide();
-//     spt.alert(spt.exception.handler(err));
-// }
-
             ''' % sobject_code
         }
 
@@ -1151,6 +1373,18 @@ server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': 
 
         return section_span
 
+    def get_save_new_button(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        save_new_button = ButtonNewWdg(title='Save New Report', icon='NEW')
+        save_new_button.add_class('save_new_button')
+        save_new_button.add_behavior(self.get_save_new_behavior())
+
+        section_span.add(save_new_button)
+
+        return section_span
+
     def get_save_as_new_button(self):
         section_span = SpanWdg()
         section_span.add_style('display', 'inline-block')
@@ -1204,7 +1438,8 @@ server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': 
             main_wdg.add(ElementEvalLinesWdg(element_evaluation_code=self.element_eval_sobject.get_code()))
             main_wdg.add(self.get_save_button())
             main_wdg.add(self.get_export_to_pdf_button())
-
-        main_wdg.add(self.get_save_as_new_button())
+            main_wdg.add(self.get_save_as_new_button())
+        else:
+            main_wdg.add(self.get_save_new_button())
 
         return main_wdg
