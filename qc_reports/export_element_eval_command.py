@@ -270,10 +270,9 @@ class ExportElementEvalCommand(Command):
 
         address_table = Table(address_table_data)
 
-        approved_rejected_table_data = [
-            ['', 'Approved'],
-            ['', 'Rejected']
-        ]
+        approved_rejected_status = element_eval_sobject.get('status')
+        approved_rejected_table_data = [[Paragraph('Status: <strong>{0}</strong>'.format(approved_rejected_status),
+                                                   styleSheet["BodyText"])]]
 
         approved_rejected_table = Table(approved_rejected_table_data)
 
