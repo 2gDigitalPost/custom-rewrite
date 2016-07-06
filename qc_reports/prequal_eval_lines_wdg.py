@@ -2,11 +2,11 @@ from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import ButtonNewWdg
 from tactic.ui.common import BaseRefreshWdg
 
-from pyasm.prod.biz import ProdSetting
 from pyasm.search import Search
 from pyasm.web import DivWdg, SpanWdg, Table
 from pyasm.widget import SelectWdg
 
+from utils import get_add_colons_for_time_behavior
 
 
 class PrequalEvalLinesWdg(BaseRefreshWdg):
@@ -37,14 +37,91 @@ class PrequalEvalLinesWdg(BaseRefreshWdg):
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
+function getTableRowsWithAttribute(table, attribute)
+{
+    var matchingElements = [];
+    var allElements = table.getElementsByTagName('tr');
+
+    for (var i = 0, n = allElements.length; i < n; i++)
+    {
+        if (allElements[i].getAttribute(attribute) !== null)
+        {
+            // Element exists with attribute. Add to array.
+            matchingElements.push(allElements[i]);
+        }
+    }
+
+    return matchingElements;
+}
+
 try {
     var prequal_eval_code = '%s';
+
+    var prequal_eval_lines_table = document.getElementById('prequal_eval_lines_table');
+    var table_rows = getTableRowsWithAttribute(prequal_eval_lines_table, 'code');
+
+    var server = TacticServerStub.get();
+
+    for (var i = 0; i < table_rows.length; i++) {
+        var line_data = {};
+
+        line_data['timecode'] = document.getElementsByName("timecode-" + String(i))[0].value;
+        line_data['field'] = document.getElementsByName("field-" + String(i))[0].value;
+        line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
+        line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
+        line_data['scale'] = document.getElementById("scale-" + String(i)).value;
+        line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
+
+        var search_key = server.build_search_key('twog/prequal_evaluation_line', table_rows[i].getAttribute('code'),
+                                                 'twog');
+
+        server.update(search_key, line_data);
+    }
+
+    // Insert a blank line
+    server.insert('twog/prequal_evaluation_line', {'prequal_evaluation_code': prequal_eval_code});
+
+    // Refresh the widget
+    var prequal_eval_lines_div = document.getElementById('prequal_eval_lines_div');
+
+    spt.api.load_panel(prequal_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
+                       {'prequal_eval_code': prequal_eval_code});
 }
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }
     ''' % self.prequal_eval_code
+        }
+
+        return behavior
+
+    def get_remove_row_behavior(self, row_code):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    if(confirm("Do you really want to delete this line?")) {
+        var server = TacticServerStub.get();
+        var prequal_eval_code = '%s';
+        var code = '%s';
+
+        server.retire_sobject(server.build_search_key('twog/prequal_evaluation_line', code, 'twog'));
+
+        // Refresh the widget
+        var prequal_eval_lines_div = document.getElementById('prequal_eval_lines_div');
+
+        spt.api.load_panel(prequal_eval_lines_div, 'qc_reports.PrequalEvalLinesWdg',
+                           {'prequal_eval_code': prequal_eval_code});
+    }
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
+''' % (self.prequal_eval_code, row_code)
         }
 
         return behavior
@@ -59,6 +136,48 @@ catch(err) {
         table.add_header("Sector/Ch")
         table.add_header("In Source")
 
+    def get_timecode_textbox(self, name, width=200, line_data=None):
+        timecode_textbox = TextInputWdg()
+        timecode_textbox.set_id(name)
+        timecode_textbox.set_name(name)
+        timecode_textbox.add_style('width', '{0}px'.format(width))
+
+        timecode_textbox.add_behavior(get_add_colons_for_time_behavior())
+
+        if line_data:
+            timecode_textbox.set_value(line_data)
+
+        return timecode_textbox
+
+    @staticmethod
+    def get_text_input_wdg(name, width=200, line_data=None):
+        textbox_wdg = TextInputWdg()
+        textbox_wdg.set_id(name)
+        textbox_wdg.set_name(name)
+        textbox_wdg.add_style('width', '{0}px'.format(width))
+
+        if line_data:
+            textbox_wdg.set_value(line_data)
+
+        return textbox_wdg
+
+    @staticmethod
+    def get_select_wdg(name, options, saved_value=None):
+        select_wdg = SelectWdg(name)
+        select_wdg.set_id(name)
+        select_wdg.add_empty_option()
+
+        for option_set in options:
+            label = option_set[0]
+            value = option_set[1]
+
+            select_wdg.append_option(label, value)
+
+        if saved_value:
+            select_wdg.set_value(saved_value)
+
+        return select_wdg
+
     def get_add_row_button(self):
         span_wdg = SpanWdg()
 
@@ -68,6 +187,19 @@ catch(err) {
         add_row_button.add_behavior(self.get_add_row_behavior())
 
         span_wdg.add(add_row_button)
+
+        return span_wdg
+
+    def get_remove_row_button(self, row_code):
+        span_wdg = SpanWdg()
+
+        remove_row_button = ButtonNewWdg(title='Remove Row', icon='REMOVE')
+
+        remove_row_button.add_class('subtract_row_button')
+        remove_row_button.add_style('display', 'inline-block')
+        remove_row_button.add_behavior(self.get_remove_row_behavior(row_code))
+
+        span_wdg.add(remove_row_button)
 
         return span_wdg
 
@@ -204,12 +336,10 @@ catch(err) {
                     self.get_timecode_textbox('timecode-{0}'.format(iterator), 150, line.get_value('timecode'))
                 )
                 table.add_cell(
-                    self.get_text_input_wdg_for_element_eval_lines('field-in-{0}'.format(iterator), 30,
-                                                                   line.get_value('field_in'))
+                    self.get_text_input_wdg('field-{0}'.format(iterator), 30, line.get_value('field'))
                 )
                 table.add_cell(
-                    self.get_text_input_wdg_for_element_eval_lines('description-{0}'.format(iterator), 150,
-                                                                   line.get_value('description'))
+                    self.get_text_input_wdg('description-{0}'.format(iterator), 150, line.get_value('description'))
                 )
                 table.add_cell(
                     self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options,
@@ -219,8 +349,8 @@ catch(err) {
                     self.get_select_wdg('scale-{0}'.format(iterator), scale_select_options, line.get_value('scale'))
                 )
                 table.add_cell(
-                    self.get_text_input_wdg_for_element_eval_lines('sector-or-channel-{0}'.format(iterator), 150,
-                                                                   line.get_value('sector_or_channel'))
+                    self.get_text_input_wdg('sector-or-channel-{0}'.format(iterator), 150,
+                                            line.get_value('sector_or_channel'))
                 )
                 table.add_cell(
                     self.get_select_wdg('in-source-{0}'.format(iterator), in_source_options,
