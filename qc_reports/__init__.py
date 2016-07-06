@@ -3,3 +3,5 @@ from metadata_report_wdg import MetaDataReportWdg
 from element_eval_wdg import ElementEvalWdg
 from element_eval_lines_wdg import ElementEvalLinesWdg
 from export_element_eval_command import ExportElementEvalCommand
+from prequal_eval_wdg import PrequalEvalWdg
+from prequal_eval_lines_wdg import PrequalEvalLinesWdg
