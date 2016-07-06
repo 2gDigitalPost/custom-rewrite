@@ -14,8 +14,8 @@ class PrequalEvalLinesWdg(BaseRefreshWdg):
         self.prequal_eval_code = self.kwargs.get('prequal_eval_code')
 
         if self.prequal_eval_code:
-            lines_search = Search('twog/prequal_eval_line')
-            lines_search.add_filter('prequal_eval_code', self.prequal_eval_code)
+            lines_search = Search('twog/prequal_evaluation_line')
+            lines_search.add_filter('prequal_evaluation_code', self.prequal_eval_code)
 
             lines = lines_search.get_sobjects()
             lines_with_values = []
@@ -32,6 +32,23 @@ class PrequalEvalLinesWdg(BaseRefreshWdg):
         else:
             self.lines = []
 
+    def get_add_row_behavior(self):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    var prequal_eval_code = '%s';
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
+    ''' % self.prequal_eval_code
+        }
+
+        return behavior
+
     def set_header_rows(self, table):
         table.add_row()
         table.add_header("Timecode")
@@ -41,6 +58,18 @@ class PrequalEvalLinesWdg(BaseRefreshWdg):
         table.add_header("Scale")
         table.add_header("Sector/Ch")
         table.add_header("In Source")
+
+    def get_add_row_button(self):
+        span_wdg = SpanWdg()
+
+        add_row_button = ButtonNewWdg(title='Add Row', icon='ADD')
+        add_row_button.add_class('add_row_button')
+        add_row_button.add_style('display', 'inline-block')
+        add_row_button.add_behavior(self.get_add_row_behavior())
+
+        span_wdg.add(add_row_button)
+
+        return span_wdg
 
     def get_display(self):
         table = Table()

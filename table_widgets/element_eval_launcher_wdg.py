@@ -5,7 +5,7 @@ from tactic.ui.widget import ButtonNewWdg
 
 class ElementEvalLauncherWdg(BaseTableElementWdg):
     """
-    A widget used to launch the OrderBuilderWdg. Placed in the order table.
+    A widget used to launch the ElementEvalWdg. Placed in the order table.
     """
 
     @staticmethod
