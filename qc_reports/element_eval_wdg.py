@@ -9,63 +9,6 @@ from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, CheckboxWdg, TextAreaWdg
 
 
-def get_image_div():
-    image_cell = '<img src="/reports/2GLogo_small4.png"/>'
-    image_div = DivWdg()
-    image_div.add(image_cell)
-    image_div.add_style('float', 'left')
-    image_div.add_style('margin', '5px')
-
-    return image_div
-
-
-def get_address_div():
-    address_div = DivWdg()
-
-    address_name_div = DivWdg('2G Digital Post, Inc.')
-    address_name_div.add_style('font-weight', 'bold')
-
-    address_street_div = DivWdg('280 E. Magnolia Blvd.')
-    address_city_div = DivWdg('Burbank, CA 91502')
-    address_phone_div = DivWdg('310-840-0600')
-    address_url_div = DivWdg('www.2gdigitalpost.com')
-
-    [address_div.add(div) for div in [address_name_div, address_street_div, address_city_div, address_phone_div,
-                                      address_url_div]]
-    address_div.add_style('display', 'inline-block')
-
-    return address_div
-
-
-def get_client_name(client_name):
-    client_name_div = DivWdg(client_name)
-    client_name_div.add_style('font-size', '40px')
-    client_name_div.add_style('display', 'inline-block')
-    client_name_div.add_style('padding', '10px')
-
-    return client_name_div
-
-
-def get_approved_rejected_checkboxes(conclusion):
-    acr_s = ['APPROVED', 'REJECTED']
-    acr = Table()
-    acr.add_style('display', 'inline-block')
-
-    for mark in acr_s:
-        acr.add_row()
-        acr1 = CheckboxWdg('marked_%s' % mark)
-
-        if mark in conclusion:
-            acr1.set_value(True)
-        else:
-            acr1.set_value(False)
-
-        acr.add_cell(acr1)
-        acr.add_cell('<b>{0}</b>'.format(mark))
-
-    return acr
-
-
 class ElementEvalWdg(BaseTableElementWdg):
 
     def init(self):
