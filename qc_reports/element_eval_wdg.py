@@ -858,12 +858,18 @@ function save_element_eval_report() {
     // server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_data': qc_report_object});
     server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': inserted_sobject['search_key']});
 }
+
 var server = TacticServerStub.get();
 
 var code = '%s';
 var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
 
 server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': search_key});
+
+var report_name = document.getElementsByName("name_data")[0].value;
+var file_path = "/assets/element_evaluations/" + report_name + ".pdf";
+
+window.open(file_path);
             ''' % sobject_code
         }
 
@@ -1401,11 +1407,11 @@ server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': 
         section_span = SpanWdg()
         section_span.add_style('display', 'inline-block')
 
-        save_as_new_button = ButtonNewWdg(title='Export to PDF', icon='ARROW_DOWN')
-        save_as_new_button.add_class('save_as_new_button')
-        save_as_new_button.add_behavior(self.get_export_to_pdf_behavior(self.element_eval_sobject.get_code()))
+        export_to_pdf_button = ButtonNewWdg(title='Export to PDF', icon='ARROW_DOWN')
+        export_to_pdf_button.add_class('save_as_new_button')
+        export_to_pdf_button.add_behavior(self.get_export_to_pdf_behavior(self.element_eval_sobject.get_code()))
 
-        section_span.add(save_as_new_button)
+        section_span.add(export_to_pdf_button)
 
         return section_span
 

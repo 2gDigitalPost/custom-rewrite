@@ -1,4 +1,3 @@
-import datetime
 import os
 from reportlab.platypus.flowables import HRFlowable
 
@@ -240,11 +239,15 @@ class ExportElementEvalCommand(Command):
         if report_search_key:
             self.export_pdf(Search.get_by_search_key(report_search_key))
 
+            from tactic_client_lib import TacticServerStub
+
+            server = TacticServerStub.get()
+            server.download("http://localhost:8081/assets/test.pdf")
+
     @staticmethod
     def export_pdf(element_eval_sobject):
-        print(element_eval_sobject)
-        file_name = element_eval_sobject.get('name') + datetime.datetime.now().strftime('-%m%d%y-%H%M%S') + '.pdf'
-        save_location = '/var/www/html/element_evaluations'
+        file_name = element_eval_sobject.get('name') + '.pdf'
+        save_location = '/home/apache/assets/element_evaluations/'
 
         saved_file_path = os.path.join(save_location, file_name)
 
