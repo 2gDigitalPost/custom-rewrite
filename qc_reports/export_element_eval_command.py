@@ -18,7 +18,7 @@ def get_top_table(element_eval_sobject):
     operator = element_eval_sobject.get('operator')
     style = element_eval_sobject.get('style')
     bay = element_eval_sobject.get('bay')
-    machine = get_machine_name_from_code(element_eval_sobject.get('machine'))
+    machine = get_name_from_code(element_eval_sobject.get('machine'), 'twog/machine')
 
     top_table_header = []
     top_table_data = []
@@ -37,7 +37,8 @@ def get_title_table(element_eval_sobject):
     title_table_data = [
         ['Title:', element_eval_sobject.get('title'), 'Format:', element_eval_sobject.get('format')],
         ['Season:', element_eval_sobject.get('season'), 'Standard:', element_eval_sobject.get('standard')],
-        ['Episode:', element_eval_sobject.get('episode'), 'Frame Rate:', element_eval_sobject.get('frame_rate')],
+        ['Episode:', element_eval_sobject.get('episode'),
+         'Frame Rate:', get_name_from_code(element_eval_sobject.get('frame_rate'), 'twog/frame_rate')],
         ['Version:', element_eval_sobject.get('version'), 'PO #:', element_eval_sobject.get('po_number')],
         ['File Name:', element_eval_sobject.get('file_name')]
     ]
@@ -48,20 +49,19 @@ def get_title_table(element_eval_sobject):
     return title_table
 
 
-def get_client_name_from_code(code):
-    client_search = Search('twog/client')
-    client_search.add_code_filter(code)
-    client = client_search.get_sobject()
+def get_name_from_code(code, search_type):
+    """
+    Using a unique code and a search type, find an SObject and return its name
 
-    return client.get('name')
+    :param code: String, Unique code for an SObject (ex: CLIENT00050)
+    :param search_type: String, An SType (ex: 'twog/client')
+    :return: String, Name of an SObject
+    """
+    search = Search(search_type)
+    search.add_code_filter(code)
+    sobject = search.get_sobject()
 
-
-def get_machine_name_from_code(code):
-    machine_search = Search('twog/machine')
-    machine_search.add_code_filter(code)
-    machine = machine_search.get_sobject()
-
-    return machine.get('name')
+    return sobject.get('name')
 
 
 def get_audio_configuration_table(element_eval_sobject):
@@ -239,11 +239,6 @@ class ExportElementEvalCommand(Command):
         if report_search_key:
             self.export_pdf(Search.get_by_search_key(report_search_key))
 
-            from tactic_client_lib import TacticServerStub
-
-            server = TacticServerStub.get()
-            server.download("http://localhost:8081/assets/test.pdf")
-
     @staticmethod
     def export_pdf(element_eval_sobject):
         file_name = element_eval_sobject.get('name') + '.pdf'
@@ -279,7 +274,7 @@ class ExportElementEvalCommand(Command):
 
         approved_rejected_table = Table(approved_rejected_table_data)
 
-        client_name = get_client_name_from_code(element_eval_sobject.get('client'))
+        client_name = get_name_from_code(element_eval_sobject.get('client'), 'twog/client')
         P = Paragraph('<strong>{0}</strong>'.format(client_name), styleSheet["Heading2"])
 
         header_table = Table([[I, address_table, P, approved_rejected_table]])

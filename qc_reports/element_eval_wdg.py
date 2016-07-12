@@ -972,10 +972,9 @@ window.open(file_path);
 
         frame_rate_search = Search('twog/frame_rate')
         frame_rates = frame_rate_search.get_sobjects()
-        frame_rates = [frame_rate.get_value('name') for frame_rate in frame_rates]
 
         for frame_rate in frame_rates:
-            frame_rate_select.append_option(frame_rate, frame_rate)
+            frame_rate_select.append_option(frame_rate.get_value('name'), frame_rate.get_code())
 
         try:
             frame_rate_select.set_value(self.frame_rate)
