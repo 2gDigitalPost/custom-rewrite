@@ -8,6 +8,8 @@ from pyasm.search import Search
 from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, CheckboxWdg, TextAreaWdg
 
+import datetime
+
 
 class ElementEvalWdg(BaseTableElementWdg):
 
@@ -800,7 +802,7 @@ window.open(file_path);
 
         try:
             date = self.date
-            date_calendar_wdg.set_value(date)
+            date_calendar_wdg.set_value(datetime.datetime.strptime(date, ('%Y-%m-%d %H:%M:%S')).strftime('%Y-%m-%d'))
         except AttributeError:
             pass
 
@@ -1186,7 +1188,8 @@ window.open(file_path);
         record_date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
 
         if hasattr(self, 'record_date'):
-            record_date_calendar_wdg.set_value(self.record_date)
+            record_date_calendar_wdg.set_value(datetime.datetime.strptime(self.record_date,
+                                                                          ('%Y-%m-%d %H:%M:%S')).strftime('%Y-%m-%d'))
 
         return record_date_calendar_wdg
 

@@ -81,7 +81,7 @@ function get_element_eval_lines() {
     return element_eval_data;
 }
 
-function save_audio_eval_lines(element_evaluation_code) {
+function save_audio_eval_lines(prequal_evaluation_code) {
     var audio_table = document.getElementById('audio_configuration_table');
     var audio_config_rows = getTableRowsWithAttribute(audio_table, 'code');
 
@@ -102,7 +102,7 @@ function save_audio_eval_lines(element_evaluation_code) {
     }
 }
 
-function save_element_eval_lines(element_evaluation_code) {
+function save_element_eval_lines(prequal_evaluation_code) {
     var element_eval_lines_table = document.getElementById('element_eval_lines_table');
     var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
 
@@ -122,7 +122,7 @@ function save_element_eval_lines(element_evaluation_code) {
         line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
         line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
 
-        var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
+        var search_key = server.build_search_key('twog/prequal_evaluation_line', table_rows[i].getAttribute('code'),
                                                  'twog');
 
         server.update(search_key, line_data);
@@ -136,7 +136,7 @@ try {
     save_element_eval_lines(code);
 
     var server = TacticServerStub.get();
-    var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+    var search_key = server.build_search_key('twog/prequal_evaluation', code, 'twog');
 
     // Name of the report
     var name = document.getElementsByName("name_data")[0].value;
@@ -245,11 +245,11 @@ try {
         'general_comments': general_comments
     };
 
-    var element_eval_panel = document.getElementById('element_eval_panel');
+    var prequal_eval_panel = document.getElementById('prequal_eval_panel');
 
     spt.app_busy.show("Saving...");
     server.update(search_key, qc_report_object);
-    spt.api.load_panel(element_eval_panel, 'qc_reports.ElementEvalWdg', {'search_key': search_key});
+    spt.api.load_panel(prequal_eval_panel, 'qc_reports.PrequalEvalWdg', {'search_key': search_key});
 
     spt.app_busy.hide();
 }
@@ -318,20 +318,20 @@ try {
         'general_comments': general_comments
     };
 
-    var element_eval_panel = document.getElementById('prequal_eval_panel');
+    var prequal_eval_panel = document.getElementById('prequal_eval_panel');
 
     var server = TacticServerStub.get();
 
     spt.app_busy.show("Saving a new Report...");
 
     // Save the new PreQual Evaluation, and get the code that it saved as
-    var inserted_element_evaluation = server.insert('twog/prequal_evaluation', qc_report_object);
-    var code = inserted_element_evaluation['code'];
+    var inserted_prequal_evaluation = server.insert('twog/prequal_evaluation', qc_report_object);
+    var code = inserted_prequal_evaluation['code'];
 
     // Finally, get the search key for the new report, and use it to reload the page
     var search_key = server.build_search_key('twog/prequal_evaluation', code, 'twog');
 
-    spt.api.load_panel(element_eval_panel, 'qc_reports.PrequalEvalWdg', {'search_key': search_key});
+    spt.api.load_panel(prequal_eval_panel, 'qc_reports.PrequalEvalWdg', {'search_key': search_key});
 
     spt.app_busy.hide();
 }
@@ -476,15 +476,15 @@ try {
         'general_comments': general_comments
     };
 
-    var element_eval_panel = document.getElementById('element_eval_panel');
+    var prequal_eval_panel = document.getElementById('prequal_eval_panel');
 
     var server = TacticServerStub.get();
 
     spt.app_busy.show("Saving a new Report...");
 
     // Save the new Element Evaluation, and get the code that it saved as
-    var inserted_element_evaluation = server.insert('twog/element_evaluation', qc_report_object);
-    var code = inserted_element_evaluation['code'];
+    var inserted_prequal_evaluation = server.insert('twog/prequal_evaluation', qc_report_object);
+    var code = inserted_prequal_evaluation['code'];
 
     // Using the code gained from the new report, save the audio and element eval lines
     var audio_table = document.getElementById('audio_configuration_table');
@@ -498,7 +498,7 @@ try {
 
         // Insert the line
         // TODO: Insert all lines at once rather than one at a time
-        server.insert('twog/audio_evaluation_line', {'element_evaluation_code': code,
+        server.insert('twog/audio_evaluation_line', {'prequal_evaluation_code': code,
                                                      'channel': channel,
                                                      'content': content,
                                                      'tone': tone,
@@ -524,7 +524,7 @@ try {
 
         // Insert the line
         // TODO: Insert all lines at once rather than one at a time
-        server.insert('twog/element_evaluation_line', {'element_evaluation_code': code,
+        server.insert('twog/prequal_evaluation_line', {'prequal_evaluation_code': code,
                                                        'timecode_in': timecode_in,
                                                        'field_in': field_in,
                                                        'description': description,
@@ -538,9 +538,9 @@ try {
     }
 
     // Finally, get the search key for the new report, and use it to reload the page
-    var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+    var search_key = server.build_search_key('twog/prequal_evaluation', code, 'twog');
 
-    spt.api.load_panel(element_eval_panel, 'qc_reports.ElementEvalWdg', {'search_key': search_key});
+    spt.api.load_panel(prequal_eval_panel, 'qc_reports.PrequalEvalWdg', {'search_key': search_key});
 
     spt.app_busy.hide();
 }
@@ -559,132 +559,12 @@ catch(err) {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
-function getTableRowsWithAttribute(table, attribute)
-{
-  var matchingElements = [];
-  var allElements = table.getElementsByTagName('tr');
-  for (var i = 0, n = allElements.length; i < n; i++)
-  {
-    if (allElements[i].getAttribute(attribute) !== null)
-    {
-      // Element exists with attribute. Add to array.
-      matchingElements.push(allElements[i]);
-    }
-  }
-  return matchingElements;
-}
-
-function get_audio_table_data() {
-    var audio_table = document.getElementById('audio_configuration_table');
-    var audio_config_rows = getTableRowsWithAttribute(audio_table, 'code');
-
-    var audio_data = [];
-
-    for (var i = 0; i < audio_config_rows.length; i++) {
-        var audio_line = {};
-
-        audio_line['channel'] = document.getElementsByName("channel-" + String(i))[0].value;
-        audio_line['content'] = document.getElementsByName("content-" + String(i))[0].value;
-        audio_line['tone'] = document.getElementsByName("tone-" + String(i))[0].value;
-        audio_line['peak'] = document.getElementsByName("peak-" + String(i))[0].value;
-
-        audio_data.push(audio_line);
-    }
-
-    return audio_data;
-}
-
-function get_element_eval_lines() {
-    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
-    var element_eval_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
-
-    var element_eval_data = [];
-
-    for (var i = 0; i < element_eval_rows.length; i++) {
-        var element_eval_line = {};
-
-        element_eval_line['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
-        element_eval_line['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
-        element_eval_line['description'] = document.getElementsByName("description-" + String(i))[0].value;
-        element_eval_line['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
-        element_eval_line['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
-        element_eval_line['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
-        element_eval_line['type_code'] = document.getElementById("type-code-" + String(i)).value;
-        element_eval_line['scale'] = document.getElementById("scale-" + String(i)).value;
-        element_eval_line['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        element_eval_line['in_source'] = document.getElementById("in-source-" + String(i)).value;
-
-        element_eval_data.push(element_eval_line);
-    }
-
-    return element_eval_data;
-}
-
-function save_element_eval_report() {
-    var qc_report_object = {};
-
-    qc_report_object['name'] = document.getElementsByName("name_data")[0].value;
-    qc_report_object['client_code'] = document.getElementById("client_code").value;
-    qc_report_object['status'] = document.getElementById("status").value;
-    qc_report_object['date'] = document.getElementsByName("date")[0].value;
-    qc_report_object['operator'] = document.getElementsByName("operator")[0].value;
-    qc_report_object['style'] = document.getElementById("style").value;
-    qc_report_object['bay'] = document.getElementById("bay").value;
-    qc_report_object['machine_code'] = document.getElementById("machine_code").value;
-    qc_report_object['title'] = document.getElementsByName("title_data")[0].value;
-    qc_report_object['format'] = document.getElementById("format").value;
-    qc_report_object['season'] = document.getElementsByName("season")[0].value;
-    qc_report_object['standard'] = document.getElementById("standard").value;
-    qc_report_object['episode'] = document.getElementsByName("episode")[0].value;
-    qc_report_object['frame_rate_code'] = document.getElementById("frame_rate_code").value;
-    qc_report_object['version'] = document.getElementsByName("version")[0].value;
-    qc_report_object['po_number'] = document.getElementsByName("po_number")[0].value;
-    qc_report_object['file_name'] = document.getElementsByName("file_name")[0].value;
-    qc_report_object['roll_up_blank'] = document.getElementsByName("roll_up_blank")[0].value;
-    qc_report_object['bars_tone'] = document.getElementsByName("bars_tone")[0].value;
-    qc_report_object['black_silence_1'] = document.getElementsByName("black_silence_1")[0].value;
-    qc_report_object['slate_silence'] = document.getElementsByName("slate_silence")[0].value;
-    qc_report_object['black_silence_2'] = document.getElementsByName("black_silence_2")[0].value;
-    qc_report_object['start_of_program'] = document.getElementsByName("start_of_program")[0].value;
-    qc_report_object['end_of_program'] = document.getElementsByName("end_of_program")[0].value;
-    qc_report_object['active_video_begins'] = document.getElementsByName("active_video_begins")[0].value;
-    qc_report_object['active_video_ends'] = document.getElementsByName("active_video_ends")[0].value;
-    qc_report_object['horizontal_blanking'] = document.getElementsByName("horizontal_blanking")[0].value;
-    qc_report_object['luminance_peak'] = document.getElementsByName("luminance_peak")[0].value;
-    qc_report_object['chroma_peak'] = document.getElementsByName("chroma_peak")[0].value;
-    qc_report_object['head_logo'] = document.getElementsByName("head_logo")[0].value;
-    qc_report_object['tail_logo'] = document.getElementsByName("tail_logo")[0].value;
-    qc_report_object['total_runtime'] = document.getElementsByName("total_runtime")[0].value;
-    qc_report_object['language_code'] = document.getElementById("language_code").value;
-    qc_report_object['tv_feature_trailer'] = document.getElementsByName("tv_feature_trailer")[0].value;
-    qc_report_object['cc_subtitles'] = document.getElementsByName("cc_subtitles")[0].value;
-    qc_report_object['video_aspect_ratio'] = document.getElementById("video_aspect_ratio").value;
-    qc_report_object['vitc'] = document.getElementsByName("vitc")[0].value;
-    qc_report_object['textless_tail'] = document.getElementsByName("textless_tail")[0].value;
-    qc_report_object['source_barcode'] = document.getElementsByName("source_barcode")[0].value;
-    qc_report_object['notices'] = document.getElementsByName("notices")[0].value;
-    qc_report_object['element_qc_barcode'] = document.getElementsByName("element_qc_barcode")[0].value;
-    qc_report_object['label'] = document.getElementById("label").value;
-    qc_report_object['record_date'] = document.getElementsByName("record_date")[0].value;
-    qc_report_object['general_comments'] = document.getElementById("general_comments").value;
-
-    console.log(qc_report_object);
-
-    var server = TacticServerStub.get();
-
-    spt.app_busy.show("Saving Report...");
-    var inserted_sobject = server.insert('twog/element_evaluation', qc_report_object);
-    spt.api.load_panel(element_eval_panel, 'qc_reports.ElementEvalWdg', {'search_key': inserted_sobject['search_key']});
-
-    // server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_data': qc_report_object});
-    server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': inserted_sobject['search_key']});
-}
 var server = TacticServerStub.get();
 
 var code = '%s';
-var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+var search_key = server.build_search_key('twog/prequal_evaluation', code, 'twog');
 
-server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': search_key});
+server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': search_key});
             ''' % sobject_code
         }
 
