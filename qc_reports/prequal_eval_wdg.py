@@ -142,7 +142,7 @@ try {
     var name = document.getElementsByName("name_data")[0].value;
 
     // Client row values
-    var client = document.getElementById("client").value;
+    var client_code = document.getElementById("client_code").value;
     var status = document.getElementById("status").value;
 
     // Operator row values
@@ -150,7 +150,7 @@ try {
     var operator = document.getElementsByName("operator")[0].value;
     var style = document.getElementById("style").value;
     var bay = document.getElementById("bay").value;
-    var machine = document.getElementById("machine").value;
+    var machine_code = document.getElementById("machine_code").value;
 
     // Title section values
     var title_data = document.getElementsByName("title_data")[0].value;
@@ -158,7 +158,7 @@ try {
     var season = document.getElementsByName("season")[0].value;
     var standard = document.getElementById("standard").value;
     var episode = document.getElementsByName("episode")[0].value;
-    var frame_rate = document.getElementById("frame_rate").value;
+    var frame_rate_code = document.getElementById("frame_rate_code").value;
     var version = document.getElementsByName("version")[0].value;
     var po_number = document.getElementsByName("po_number")[0].value;
     var file_name = document.getElementsByName("file_name")[0].value;
@@ -183,7 +183,7 @@ try {
 
     // Element Profile values
     var total_runtime = document.getElementsByName("total_runtime")[0].value;
-    var language = document.getElementsByName("language")[0].value;
+    var language_code = document.getElementById("language_code").value;
     var tv_feature_trailer = document.getElementsByName("tv_feature_trailer")[0].value;
     var cc_subtitles = document.getElementsByName("cc_subtitles")[0].value;
     var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
@@ -200,19 +200,19 @@ try {
 
     var qc_report_object = {
         'name': name,
-        'client': client,
+        'client_code': client_code,
         'status': status,
         'date': date,
         'operator': operator,
         'style': style,
         'bay': bay,
-        'machine': machine,
+        'machine_code': machine_code,
         'title': title_data,
         'format': format,
         'season': season,
         'standard': standard,
         'episode': episode,
-        'frame_rate': frame_rate,
+        'frame_rate_code': frame_rate_code,
         'version': version,
         'po_number': po_number,
         'file_name': file_name,
@@ -231,7 +231,7 @@ try {
         'head_logo': head_logo,
         'tail_logo': tail_logo,
         'total_runtime': total_runtime,
-        'language': language,
+        'language_code': language_code,
         'tv_feature_trailer': tv_feature_trailer,
         'cc_subtitles': cc_subtitles,
         'video_aspect_ratio': video_aspect_ratio,
@@ -273,7 +273,7 @@ try {
     var name = document.getElementsByName("name_data")[0].value;
 
     // Client row values
-    var client = document.getElementById("client").value;
+    var client_code = document.getElementById("client_code").value;
     var status = document.getElementById("status").value;
 
     // Operator row values
@@ -281,7 +281,7 @@ try {
     var operator = document.getElementsByName("operator")[0].value;
     var style = document.getElementById("style").value;
     var bay = document.getElementById("bay").value;
-    var machine = document.getElementById("machine").value;
+    var machine_code = document.getElementById("machine_code").value;
 
     // Title section values
     var title_data = document.getElementsByName("title_data")[0].value;
@@ -289,7 +289,7 @@ try {
     var season = document.getElementsByName("season")[0].value;
     var standard = document.getElementById("standard").value;
     var episode = document.getElementsByName("episode")[0].value;
-    var frame_rate = document.getElementById("frame_rate").value;
+    var frame_rate_code = document.getElementById("frame_rate_code").value;
     var version = document.getElementsByName("version")[0].value;
     var po_number = document.getElementsByName("po_number")[0].value;
     var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
@@ -299,19 +299,19 @@ try {
 
     var qc_report_object = {
         'name': name,
-        'client': client,
+        'client_code': client_code,
         'status': status,
         'date': date,
         'operator': operator,
         'style': style,
         'bay': bay,
-        'machine': machine,
+        'machine_code': machine_code,
         'title': title_data,
         'format': format,
         'season': season,
         'standard': standard,
         'episode': episode,
-        'frame_rate': frame_rate,
+        'frame_rate_code': frame_rate_code,
         'version': version,
         'po_number': po_number,
         'video_aspect_ratio': video_aspect_ratio,
@@ -373,7 +373,7 @@ try {
     var name = document.getElementsByName("name_data")[0].value;
 
     // Client row values
-    var client = document.getElementById("client").value;
+    var client_code = document.getElementById("client_code").value;
     var status = document.getElementById("status").value;
 
     // Operator row values
@@ -381,7 +381,7 @@ try {
     var operator = document.getElementsByName("operator")[0].value;
     var style = document.getElementById("style").value;
     var bay = document.getElementById("bay").value;
-    var machine = document.getElementById("machine").value;
+    var machine_code = document.getElementById("machine_code").value;
 
     // Title section values
     var title_data = document.getElementsByName("title_data")[0].value;
@@ -389,7 +389,7 @@ try {
     var season = document.getElementsByName("season")[0].value;
     var standard = document.getElementById("standard").value;
     var episode = document.getElementsByName("episode")[0].value;
-    var frame_rate = document.getElementById("frame_rate").value;
+    var frame_rate_code = document.getElementById("frame_rate_code").value;
     var version = document.getElementsByName("version")[0].value;
     var po_number = document.getElementsByName("po_number")[0].value;
     var file_name = document.getElementsByName("file_name")[0].value;
@@ -414,7 +414,7 @@ try {
 
     // Element Profile values
     var total_runtime = document.getElementsByName("total_runtime")[0].value;
-    var language = document.getElementsByName("language")[0].value;
+    var language_code = document.getElementById("language_code")[0].value;
     var tv_feature_trailer = document.getElementsByName("tv_feature_trailer")[0].value;
     var cc_subtitles = document.getElementsByName("cc_subtitles")[0].value;
     var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
@@ -431,19 +431,19 @@ try {
 
     var qc_report_object = {
         'name': name,
-        'client': client,
+        'client_code': client_code,
         'status': status,
         'date': date,
         'operator': operator,
         'style': style,
         'bay': bay,
-        'machine': machine,
+        'machine_code': machine_code,
         'title': title_data,
         'format': format,
         'season': season,
         'standard': standard,
         'episode': episode,
-        'frame_rate': frame_rate,
+        'frame_rate_code': frame_rate_code,
         'version': version,
         'po_number': po_number,
         'file_name': file_name,
@@ -462,7 +462,7 @@ try {
         'head_logo': head_logo,
         'tail_logo': tail_logo,
         'total_runtime': total_runtime,
-        'language': language,
+        'language_code': language_code,
         'tv_feature_trailer': tv_feature_trailer,
         'cc_subtitles': cc_subtitles,
         'video_aspect_ratio': video_aspect_ratio,
@@ -624,19 +624,19 @@ function save_element_eval_report() {
     var qc_report_object = {};
 
     qc_report_object['name'] = document.getElementsByName("name_data")[0].value;
-    qc_report_object['client'] = document.getElementById("client").value;
+    qc_report_object['client_code'] = document.getElementById("client_code").value;
     qc_report_object['status'] = document.getElementById("status").value;
     qc_report_object['date'] = document.getElementsByName("date")[0].value;
     qc_report_object['operator'] = document.getElementsByName("operator")[0].value;
     qc_report_object['style'] = document.getElementById("style").value;
     qc_report_object['bay'] = document.getElementById("bay").value;
-    qc_report_object['machine'] = document.getElementById("machine").value;
+    qc_report_object['machine_code'] = document.getElementById("machine_code").value;
     qc_report_object['title'] = document.getElementsByName("title_data")[0].value;
     qc_report_object['format'] = document.getElementById("format").value;
     qc_report_object['season'] = document.getElementsByName("season")[0].value;
     qc_report_object['standard'] = document.getElementById("standard").value;
     qc_report_object['episode'] = document.getElementsByName("episode")[0].value;
-    qc_report_object['frame_rate'] = document.getElementById("frame_rate").value;
+    qc_report_object['frame_rate_code'] = document.getElementById("frame_rate_code").value;
     qc_report_object['version'] = document.getElementsByName("version")[0].value;
     qc_report_object['po_number'] = document.getElementsByName("po_number")[0].value;
     qc_report_object['file_name'] = document.getElementsByName("file_name")[0].value;
@@ -655,7 +655,7 @@ function save_element_eval_report() {
     qc_report_object['head_logo'] = document.getElementsByName("head_logo")[0].value;
     qc_report_object['tail_logo'] = document.getElementsByName("tail_logo")[0].value;
     qc_report_object['total_runtime'] = document.getElementsByName("total_runtime")[0].value;
-    qc_report_object['language'] = document.getElementsByName("language")[0].value;
+    qc_report_object['language_code'] = document.getElementById("language_code").value;
     qc_report_object['tv_feature_trailer'] = document.getElementsByName("tv_feature_trailer")[0].value;
     qc_report_object['cc_subtitles'] = document.getElementsByName("cc_subtitles")[0].value;
     qc_report_object['video_aspect_ratio'] = document.getElementById("video_aspect_ratio").value;
@@ -696,15 +696,30 @@ server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': 
         textbox_wdg.set_name(field_name)
         textbox_wdg.add_style('width', '{0}px'.format(width))
 
-        if hasattr(self, field_name):
-            textbox_wdg.set_value(getattr(self, field_name))
+        try:
+            textbox_wdg.set_value(self.prequal_eval_sobject.get(field_name))
+        except AttributeError:
+            pass
+
+        return textbox_wdg
+
+    def get_name_input_wdg(self, width=500):
+        textbox_wdg = TextInputWdg()
+        textbox_wdg.set_id('name_data')
+        textbox_wdg.set_name('name_data')
+        textbox_wdg.add_style('width', '{0}px'.format(width))
+
+        try:
+            textbox_wdg.set_value(self.prequal_eval_sobject.get('name'))
+        except AttributeError:
+            pass
 
         return textbox_wdg
 
     def get_name_section(self):
         section_div = DivWdg()
 
-        name_wdg = self.get_text_input_wdg('name_data', 500)
+        name_wdg = self.get_name_input_wdg()
 
         section_div.add('Name: ')
         section_div.add(name_wdg)
@@ -731,7 +746,7 @@ server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': 
 
     def get_client_select(self):
         client_sel = SelectWdg('client_select')
-        client_sel.set_id('client')
+        client_sel.set_id('client_code')
         client_sel.add_style('width', '135px')
         client_sel.add_empty_option()
 
@@ -741,8 +756,10 @@ server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': 
         for client in clients:
             client_sel.append_option(client.get_value('name'), client.get_code())
 
-        if hasattr(self, 'client'):
-            client_sel.set_value(self.client)
+        try:
+            client_sel.set_value(self.prequal_eval_sobject.get('client_code'))
+        except AttributeError:
+            pass
 
         return client_sel
 
@@ -833,7 +850,7 @@ server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': 
 
     def get_machine_select(self):
         machine_sel = SelectWdg('machine_select')
-        machine_sel.set_id('machine')
+        machine_sel.set_id('machine_code')
         machine_sel.add_style('width', '135px')
         machine_sel.add_empty_option()
 
@@ -864,7 +881,17 @@ server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': 
 
         section_span.add('Title: ')
 
-        section_span.add(self.get_text_input_wdg('title_data', 400))
+        textbox_wdg = TextInputWdg()
+        textbox_wdg.set_id('title_data')
+        textbox_wdg.set_name('title_data')
+        textbox_wdg.add_style('width', '{0}px'.format(200))
+
+        try:
+            textbox_wdg.set_value(self.prequal_eval_sobject.get('title'))
+        except AttributeError:
+            pass
+
+        section_span.add(textbox_wdg)
 
         return section_span
 
@@ -958,7 +985,7 @@ server.execute_cmd('qc_reports.ExportElementEvalCommand', {'report_search_key': 
         section_span.add('Frame Rate: ')
 
         frame_rate_select = SelectWdg('frame_rate_select')
-        frame_rate_select.set_id('frame_rate')
+        frame_rate_select.set_id('frame_rate_code')
         frame_rate_select.add_style('width', '153px')
         frame_rate_select.add_style('display', 'inline-block')
         frame_rate_select.add_empty_option()
