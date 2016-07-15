@@ -252,7 +252,7 @@ class ExportElementEvalCommand(Command):
 
         styleSheet = getSampleStyleSheet()
 
-        I = Image(os.path.dirname(os.path.realpath(__file__)) + '/2GLogo_small4.png')
+        I = Image(os.path.dirname(os.path.realpath(__file__)) + '/2g_logo.png')
         I.drawHeight = 1.25 * inch * I.drawHeight / I.drawWidth
         I.drawWidth = 1.25 * inch
 
