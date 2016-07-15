@@ -108,6 +108,18 @@ def get_element_eval_lines_table(element_eval_sobject):
     element_eval_lines_search.add_filter('element_evaluation_code', element_eval_sobject.get_code())
     element_eval_lines = element_eval_lines_search.get_sobjects()
 
+    lines_with_values = []
+    lines_without_values = []
+
+    for line in element_eval_lines:
+        if line.get_value('timecode_in'):
+            lines_with_values.append(line)
+        else:
+            lines_without_values.append(line)
+
+    element_eval_lines = sorted(lines_with_values, key=lambda x: x.get_value('timecode_in'))
+    element_eval_lines.extend(lines_without_values)
+
     for line in element_eval_lines:
         timecode_in = line.get('timecode_in')
         field_in = line.get('field_in')
