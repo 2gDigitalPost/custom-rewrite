@@ -48,8 +48,7 @@ class ElementEvalTest(unittest.TestCase):
 
         time.sleep(3)
 
-        element_eval_link = self.browser.find_element_by_xpath('//div[@spt_title="Report"]')
-        element_eval_link.click()
+        self.browser.get('http://127.0.0.1:8081/tactic/twog/admin/link/report')
 
         time.sleep(2)
 
@@ -59,11 +58,11 @@ class ElementEvalTest(unittest.TestCase):
         element_eval_header = self.browser.find_element_by_class_name('spt_tab_header_label')
         self.assertEqual('Report', element_eval_header.text)
 
-    def test_reload_page_keeps_input_values(self):
+    def test_save_for_first_time_reloads_values(self):
         self.load_element_eval_page()
 
         # Some values to pass into the input widgets
-        date_field_input = datetime.date.today().strftime('%m-%d-%Y')
+        date_field_input = datetime.date.today().strftime('%Y-%m-%d')
         operator_field_input = 'Test Operator'
         title_field_input = 'Test Title'
         season_field_input = 'Test Season'
@@ -89,12 +88,11 @@ class ElementEvalTest(unittest.TestCase):
         tv_feature_trailer_field_input = 'Test TV/Feature/Trailer'
         textless_tail_field_input = 'Test Textless @ Tail'
         notices_field_input = 'Test Notices'
-        language_field_input = 'Test Language'
         cc_subtitles_field_input = 'Test CC/Subtitles'
         vitc_field_input = 'Test VITC'
         source_barcode_field_input = 'Test Source Barcode'
         element_qc_barcode_field_input = 'Test Element QC Barcode'
-        record_date_field_input = datetime.date.today().strftime('%m-%d-%Y')
+        record_date_field_input = datetime.date.today().strftime('%Y-%m-%d')
         general_comments_field_input = 'This is a test.'
 
         # Send the input values to all the input widgets on the page
@@ -124,7 +122,6 @@ class ElementEvalTest(unittest.TestCase):
         self.browser.find_element_by_name('tv_feature_trailer').send_keys(tv_feature_trailer_field_input)
         self.browser.find_element_by_name('textless_tail').send_keys(textless_tail_field_input)
         self.browser.find_element_by_name('notices').send_keys(notices_field_input)
-        self.browser.find_element_by_name('language').send_keys(language_field_input)
         self.browser.find_element_by_name('cc_subtitles').send_keys(cc_subtitles_field_input)
         self.browser.find_element_by_name('vitc').send_keys(vitc_field_input)
         self.browser.find_element_by_name('source_barcode').send_keys(source_barcode_field_input)
@@ -142,7 +139,7 @@ class ElementEvalTest(unittest.TestCase):
         bay_select.select_by_visible_text(bay_select_option)
 
         machine_select_option = 'VTR233'
-        machine_select = Select(self.browser.find_element_by_id('machine_number'))
+        machine_select = Select(self.browser.find_element_by_id('machine_code'))
         machine_select.select_by_visible_text(machine_select_option)
 
         format_select_option = 'File - WAV'
@@ -154,7 +151,7 @@ class ElementEvalTest(unittest.TestCase):
         standard_select.select_by_visible_text(standard_select_option)
 
         frame_rate_select_option = '24p'
-        frame_rate_select = Select(self.browser.find_element_by_id('frame_rate'))
+        frame_rate_select = Select(self.browser.find_element_by_id('frame_rate_code'))
         frame_rate_select.select_by_visible_text(frame_rate_select_option)
 
         video_aspect_ratio_select_option = '4x3 2.35 Letterbox'
@@ -165,8 +162,12 @@ class ElementEvalTest(unittest.TestCase):
         label_select = Select(self.browser.find_element_by_id('label'))
         label_select.select_by_visible_text(label_select_option)
 
-        # Find the button that refreshes the page (the add row button in this case) and click it
-        add_row_button = self.browser.find_element_by_class_name('add_row_button')
+        language_select_option = 'English'
+        language_select = Select(self.browser.find_element_by_id('language_code'))
+        language_select.select_by_visible_text(language_select_option)
+
+        # Find the save new report button and click it
+        add_row_button = self.browser.find_element_by_class_name('save_new_button')
         add_row_button.click()
 
         # Give the page a few seconds to reload
@@ -213,7 +214,6 @@ class ElementEvalTest(unittest.TestCase):
         self.assertEqual(textless_tail_field_input,
                          self.browser.find_element_by_name('textless_tail').get_attribute('value'))
         self.assertEqual(notices_field_input, self.browser.find_element_by_name('notices').get_attribute('value'))
-        self.assertEqual(language_field_input, self.browser.find_element_by_name('language').get_attribute('value'))
         self.assertEqual(cc_subtitles_field_input,
                          self.browser.find_element_by_name('cc_subtitles').get_attribute('value'))
         self.assertEqual(vitc_field_input, self.browser.find_element_by_name('vitc').get_attribute('value'))
@@ -229,12 +229,13 @@ class ElementEvalTest(unittest.TestCase):
         # Also check the select widgets and make sure they are what was selected
         style_select = Select(self.browser.find_element_by_id('style'))
         bay_select = Select(self.browser.find_element_by_id('bay'))
-        machine_select = Select(self.browser.find_element_by_id('machine_number'))
+        machine_select = Select(self.browser.find_element_by_id('machine_code'))
         format_select = Select(self.browser.find_element_by_id('format'))
         standard_select = Select(self.browser.find_element_by_id('standard'))
-        frame_rate_select = Select(self.browser.find_element_by_id('frame_rate'))
+        frame_rate_select = Select(self.browser.find_element_by_id('frame_rate_code'))
         video_aspect_ratio_select = Select(self.browser.find_element_by_id('video_aspect_ratio'))
         label_select = Select(self.browser.find_element_by_id('label'))
+        language_select = Select(self.browser.find_element_by_id('language_code'))
 
         self.assertEqual(style_select_option, style_select.first_selected_option.text)
         self.assertEqual(bay_select_option, bay_select.first_selected_option.text)
@@ -244,6 +245,7 @@ class ElementEvalTest(unittest.TestCase):
         self.assertEqual(frame_rate_select_option, frame_rate_select.first_selected_option.text)
         self.assertEqual(video_aspect_ratio_select_option, video_aspect_ratio_select.first_selected_option.text)
         self.assertEqual(label_select_option, label_select.first_selected_option.text)
+        self.assertEqual(language_select_option, language_select.first_selected_option.text)
 
     def test_add_and_remove_row_buttons(self):
         self.load_element_eval_page()
