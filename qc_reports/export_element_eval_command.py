@@ -18,7 +18,7 @@ def get_top_table(element_eval_sobject):
     operator = element_eval_sobject.get('operator')
     style = element_eval_sobject.get('style')
     bay = element_eval_sobject.get('bay')
-    machine = get_name_from_code(element_eval_sobject.get('machine'), 'twog/machine')
+    machine = get_name_from_code(element_eval_sobject.get('machine_code'), 'twog/machine')
 
     top_table_header = []
     top_table_data = []
@@ -38,7 +38,7 @@ def get_title_table(element_eval_sobject):
         ['Title:', element_eval_sobject.get('title'), 'Format:', element_eval_sobject.get('format')],
         ['Season:', element_eval_sobject.get('season'), 'Standard:', element_eval_sobject.get('standard')],
         ['Episode:', element_eval_sobject.get('episode'),
-         'Frame Rate:', get_name_from_code(element_eval_sobject.get('frame_rate'), 'twog/frame_rate')],
+         'Frame Rate:', get_name_from_code(element_eval_sobject.get('frame_rate_code'), 'twog/frame_rate')],
         ['Version:', element_eval_sobject.get('version'), 'PO #:', element_eval_sobject.get('po_number')],
         ['File Name:', element_eval_sobject.get('file_name')]
     ]
@@ -193,7 +193,7 @@ def get_element_profile_table(element_eval_sobject):
             Paragraph('<strong>Total Runtime</strong>', styleSheet['BodyText']),
             element_eval_sobject.get('total_runtime'),
             Paragraph('<strong>Language</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('language')
+            element_eval_sobject.get('language_code')
         ],
         [
             Paragraph('<strong>TV/Feature/Trailer</strong>', styleSheet['BodyText']),
@@ -252,7 +252,7 @@ class ExportElementEvalCommand(Command):
 
         styleSheet = getSampleStyleSheet()
 
-        I = Image('/opt/spt/custom/qc_reports/2GLogo_small4.png')
+        I = Image(os.path.dirname(os.path.realpath(__file__)) + '/2GLogo_small4.png')
         I.drawHeight = 1.25 * inch * I.drawHeight / I.drawWidth
         I.drawWidth = 1.25 * inch
 
@@ -274,7 +274,7 @@ class ExportElementEvalCommand(Command):
 
         approved_rejected_table = Table(approved_rejected_table_data)
 
-        client_name = get_name_from_code(element_eval_sobject.get('client'), 'twog/client')
+        client_name = get_name_from_code(element_eval_sobject.get('client_code'), 'twog/client')
         P = Paragraph('<strong>{0}</strong>'.format(client_name), styleSheet["Heading2"])
 
         header_table = Table([[I, address_table, P, approved_rejected_table]])
