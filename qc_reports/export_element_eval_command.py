@@ -61,6 +61,9 @@ def get_name_from_code(code, search_type):
     search.add_code_filter(code)
     sobject = search.get_sobject()
 
+    if not sobject:
+        return None
+
     return sobject.get('name')
 
 
@@ -287,6 +290,11 @@ class ExportElementEvalCommand(Command):
         approved_rejected_table = Table(approved_rejected_table_data)
 
         client_name = get_name_from_code(element_eval_sobject.get('client_code'), 'twog/client')
+
+        # If a client name is not specified, just put 'Element Evaluation' at the top of the report in its place
+        if not client_name:
+            client_name = "Element Evaluation"
+
         P = Paragraph('<strong>{0}</strong>'.format(client_name), styleSheet["Heading2"])
 
         header_table = Table([[I, address_table, P, approved_rejected_table]])
