@@ -801,8 +801,7 @@ window.open(file_path);
         date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
 
         try:
-            date = self.date
-            date_calendar_wdg.set_value(datetime.datetime.strptime(date, ('%Y-%m-%d %H:%M:%S')).strftime('%Y-%m-%d'))
+            date_calendar_wdg.set_value(self.date)
         except AttributeError:
             pass
 
@@ -1005,7 +1004,6 @@ window.open(file_path);
 
         return language_select
 
-
     def get_version_section(self):
         section_div = DivWdg()
 
@@ -1188,8 +1186,7 @@ window.open(file_path);
         record_date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
 
         if hasattr(self, 'record_date'):
-            record_date_calendar_wdg.set_value(datetime.datetime.strptime(self.record_date,
-                                                                          ('%Y-%m-%d %H:%M:%S')).strftime('%Y-%m-%d'))
+            record_date_calendar_wdg.set_value(self.record_date)
 
         return record_date_calendar_wdg
 
