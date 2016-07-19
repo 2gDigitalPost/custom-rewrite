@@ -208,7 +208,7 @@ def get_element_profile_table(element_eval_sobject):
             Paragraph('<strong>Total Runtime</strong>', styleSheet['BodyText']),
             element_eval_sobject.get('total_runtime'),
             Paragraph('<strong>Language</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('language_code')
+            get_name_from_code(element_eval_sobject.get('language_code'), 'twog/language')
         ],
         [
             Paragraph('<strong>TV/Feature/Trailer</strong>', styleSheet['BodyText']),
