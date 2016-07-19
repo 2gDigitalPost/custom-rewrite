@@ -1169,11 +1169,16 @@ window.open(file_path);
         label_select_wdg.add_style('display', 'inline-block')
         label_select_wdg.add_empty_option()
 
-        for label in ('Good', 'Fair', 'Poor'):
+        label_options = ('Good', 'Fair', 'Poor')
+
+        for label in label_options:
             label_select_wdg.append_option(label, label)
 
         if hasattr(self, 'label'):
-            label_select_wdg.set_value(self.label)
+            # Double check that 'label' is within the given options (sometimes it isn't for some reason which causes
+            # an error)
+            if self.label in label_options:
+                label_select_wdg.set_value(self.label)
 
         return label_select_wdg
 
