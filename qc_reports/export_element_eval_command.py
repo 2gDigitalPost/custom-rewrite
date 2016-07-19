@@ -68,6 +68,15 @@ def get_name_from_code(code, search_type):
 
 
 def get_audio_configuration_table(element_eval_sobject):
+    audio_configuration_lines_search = Search('twog/audio_evaluation_line')
+    audio_configuration_lines_search.add_filter('element_evaluation_code', element_eval_sobject.get_code())
+    audio_configuration_lines = audio_configuration_lines_search.get_sobjects()
+
+    # If no audio configuration lines exist for this element evaluation, return None so that the PDF won't display
+    # a table
+    if not audio_configuration_lines:
+        return None
+
     styleSheet = getSampleStyleSheet()
 
     audio_configuration_table_data = [
@@ -78,10 +87,6 @@ def get_audio_configuration_table(element_eval_sobject):
             Paragraph('<strong>Peak</strong>', styleSheet['BodyText'])
         ]
     ]
-
-    audio_configuration_lines_search = Search('twog/audio_evaluation_line')
-    audio_configuration_lines_search.add_filter('element_evaluation_code', element_eval_sobject.get_code())
-    audio_configuration_lines = audio_configuration_lines_search.get_sobjects()
 
     for line in audio_configuration_lines:
         channel = line.get('channel')
@@ -101,15 +106,19 @@ def get_audio_configuration_table(element_eval_sobject):
 
 
 def get_element_eval_lines_table(element_eval_sobject):
+    element_eval_lines_search = Search('twog/element_evaluation_line')
+    element_eval_lines_search.add_filter('element_evaluation_code', element_eval_sobject.get_code())
+    element_eval_lines = element_eval_lines_search.get_sobjects()
+
+    # If no element eval lines exist for this element evaluation, return None so that the PDF won't display a table
+    if not element_eval_lines:
+        return None
+
     styleSheet = getSampleStyleSheet()
     styleSheet.fontSize = 10
 
     element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'F', 'Code',
                                       'Scale', 'Sector/Ch', 'In Source']]
-
-    element_eval_lines_search = Search('twog/element_evaluation_line')
-    element_eval_lines_search.add_filter('element_evaluation_code', element_eval_sobject.get_code())
-    element_eval_lines = element_eval_lines_search.get_sobjects()
 
     lines_with_values = []
     lines_without_values = []
@@ -150,6 +159,12 @@ def get_element_eval_lines_table(element_eval_sobject):
                                      colWidths=[(.7 * inch), (.19 * inch), (inch * 2.6), (.4 * inch), (.82 * inch),
                                                 (.19 * inch), (.75 * inch), (.3 * inch), (.55 * inch),
                                                 (.55 * inch)])
+
+    element_eval_lines_table.setStyle([('BOX', (0, 0), (-1, -1), 0.2, colors.black),
+                                       ('INNERGRID', (0, 0), (-1, -1), 0.2, colors.black),
+                                       ('FONTSIZE', (0, 0), (-1, -1), 8),
+                                       ('LEFTPADDING', (0, 0), (-1, -1), 1),
+                                       ('RIGHTPADDING', (0, 0), (-1, -1), 1)])
 
     return element_eval_lines_table
 
@@ -223,7 +238,7 @@ def get_element_profile_table(element_eval_sobject):
             element_eval_sobject.get('vitc')
         ],
         [
-            Paragraph('<strong>Textless @ Tail</strong>',styleSheet['BodyText']),
+            Paragraph('<strong>Textless @ Tail</strong>', styleSheet['BodyText']),
             element_eval_sobject.get('textless_tail'),
             Paragraph('<strong>Source Barcode</strong>', styleSheet['BodyText']),
             element_eval_sobject.get('source_barcode')
@@ -331,20 +346,21 @@ class ExportElementEvalCommand(Command):
 
         element_eval_lines_table = get_element_eval_lines_table(element_eval_sobject)
 
-        element_eval_lines_table.setStyle([('BOX', (0, 0), (-1, -1), 0.2, colors.black),
-                                           ('INNERGRID', (0, 0), (-1, -1), 0.2, colors.black),
-                                           ('FONTSIZE', (0, 0), (-1, -1), 8),
-                                           ('LEFTPADDING', (0, 0), (-1, -1), 1),
-                                           ('RIGHTPADDING', (0, 0), (-1, -1), 1)])
+        # Now apply some styling to all the tables (except the bottom one, which is styled separately since it needs
+        # special styling to fit on the page). Only include audio_configuration_table if it exists
+        tables_to_style = [program_format_table, video_measurements_table, element_profile_table]
+
+        if audio_configuration_table:
+            tables_to_style.append(audio_configuration_table)
 
         map(lambda x: x.setStyle([
             ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black)
-        ]), [program_format_table, video_measurements_table, element_profile_table,
-             audio_configuration_table])
+        ]), tables_to_style)
 
         hrFlowable = HRFlowable(color=colors.gray, width='100%')
 
+        # Add the segments to the report, regardless of whether or not there is data in the tables
         elements.append(top_table)
         elements.append(title_table)
         elements.append(hrFlowable)
@@ -352,13 +368,17 @@ class ExportElementEvalCommand(Command):
         elements.append(program_format_video_measurements_table)
         elements.append(element_profile_header)
         elements.append(element_profile_table)
-        elements.append(audio_configuration_header)
-        elements.append(audio_configuration_table)
+
+        # Only include the next few segments if they have data
+        if audio_configuration_table:
+            elements.append(audio_configuration_header)
+            elements.append(audio_configuration_table)
 
         if element_eval_sobject.get('general_comments'):
             elements.append(general_comments_header)
             elements.append(general_comments)
 
-        elements.append(element_eval_lines_table)
+        if element_eval_lines_table:
+            elements.append(element_eval_lines_table)
 
         doc.build(elements)
