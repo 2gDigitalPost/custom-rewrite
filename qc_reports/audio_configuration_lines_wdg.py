@@ -143,7 +143,7 @@ class AudioLinesTableWdg(BaseTableElementWdg):
         section_span = SpanWdg()
         section_span.add_style('display', 'inline-block')
 
-        remove_row_button = ButtonNewWdg(title='Remove Row', icon='REMOVE')
+        remove_row_button = ButtonNewWdg(title='Remove Row', icon='DELETE')
         remove_row_button.add_class('remove_row_button')
         remove_row_button.add_behavior(get_remove_audio_configuration_line_behavior(self.element_evaluation_code,
                                                                                     line_code))

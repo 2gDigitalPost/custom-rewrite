@@ -207,7 +207,7 @@ catch(err) {
     def get_remove_row_button(self, row_code):
         span_wdg = SpanWdg()
 
-        remove_row_button = ButtonNewWdg(title='Remove Row', icon='REMOVE')
+        remove_row_button = ButtonNewWdg(title='Remove Row', icon='DELETE')
 
         remove_row_button.add_class('subtract_row_button')
         remove_row_button.add_style('display', 'inline-block')
