@@ -67,11 +67,11 @@ try {
 
         line_data['timecode'] = document.getElementsByName("timecode-" + String(i))[0].value;
         line_data['field'] = document.getElementsByName("field-" + String(i))[0].value;
-        line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
+        line_data['prequal_line_description_code'] = document.getElementsByName("prequal-line-description-" + String(i))[0].value;
         line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
         line_data['scale'] = document.getElementById("scale-" + String(i)).value;
         line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
+        line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
 
         var search_key = server.build_search_key('twog/prequal_evaluation_line', table_rows[i].getAttribute('code'),
                                                  'twog');
@@ -178,6 +178,23 @@ catch(err) {
 
         return select_wdg
 
+    @staticmethod
+    def get_description_select_wdg(name, value=None):
+        select_wdg = SelectWdg(name)
+        select_wdg.set_id(name)
+        select_wdg.add_empty_option()
+
+        description_search = Search('twog/prequal_line_description')
+        descriptions = description_search.get_sobjects()
+
+        for description in descriptions:
+            select_wdg.append_option(description.get_value('name'), description.get_code())
+
+        if value:
+            select_wdg.set_value(value)
+
+        return select_wdg
+
     def get_add_row_button(self):
         span_wdg = SpanWdg()
 
@@ -210,123 +227,9 @@ catch(err) {
         if self.lines:
             self.set_header_rows(table)
 
-            description_options = (
-                "A - Audio dropout: ( )",
-                "A - Audio clipping: ( )",
-                "A - Audio flutter: ( )",
-                "A - Audio tick: ( )",
-                "A - Audio tick during dialogue: ( )",
-                "A - Audio pop: ( )",
-                "A - Audio pop during dialogue: ( )",
-                "A - Audio crackle: ( )",
-                "A - Audio phasing error: ( )",
-                "A - Bad Audio Edit: ( )",
-                "A - Missing Effects: ( )",
-                "A - Out of sync dialogue: ( )",
-                "A - Out of sync effect: ( )",
-                "A - Loose ADR: ( )",
-                "A - Example of() found throughout program",
-                "A - Z Other...",
-                "V - Aliasing: ( )",
-                "V - Animation Error: ( )",
-                "V - Artifacting: ( )",
-                "V - Banding: ( )",
-                "V - Color Correction Error: ( )",
-                "V - Dead Pixel: ( )",
-                "V - Digital Hit: ( )",
-                "V - Freeze Frame: ( )",
-                "V - Interlacing: ( )",
-                "V - High Video Levels() mV",
-                "V - Low Black Levels - ( ) mV",
-                "V - Jump Cut: ( )",
-                "V - Luminance Shift: ( )",
-                "V - Moire Pattern: ( )",
-                "V - Recorded In Digital Hit: ( )",
-                "V - Text out of 16x9 safe action: ( )",
-                "V - Text out of 4x3 punch safe: ( )",
-                "V - Video Dropout: ( )",
-                "V - Video Stepping: ( )",
-                "V - Example of() found throughout program",
-                "V - Z Other...",
-                "V - Start Of Program: ( )",
-                "V - Aliasing During Fox Logo: ( )",
-                "V - Start Of Program: ( )",
-                "V - Aliasing During Fox Logo: ( )",
-                "V - Force Narrative Translation Overlaps ENG Burned in Narrative: ( )",
-                "V - End Of Program: ( )",
-                "V - Dub Card: ( )",
-                "V - Text Over Picture: ( )",
-                "V - Negative dirt: ( )",
-                "V - Stain: ( )",
-                "V - Emulsion stain: ( )",
-                "V - Scratch: ( )",
-                "A - Mis - time: ( )",
-                "A - Capstan hit: ( )",
-                "V - Noticeable jitter throughout opening sequence: ( )",
-                "V - Capstan bump: ( )",
-                "V - Film Bump: ( )",
-                "V - Video Jitter: ( )",
-                "V - Film Stain: ( )",
-                "A - Audio Distortion: ( )",
-                "V - Audio dip: ( )",
-                "A - Audio dip: ( )",
-                "V - Last Cut Of Program: ( )",
-                "V - End Credits: ( )",
-                "V - 20th Century Fox animated logo: ( )",
-                "V - Main Title: ( )",
-                "V - Start of program: ( )",
-                "V - Text Forced Narritive: ( )",
-                "V - Text Forced Narrative: ( )",
-                "V - Text Forced Narrative: ( )",
-                "V - Fox Searchlight Pictures Logo: ( )",
-                "V - Camera Flare: ( )",
-                "V - 20th Century Fox Logo Celebrating 75 Years: ( )",
-                "V - Subtitle overlaps Casting Credit: ( )",
-                "V - Subtitle overlaps credit: ( )",
-                "V - Minor Aliasing during Paramount Logo: ( )",
-                "V - Digital Hit: ( )",
-                "V - Scene Missing. Could be Edited for Creative Choice: ( )",
-                "A - Noticeable ADR: ( )",
-                "V - Pixel above mouth is flickering: ( )",
-                "A - Hit Across Face: ( )",
-                "V - New Life Foundation Information: ( )",
-                "V - End of program: ( )",
-                "V - Horrizontal Streak: ( )",
-                "V - Hit Across Face: ( )",
-                "V - Slate: ( )",
-                "A - Hiss: ( )",
-                "V - First Cut Of Program: ( )",
-                "A - Audio Crackle: ( )",
-                "V - Moire: ( )",
-                "A - Audio Distortion: ( )",
-                "V - TBC Hit: ( )",
-                "A - Audio Mutes during TBC Hit: ( )",
-                "A - Slight Hiss: ( )",
-                "V - Flash / off set: ( )",
-                "A - MIC bump: ( )",
-                "A - Audio levels dip / Very low: ( )",
-                "A - Dip in Audio Levels: ( )",
-                "A - Spelling Error on Slate: ( )",
-                "V - Spelling Error on Slate: ( )",
-                "V - Tracking: ( )",
-                "A - Audio Sync Verification: ( )",
-                "V - Picture Ringing: ( )",
-                "V - Dubcard: ( )",
-                "A - Dialogue clipping: ( )",
-                "A - Audio Bump: ( )",
-                "V - Video Jitter: ( )",
-                "V - Dropped frame: ( )",
-                "V - Chroma shift: ( )",
-                "V - Fox Searchlight Pictures Logo: ( )",
-                "V - Jitter: ( )"
-            )
             type_code_options = [('Film', 'film'), ('Video', 'video'), ('Telecine', 'telecine'), ('Audio', 'audio')]
             scale_select_options = [('1', '1'), ('2', '2'), ('3', '3'), ('FYI', 'fyi')]
-            in_source_options = [('No', 'no'), ('Yes', 'yes'), ('New', 'new'), ('Approved', 'approved'),
-                                 ('Fixed', 'fixed'), ('Not Fixed', 'not_fixed'),
-                                 ('Approved by Production', 'approved_by_production'),
-                                 ('Approved by Client', 'approved_by_client'), ('Approved as is', 'approved_as_is'),
-                                 ('Approved by Territory', 'approved_by_territory')]
+            in_source_options = [('No', 'no'), ('Yes', 'yes')]
 
             for iterator, line in enumerate(self.lines):
                 current_row = table.add_row()
@@ -339,7 +242,7 @@ catch(err) {
                     self.get_text_input_wdg('field-{0}'.format(iterator), 30, line.get_value('field'))
                 )
                 table.add_cell(
-                    self.get_text_input_wdg('description-{0}'.format(iterator), 150, line.get_value('description'))
+                    self.get_description_select_wdg('prequal-line-description-{0}'.format(iterator))
                 )
                 table.add_cell(
                     self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options,
@@ -354,7 +257,7 @@ catch(err) {
                 )
                 table.add_cell(
                     self.get_select_wdg('in-source-{0}'.format(iterator), in_source_options,
-                                        line.get_value('in_source'))
+                                        line.get_value('in_source').lower())
                 )
                 table.add_cell(
                     self.get_remove_row_button(line.get_code())

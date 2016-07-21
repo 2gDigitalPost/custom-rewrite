@@ -22,118 +22,72 @@ class PrequalEvalWdg(BaseRefreshWdg):
             'cbjs_action': '''
 function getTableRowsWithAttribute(table, attribute)
 {
-  var matchingElements = [];
-  var allElements = table.getElementsByTagName('tr');
-  for (var i = 0, n = allElements.length; i < n; i++)
-  {
-    if (allElements[i].getAttribute(attribute) !== null)
+    var matchingElements = [];
+    var allElements = table.getElementsByTagName('tr');
+
+    for (var i = 0, n = allElements.length; i < n; i++)
     {
-      // Element exists with attribute. Add to array.
-      matchingElements.push(allElements[i]);
-    }
-  }
-  return matchingElements;
-}
-
-function get_audio_table_data() {
-    var audio_table = document.getElementById('audio_configuration_table');
-    var audio_config_rows = getTableRowsWithAttribute(audio_table, 'code');
-
-    var audio_data = [];
-
-    for (var i = 0; i < audio_config_rows.length; i++) {
-        var audio_line = {};
-
-        audio_line['channel'] = document.getElementsByName("channel-" + String(i))[0].value;
-        audio_line['content'] = document.getElementsByName("content-" + String(i))[0].value;
-        audio_line['tone'] = document.getElementsByName("tone-" + String(i))[0].value;
-        audio_line['peak'] = document.getElementsByName("peak-" + String(i))[0].value;
-
-        audio_data.push(audio_line);
+        if (allElements[i].getAttribute(attribute) !== null)
+        {
+            // Element exists with attribute. Add to array.
+            matchingElements.push(allElements[i]);
+        }
     }
 
-    return audio_data;
+    return matchingElements;
 }
 
-function get_element_eval_lines() {
-    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
-    var element_eval_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
+function get_prequal_eval_lines() {
+    var prequal_eval_lines_table = document.getElementById('prequal_eval_lines_table');
+    var prequal_eval_rows = getTableRowsWithAttribute(prequal_eval_lines_table, 'code');
 
-    var element_eval_data = [];
+    var prequal_eval_data = [];
 
-    for (var i = 0; i < element_eval_rows.length; i++) {
-        var element_eval_line = {};
+    for (var i = 0; i < prequal_eval_rows.length; i++) {
+        var prequal_eval_line = {};
 
-        element_eval_line['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
-        element_eval_line['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
-        element_eval_line['description'] = document.getElementsByName("description-" + String(i))[0].value;
-        element_eval_line['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
-        element_eval_line['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
-        element_eval_line['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
-        element_eval_line['type_code'] = document.getElementById("type-code-" + String(i)).value;
-        element_eval_line['scale'] = document.getElementById("scale-" + String(i)).value;
-        element_eval_line['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        element_eval_line['in_source'] = document.getElementById("in-source-" + String(i)).value;
+        prequal_eval_line['timecode'] = document.getElementsByName("timecode-" + String(i))[0].value;
+        prequal_eval_line['field'] = document.getElementsByName("field-" + String(i))[0].value;
+        prequal_eval_line['prequal_line_description_code'] = document.getElementsByName("prequal-line-description-" + String(i))[0].value;
+        prequal_eval_line['type_code'] = document.getElementById("type-code-" + String(i)).value;
+        prequal_eval_line['scale'] = document.getElementById("scale-" + String(i)).value;
+        prequal_eval_line['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        prequal_eval_line['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
 
-        element_eval_data.push(element_eval_line);
+        prequal_eval_data.push(prequal_eval_line);
     }
 
-    return element_eval_data;
+    return prequal_eval_data;
 }
 
-function save_audio_eval_lines(prequal_evaluation_code) {
-    var audio_table = document.getElementById('audio_configuration_table');
-    var audio_config_rows = getTableRowsWithAttribute(audio_table, 'code');
+function save_prequal_eval_lines(prequal_evaluation_code) {
+    var prequal_eval_lines_table = document.getElementById('prequal_eval_lines_table');
+    var prequal_eval_rows = getTableRowsWithAttribute(prequal_eval_lines_table, 'code');
 
     var server = TacticServerStub.get();
 
-    for (var i = 0; i < audio_config_rows.length; i++) {
-        var audio_line = {};
+    for (var i = 0; i < prequal_eval_rows.length; i++) {
+        var prequal_eval_line = {};
 
-        audio_line['channel'] = document.getElementsByName("channel-" + String(i))[0].value;
-        audio_line['content'] = document.getElementsByName("content-" + String(i))[0].value;
-        audio_line['tone'] = document.getElementsByName("tone-" + String(i))[0].value;
-        audio_line['peak'] = document.getElementsByName("peak-" + String(i))[0].value;
+        prequal_eval_line['timecode'] = document.getElementsByName("timecode-" + String(i))[0].value;
+        prequal_eval_line['field'] = document.getElementsByName("field-" + String(i))[0].value;
+        prequal_eval_line['prequal_line_description_code'] = document.getElementsByName("prequal-line-description-" + String(i))[0].value;
+        prequal_eval_line['type_code'] = document.getElementById("type-code-" + String(i)).value;
+        prequal_eval_line['scale'] = document.getElementById("scale-" + String(i)).value;
+        prequal_eval_line['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        prequal_eval_line['in_source'] = document.getElementById("in-source-" + String(i)).value;
 
-        var search_key = server.build_search_key('twog/audio_evaluation_line',
-                                                 audio_config_rows[i].getAttribute('code'), 'twog');
+        var search_key = server.build_search_key('twog/prequal_evaluation_line',
+                                                 prequal_eval_rows[i].getAttribute('code'), 'twog');
 
-        server.update(search_key, audio_line);
-    }
-}
-
-function save_element_eval_lines(prequal_evaluation_code) {
-    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
-    var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
-
-    var server = TacticServerStub.get();
-
-    for (var i = 0; i < table_rows.length; i++) {
-        var line_data = {};
-
-        line_data['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
-        line_data['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
-        line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
-        line_data['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
-        line_data['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
-        line_data['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
-        line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
-        line_data['scale'] = document.getElementById("scale-" + String(i)).value;
-        line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
-
-        var search_key = server.build_search_key('twog/prequal_evaluation_line', table_rows[i].getAttribute('code'),
-                                                 'twog');
-
-        server.update(search_key, line_data);
+        server.update(search_key, prequal_eval_line);
     }
 }
 
 try {
     var code = '%s';
 
-    save_audio_eval_lines(code);
-    save_element_eval_lines(code);
+    save_prequal_eval_lines(code);
 
     var server = TacticServerStub.get();
     var search_key = server.build_search_key('twog/prequal_evaluation', code, 'twog');
@@ -161,39 +115,7 @@ try {
     var frame_rate_code = document.getElementById("frame_rate_code").value;
     var version = document.getElementsByName("version")[0].value;
     var po_number = document.getElementsByName("po_number")[0].value;
-    var file_name = document.getElementsByName("file_name")[0].value;
-
-    // Program Format values
-    var roll_up_blank = document.getElementsByName("roll_up_blank")[0].value;
-    var bars_tone = document.getElementsByName("bars_tone")[0].value;
-    var black_silence_1 = document.getElementsByName("black_silence_1")[0].value;
-    var slate_silence = document.getElementsByName("slate_silence")[0].value;
-    var black_silence_2 = document.getElementsByName("black_silence_2")[0].value;
-    var start_of_program = document.getElementsByName("start_of_program")[0].value;
-    var end_of_program = document.getElementsByName("end_of_program")[0].value;
-
-    // Video Measurements values
-    var active_video_begins = document.getElementsByName("active_video_begins")[0].value;
-    var active_video_ends = document.getElementsByName("active_video_ends")[0].value;
-    var horizontal_blanking = document.getElementsByName("horizontal_blanking")[0].value;
-    var luminance_peak = document.getElementsByName("luminance_peak")[0].value;
-    var chroma_peak = document.getElementsByName("chroma_peak")[0].value;
-    var head_logo = document.getElementsByName("head_logo")[0].value;
-    var tail_logo = document.getElementsByName("tail_logo")[0].value;
-
-    // Element Profile values
-    var total_runtime = document.getElementsByName("total_runtime")[0].value;
-    var language_code = document.getElementById("language_code").value;
-    var tv_feature_trailer = document.getElementsByName("tv_feature_trailer")[0].value;
-    var cc_subtitles = document.getElementsByName("cc_subtitles")[0].value;
     var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
-    var vitc = document.getElementsByName("vitc")[0].value;
-    var textless_tail = document.getElementsByName("textless_tail")[0].value;
-    var source_barcode = document.getElementsByName("source_barcode")[0].value;
-    var notices = document.getElementsByName("notices")[0].value;
-    var element_qc_barcode = document.getElementsByName("element_qc_barcode")[0].value;
-    var label = document.getElementById("label").value;
-    var record_date = document.getElementsByName("record_date")[0].value;
 
     // General comments
     var general_comments = document.getElementById("general_comments").value;
@@ -215,33 +137,7 @@ try {
         'frame_rate_code': frame_rate_code,
         'version': version,
         'po_number': po_number,
-        'file_name': file_name,
-        'roll_up_blank': roll_up_blank,
-        'bars_tone': bars_tone,
-        'black_silence_1': black_silence_1,
-        'slate_silence': slate_silence,
-        'black_silence_2': black_silence_2,
-        'start_of_program': start_of_program,
-        'end_of_program': end_of_program,
-        'active_video_begins': active_video_begins,
-        'active_video_ends': active_video_ends,
-        'horizontal_blanking': horizontal_blanking,
-        'luminance_peak': luminance_peak,
-        'chroma_peak': chroma_peak,
-        'head_logo': head_logo,
-        'tail_logo': tail_logo,
-        'total_runtime': total_runtime,
-        'language_code': language_code,
-        'tv_feature_trailer': tv_feature_trailer,
-        'cc_subtitles': cc_subtitles,
         'video_aspect_ratio': video_aspect_ratio,
-        'vitc': vitc,
-        'textless_tail': textless_tail,
-        'source_barcode': source_barcode,
-        'notices': notices,
-        'element_qc_barcode': element_qc_barcode,
-        'label': label,
-        'record_date': record_date,
         'general_comments': general_comments
     };
 
@@ -654,8 +550,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
         for status in statuses:
             status_sel.append_option(status, status)
 
-        if hasattr(self, 'status'):
-            status_sel.set_value(self.status)
+        if self.prequal_eval_sobject:
+            status_sel.set_value(self.prequal_eval_sobject.get_value('status'))
 
         return status_sel
 
@@ -688,11 +584,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
         date_calendar_wdg.set_option('id', 'date')
         date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
 
-        try:
-            date = self.date
-            date_calendar_wdg.set_value(date)
-        except AttributeError:
-            pass
+        if self.prequal_eval_sobject:
+            date_calendar_wdg.set_value(self.prequal_eval_sobject.get_value('date'))
 
         return date_calendar_wdg
 
@@ -705,10 +598,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
         for style in ('Technical', 'Spot QC', 'Mastering'):
             style_sel.append_option(style, style)
 
-        try:
-            style_sel.set_value(self.style_sel)
-        except AttributeError:
-            pass
+        if self.prequal_eval_sobject:
+            style_sel.set_value(self.prequal_eval_sobject.get_value('style'))
 
         return style_sel
 
@@ -721,10 +612,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
         for i in range(1, 13):
             bay_sel.append_option('Bay %s' % i, 'Bay %s' % i)
 
-        try:
-            bay_sel.set_value(self.bay)
-        except AttributeError:
-            pass
+        if self.prequal_eval_sobject:
+            bay_sel.set_value(self.prequal_eval_sobject.get_value('bay'))
 
         return bay_sel
 
@@ -740,10 +629,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
         for machine in machines:
             machine_sel.append_option(machine.get_value('name'), machine.get_code())
 
-        try:
-            machine_sel.set_value(self.machine)
-        except AttributeError:
-            pass
+        if self.prequal_eval_sobject:
+            machine_sel.set_value(self.prequal_eval_sobject.get_value('machine_code'))
 
         return machine_sel
 
@@ -794,10 +681,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
                             'HDCAM SR', 'NTSC', 'PAL'):
             format_sel.append_option(file_format, file_format)
 
-        try:
-            format_sel.set_value(self.format_data)
-        except AttributeError:
-            pass
+        if self.prequal_eval_sobject:
+            format_sel.set_value(self.prequal_eval_sobject.get_value('format'))
 
         return format_sel
 
@@ -833,10 +718,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
         for standard in ('625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC'):
             standard_select.append_option(standard, standard)
 
-        try:
-            standard_select.set_value(self.standard)
-        except AttributeError:
-            pass
+        if self.prequal_eval_sobject:
+            standard_select.set_value(self.prequal_eval_sobject.get_value('standard'))
 
         section_span.add(standard_select)
 
@@ -877,10 +760,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
         for frame_rate in frame_rates:
             frame_rate_select.append_option(frame_rate, frame_rate)
 
-        try:
-            frame_rate_select.set_value(self.frame_rate)
-        except AttributeError:
-            pass
+        if self.prequal_eval_sobject:
+            frame_rate_select.set_value(self.prequal_eval_sobject.get_value('frame_rate_code'))
 
         section_span.add(frame_rate_select)
 
@@ -937,8 +818,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
                                    '4x3 2.35 Letterbox', '4x3 2.40 Letterbox'):
             video_aspect_ratio_sel.append_option(video_aspect_ratio, video_aspect_ratio)
 
-        if hasattr(self, 'video_aspect_ratio'):
-            video_aspect_ratio_sel.set_value(self.video_aspect_ratio)
+        if self.prequal_eval_sobject:
+            video_aspect_ratio_sel.set_value(self.prequal_eval_sobject.get_value('video_aspect_ratio'))
 
         return video_aspect_ratio_sel
 
@@ -949,8 +830,8 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
         general_comments_wdg.set_id('general_comments')
         general_comments_wdg.set_input_prefix('test')
 
-        if hasattr(self, 'general_comments'):
-            general_comments_wdg.set_value(self.general_comments)
+        if self.prequal_eval_sobject:
+            general_comments_wdg.set_value(self.prequal_eval_sobject.get_value('general_comments'))
 
         general_comments_text_div = DivWdg('General Comments')
         general_comments_text_div.add_style('font-weight', 'bold')
