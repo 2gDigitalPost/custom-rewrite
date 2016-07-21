@@ -996,6 +996,8 @@ window.open(file_path);
         language_search = Search('twog/language')
         languages = language_search.get_sobjects()
 
+        languages = sorted(languages, key=lambda x: x.get_value('name'))
+
         for language in languages:
             language_select.append_option(language.get_value('name'), language.get_code())
 
