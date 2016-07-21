@@ -1,5 +1,5 @@
 import os
-from reportlab.platypus.flowables import HRFlowable
+from ConfigParser import SafeConfigParser
 
 from pyasm.command import Command
 from pyasm.search import Search
@@ -9,6 +9,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
+from reportlab.platypus.flowables import HRFlowable
 
 
 def get_top_table(element_eval_sobject):
@@ -271,8 +272,12 @@ class ExportElementEvalCommand(Command):
 
     @staticmethod
     def export_pdf(element_eval_sobject):
+        parser = SafeConfigParser()
+        config_path = os.path.abspath(os.path.dirname(__file__))
+        parser.read(config_path + '/config.ini')
+
         file_name = element_eval_sobject.get('name') + '.pdf'
-        save_location = '/home/apache/assets/element_evaluations/'
+        save_location = parser.get('save', 'directory')
 
         saved_file_path = os.path.join(save_location, file_name)
 

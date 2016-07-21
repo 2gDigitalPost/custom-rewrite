@@ -1,7 +1,8 @@
 from audio_configuration_lines_wdg import AudioLinesTableWdg
-from metadata_report_wdg import MetaDataReportWdg
-from element_eval_wdg import ElementEvalWdg
 from element_eval_lines_wdg import ElementEvalLinesWdg
-from export_element_eval_command import ExportElementEvalCommand
-from prequal_eval_wdg import PrequalEvalWdg
+from element_eval_wdg import ElementEvalWdg
+from metadata_report_wdg import MetaDataReportWdg
 from prequal_eval_lines_wdg import PrequalEvalLinesWdg
+from prequal_eval_wdg import PrequalEvalWdg
+from qc_reports.pdf_export.export_element_eval_command import ExportElementEvalCommand
+
