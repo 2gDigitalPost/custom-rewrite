@@ -169,8 +169,10 @@ def get_video_measurements_table(element_eval_sobject):
         [Paragraph('<strong>Luminance Peak</strong>', styleSheet['BodyText']),
          element_eval_sobject.get('luminance_peak')],
         [Paragraph('<strong>Chroma Peak</strong>', styleSheet['BodyText']), element_eval_sobject.get('chroma_peak')],
-        [Paragraph('<strong>Head Logo</strong>', styleSheet['BodyText']), element_eval_sobject.get('head_logo')],
-        [Paragraph('<strong>Tail Logo</strong>', styleSheet['BodyText']), element_eval_sobject.get('tail_logo')]
+        [Paragraph('<strong>Head Logo</strong>', styleSheet['BodyText']),
+         Paragraph(element_eval_sobject.get('head_logo'), styleSheet['BodyText'])],
+        [Paragraph('<strong>Tail Logo</strong>', styleSheet['BodyText']),
+         Paragraph(element_eval_sobject.get('tail_logo'), styleSheet['BodyText'])]
     ]
 
     video_measurements_table = Table(video_measurements_table_data, hAlign='LEFT', colWidths=[(1.4 * inch),
