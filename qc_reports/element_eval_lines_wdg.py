@@ -61,6 +61,10 @@ try {
 
     var server = TacticServerStub.get();
 
+    // Get a dictionary of all the line items, indexed by search key. This is to send all the lines to the database
+    // at once and avoid multiple insert queries (ends up being really slow).
+    var lines = {};
+
     for (var i = 0; i < table_rows.length; i++) {
         var line_data = {};
 
@@ -78,8 +82,12 @@ try {
         var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
                                                  'twog');
 
-        server.update(search_key, line_data);
+        lines[search_key] = line_data;
+
     }
+
+    // Update all the lines at once
+    server.update_multiple(lines);
 
     // Insert a blank line
     server.insert('twog/element_evaluation_line', {'element_evaluation_code': element_evaluation_code});

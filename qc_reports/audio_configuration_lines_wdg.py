@@ -39,6 +39,8 @@ try {
 
     var server = TacticServerStub.get();
 
+    var lines = {};
+
     for (var i = 0; i < audio_config_rows.length; i++) {
         var audio_line = {};
 
@@ -50,8 +52,10 @@ try {
         var search_key = server.build_search_key('twog/audio_evaluation_line',
                                                  audio_config_rows[i].getAttribute('code'), 'twog');
 
-        server.update(search_key, audio_line);
+        lines[search_key] = audio_line;
     }
+
+    server.update_multiple(lines);
 
     // Insert a blank line
     server.insert('twog/audio_evaluation_line', {'element_evaluation_code': element_evaluation_code});

@@ -135,6 +135,8 @@ function save_audio_eval_lines(element_evaluation_code) {
 
     var server = TacticServerStub.get();
 
+    var lines = {};
+
     for (var i = 0; i < audio_config_rows.length; i++) {
         var audio_line = {};
 
@@ -146,8 +148,10 @@ function save_audio_eval_lines(element_evaluation_code) {
         var search_key = server.build_search_key('twog/audio_evaluation_line',
                                                  audio_config_rows[i].getAttribute('code'), 'twog');
 
-        server.update(search_key, audio_line);
+        lines[search_key] = audio_line;
     }
+
+    server.update_multiple(lines);
 }
 
 function save_element_eval_lines(element_evaluation_code) {
@@ -155,6 +159,8 @@ function save_element_eval_lines(element_evaluation_code) {
     var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
 
     var server = TacticServerStub.get();
+
+    lines = {};
 
     for (var i = 0; i < table_rows.length; i++) {
         var line_data = {};
@@ -173,8 +179,10 @@ function save_element_eval_lines(element_evaluation_code) {
         var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
                                                  'twog');
 
-        server.update(search_key, line_data);
+        lines[search_key] = line_data;
     }
+
+    server.update_multiple(lines);
 }
 
 try {
