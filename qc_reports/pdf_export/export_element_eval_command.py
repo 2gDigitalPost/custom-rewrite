@@ -100,6 +100,14 @@ def get_element_eval_lines_table(element_eval_sobject):
         field_in = line.get('field_in')
         description = line.get('description')
         in_safe = line.get('in_safe')
+
+        if in_safe == 'True':
+            in_safe = 'Yes'
+        elif in_safe == 'False':
+            in_safe = 'No'
+        else:
+            in_safe = ''
+
         timecode_out = line.get('timecode_out')
         field_out = line.get('field_out')
         type_code = line.get('type_code')
