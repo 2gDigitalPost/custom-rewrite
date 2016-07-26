@@ -107,6 +107,90 @@ catch(err) {
 
         return behavior
 
+    def get_add_multiple_rows_behavior(self):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+function getTableRowsWithAttribute(table, attribute)
+{
+  var matchingElements = [];
+  var allElements = table.getElementsByTagName('tr');
+  for (var i = 0, n = allElements.length; i < n; i++)
+  {
+    if (allElements[i].getAttribute(attribute) !== null)
+    {
+      // Element exists with attribute. Add to array.
+      matchingElements.push(allElements[i]);
+    }
+  }
+  return matchingElements;
+}
+
+try {
+    var element_evaluation_code = '%s';
+
+    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
+    var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
+
+    var server = TacticServerStub.get();
+
+    // var number_of_lines = 5;
+    var number_of_lines = Number(prompt('Enter the amount of lines you want to add.'));
+
+    if (isNaN(number_of_lines)) {
+        alert("Your entry was invalid, please enter only a number");
+        return;
+    }
+
+    // Get a dictionary of all the line items, indexed by search key. This is to send all the lines to the database
+    // at once and avoid multiple insert queries (ends up being really slow).
+    var lines = {};
+
+    for (var i = 0; i < table_rows.length; i++) {
+        var line_data = {};
+
+        line_data['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
+        line_data['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
+        line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
+        line_data['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
+        line_data['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
+        line_data['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
+        line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
+        line_data['scale'] = document.getElementById("scale-" + String(i)).value;
+        line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
+
+        var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
+                                                 'twog');
+
+        lines[search_key] = line_data;
+    }
+
+    // Update all the lines at once
+    server.update_multiple(lines);
+
+    // Insert multiple blank lines. Unfortunately, as far as I know, insert_multiple does not work, and each line
+    // must be inserted individually
+    for (var x = 0; x < number_of_lines; x++) {
+        server.insert('twog/element_evaluation_line', {'element_evaluation_code': element_evaluation_code})
+    }
+
+    // Refresh the widget
+    var element_eval_lines_div = document.getElementById('element_eval_lines_div');
+
+    spt.api.load_panel(element_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
+                       {'element_evaluation_code': element_evaluation_code});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
+        ''' % self.element_evaluation_code
+        }
+
+        return behavior
+
     def get_remove_row_behavior(self, row_code):
         behavior = {
             'css_class': 'clickme',
@@ -212,6 +296,19 @@ catch(err) {
 
         return span_wdg
 
+    def get_add_multiple_rows_button(self):
+        span_wdg = SpanWdg()
+
+        # TODO: Find a better icon for this
+        add_row_button = ButtonNewWdg(title='Add Multiple Row', icon='PLUS_ADD')
+        add_row_button.add_class('add_row_button')
+        add_row_button.add_style('display', 'inline-block')
+        add_row_button.add_behavior(self.get_add_multiple_rows_behavior())
+
+        span_wdg.add(add_row_button)
+
+        return span_wdg
+
     def get_remove_row_button(self, row_code):
         span_wdg = SpanWdg()
 
@@ -286,6 +383,7 @@ catch(err) {
             table.add_cell("No Element Evaluation lines exist yet. Add one?")
 
         table.add_cell(self.get_add_row_button())
+        table.add_cell(self.get_add_multiple_rows_button())
 
         main_div = DivWdg()
         main_div.set_id('element_eval_lines_div')
