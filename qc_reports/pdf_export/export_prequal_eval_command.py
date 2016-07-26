@@ -152,7 +152,7 @@ def get_element_eval_lines_table(element_eval_sobject):
     return element_eval_lines_table
 
 
-class ExportElementEvalCommand(Command):
+class ExportPreqaulEvalCommand(Command):
     def execute(self):
         report_search_key = self.kwargs.get('report_search_key')
 
