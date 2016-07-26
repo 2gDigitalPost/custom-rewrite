@@ -337,7 +337,7 @@ catch(err) {
                     self.get_text_input_wdg('field-{0}'.format(iterator), 30, line.get_value('field'))
                 )
                 table.add_cell(
-                    self.get_description_select_wdg('prequal-line-description-{0}'.format(iterator))
+                    self.get_description_select_wdg('prequal-line-description-{0}'.format(iterator), line.get_value('prequal_line_description_code'))
                 )
                 table.add_cell(
                     self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options,

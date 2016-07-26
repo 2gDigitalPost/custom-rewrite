@@ -37,57 +37,38 @@ function getTableRowsWithAttribute(table, attribute)
     return matchingElements;
 }
 
-function get_prequal_eval_lines() {
-    var prequal_eval_lines_table = document.getElementById('prequal_eval_lines_table');
-    var prequal_eval_rows = getTableRowsWithAttribute(prequal_eval_lines_table, 'code');
-
-    var prequal_eval_data = [];
-
-    for (var i = 0; i < prequal_eval_rows.length; i++) {
-        var prequal_eval_line = {};
-
-        prequal_eval_line['timecode'] = document.getElementsByName("timecode-" + String(i))[0].value;
-        prequal_eval_line['field'] = document.getElementsByName("field-" + String(i))[0].value;
-        prequal_eval_line['prequal_line_description_code'] = document.getElementsByName("prequal-line-description-" + String(i))[0].value;
-        prequal_eval_line['type_code'] = document.getElementById("type-code-" + String(i)).value;
-        prequal_eval_line['scale'] = document.getElementById("scale-" + String(i)).value;
-        prequal_eval_line['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        prequal_eval_line['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
-
-        prequal_eval_data.push(prequal_eval_line);
-    }
-
-    return prequal_eval_data;
-}
-
-function save_prequal_eval_lines(prequal_evaluation_code) {
+function save_prequal_eval_lines() {
     var prequal_eval_lines_table = document.getElementById('prequal_eval_lines_table');
     var prequal_eval_rows = getTableRowsWithAttribute(prequal_eval_lines_table, 'code');
 
     var server = TacticServerStub.get();
 
+    var lines = {};
+
     for (var i = 0; i < prequal_eval_rows.length; i++) {
-        var prequal_eval_line = {};
+        var line_data = {};
 
-        prequal_eval_line['timecode'] = document.getElementsByName("timecode-" + String(i))[0].value;
-        prequal_eval_line['field'] = document.getElementsByName("field-" + String(i))[0].value;
-        prequal_eval_line['prequal_line_description_code'] = document.getElementsByName("prequal-line-description-" + String(i))[0].value;
-        prequal_eval_line['type_code'] = document.getElementById("type-code-" + String(i)).value;
-        prequal_eval_line['scale'] = document.getElementById("scale-" + String(i)).value;
-        prequal_eval_line['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        prequal_eval_line['in_source'] = document.getElementById("in-source-" + String(i)).value;
+        line_data['timecode'] = document.getElementsByName("timecode-" + String(i))[0].value;
+        line_data['field'] = document.getElementsByName("field-" + String(i))[0].value;
+        line_data['prequal_line_description_code'] = document.getElementsByName("prequal-line-description-" + String(i))[0].value;
+        line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
+        line_data['scale'] = document.getElementById("scale-" + String(i)).value;
+        line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
 
-        var search_key = server.build_search_key('twog/prequal_evaluation_line',
-                                                 prequal_eval_rows[i].getAttribute('code'), 'twog');
+        var line_search_key = server.build_search_key('twog/prequal_evaluation_line',
+                                                      prequal_eval_rows[i].getAttribute('code'), 'twog');
 
-        server.update(search_key, prequal_eval_line);
+        lines[line_search_key] = line_data;
     }
+
+    server.update_multiple(lines);
 }
 
 try {
     var code = '%s';
 
-    save_prequal_eval_lines(code);
+    save_prequal_eval_lines();
 
     var server = TacticServerStub.get();
     var search_key = server.build_search_key('twog/prequal_evaluation', code, 'twog');
@@ -671,10 +652,9 @@ server.execute_cmd('qc_reports.ExportPrequalEvalCommand', {'report_search_key': 
 
         frame_rate_search = Search('twog/frame_rate')
         frame_rates = frame_rate_search.get_sobjects()
-        frame_rates = [frame_rate.get_value('name') for frame_rate in frame_rates]
 
         for frame_rate in frame_rates:
-            frame_rate_select.append_option(frame_rate, frame_rate)
+            frame_rate_select.append_option(frame_rate.get_value('name'), frame_rate.get_code())
 
         if self.prequal_eval_sobject:
             frame_rate_select.set_value(self.prequal_eval_sobject.get_value('frame_rate_code'))
