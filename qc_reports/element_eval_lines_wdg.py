@@ -83,7 +83,6 @@ try {
                                                  'twog');
 
         lines[search_key] = line_data;
-
     }
 
     // Update all the lines at once
@@ -135,7 +134,6 @@ try {
 
     var server = TacticServerStub.get();
 
-    // var number_of_lines = 5;
     var number_of_lines = Number(prompt('Enter the amount of lines you want to add.'));
 
     if (isNaN(number_of_lines)) {

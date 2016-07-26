@@ -62,6 +62,8 @@ try {
 
     var server = TacticServerStub.get();
 
+    var lines = {};
+
     for (var i = 0; i < table_rows.length; i++) {
         var line_data = {};
 
@@ -76,8 +78,10 @@ try {
         var search_key = server.build_search_key('twog/prequal_evaluation_line', table_rows[i].getAttribute('code'),
                                                  'twog');
 
-        server.update(search_key, line_data);
+        lines[search_key] = line_data;
     }
+
+    server.update_multiple(lines);
 
     // Insert a blank line
     server.insert('twog/prequal_evaluation_line', {'prequal_evaluation_code': prequal_eval_code});
@@ -85,7 +89,7 @@ try {
     // Refresh the widget
     var prequal_eval_lines_div = document.getElementById('prequal_eval_lines_div');
 
-    spt.api.load_panel(prequal_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
+    spt.api.load_panel(prequal_eval_lines_div, 'qc_reports.PrequalEvalLinesWdg',
                        {'prequal_eval_code': prequal_eval_code});
 }
 catch(err) {
@@ -93,6 +97,85 @@ catch(err) {
     spt.alert(spt.exception.handler(err));
 }
     ''' % self.prequal_eval_code
+        }
+
+        return behavior
+
+    def get_add_multiple_rows_behavior(self):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+function getTableRowsWithAttribute(table, attribute)
+{
+    var matchingElements = [];
+    var allElements = table.getElementsByTagName('tr');
+
+    for (var i = 0, n = allElements.length; i < n; i++)
+    {
+        if (allElements[i].getAttribute(attribute) !== null)
+        {
+            // Element exists with attribute. Add to array.
+            matchingElements.push(allElements[i]);
+        }
+    }
+
+    return matchingElements;
+}
+
+try {
+    var prequal_eval_code = '%s';
+
+    var prequal_eval_lines_table = document.getElementById('prequal_eval_lines_table');
+    var table_rows = getTableRowsWithAttribute(prequal_eval_lines_table, 'code');
+
+    var server = TacticServerStub.get();
+
+    var number_of_lines = Number(prompt('Enter the amount of lines you want to add.'));
+
+    if (isNaN(number_of_lines)) {
+        alert("Your entry was invalid, please enter only a number");
+        return;
+    }
+
+    var lines = {};
+
+    for (var i = 0; i < table_rows.length; i++) {
+        var line_data = {};
+
+        line_data['timecode'] = document.getElementsByName("timecode-" + String(i))[0].value;
+        line_data['field'] = document.getElementsByName("field-" + String(i))[0].value;
+        line_data['prequal_line_description_code'] = document.getElementsByName("prequal-line-description-" + String(i))[0].value;
+        line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
+        line_data['scale'] = document.getElementById("scale-" + String(i)).value;
+        line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
+
+        var search_key = server.build_search_key('twog/prequal_evaluation_line', table_rows[i].getAttribute('code'),
+                                                 'twog');
+
+        lines[search_key] = line_data;
+    }
+
+    server.update_multiple(lines);
+
+    // Insert multiple blank lines. Unfortunately, as far as I know, insert_multiple does not work, and each line
+    // must be inserted individually
+    for (var x = 0; x < number_of_lines; x++) {
+        server.insert('twog/prequal_evaluation_line', {'prequal_evaluation_code': prequal_eval_code});
+    }
+
+    // Refresh the widget
+    var prequal_eval_lines_div = document.getElementById('prequal_eval_lines_div');
+
+    spt.api.load_panel(prequal_eval_lines_div, 'qc_reports.PrequalEvalLinesWdg',
+                       {'prequal_eval_code': prequal_eval_code});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
+            ''' % self.prequal_eval_code
         }
 
         return behavior
@@ -210,13 +293,25 @@ catch(err) {
     def get_remove_row_button(self, row_code):
         span_wdg = SpanWdg()
 
-        remove_row_button = ButtonNewWdg(title='Remove Row', icon='REMOVE')
+        remove_row_button = ButtonNewWdg(title='Remove Row', icon='DELETE')
 
         remove_row_button.add_class('subtract_row_button')
         remove_row_button.add_style('display', 'inline-block')
         remove_row_button.add_behavior(self.get_remove_row_behavior(row_code))
 
         span_wdg.add(remove_row_button)
+
+        return span_wdg
+
+    def get_add_multiple_rows_button(self):
+        span_wdg = SpanWdg()
+
+        add_rows_button = ButtonNewWdg(title='Add Multiple Row', icon='PLUS_ADD')
+        add_rows_button.add_class('add_rows_button')
+        add_rows_button.add_style('display', 'inline-block')
+        add_rows_button.add_behavior(self.get_add_multiple_rows_behavior())
+
+        span_wdg.add(add_rows_button)
 
         return span_wdg
 
@@ -266,6 +361,7 @@ catch(err) {
             table.add_cell("No PreQual Evaluation lines exist yet. Add one?")
 
         table.add_cell(self.get_add_row_button())
+        table.add_cell(self.get_add_multiple_rows_button())
 
         main_div = DivWdg()
         main_div.set_id('prequal_eval_lines_div')
