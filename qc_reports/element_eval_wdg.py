@@ -640,34 +640,32 @@ try {
     var element_eval_lines_table = document.getElementById('element_eval_lines_table');
     var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
 
+    // Get a dictionary of all the line items, indexed by search key. This is to send all the lines to the database
+    // at once and avoid multiple insert queries (ends up being really slow).
+    var lines = {};
+
     for (var i = 0; i < table_rows.length; i++) {
         var line_data = {};
 
-        var timecode_in = document.getElementsByName("timecode-in-" + String(i))[0].value;
-        var field_in = document.getElementsByName("field-in-" + String(i))[0].value;
-        var description = document.getElementsByName("description-" + String(i))[0].value;
-        var in_safe = document.getElementById("in-safe-" + String(i)).value;
-        var timecode_out = document.getElementsByName("timecode-out-" + String(i))[0].value;
-        var field_out = document.getElementsByName("field-out-" + String(i))[0].value;
-        var type_code = document.getElementById("type-code-" + String(i)).value;
-        var scale = document.getElementById("scale-" + String(i)).value;
-        var sector_or_channel = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        var in_source = document.getElementById("in-source-" + String(i))[0].value;
+        line_data['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
+        line_data['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
+        line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
+        line_data['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
+        line_data['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
+        line_data['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
+        line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
+        line_data['scale'] = document.getElementById("scale-" + String(i)).value;
+        line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+        line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
 
-        // Insert the line
-        // TODO: Insert all lines at once rather than one at a time
-        server.insert('twog/element_evaluation_line', {'element_evaluation_code': code,
-                                                       'timecode_in': timecode_in,
-                                                       'field_in': field_in,
-                                                       'description': description,
-                                                       'in_safe': in_safe,
-                                                       'timecode_out': timecode_out,
-                                                       'field_out': field_out,
-                                                       'type_code': type_code,
-                                                       'scale': scale,
-                                                       'sector_or_channel': sector_or_channel,
-                                                       'in_source': in_source});
+        var line_search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
+                                                 'twog');
+
+        lines[line_search_key] = line_data;
     }
+
+    // Update all the lines at once
+    server.update_multiple(lines);
 
     // Finally, get the search key for the new report, and use it to reload the page
     var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
