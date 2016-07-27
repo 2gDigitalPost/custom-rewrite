@@ -466,66 +466,70 @@ function getTableRowsWithAttribute(table, attribute)
     return matchingElements;
 }
 
-try {
+function get_report_values() {
+    // Return an object containing the element evaluation's values
+    var top = bvr.src_el.getParent("#element_eval_panel");
+    var report_values = spt.api.get_input_values(top, null, false);
+
     // Name of the report
-    var name = document.getElementsByName("name_data")[0].value;
+    var name = report_values.name_data;
 
     // Client row values
-    var client_code = document.getElementById("client_code").value;
-    var status = document.getElementById("status").value;
+    var client_code = report_values.client_select;
+    var status = report_values.status_select;
 
     // Operator row values
-    var date = document.getElementsByName("date")[0].value;
-    var operator = document.getElementsByName("operator")[0].value;
-    var style = document.getElementById("style").value;
-    var bay = document.getElementById("bay").value;
-    var machine_code = document.getElementById("machine_code").value;
+    var date = report_values.date;
+    var operator = report_values.operator;
+    var style = report_values.style_select;
+    var bay = report_values.bay_select;
+    var machine_code = report_values.machine_select;
 
     // Title section values
-    var title_data = document.getElementsByName("title_data")[0].value;
-    var format = document.getElementById("format").value;
-    var season = document.getElementsByName("season")[0].value;
-    var standard = document.getElementById("standard").value;
-    var episode = document.getElementsByName("episode")[0].value;
-    var frame_rate_code = document.getElementById("frame_rate_code").value;
-    var version = document.getElementsByName("version")[0].value;
-    var po_number = document.getElementsByName("po_number")[0].value;
-    var file_name = document.getElementsByName("file_name")[0].value;
+    var title_data = report_values.title_data;
+    var format = report_values.format_select;
+    var season = report_values.season;
+    var standard = report_values.standard_select;
+    var episode = report_values.episode;
+    var frame_rate_code = report_values.frame_rate_select;
+    var version = report_values.version;
+    var po_number = report_values.po_number;
+    var file_name = report_values.file_name;
 
     // Program Format values
-    var roll_up_blank = document.getElementsByName("roll_up_blank")[0].value;
-    var bars_tone = document.getElementsByName("bars_tone")[0].value;
-    var black_silence_1 = document.getElementsByName("black_silence_1")[0].value;
-    var slate_silence = document.getElementsByName("slate_silence")[0].value;
-    var black_silence_2 = document.getElementsByName("black_silence_2")[0].value;
-    var start_of_program = document.getElementsByName("start_of_program")[0].value;
-    var end_of_program = document.getElementsByName("end_of_program")[0].value;
+    var roll_up_blank = report_values.roll_up_blank;
+    var bars_tone = report_values.bars_tone;
+    var black_silence_1 = report_values.black_silence_1;
+    var slate_silence = report_values.slate_silence;
+    var black_silence_2 = report_values.black_silence_2;
+    var start_of_program = report_values.start_of_program;
+    var end_of_program = report_values.end_of_program;
 
     // Video Measurements values
-    var active_video_begins = document.getElementsByName("active_video_begins")[0].value;
-    var active_video_ends = document.getElementsByName("active_video_ends")[0].value;
-    var horizontal_blanking = document.getElementsByName("horizontal_blanking")[0].value;
-    var luminance_peak = document.getElementsByName("luminance_peak")[0].value;
-    var chroma_peak = document.getElementsByName("chroma_peak")[0].value;
-    var head_logo = document.getElementsByName("head_logo")[0].value;
-    var tail_logo = document.getElementsByName("tail_logo")[0].value;
+    var active_video_begins = report_values.active_video_begins;
+    var active_video_ends = report_values.active_video_ends;
+    var horizontal_blanking = report_values.horizontal_blanking;
+    var luminance_peak = report_values.luminance_peak;
+    var chroma_peak = report_values.chroma_peak;
+    var head_logo = report_values.head_logo;
+    var tail_logo = report_values.tail_logo;
 
     // Element Profile values
-    var total_runtime = document.getElementsByName("total_runtime")[0].value;
-    var language_code = document.getElementById("language_code").value;
-    var tv_feature_trailer = document.getElementsByName("tv_feature_trailer")[0].value;
-    var cc_subtitles = document.getElementsByName("cc_subtitles")[0].value;
-    var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
-    var vitc = document.getElementsByName("vitc")[0].value;
-    var textless_tail = document.getElementsByName("textless_tail")[0].value;
-    var source_barcode = document.getElementsByName("source_barcode")[0].value;
-    var notices = document.getElementsByName("notices")[0].value;
-    var element_qc_barcode = document.getElementsByName("element_qc_barcode")[0].value;
-    var label = document.getElementById("label").value;
-    var record_date = document.getElementsByName("record_date")[0].value;
+    var total_runtime = report_values.total_runtime;
+    var language_code = report_values.language_select;
+    var tv_feature_trailer = report_values.tv_feature_trailer;
+    var cc_subtitles = report_values.cc_subtitles;
+    var video_aspect_ratio = report_values.video_aspect_ratio_select;
+    var vitc = report_values.vitc;
+    var textless_tail = report_values.textless_tail;
+    var source_barcode = report_values.source_barcode;
+    var notices = report_values.notices;
+    var element_qc_barcode = report_values.element_qc_barcode;
+    var label = report_values.label;
+    var record_date = report_values.record_date;
 
     // General comments
-    var general_comments = document.getElementById("general_comments").value;
+    var general_comments = report_values.general_comments;
 
     var qc_report_object = {
         'name': name,
@@ -574,11 +578,17 @@ try {
         'general_comments': general_comments
     };
 
+    return qc_report_object;
+}
+
+try {
     var element_eval_panel = document.getElementById('element_eval_panel');
 
     var server = TacticServerStub.get();
 
     spt.app_busy.show("Saving a new Report...");
+
+    var qc_report_object = get_report_values();
 
     // Save the new Element Evaluation, and get the code that it saved as
     var inserted_element_evaluation = server.insert('twog/element_evaluation', qc_report_object);
@@ -606,10 +616,6 @@ try {
     var element_eval_lines_table = document.getElementById('element_eval_lines_table');
     var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
 
-    // Get a dictionary of all the line items, indexed by search key. This is to send all the lines to the database
-    // at once and avoid multiple insert queries (ends up being really slow).
-    var lines = {};
-
     for (var i = 0; i < table_rows.length; i++) {
         var line_data = {};
 
@@ -623,15 +629,10 @@ try {
         line_data['scale'] = document.getElementById("scale-" + String(i)).value;
         line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
         line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
+        line_data['element_evaluation_code'] = code;
 
-        var line_search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
-                                                 'twog');
-
-        lines[line_search_key] = line_data;
+        server.insert('twog/element_evaluation_line', line_data);
     }
-
-    // Update all the lines at once
-    server.update_multiple(lines);
 
     // Finally, get the search key for the new report, and use it to reload the page
     var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
@@ -1170,7 +1171,7 @@ window.open(file_path);
         return record_date_calendar_wdg
 
     def get_general_comments_section(self):
-        general_comments_div = DivWdg('general_comments')
+        general_comments_div = DivWdg()
         general_comments_div.add_style('margin', '10px')
         general_comments_wdg = TextAreaWdg()
         general_comments_wdg.set_id('general_comments')
