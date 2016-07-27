@@ -70,63 +70,19 @@ class ElementEvalWdg(BaseTableElementWdg):
             'cbjs_action': '''
 function getTableRowsWithAttribute(table, attribute)
 {
-  var matchingElements = [];
-  var allElements = table.getElementsByTagName('tr');
-  for (var i = 0, n = allElements.length; i < n; i++)
-  {
-    if (allElements[i].getAttribute(attribute) !== null)
+    var matchingElements = [];
+    var allElements = table.getElementsByTagName('tr');
+
+    for (var i = 0, n = allElements.length; i < n; i++)
     {
-      // Element exists with attribute. Add to array.
-      matchingElements.push(allElements[i]);
-    }
-  }
-  return matchingElements;
-}
-
-function get_audio_table_data() {
-    var audio_table = document.getElementById('audio_configuration_table');
-    var audio_config_rows = getTableRowsWithAttribute(audio_table, 'code');
-
-    var audio_data = [];
-
-    for (var i = 0; i < audio_config_rows.length; i++) {
-        var audio_line = {};
-
-        audio_line['channel'] = document.getElementsByName("channel-" + String(i))[0].value;
-        audio_line['content'] = document.getElementsByName("content-" + String(i))[0].value;
-        audio_line['tone'] = document.getElementsByName("tone-" + String(i))[0].value;
-        audio_line['peak'] = document.getElementsByName("peak-" + String(i))[0].value;
-
-        audio_data.push(audio_line);
+        if (allElements[i].getAttribute(attribute) !== null)
+        {
+            // Element exists with attribute. Add to array.
+            matchingElements.push(allElements[i]);
+        }
     }
 
-    return audio_data;
-}
-
-function get_element_eval_lines() {
-    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
-    var element_eval_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
-
-    var element_eval_data = [];
-
-    for (var i = 0; i < element_eval_rows.length; i++) {
-        var element_eval_line = {};
-
-        element_eval_line['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
-        element_eval_line['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
-        element_eval_line['description'] = document.getElementsByName("description-" + String(i))[0].value;
-        element_eval_line['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
-        element_eval_line['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
-        element_eval_line['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
-        element_eval_line['type_code'] = document.getElementById("type-code-" + String(i)).value;
-        element_eval_line['scale'] = document.getElementById("scale-" + String(i)).value;
-        element_eval_line['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        element_eval_line['in_source'] = document.getElementById("in-source-" + String(i)).value;
-
-        element_eval_data.push(element_eval_line);
-    }
-
-    return element_eval_data;
+    return matchingElements;
 }
 
 function save_audio_eval_lines(element_evaluation_code) {
@@ -185,74 +141,70 @@ function save_element_eval_lines(element_evaluation_code) {
     server.update_multiple(lines);
 }
 
-try {
-    var code = '%s';
-
-    save_audio_eval_lines(code);
-    save_element_eval_lines(code);
-
-    var server = TacticServerStub.get();
-    var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+function get_report_values() {
+    // Return an object containing the element evaluation's values
+    var top = bvr.src_el.getParent("#element_eval_panel");
+    var report_values = spt.api.get_input_values(top, null, false);
 
     // Name of the report
-    var name = document.getElementsByName("name_data")[0].value;
+    var name = report_values.name_data;
 
     // Client row values
-    var client_code = document.getElementById("client_code").value;
-    var status = document.getElementById("status").value;
+    var client_code = report_values.client_select;
+    var status = report_values.status_select;
 
     // Operator row values
-    var date = document.getElementsByName("date")[0].value;
-    var operator = document.getElementsByName("operator")[0].value;
-    var style = document.getElementById("style").value;
-    var bay = document.getElementById("bay").value;
-    var machine_code = document.getElementById("machine_code").value;
+    var date = report_values.date;
+    var operator = report_values.operator;
+    var style = report_values.style_select;
+    var bay = report_values.bay_select;
+    var machine_code = report_values.machine_select;
 
     // Title section values
-    var title_data = document.getElementsByName("title_data")[0].value;
-    var format = document.getElementById("format").value;
-    var season = document.getElementsByName("season")[0].value;
-    var standard = document.getElementById("standard").value;
-    var episode = document.getElementsByName("episode")[0].value;
-    var frame_rate_code = document.getElementById("frame_rate_code").value;
-    var version = document.getElementsByName("version")[0].value;
-    var po_number = document.getElementsByName("po_number")[0].value;
-    var file_name = document.getElementsByName("file_name")[0].value;
+    var title_data = report_values.title_data;
+    var format = report_values.format_select;
+    var season = report_values.season;
+    var standard = report_values.standard_select;
+    var episode = report_values.episode;
+    var frame_rate_code = report_values.frame_rate_select;
+    var version = report_values.version;
+    var po_number = report_values.po_number;
+    var file_name = report_values.file_name;
 
     // Program Format values
-    var roll_up_blank = document.getElementsByName("roll_up_blank")[0].value;
-    var bars_tone = document.getElementsByName("bars_tone")[0].value;
-    var black_silence_1 = document.getElementsByName("black_silence_1")[0].value;
-    var slate_silence = document.getElementsByName("slate_silence")[0].value;
-    var black_silence_2 = document.getElementsByName("black_silence_2")[0].value;
-    var start_of_program = document.getElementsByName("start_of_program")[0].value;
-    var end_of_program = document.getElementsByName("end_of_program")[0].value;
+    var roll_up_blank = report_values.roll_up_blank;
+    var bars_tone = report_values.bars_tone;
+    var black_silence_1 = report_values.black_silence_1;
+    var slate_silence = report_values.slate_silence;
+    var black_silence_2 = report_values.black_silence_2;
+    var start_of_program = report_values.start_of_program;
+    var end_of_program = report_values.end_of_program;
 
     // Video Measurements values
-    var active_video_begins = document.getElementsByName("active_video_begins")[0].value;
-    var active_video_ends = document.getElementsByName("active_video_ends")[0].value;
-    var horizontal_blanking = document.getElementsByName("horizontal_blanking")[0].value;
-    var luminance_peak = document.getElementsByName("luminance_peak")[0].value;
-    var chroma_peak = document.getElementsByName("chroma_peak")[0].value;
-    var head_logo = document.getElementsByName("head_logo")[0].value;
-    var tail_logo = document.getElementsByName("tail_logo")[0].value;
+    var active_video_begins = report_values.active_video_begins;
+    var active_video_ends = report_values.active_video_ends;
+    var horizontal_blanking = report_values.horizontal_blanking;
+    var luminance_peak = report_values.luminance_peak;
+    var chroma_peak = report_values.chroma_peak;
+    var head_logo = report_values.head_logo;
+    var tail_logo = report_values.tail_logo;
 
     // Element Profile values
-    var total_runtime = document.getElementsByName("total_runtime")[0].value;
-    var language_code = document.getElementById("language_code").value;
-    var tv_feature_trailer = document.getElementsByName("tv_feature_trailer")[0].value;
-    var cc_subtitles = document.getElementsByName("cc_subtitles")[0].value;
-    var video_aspect_ratio = document.getElementById("video_aspect_ratio").value;
-    var vitc = document.getElementsByName("vitc")[0].value;
-    var textless_tail = document.getElementsByName("textless_tail")[0].value;
-    var source_barcode = document.getElementsByName("source_barcode")[0].value;
-    var notices = document.getElementsByName("notices")[0].value;
-    var element_qc_barcode = document.getElementsByName("element_qc_barcode")[0].value;
-    var label = document.getElementById("label").value;
-    var record_date = document.getElementsByName("record_date")[0].value;
+    var total_runtime = report_values.total_runtime;
+    var language_code = report_values.language_select;
+    var tv_feature_trailer = report_values.tv_feature_trailer;
+    var cc_subtitles = report_values.cc_subtitles;
+    var video_aspect_ratio = report_values.video_aspect_ratio_select;
+    var vitc = report_values.vitc;
+    var textless_tail = report_values.textless_tail;
+    var source_barcode = report_values.source_barcode;
+    var notices = report_values.notices;
+    var element_qc_barcode = report_values.element_qc_barcode;
+    var label = report_values.label;
+    var record_date = report_values.record_date;
 
     // General comments
-    var general_comments = document.getElementById("general_comments").value;
+    var general_comments = report_values.general_comments;
 
     var qc_report_object = {
         'name': name,
@@ -300,6 +252,20 @@ try {
         'record_date': record_date,
         'general_comments': general_comments
     };
+
+    return qc_report_object;
+}
+
+try {
+    var code = '%s';
+
+    save_audio_eval_lines(code);
+    save_element_eval_lines(code);
+
+    var server = TacticServerStub.get();
+    var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+
+    var qc_report_object = get_report_values();
 
     var element_eval_panel = document.getElementById('element_eval_panel');
 
@@ -1204,11 +1170,11 @@ window.open(file_path);
         return record_date_calendar_wdg
 
     def get_general_comments_section(self):
-        general_comments_div = DivWdg()
+        general_comments_div = DivWdg('general_comments')
         general_comments_div.add_style('margin', '10px')
         general_comments_wdg = TextAreaWdg()
         general_comments_wdg.set_id('general_comments')
-        general_comments_wdg.set_input_prefix('test')
+        general_comments_wdg.set_name('general_comments')
 
         if hasattr(self, 'general_comments'):
             general_comments_wdg.set_value(self.general_comments)
