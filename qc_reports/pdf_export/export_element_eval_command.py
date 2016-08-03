@@ -8,10 +8,10 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
+from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table, BaseDocTemplate, PageTemplate, Frame
 from reportlab.platypus.flowables import HRFlowable
 
-from pdf_export_utils import get_name_from_code, get_top_table
+from pdf_export_utils import get_name_from_code, get_top_table, NumberedCanvas
 
 
 def get_title_table(element_eval_sobject):
@@ -253,8 +253,6 @@ class ExportElementEvalCommand(Command):
 
         saved_file_path = os.path.join(save_location, file_name)
 
-        doc = SimpleDocTemplate(saved_file_path, pagesize=letter)
-
         elements = []
 
         styleSheet = getSampleStyleSheet()
@@ -358,4 +356,10 @@ class ExportElementEvalCommand(Command):
         if element_eval_lines_table:
             elements.append(element_eval_lines_table)
 
-        doc.build(elements)
+        # frameT = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, topPadding=0)
+
+        # doc.addPageTemplates([PageTemplate(frames=frameT)])
+
+        doc = SimpleDocTemplate(saved_file_path)
+
+        doc.build(elements, canvasmaker=NumberedCanvas)
