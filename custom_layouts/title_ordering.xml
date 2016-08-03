@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <title_ordering_conf include_mako='true'>
+        <html>
+            <head>
+                <title>Title</title>
+            </head>
+            <body>
+                <div class="spt_top">
+<![CDATA[
+<%
+    title_orders = server.eval("@SOBJECT(twog/title_order)")
+%>
+]]>
+                </div>
+                <h1>Title Ordering Test</h1>
+                <ul>
+                    % for title_order in title_orders:
+                        <li>
+                            ${title_order.get('name')}
+                        </li>
+                    % endfor
+                </ul>
+                <div class="my_load_class"/>
+
+                <ul id="example1">
+  <li>Item #1</li>
+  <li>Item #2</li>
+  <li>Item #3</li>
+  <li>Item #4</li>
+  <li>Item #5</li>
+</ul>
+
+<p>It is even possible to drag &amp; drop list-elements between lists.</p>
+
+<div id="example2">
+  <ul>
+    <li>Item #1</li>
+    <li>Item #2</li>
+    <li>Item #3</li>
+    <li>Item #4</li>
+    <li>Item #5</li>
+  </ul>
+  <ul>
+    <li><strong>Item #1</strong></li>
+    <li><strong>Item #2</strong></li>
+    <li><strong>Item #3</strong></li>
+    <li><strong>Item #4</strong></li>
+    <li><strong>Item #5</strong></li>
+  </ul>
+</div>
+
+            </body>
+        </html>
+        <behavior class="my_load_class" event="load">
+// spt.dom.load_js(['mootools/mootools-more-1.4.0.1-yc.js']);
+spt.dom.load_js(['mootools/mootools-1.2.5.1-more.js']);
+window.addEvent('domready', function(){
+/*
+  var example1 = $('example1'),
+    step = 0;
+
+  example1.getElements('li').each(function(li){
+    var color = [step, 82, 87].hsbToRgb();
+    li.setStyles({
+      'background-color': color,
+      height: Number.random(20, 50)
+    });
+    step += 35;
+  });
+
+  new Sortables(example1);
+
+  new Sortables('#example2 UL', {
+    clone: true,
+    revert: true,
+    opacity: 0.7
+  });
+*/
+    console.log(Drag);
+    new Sortables($('example1'), {
+
+	initialize: function(){
+		var step = 0;
+		this.elements.each(function(element, i){
+			var color = [step, 82, 87].hsbToRgb();
+			element.setStyle('background-color', color);
+			step = step + 35;
+			element.setStyle('height', $random(40, 100));
+		});
+	}
+
+});
+
+});
+                </behavior>
+    </title_ordering_conf>
+</config>
