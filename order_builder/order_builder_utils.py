@@ -211,3 +211,20 @@ def get_order_builder_url(order_code, server=None, project='twog'):
 
     base_url = get_base_url(server, project)
     return "{0}order_builder/{1}".format(base_url, order_code)
+
+
+def get_add_notes_behavior(search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    spt.api.load_popup('Add Note', 'tactic.ui.widget.discussion_wdg.DiscussionWdg', {'search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % search_key
+    }
+
+    return behavior

@@ -59,7 +59,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             description_div.add('No description available')
 
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
-        note_button.add_behavior(self.get_add_notes_behavior(self.order_sobject.get_search_key()))
+        note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
 
         # Add the divs to the outer_div for display
         order_div.add(order_name_div)
@@ -122,11 +122,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
         else:
             department_div.add('No department assigned')
 
+        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+        note_button.add_behavior(obu.get_add_notes_behavior(task.get_search_key()))
+
         task_div.add(process_div)
         task_div.add(status_div)
         task_div.add(priority_div)
         task_div.add(assigned_div)
         task_div.add(department_div)
+        task_div.add(note_button)
 
         return task_div
 
@@ -178,7 +182,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             element_evaluation_button.add_behavior(self.get_element_evaluation_button_behavior(title_order.get('title_code')))
 
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
-            note_button.add_behavior(self.get_add_notes_behavior(title_order.get_search_key()))
+            note_button.add_behavior(obu.get_add_notes_behavior(title_order.get_search_key()))
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
             instructions_button.add_behavior(self.get_instructions_wdg(title_order.get_code()))
@@ -282,23 +286,6 @@ catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
         }''' % title_code
-        }
-
-        return behavior
-
-    @staticmethod
-    def get_add_notes_behavior(search_key):
-        behavior = {
-            'css_class': 'clickme',
-            'type': 'click_up',
-            'cbjs_action': '''
-try {
-    spt.api.load_popup('Add Note', 'tactic.ui.widget.discussion_wdg.DiscussionWdg', {'search_key': '%s'});
-}
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}''' % search_key
         }
 
         return behavior
