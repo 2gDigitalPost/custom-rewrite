@@ -29,7 +29,7 @@ class ChangeDueDateWdg(BaseRefreshWdg):
     @staticmethod
     def save_button_behavior(title_order_code):
         """
-        Save the current order and load the Order Builder widget
+        Save the new date and close the popup
 
         :return: behavior dictionary
         """
@@ -50,9 +50,6 @@ function submit_form() {
     server.update(search_key, {'due_date': date});
 
     spt.api.app_busy_hide();
-
-    // Close the popup
-    spt.popup.close();
 }
 
 try {
@@ -60,9 +57,12 @@ try {
     var outer_div = spt.api.get_parent(bvr.src_el, '#change_due_date_wdg');
     var values = spt.api.get_input_values(outer_div, null, false);
 
-    console.log(values);
-
     submit_form(values);
+
+    // Close the popup
+    spt.popup.close(outer_div);
+
+    spt.panel.refresh()
 }
 catch(err) {
     spt.app_busy.hide();

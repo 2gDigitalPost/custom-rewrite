@@ -83,8 +83,10 @@ class OrderBuilderWdg(BaseRefreshWdg):
         task_div = DivWdg()
         task_div.add_style('display', 'inline-block')
         task_div.add_style('background-color', '#F2F2F2')
-        task_div.add_style('padding', '10px')
+        task_div.add_style('padding-left', '10px')
+        task_div.add_style('padding-top', '10px')
         task_div.add_style('border-radius', '10px')
+        task_div.add_style('width', '100%')
 
         process_div = DivWdg()
         process_div.add_style('font-weight', 'bold')
@@ -145,11 +147,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
         title_order_list.add_style('list-style-type', 'none')
 
         for title_order in self.titles_in_order:
-            title_order_li = HtmlElement.li()
-            title_order_li.add_style('background-color', '#d9edcf')
-            title_order_li.add_style('padding', '5px')
-            title_order_li.add_style('border-radius', '10px')
-
             title_order_name_div = DivWdg()
             title_order_name_div.add_style('font-weight', 'bold')
             title_order_name_div.add(title_order.get('name'))
@@ -159,64 +156,75 @@ class OrderBuilderWdg(BaseRefreshWdg):
             title_order_description_div.add(title_order.get('description'))
 
             title_order_priority_div = DivWdg()
-            title_order_priority_div.add(title_order.get('priority'))
+            title_order_priority_div.add('Priority: {0}'.format(title_order.get('priority')))
 
             title_order_due_date_div = DivWdg()
 
             if title_order.get('due_date'):
                 title_order_due_date_div.add('Due: {0}'.format(title_order.get('due_date')))
 
-            # title_order_platform_div = DivWdg()
-            # title_order_platform_div.add(title_order.get('platform'))
-
             external_rejection_button = ButtonNewWdg(title='External Rejection', icon='RED_BOMB')
             external_rejection_button.add_behavior(self.get_external_rejection_button_behavior())
-
-            # upload_button = Html5UploadWdg()
-            # upload_button = ButtonNewWdg(title='Upload', icon='UPLOAD')
-            # upload_button.add_behavior(self.get_upload_button_behavior())
-
-            # upload_button = CheckinButtonElementWdg()
+            external_rejection_button.add_style('display', 'inline-block')
 
             element_evaluation_button = ButtonNewWdg(title='Element Evaluation', icon='REPORT')
             element_evaluation_button.add_behavior(self.get_element_evaluation_button_behavior(title_order.get('title_code')))
+            element_evaluation_button.add_style('display', 'inline-block')
 
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(obu.get_add_notes_behavior(title_order.get_search_key()))
+            note_button.add_style('display', 'inline-block')
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
             instructions_button.add_behavior(self.get_instructions_wdg(title_order.get_code()))
+            instructions_button.add_style('display', 'inline-block')
 
             change_due_date_button = ButtonNewWdg(title='Change Due Date', icon='DATE')
             change_due_date_button.add_behavior(self.get_change_due_date_behavior(title_order.get_code(),
                                                                                   title_order.get('due_date')))
+            change_due_date_button.add_style('display', 'inline-block')
 
-            title_order_li.add(title_order_name_div)
-            title_order_li.add(title_order_description_div)
-            title_order_li.add(title_order_priority_div)
-            title_order_li.add(title_order_due_date_div)
-            title_order_li.add(external_rejection_button)
-            title_order_li.add(element_evaluation_button)
-            # title_order_li.add(upload_button)
-            title_order_li.add(note_button)
-            title_order_li.add(instructions_button)
-            title_order_li.add(change_due_date_button)
+            button_row_div = SpanWdg()
+            button_row_div.add_style('display', 'inline-block')
+            button_row_div.add(external_rejection_button)
+            button_row_div.add(element_evaluation_button)
+            button_row_div.add(note_button)
+            button_row_div.add(instructions_button)
+            button_row_div.add(change_due_date_button)
+
+            title_div = DivWdg()
+            title_div.add_style('background-color', '#d9edcf')
+            title_div.add_style('padding', '10px')
+            title_div.add_style('border-radius', '10px')
+
+            title_div.add(title_order_name_div)
+            title_div.add(title_order_description_div)
+            title_div.add(title_order_priority_div)
+            title_div.add(title_order_due_date_div)
+            title_div.add(button_row_div)
 
             tasks = obu.get_tasks_for_title_order(title_order)
 
+            title_task_div = DivWdg()
+            title_task_div.add_style('width', '100%')
+            title_task_div.add_style('margin-left', '30px')
+
             # If there are tasks associated to the title_order, add them as a sub-list below it
             if tasks:
-                sub_list = HtmlElement.ul()
-                sub_list.add_style('list-style-type', 'none')
+                task_list = DivWdg()
 
                 for task in tasks:
-                    task_li = HtmlElement.li()
-                    task_li.add(self.get_task_div(task))
-                    sub_list.add(task_li)
+                    task_div = DivWdg()
+                    task_div.add(self.get_task_div(task))
+                    task_list.add(task_div)
 
-                title_order_li.add(sub_list)
+                title_task_div.add(task_list)
 
-            title_order_list.add(title_order_li)
+            title_order_div = DivWdg()
+            title_order_div.add(title_div)
+            title_order_div.add(title_task_div)
+
+            title_order_list.add(title_order_div)
 
         return title_order_list
 
@@ -341,6 +349,7 @@ catch(err) {
 
         title_orders_div = DivWdg()
         title_orders_div.add_style('display', 'inline-block')
+        title_orders_div.add_style('width', '600px')
         title_orders_div.add(self.setup_html_list_for_title_orders())
         outer_div.add(title_orders_div)
 
