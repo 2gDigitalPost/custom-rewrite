@@ -168,7 +168,7 @@ function get_audio_configuration_values(report_values) {
     ]
 
     for (var i = 0; i < audio_configuration_data_points.length; i++) {
-        var data_point = audio_configuration[i];
+        var data_point = audio_configuration_data_points[i];
         audio_configuration[data_point] = get_feature_audio_preview_values(report_values, data_point);
     }
 
