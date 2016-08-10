@@ -52,6 +52,63 @@ class MetaDataReportWdg(BaseRefreshWdg):
                     setattr(self, data_point, data)
 
         if audio_configuration:
+            data_points = (
+                'feature_audio_config_language_1',
+                'feature_audio_config_language_2',
+                'feature_audio_config_language_3',
+                'feature_audio_config_language_4',
+                'feature_audio_config_language_5',
+                'feature_audio_config_language_6',
+                'feature_audio_config_language_7',
+                'feature_audio_config_language_8',
+                'feature_audio_config_type_1',
+                'feature_audio_config_type_2',
+                'feature_audio_config_type_3',
+                'feature_audio_config_type_4',
+                'feature_audio_config_type_5',
+                'feature_audio_config_type_6',
+                'feature_audio_config_type_7',
+                'feature_audio_config_type_8',
+                'audio_bundle_language_1',
+                'audio_bundle_language_2',
+                'audio_bundle_language_3',
+                'audio_bundle_language_4',
+                'audio_bundle_language_5',
+                'audio_bundle_language_6',
+                'audio_bundle_language_7',
+                'audio_bundle_language_8',
+                'audio_bundle_type_1',
+                'audio_bundle_type_2',
+                'audio_bundle_type_3',
+                'audio_bundle_type_4',
+                'audio_bundle_type_5',
+                'audio_bundle_type_6',
+                'audio_bundle_type_7',
+                'audio_bundle_type_8',
+                'preview_trailer_audio_config_language_1',
+                'preview_trailer_audio_config_language_2',
+                'preview_trailer_audio_config_language_3',
+                'preview_trailer_audio_config_language_4',
+                'preview_trailer_audio_config_language_5',
+                'preview_trailer_audio_config_language_6',
+                'preview_trailer_audio_config_language_7',
+                'preview_trailer_audio_config_language_8',
+                'preview_trailer_audio_config_type_1',
+                'preview_trailer_audio_config_type_2',
+                'preview_trailer_audio_config_type_3',
+                'preview_trailer_audio_config_type_4',
+                'preview_trailer_audio_config_type_5',
+                'preview_trailer_audio_config_type_6',
+                'preview_trailer_audio_config_type_7',
+                'preview_trailer_audio_config_type_8'
+            )
+
+            for data_point in data_points:
+                data = audio_configuration.get(data_point)
+
+                if data:
+                    setattr(self, data_point, data)
+
             data_points = ('audio_configuration_verified', 'audio_in_sync_with_video', 'audio_tagged_correctly',
                            'no_audio_cut_off', 'trt_audio_equals_trt_video', 'correct_language_present')
 
@@ -158,7 +215,7 @@ function get_video_configuration_values(report_values) {
 function get_audio_configuration_values(report_values) {
     var audio_configuration = {};
 
-    audio_configuration_data_points = [
+    var audio_configuration_data_points = [
         'audio_configuration_verified',
         'audio_in_sync_with_video',
         'audio_tagged_correctly',
@@ -170,6 +227,62 @@ function get_audio_configuration_values(report_values) {
     for (var i = 0; i < audio_configuration_data_points.length; i++) {
         var data_point = audio_configuration_data_points[i];
         audio_configuration[data_point] = get_feature_audio_preview_values(report_values, data_point);
+    }
+
+    var audio_configuration_data_points_2 = [
+        'feature_audio_config_language_1',
+        'feature_audio_config_language_2',
+        'feature_audio_config_language_3',
+        'feature_audio_config_language_4',
+        'feature_audio_config_language_5',
+        'feature_audio_config_language_6',
+        'feature_audio_config_language_7',
+        'feature_audio_config_language_8',
+        'feature_audio_config_type_1',
+        'feature_audio_config_type_2',
+        'feature_audio_config_type_3',
+        'feature_audio_config_type_4',
+        'feature_audio_config_type_5',
+        'feature_audio_config_type_6',
+        'feature_audio_config_type_7',
+        'feature_audio_config_type_8',
+        'audio_bundle_language_1',
+        'audio_bundle_language_2',
+        'audio_bundle_language_3',
+        'audio_bundle_language_4',
+        'audio_bundle_language_5',
+        'audio_bundle_language_6',
+        'audio_bundle_language_7',
+        'audio_bundle_language_8',
+        'audio_bundle_type_1',
+        'audio_bundle_type_2',
+        'audio_bundle_type_3',
+        'audio_bundle_type_4',
+        'audio_bundle_type_5',
+        'audio_bundle_type_6',
+        'audio_bundle_type_7',
+        'audio_bundle_type_8',
+        'preview_trailer_audio_config_language_1',
+        'preview_trailer_audio_config_language_2',
+        'preview_trailer_audio_config_language_3',
+        'preview_trailer_audio_config_language_4',
+        'preview_trailer_audio_config_language_5',
+        'preview_trailer_audio_config_language_6',
+        'preview_trailer_audio_config_language_7',
+        'preview_trailer_audio_config_language_8',
+        'preview_trailer_audio_config_type_1',
+        'preview_trailer_audio_config_type_2',
+        'preview_trailer_audio_config_type_3',
+        'preview_trailer_audio_config_type_4',
+        'preview_trailer_audio_config_type_5',
+        'preview_trailer_audio_config_type_6',
+        'preview_trailer_audio_config_type_7',
+        'preview_trailer_audio_config_type_8'
+    ]
+
+    for (var x = 0; x < audio_configuration_data_points_2.length; x++) {
+        var data_point = audio_configuration_data_points_2[x];
+        audio_configuration[data_point] = report_values[data_point];
     }
 
     return audio_configuration;
@@ -191,6 +304,8 @@ function get_report_values() {
     // Return an object containing the element evaluation's values
     var top = bvr.src_el.getParent("#metadata_eval_panel");
     var report_values = spt.api.get_input_values(top, null, false);
+
+    console.log(report_values);
 
     // Name of the report
     var name = report_values.name_data;
@@ -339,7 +454,10 @@ spt.app_busy.hide();
         languages = language_search.get_sobjects()
 
         for language in languages:
-            select_wdg.append_option(language.get_value('name'), language.get_value('name'))
+            select_wdg.append_option(language.get_value('name'), language.get_code())
+
+        if hasattr(self, name):
+            select_wdg.set_value(getattr(self, name))
 
         return select_wdg
 
@@ -594,8 +712,8 @@ spt.app_busy.hide();
             label_cell = table.add_cell('TRK. {0}'.format(i))
             label_cell.add_style('padding', '10px 10px 10px 0px')
 
-            table.add_cell(self.get_language_select_wdg(id))
-            table.add_cell(self.get_type_select_wdg(id))
+            table.add_cell(self.get_language_select_wdg(id + '_language_' + str(i)))
+            table.add_cell(self.get_type_select_wdg(id + '_type_' + str(i)))
 
         return table
 
