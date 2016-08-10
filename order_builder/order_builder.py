@@ -1,6 +1,4 @@
 from tactic.ui.common import BaseRefreshWdg
-from tactic.ui.input import Html5UploadWdg
-from tactic.ui.table import CheckinButtonElementWdg
 from tactic.ui.widget import ButtonNewWdg
 
 from pyasm.search import Search

@@ -1,0 +1,25 @@
+{
+  "video_configuration": {
+    "encoding_log_no_errors": {
+      "feature": true,
+      "trailer": false
+    },
+    "correct_video_codec_used": {
+      "feature": true
+    }
+  },
+  "audio_configuration": {
+    "feature_audio_config": [
+      {
+        "trk_1": [
+          {
+            "language": "asdf"
+          },
+          {
+            "type": "something"
+          }
+        ]
+      }
+    ]
+  }
+}

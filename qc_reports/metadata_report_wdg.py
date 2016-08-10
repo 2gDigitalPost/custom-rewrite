@@ -1,15 +1,254 @@
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.input import TextInputWdg
-from tactic.ui.widget import CalendarInputWdg, ButtonNewWdg
+from tactic.ui.widget import ButtonNewWdg, CalendarInputWdg
 
 from pyasm.search import Search
 from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, TextAreaWdg
 
+import json
+
 
 class MetaDataReportWdg(BaseRefreshWdg):
     def init(self):
         self.metadata_report_sobject = self.get_sobject_from_kwargs()
+
+        if self.metadata_report_sobject:
+            self.report_data = self.parse_report_data_json(self.metadata_report_sobject.get_value('report_data'))
+
+    def parse_report_data_json(self, report_data):
+        report_data_dictionary = json.loads(report_data)
+
+        video_configuration = report_data_dictionary.get('video_configuration')
+        audio_configuration = report_data_dictionary.get('audio_configuration')
+        assets = report_data_dictionary.get('assets')
+        chapter_thumbnails = report_data_dictionary.get('chapter_thumbnails')
+
+        if video_configuration:
+            data_points = ('encoding_log_shows_no_errors', 'correct_video_codec_used',
+                           'frame_rate_same_as_native_source', 'hd_resolution', 'field_dominance_set_to_none',
+                           'tagged_as_progressive', 'clap_tag_removed', 'pasp_correct', 'gamma_tag_removed',
+                           'video_asset_does_not_contain', 'video_proper_aspect_ratio', 'websites_not_listed',
+                           'cropping_values_correct')
+
+            for data_point in data_points:
+                data = video_configuration.get(data_point)
+
+                if data:
+                    feature_data = data.get('feature')
+                    preview_data = data.get('preview')
+
+                    setattr(self, data_point + '_feature', feature_data)
+                    setattr(self, data_point + '_preview', preview_data)
+
+            data_points = ('trailer_no_promotional_bumpers', 'trailer_same_aspect_ratio', 'trailer_general_audience',
+                           'file_starts_with_black', 'program_starts', 'program_ends_black_frame_feature',
+                           'file_starts_fade_up_down', 'program_ends_black_frame_preview', 'program_ends_fade_down')
+
+            for data_point in data_points:
+                data = video_configuration.get(data_point)
+
+                if data:
+                    setattr(self, data_point, data)
+
+        if audio_configuration:
+            data_points = ('audio_configuration_verified', 'audio_in_sync_with_video', 'audio_tagged_correctly',
+                           'no_audio_cut_off', 'trt_audio_equals_trt_video', 'correct_language_present')
+
+            for data_point in data_points:
+                data = audio_configuration.get(data_point)
+
+                if data:
+                    feature_data = data.get('feature')
+                    audio_data = data.get('audio')
+                    preview_data = data.get('preview')
+
+                    setattr(self, data_point + '_feature', feature_data)
+                    setattr(self, data_point + '_audio', audio_data)
+                    setattr(self, data_point + '_preview', preview_data)
+
+        return report_data_dictionary
+
+    @staticmethod
+    def get_save_behavior(code):
+        behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
+function get_feature_preview_values(report_values, key) {
+    var values = {};
+
+    var feature_key = key + "_feature";
+    var preview_key = key + "_preview";
+
+    if (feature_key in report_values) {
+        values["feature"] = report_values[feature_key];
+    }
+
+    if (preview_key in report_values) {
+        values["preview"] = report_values[preview_key];
+    }
+
+    return values;
+}
+
+function get_feature_audio_preview_values(report_values, key) {
+    var values = {};
+
+    var feature_key = key + "_feature";
+    var audio_key = key + "_audio";
+    var preview_key = key + "_preview";
+
+    if (feature_key in report_values) {
+        values["feature"] = report_values[feature_key];
+    }
+
+    if (audio_key in report_values) {
+        values["audio"] = report_values[audio_key];
+    }
+
+    if (preview_key in report_values) {
+        values["preview"] = report_values[preview_key];
+    }
+
+    return values;
+}
+
+function get_video_configuration_values(report_values) {
+    var video_configuration = {};
+
+    var video_configuration_data_points_1 = [
+        'encoding_log_shows_no_errors',
+        'correct_video_codec_used',
+        'frame_rate_same_as_native_source',
+        'hd_resolution',
+        'field_dominance_set_to_none',
+        'tagged_as_progressive',
+        'clap_tag_removed',
+        'pasp_correct',
+        'gamma_tag_removed',
+        'video_asset_does_not_contain',
+        'video_proper_aspect_ratio',
+        'websites_not_listed',
+        'cropping_values_correct'
+    ]
+
+    var video_configuration_data_points_2 = [
+        'trailer_no_promotional_bumpers',
+        'trailer_same_aspect_ratio',
+        'trailer_general_audience',
+        'file_starts_with_black',
+        'program_starts',
+        'program_ends_black_frame_feature',
+        'file_starts_fade_up_down',
+        'program_ends_black_frame_preview',
+        'program_ends_fade_down'
+    ]
+
+    for (var i = 0; i < video_configuration_data_points_1.length; i++) {
+        var data_point = video_configuration_data_points_1[i];
+        video_configuration[data_point] = get_feature_preview_values(report_values, data_point);
+    }
+
+    for (var i = 0; i < video_configuration_data_points_2.length; i++) {
+        var data_point = video_configuration_data_points_2[i];
+        video_configuration[data_point] = report_values[data_point];
+    }
+
+    return video_configuration;
+}
+
+function get_audio_configuration_values(report_values) {
+    var audio_configuration = {};
+
+    audio_configuration_data_points = [
+        'audio_configuration_verified',
+        'audio_in_sync_with_video',
+        'audio_tagged_correctly',
+        'no_audio_cut_off',
+        'trt_audio_equals_trt_video',
+        'correct_language_present'
+    ]
+
+    for (var i = 0; i < audio_configuration_data_points.length; i++) {
+        var data_point = audio_configuration[i];
+        audio_configuration[data_point] = get_feature_audio_preview_values(report_values, data_point);
+    }
+
+    return audio_configuration;
+}
+
+function get_assets_values(report_values) {
+    var assets = {};
+
+    return assets;
+}
+
+function get_chapter_thumbnails_values(report_values) {
+    var chapter_thumbnails = {};
+
+    return chapter_thumbnails;
+}
+
+function get_report_values() {
+    // Return an object containing the element evaluation's values
+    var top = bvr.src_el.getParent("#metadata_eval_panel");
+    var report_values = spt.api.get_input_values(top, null, false);
+
+    // Name of the report
+    var name = report_values.name_data;
+
+    // Title section values
+    var title_data = report_values.title_data;
+    var episode = report_values.episode;
+    var cont = report_values.cont;
+    var source_type = report_values.source_type;
+    var operator = report_values.operator;
+    var date = report_values.date;
+    var trt_feature = report_values.trt_feature;
+    var trt_trailer = report_values.trt_trailer;
+
+    var qc_notes = report_values.qc_notes;
+
+    var report_data = {};
+
+    report_data["video_configuration"] = get_video_configuration_values(report_values);
+    report_data["audio_configuration"] = get_audio_configuration_values(report_values);
+    report_data["assets"] = get_assets_values(report_values);
+    report_data["chapter_thumbnails"] = get_chapter_thumbnails_values(report_values);
+
+    var qc_report_object = {
+        'name': name,
+        'title': title_data,
+        'episode': episode,
+        'cont': cont,
+        'source_type': source_type,
+        'operator': operator,
+        'date': date,
+        'trt_feature': trt_feature,
+        'trt_trailer': trt_trailer,
+        'qc_notes': qc_notes,
+        'report_data': JSON.stringify(report_data)
+    };
+
+    return qc_report_object;
+}
+
+var code = '%s';
+
+var server = TacticServerStub.get();
+var search_key = server.build_search_key('twog/metadata_report', code, 'twog');
+
+var qc_report_object = get_report_values();
+
+var metadata_eval_panel = document.getElementById('metadata_eval_panel');
+
+spt.app_busy.show("Saving...");
+server.update(search_key, qc_report_object);
+spt.api.load_panel(metadata_eval_panel, 'qc_reports.MetaDataReportWdg', {'search_key': search_key});
+
+spt.app_busy.hide();
+''' % code
+        }
+
+        return behavior
 
     # TODO: This function is the same as the one in ElementEvalWdg, merge the two into one
     def get_text_input_wdg(self, field_name, width=200):
@@ -155,18 +394,22 @@ class MetaDataReportWdg(BaseRefreshWdg):
 
     def get_top_section(self):
         title_span = SpanWdg()
+        title_span.add_style('display', 'inline-block')
         title_span.add("Title")
         title_span.add(self.get_text_input_wdg('title_data', 400))
 
         episode_span = SpanWdg()
+        episode_span.add_style('display', 'inline-block')
         episode_span.add("Episode")
         episode_span.add(self.get_text_input_wdg('episode', 400))
 
         cont_span = SpanWdg()
+        cont_span.add_style('display', 'inline-block')
         cont_span.add("Cont")
         cont_span.add(self.get_text_input_wdg('cont', 400))
 
         source_type_span = SpanWdg()
+        source_type_span.add_style('display', 'inline-block')
         source_type_span.add("Source Type")
         source_type_span.add(self.get_text_input_wdg('source_type', 400))
 
@@ -179,18 +422,22 @@ class MetaDataReportWdg(BaseRefreshWdg):
         left_div.add(source_type_span)
 
         qc_operator_span = SpanWdg()
+        qc_operator_span.add_style('display', 'inline-block')
         qc_operator_span.add('QC Operator')
         qc_operator_span.add(self.get_text_input_wdg('qc_operator', 400))
 
         qc_date_span = SpanWdg()
+        qc_date_span.add_style('display', 'inline-block')
         qc_date_span.add('QC Date')
         qc_date_span.add(self.get_date_calendar_wdg())
 
         trt_feature_span = SpanWdg()
+        trt_feature_span.add_style('display', 'inline-block')
         trt_feature_span.add('TRT Feature')
         trt_feature_span.add(self.get_text_input_wdg('trt_feature', 400))
 
         trt_trailer_preview_span = SpanWdg()
+        trt_trailer_preview_span.add_style('display', 'inline-block')
         trt_trailer_preview_span.add('TRT Trailer/Preview')
         trt_trailer_preview_span.add(self.get_text_input_wdg('trt_trailer_preview', 400))
 
@@ -206,7 +453,6 @@ class MetaDataReportWdg(BaseRefreshWdg):
         section_div.add(self.get_text_area_input_wdg('QC Notes', 'qc_notes'))
 
         return section_div
-
 
     def get_section_one(self):
         section_div = DivWdg()
@@ -276,7 +522,7 @@ class MetaDataReportWdg(BaseRefreshWdg):
             table.add_row()
             table.add_cell(label)
             table.add_cell()
-            table.add_cell(self.get_true_false_select_wdg(value + '_preview'))
+            table.add_cell(self.get_true_false_select_wdg(value))
 
         return table
 
@@ -545,9 +791,21 @@ class MetaDataReportWdg(BaseRefreshWdg):
 
         return table
 
+    def get_save_button(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        save_button = ButtonNewWdg(title='Save', icon='SAVE')
+        save_button.add_class('save_button')
+        save_button.add_behavior(self.get_save_behavior(self.metadata_report_sobject.get_code()))
+
+        section_span.add(save_button)
+
+        return section_span
+
     def get_display(self):
         main_wdg = DivWdg()
-        main_wdg.set_id('metadata_report_wdg')
+        main_wdg.set_id('metadata_eval_panel')
 
         main_wdg.add(self.get_top_section())
 
@@ -555,5 +813,8 @@ class MetaDataReportWdg(BaseRefreshWdg):
         main_wdg.add(self.get_section_two())
         main_wdg.add(self.get_section_three())
         main_wdg.add(self.get_section_four())
+
+        if hasattr(self, 'metadata_report_sobject') and self.metadata_report_sobject:
+            main_wdg.add(self.get_save_button())
 
         return main_wdg

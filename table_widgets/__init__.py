@@ -1,2 +1,3 @@
 from element_eval_launcher_wdg import ElementEvalLauncherWdg
+from metadata_eval_launcher_wdg import MetaDataLauncherWdg
 from prequal_eval_launcher_wdg import PrequalEvalLauncherWdg
