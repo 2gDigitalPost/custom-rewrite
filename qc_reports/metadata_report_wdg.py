@@ -14,6 +14,15 @@ class MetaDataReportWdg(BaseRefreshWdg):
         self.metadata_report_sobject = self.get_sobject_from_kwargs()
 
         if self.metadata_report_sobject:
+            self.title_data = self.metadata_report_sobject.get_value('title')
+            self.episode = self.metadata_report_sobject.get_value('episode')
+            self.cont = self.metadata_report_sobject.get_value('cont')
+            self.source_type = self.metadata_report_sobject.get_value('source_type')
+            self.operator = self.metadata_report_sobject.get_value('operator')
+            self.date = self.metadata_report_sobject.get_value('date')
+            self.trt_feature = self.metadata_report_sobject.get_value('trt_feature')
+            self.trt_trailer_preview = self.metadata_report_sobject.get_value('trt_trailer')
+            self.qc_notes = self.metadata_report_sobject.get_value('qc_notes')
             self.report_data = self.parse_report_data_json(self.metadata_report_sobject.get_value('report_data'))
 
     def parse_report_data_json(self, report_data):
@@ -123,6 +132,35 @@ class MetaDataReportWdg(BaseRefreshWdg):
                     setattr(self, data_point + '_feature', feature_data)
                     setattr(self, data_point + '_audio', audio_data)
                     setattr(self, data_point + '_preview', preview_data)
+
+        if assets:
+            data_points = ('feature_delivery_snapshot', 'trailer_delivery_snapshot', 'alt_audio_delivery_snapshot',
+                           'subtitle_delivery_snapshot', 'cc_delivery_snapshot', 'vendor_notes_delivery_snapshot',
+                           'poster_art_delivery_snapshot', 'dub_card_delivery_snapshot', 'forced_narrative_feature',
+                           'overlap_credits_text_1', 'forced_narrative_trailer', 'overlap_credits_text_2',
+                           'subtitles_on_feature', 'overlap_credits_text_3', 'subtitles_on_trailer',
+                           'overlap_credits_text_4', 'dub_card_dimensions', 'cc_in_sync', 'dub_card_fps',
+                           'subtitles_in_sync', 'dub_card_language', 'subtitles_correct_language', 'dub_card_duration',
+                           'dub_card_contains')
+
+            for data_point in data_points:
+                data = assets.get(data_point)
+
+                if data:
+                    setattr(self, data_point, data)
+
+        if chapter_thumbnails:
+            data_points = ('image_is_jpeg_chapter', 'dpi_is_72_chapter', 'color_profile_rgb_chapter',
+                           'same_aspect_ratio_as_video_chapter', 'only_active_pixels_chapter',
+                           'horizontal_dimension_640_chapter', 'each_chapter_thumbnail_chapter', 'image_is_jpeg_poster',
+                           'dpi_is_72_poster', 'color_profile_rgb_poster', 'resolution_poster', 'aspect_ratio_poster',
+                           'contains_key_art_poster', 'no_promo_poster')
+
+            for data_point in data_points:
+                data = chapter_thumbnails.get(data_point)
+
+                if data:
+                    setattr(self, data_point, data)
 
         return report_data_dictionary
 
@@ -291,11 +329,65 @@ function get_audio_configuration_values(report_values) {
 function get_assets_values(report_values) {
     var assets = {};
 
+    var assets_data_points = [
+        'feature_delivery_snapshot',
+        'trailer_delivery_snapshot',
+        'alt_audio_delivery_snapshot',
+        'subtitle_delivery_snapshot',
+        'cc_delivery_snapshot',
+        'vendor_notes_delivery_snapshot',
+        'poster_art_delivery_snapshot',
+        'dub_card_delivery_snapshot',
+        'forced_narrative_feature',
+        'overlap_credits_text_1',
+        'forced_narrative_trailer',
+        'overlap_credits_text_2',
+        'subtitles_on_feature',
+        'overlap_credits_text_3',
+        'subtitles_on_trailer',
+        'overlap_credits_text_4',
+        'dub_card_dimensions',
+        'cc_in_sync',
+        'dub_card_fps',
+        'subtitles_in_sync',
+        'dub_card_language',
+        'subtitles_correct_language',
+        'dub_card_duration',
+        'dub_card_contains'
+    ];
+
+    for (var i = 0; i < assets_data_points.length; i++) {
+        var data_point = assets_data_points[i];
+        assets[data_point] = report_values[data_point];
+    }
+
     return assets;
 }
 
 function get_chapter_thumbnails_values(report_values) {
     var chapter_thumbnails = {};
+
+    var chapter_thumbnails_data_points = [
+        'image_is_jpeg_chapter',
+        'dpi_is_72_chapter',
+        'color_profile_rgb_chapter',
+        'same_aspect_ratio_as_video_chapter',
+        'only_active_pixels_chapter',
+        'horizontal_dimension_640_chapter',
+        'each_chapter_thumbnail_chapter',
+        'image_is_jpeg_poster',
+        'dpi_is_72_poster',
+        'color_profile_rgb_poster',
+        'resolution_poster',
+        'aspect_ratio_poster',
+        'contains_key_art_poster',
+        'no_promo_poster'
+    ];
+
+    for (var i = 0; i < chapter_thumbnails_data_points.length; i++) {
+        var data_point = chapter_thumbnails_data_points[i];
+        chapter_thumbnails[data_point] = report_values[data_point];
+    }
 
     return chapter_thumbnails;
 }
@@ -399,7 +491,7 @@ spt.app_busy.hide();
         text_area_wdg.set_id(id)
 
         if hasattr(self, id):
-            text_area_wdg.set_value(self.general_comments)
+            text_area_wdg.set_value(getattr(self, id))
 
         text_area_div = DivWdg(name)
         text_area_div.add_style('font-weight', 'bold')
@@ -890,7 +982,7 @@ spt.app_busy.hide();
 
             table.add_row()
             table.add_cell(label)
-            table.add_cell(self.get_true_false_select_wdg(value + '_chapter'))
+            table.add_cell(self.get_true_false_select_wdg(value))
 
         return table
 
@@ -905,7 +997,7 @@ spt.app_busy.hide();
 
             table.add_row()
             table.add_cell(label)
-            table.add_cell(self.get_true_false_select_wdg(value + '_poster'))
+            table.add_cell(self.get_true_false_select_wdg(value))
 
         return table
 
