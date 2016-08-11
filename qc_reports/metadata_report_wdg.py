@@ -14,6 +14,7 @@ class MetaDataReportWdg(BaseRefreshWdg):
         self.metadata_report_sobject = self.get_sobject_from_kwargs()
 
         if self.metadata_report_sobject:
+            self.name_data = self.metadata_report_sobject.get_value('name')
             self.title_data = self.metadata_report_sobject.get_value('title')
             self.episode = self.metadata_report_sobject.get_value('episode')
             self.cont = self.metadata_report_sobject.get_value('cont')
@@ -624,6 +625,10 @@ window.open(file_path);
         return select_wdg
 
     def get_top_section(self):
+        name_div = DivWdg()
+        name_div.add("Name")
+        name_div.add(self.get_text_input_wdg('name_data', 400))
+
         title_span = SpanWdg()
         title_span.add_style('display', 'inline-block')
         title_span.add("Title")
@@ -679,6 +684,7 @@ window.open(file_path);
         right_div.add(trt_trailer_preview_span)
 
         section_div = DivWdg()
+        section_div.add(name_div)
         section_div.add(left_div)
         section_div.add(right_div)
         section_div.add(self.get_text_area_input_wdg('QC Notes', 'qc_notes'))
