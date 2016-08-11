@@ -18,7 +18,7 @@ class MetaDataReportWdg(BaseRefreshWdg):
             self.episode = self.metadata_report_sobject.get_value('episode')
             self.cont = self.metadata_report_sobject.get_value('cont')
             self.source_type = self.metadata_report_sobject.get_value('source_type')
-            self.operator = self.metadata_report_sobject.get_value('operator')
+            self.qc_operator = self.metadata_report_sobject.get_value('operator')
             self.date = self.metadata_report_sobject.get_value('date')
             self.trt_feature = self.metadata_report_sobject.get_value('trt_feature')
             self.trt_trailer_preview = self.metadata_report_sobject.get_value('trt_trailer')
@@ -407,11 +407,10 @@ function get_report_values() {
     var episode = report_values.episode;
     var cont = report_values.cont;
     var source_type = report_values.source_type;
-    var operator = report_values.operator;
+    var operator = report_values.qc_operator;
     var date = report_values.date;
     var trt_feature = report_values.trt_feature;
-    var trt_trailer = report_values.trt_trailer;
-
+    var trt_trailer = report_values.trt_trailer_preview;
     var qc_notes = report_values.qc_notes;
 
     var report_data = {};
@@ -453,6 +452,28 @@ spt.api.load_panel(metadata_eval_panel, 'qc_reports.MetaDataReportWdg', {'search
 
 spt.app_busy.hide();
 ''' % code
+        }
+
+        return behavior
+
+    @staticmethod
+    def get_export_to_pdf_behavior(sobject_code):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+var server = TacticServerStub.get();
+
+var code = '%s';
+var search_key = server.build_search_key('twog/metadata_report', code, 'twog');
+
+server.execute_cmd('qc_reports.ExportMetaDataReportCommand', {'report_search_key': search_key});
+
+var report_name = document.getElementsByName("name_data")[0].value;
+var file_path = "/assets/metadata_reports/" + report_name + ".pdf";
+
+window.open(file_path);
+            ''' % sobject_code
         }
 
         return behavior
