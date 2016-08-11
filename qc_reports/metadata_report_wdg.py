@@ -1040,6 +1040,18 @@ window.open(file_path);
 
         return section_span
 
+    def get_export_to_pdf_button(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        export_to_pdf_button = ButtonNewWdg(title='Export to PDF', icon='ARROW_DOWN')
+        export_to_pdf_button.add_class('export_to_pdf_button')
+        export_to_pdf_button.add_behavior(self.get_export_to_pdf_behavior(self.metadata_report_sobject.get_code()))
+
+        section_span.add(export_to_pdf_button)
+
+        return section_span
+
     def get_display(self):
         main_wdg = DivWdg()
         main_wdg.set_id('metadata_eval_panel')
@@ -1053,5 +1065,6 @@ window.open(file_path);
 
         if hasattr(self, 'metadata_report_sobject') and self.metadata_report_sobject:
             main_wdg.add(self.get_save_button())
+            main_wdg.add(self.get_export_to_pdf_button())
 
         return main_wdg

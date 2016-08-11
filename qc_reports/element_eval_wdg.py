@@ -1228,7 +1228,7 @@ window.open(file_path);
         section_span.add_style('display', 'inline-block')
 
         export_to_pdf_button = ButtonNewWdg(title='Export to PDF', icon='ARROW_DOWN')
-        export_to_pdf_button.add_class('save_as_new_button')
+        export_to_pdf_button.add_class('export_to_pdf_button')
         export_to_pdf_button.add_behavior(self.get_export_to_pdf_behavior(self.element_eval_sobject.get_code()))
 
         section_span.add(export_to_pdf_button)

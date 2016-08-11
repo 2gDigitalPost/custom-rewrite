@@ -5,4 +5,5 @@ from metadata_report_wdg import MetaDataReportWdg
 from prequal_eval_lines_wdg import PrequalEvalLinesWdg
 from prequal_eval_wdg import PrequalEvalWdg
 from qc_reports.pdf_export.export_element_eval_command import ExportElementEvalCommand
+from qc_reports.pdf_export.export_metadata_report_command import ExportMetaDataReportCommand
 

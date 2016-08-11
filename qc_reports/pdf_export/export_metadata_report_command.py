@@ -14,6 +14,21 @@ from reportlab.platypus.flowables import HRFlowable
 from pdf_export_utils import get_name_from_code, get_top_table, NumberedCanvas
 
 
+def get_title_table(metadata_report_sobject):
+    title_table_data = [
+        ['Title:', metadata_report_sobject.get('title'), 'QC Operator:', metadata_report_sobject.get('operator')],
+        ['Episode:', metadata_report_sobject.get('episode'), 'QC Date:', metadata_report_sobject.get('date')],
+        ['Cont:', metadata_report_sobject.get('cont'), 'TRT Feature:', metadata_report_sobject.get('trt_feature')],
+        ['Source Type:', metadata_report_sobject.get('source_type'),
+         'TRT Trailer/Preview:', metadata_report_sobject.get('trt_trailer')],
+        ['QC Notes:', metadata_report_sobject.get('qc_notes')]
+    ]
+
+    title_table = Table(title_table_data, hAlign='LEFT', colWidths=[(1 * inch), (2 * inch), (1 * inch), (2 * inch)])
+
+    return title_table
+
+
 class ExportMetaDataReportCommand(Command):
     def execute(self):
         report_search_key = self.kwargs.get('report_search_key')
@@ -28,7 +43,7 @@ class ExportMetaDataReportCommand(Command):
         parser.read(config_path + '/config.ini')
 
         file_name = metadata_report_sobject.get('name') + '.pdf'
-        save_location = parser.get('save', 'directory')
+        save_location = parser.get('save', 'metadata_directory')
 
         saved_file_path = os.path.join(save_location, file_name)
 
@@ -56,4 +71,11 @@ class ExportMetaDataReportCommand(Command):
 
         header_table = Table([[I, address_table, P]])
 
+        title_table = get_title_table(metadata_report_sobject)
+
         elements.append(header_table)
+        elements.append(title_table)
+
+        doc = SimpleDocTemplate(saved_file_path)
+
+        doc.build(elements, canvasmaker=NumberedCanvas)

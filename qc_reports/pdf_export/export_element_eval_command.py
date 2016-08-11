@@ -249,7 +249,7 @@ class ExportElementEvalCommand(Command):
         parser.read(config_path + '/config.ini')
 
         file_name = element_eval_sobject.get('name') + '.pdf'
-        save_location = parser.get('save', 'directory')
+        save_location = parser.get('save', 'element_directory')
 
         saved_file_path = os.path.join(save_location, file_name)
 
@@ -359,7 +359,3 @@ class ExportElementEvalCommand(Command):
         # frameT = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, topPadding=0)
 
         # doc.addPageTemplates([PageTemplate(frames=frameT)])
-
-        doc = SimpleDocTemplate(saved_file_path)
-
-        doc.build(elements, canvasmaker=NumberedCanvas)
