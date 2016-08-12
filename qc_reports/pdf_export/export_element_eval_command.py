@@ -359,3 +359,8 @@ class ExportElementEvalCommand(Command):
         # frameT = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, topPadding=0)
 
         # doc.addPageTemplates([PageTemplate(frames=frameT)])
+
+
+        doc = SimpleDocTemplate(saved_file_path)
+
+        doc.build(elements, canvasmaker=NumberedCanvas)
