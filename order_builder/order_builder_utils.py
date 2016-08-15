@@ -238,7 +238,7 @@ def load_task_instructions_behavior(task_search_key):
 try {
     var task_search_key = '%s';
 
-    spt.api.load_popup('Instructions', 'order_builder.TaskInstructionsWdg', {'search_key': task_search_key});
+    spt.tab.add_new('instructions_' + task_search_key, 'Instructions', 'order_builder.TaskInstructionsWdg', {'search_key': task_search_key});
 }
 catch(err) {
     spt.app_busy.hide();
