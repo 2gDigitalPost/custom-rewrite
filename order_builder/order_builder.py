@@ -70,7 +70,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         return order_div
 
     @staticmethod
-    def get_task_div(task):
+    def get_task_div(task, instructions):
         """
         Take a task object and set up the Div to display it.
 
@@ -125,12 +125,17 @@ class OrderBuilderWdg(BaseRefreshWdg):
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(task.get_search_key()))
 
+        instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
+        instructions_button.add_behavior(obu.load_task_instructions_behavior(task.get_search_key()))
+        instructions_button.add_style('display', 'inline-block')
+
         task_div.add(process_div)
         task_div.add(status_div)
         task_div.add(priority_div)
         task_div.add(assigned_div)
         task_div.add(department_div)
         task_div.add(note_button)
+        task_div.add(instructions_button)
 
         return task_div
 
@@ -174,7 +179,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             note_button.add_style('display', 'inline-block')
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
-            instructions_button.add_behavior(self.get_instructions_wdg(title_order.get_code()))
+            instructions_button.add_behavior(self.get_title_instructions_wdg(title_order.get_code()))
             instructions_button.add_style('display', 'inline-block')
 
             change_due_date_button = ButtonNewWdg(title='Change Due Date', icon='DATE')
@@ -213,7 +218,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
                 for task in tasks:
                     task_div = DivWdg()
-                    task_div.add(self.get_task_div(task))
+                    task_div.add(self.get_task_div(task, title_order.get('instructions')))
                     task_list.add(task_div)
 
                 title_task_div.add(task_list)
@@ -297,7 +302,13 @@ catch(err) {
         return behavior
 
     @staticmethod
-    def get_instructions_wdg(code):
+    def get_title_instructions_wdg(code):
+        """
+        Load the instructions for the title.
+
+        :param code: title_order_code (unique ID)
+        :return: Behavior (Instructions Widget)
+        """
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',

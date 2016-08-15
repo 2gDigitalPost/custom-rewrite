@@ -228,3 +228,22 @@ catch(err) {
     }
 
     return behavior
+
+
+def load_task_instructions_behavior(task_search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    var task_search_key = '%s';
+
+    spt.api.load_popup('Instructions', 'order_builder.TaskInstructionsWdg', {'search_key': task_search_key});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % task_search_key
+    }
+
+    return behavior
