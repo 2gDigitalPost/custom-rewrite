@@ -348,7 +348,7 @@ catch(err) {
                                                                    line.get_value('field_in'))
                 )
                 table.add_cell(
-                    self.get_text_input_wdg_for_element_eval_lines('description-{0}'.format(iterator), 150,
+                    self.get_text_input_wdg_for_element_eval_lines('description-{0}'.format(iterator), 400,
                                                                    line.get_value('description'))
                 )
                 table.add_cell(
