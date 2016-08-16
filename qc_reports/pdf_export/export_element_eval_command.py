@@ -5,10 +5,9 @@ from pyasm.command import Command
 from pyasm.search import Search
 
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table, BaseDocTemplate, PageTemplate, Frame
+from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
 from reportlab.platypus.flowables import HRFlowable
 
 from pdf_export_utils import get_name_from_code, get_top_table, NumberedCanvas
@@ -68,6 +67,22 @@ def get_audio_configuration_table(element_eval_sobject):
     return audio_configuration_table
 
 
+def translate_in_source(text):
+    """
+    Take the value of the in_source field and convert it to readable text. Remove underscores and replace with spaces,
+    and capitalize the first word
+
+    :param text: String
+    :return: String
+    """
+
+    words = text.split('_')
+    translated_text = ' '.join(words)
+    translated_text = translated_text.capitalize()
+
+    return translated_text
+
+
 def get_element_eval_lines_table(element_eval_sobject):
     element_eval_lines_search = Search('twog/element_evaluation_line')
     element_eval_lines_search.add_filter('element_evaluation_code', element_eval_sobject.get_code())
@@ -113,16 +128,23 @@ def get_element_eval_lines_table(element_eval_sobject):
         type_code = line.get('type_code').capitalize()
         scale = line.get('scale').upper()
         sector_or_channel = line.get('sector_or_channel')
-        in_source = line.get('in_source')
+        in_source = translate_in_source(line.get('in_source'))
 
         if any([timecode_in, field_in, description, in_safe, timecode_out, field_out, type_code, scale,
                 sector_or_channel, in_source]):
-            description_paragraph_style = ParagraphStyle(description)
-            description_paragraph_style.fontSize = 8
-            description_paragraph = Paragraph(line.get('description'), description_paragraph_style)
+            line_data = []
 
-            line_data = [timecode_in, field_in, description_paragraph, in_safe, timecode_out, field_out, type_code,
-                         scale, sector_or_channel, in_source]
+            for attribute in [timecode_in, field_in, description, in_safe, timecode_out, field_out, type_code, scale,
+                              sector_or_channel, in_source]:
+                paragraph_style = ParagraphStyle(attribute)
+                paragraph_style.fontSize = 8
+
+                if scale == '3':
+                    paragraph = Paragraph('<b>' + attribute + '</b>', paragraph_style)
+                else:
+                    paragraph = Paragraph(attribute, paragraph_style)
+
+                line_data.append(paragraph)
 
             element_eval_lines_table_data.append(line_data)
 
