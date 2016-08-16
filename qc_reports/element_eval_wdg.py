@@ -6,9 +6,7 @@ from tactic.ui.widget import CalendarInputWdg, ButtonNewWdg
 
 from pyasm.search import Search
 from pyasm.web import Table, DivWdg, SpanWdg
-from pyasm.widget import SelectWdg, CheckboxWdg, TextAreaWdg
-
-import datetime
+from pyasm.widget import SelectWdg, TextAreaWdg
 
 
 class ElementEvalWdg(BaseTableElementWdg):

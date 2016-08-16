@@ -110,8 +110,8 @@ def get_element_eval_lines_table(element_eval_sobject):
 
         timecode_out = line.get('timecode_out')
         field_out = line.get('field_out')
-        type_code = line.get('type_code')
-        scale = line.get('scale')
+        type_code = line.get('type_code').capitalize()
+        scale = line.get('scale').upper()
         sector_or_channel = line.get('sector_or_channel')
         in_source = line.get('in_source')
 
@@ -355,11 +355,6 @@ class ExportElementEvalCommand(Command):
 
         if element_eval_lines_table:
             elements.append(element_eval_lines_table)
-
-        # frameT = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, topPadding=0)
-
-        # doc.addPageTemplates([PageTemplate(frames=frameT)])
-
 
         doc = SimpleDocTemplate(saved_file_path)
 
