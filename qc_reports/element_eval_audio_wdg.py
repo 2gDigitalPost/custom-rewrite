@@ -1,11 +1,11 @@
 from tactic_client_lib import TacticServerStub
-from tactic.ui.common import BaseTableElementWdg
+from tactic.ui.common import BaseRefreshWdg
 
 from pyasm.web import Table
 from pyasm.widget import TextWdg
 
 
-class ElementEvalAudioWdg(BaseTableElementWdg):
+class ElementEvalAudioWdg(BaseRefreshWdg):
     def init(my):
         my.content_pull = '<select REPLACE_ME><option value="">--Select--</option>'
         my.contents = ['5.1 Left', '5.1 Right', '5.1 Center', '5.1 LFE', '5.1 Left Surround', '5.1 Right Surround',

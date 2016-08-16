@@ -1,6 +1,6 @@
 from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import ButtonNewWdg
-from tactic.ui.common import BaseTableElementWdg
+from tactic.ui.common import BaseRefreshWdg
 
 from pyasm.prod.biz import ProdSetting
 from pyasm.search import Search
@@ -10,7 +10,7 @@ from pyasm.widget import SelectWdg
 from utils import get_add_colons_for_time_behavior
 
 
-class ElementEvalLinesWdg(BaseTableElementWdg):
+class ElementEvalLinesWdg(BaseRefreshWdg):
     def init(self):
         self.element_evaluation_code = self.kwargs.get('element_evaluation_code')
 

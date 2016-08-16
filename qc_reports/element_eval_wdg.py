@@ -1,6 +1,6 @@
 from qc_reports.audio_configuration_lines_wdg import AudioLinesTableWdg
 from qc_reports.element_eval_lines_wdg import ElementEvalLinesWdg
-from tactic.ui.common import BaseTableElementWdg
+from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import CalendarInputWdg, ButtonNewWdg
 
@@ -9,7 +9,7 @@ from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, TextAreaWdg
 
 
-class ElementEvalWdg(BaseTableElementWdg):
+class ElementEvalWdg(BaseRefreshWdg):
 
     def init(self):
         self.element_eval_sobject = self.get_sobject_from_kwargs()
