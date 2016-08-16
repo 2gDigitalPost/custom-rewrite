@@ -59,12 +59,16 @@ class OrderBuilderWdg(BaseRefreshWdg):
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
 
+        add_titles_button = ButtonNewWdg(title='Add Titles', icon='INSERT_MULTI')
+        # add_titles_button.add_behavior(())
+
         # Add the divs to the outer_div for display
         order_div.add(order_name_div)
         order_div.add(client_name_div)
         order_div.add(po_number_div)
         order_div.add(description_div)
         order_div.add(note_button)
+        order_div.add(add_titles_button)
         order_div.add(HtmlElement.br)
 
         return order_div
@@ -187,6 +191,10 @@ class OrderBuilderWdg(BaseRefreshWdg):
                                                                                   title_order.get('due_date')))
             change_due_date_button.add_style('display', 'inline-block')
 
+            add_task_button = ButtonNewWdg(title='Add Task', icon='INSERT')
+            add_task_button.add_behavior(self.get_add_task_behavior(title_order.get_search_key()))
+            add_task_button.add_style('display', 'inline-block')
+
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(external_rejection_button)
@@ -194,6 +202,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div.add(note_button)
             button_row_div.add(instructions_button)
             button_row_div.add(change_due_date_button)
+            button_row_div.add(add_task_button)
 
             title_div = DivWdg()
             title_div.add_style('background-color', '#d9edcf')
@@ -341,6 +350,23 @@ catch(err) {
 
         return behavior
 
+    @staticmethod
+    def get_add_task_behavior(title_order_search_key):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    spt.api.load_popup('Instructions', 'order_builder.AddTaskToTitleOrderWdg', {'title_order_search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % title_order_search_key
+        }
+
+        return behavior
+
     def get_add_titles_button(self):
         add_titles_button = ButtonNewWdg(title='Add Title', icon='ADD')
         add_titles_button.add_behavior(self.get_add_titles_behavior(self.order_code))
@@ -354,13 +380,15 @@ catch(err) {
         order_div = DivWdg()
 
         order_div.add(self.setup_order_information())
-        outer_div.add(order_div)
+        # outer_div.add(order_div)
 
         title_orders_div = DivWdg()
         title_orders_div.add_style('display', 'inline-block')
         title_orders_div.add_style('width', '600px')
         title_orders_div.add(self.setup_html_list_for_title_orders())
-        outer_div.add(title_orders_div)
+        order_div.add(title_orders_div)
+
+        outer_div.add(order_div)
 
         outer_div.add(self.get_add_titles_button())
 

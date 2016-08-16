@@ -3,7 +3,7 @@ from xml.etree import ElementTree
 from pyasm.search import Search
 from pyasm.widget import SelectWdg
 
-from pyasm.web import HtmlElement
+from pyasm.web import DivWdg, HtmlElement
 
 from tactic_client_lib import tactic_server_stub
 
@@ -29,6 +29,22 @@ def get_label_widget(label_text):
     """
 
     return HtmlElement.label(label_text)
+
+
+def get_widget_header(text):
+    """
+    Given a string, return a DivWdg containing the label, bolded and underlined
+
+    :param text: String
+    :return: DivWdg
+    """
+
+    div = DivWdg(text)
+
+    div.add_style('font-weight', 'bold')
+    div.add_style('text-decoration', 'underline')
+
+    return div
 
 
 def get_select_widget_from_search_type(search_type, label, label_column, value_column, search_filters=None,
