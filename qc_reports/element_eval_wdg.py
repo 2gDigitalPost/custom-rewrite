@@ -822,18 +822,18 @@ window.open(file_path);
     def get_title_section(self):
         section_div = DivWdg()
 
-        section_div.add(self.get_title_input_wdg())
+        section_div.add(self.get_input_widget_with_label('Title: ', 'title_data', 400))
         section_div.add(self.get_format_section())
 
         return section_div
 
-    def get_title_input_wdg(self):
+    def get_input_widget_with_label(self, label, id, width):
         section_span = SpanWdg()
         section_span.add_style('display', 'inline-block')
 
-        section_span.add('Title: ')
+        section_span.add(label)
 
-        section_span.add(get_text_input_wdg('title_data', get_attribute_or_none(self, 'title_data'), 400))
+        section_span.add(get_text_input_wdg(id, get_attribute_or_none(self, id), width))
 
         return section_span
 
@@ -866,20 +866,10 @@ window.open(file_path);
     def get_season_section(self):
         section_div = DivWdg()
 
-        section_div.add(self.get_season_input_wdg())
+        section_div.add(self.get_input_widget_with_label('Season: ', 'season', 400))
         section_div.add(self.get_standard_section())
 
         return section_div
-
-    def get_season_input_wdg(self):
-        section_span = SpanWdg()
-        section_span.add_style('display', 'inline-block')
-
-        section_span.add('Season: ')
-
-        section_span.add(get_text_input_wdg('season', get_attribute_or_none(self, 'season'), 400))
-
-        return section_span
 
     def get_standard_section(self):
         section_span = SpanWdg()
@@ -907,19 +897,10 @@ window.open(file_path);
     def get_episode_section(self):
         section_div = DivWdg()
 
-        section_div.add(self.get_episode_input_wdg())
+        section_div.add(self.get_input_widget_with_label('Episode: ', 'episode', 400))
         section_div.add(self.get_frame_rate_section())
 
         return section_div
-
-    def get_episode_input_wdg(self):
-        section_span = SpanWdg()
-        section_span.add_style('display', 'inline-block')
-
-        section_span.add('Episode: ')
-        section_span.add(get_text_input_wdg('episode', get_attribute_or_none(self, 'episode'), 400))
-
-        return section_span
 
     def get_frame_rate_section(self):
         section_span = SpanWdg()
@@ -970,43 +951,17 @@ window.open(file_path);
     def get_version_section(self):
         section_div = DivWdg()
 
-        section_div.add(self.get_version_input_wdg())
-        section_div.add(self.get_po_number_section())
+        section_div.add(self.get_input_widget_with_label('Version: ', 'version', 400))
+        section_div.add(self.get_input_widget_with_label('PO #: ', 'po_number', 100))
 
         return section_div
-
-    def get_version_input_wdg(self):
-        section_span = SpanWdg()
-        section_span.add_style('display', 'inline-block')
-
-        section_span.add('Version: ')
-        section_span.add(get_text_input_wdg('version', get_attribute_or_none(self, 'version'), 400))
-
-        return section_span
-
-    def get_po_number_section(self):
-        section_span = SpanWdg()
-        section_span.add_style('display', 'inline-block')
-
-        section_span.add('PO #: ')
-        section_span.add(get_text_input_wdg('po_number', get_attribute_or_none(self, 'po_number'), 100))
-
-        return section_span
 
     def get_file_name_section(self):
         section_div = DivWdg()
 
-        section_div.add(self.get_file_name_input_wdg())
+        section_div.add(self.get_input_widget_with_label('File Name: ', 'file_name', 600))
 
         return section_div
-
-    def get_file_name_input_wdg(self):
-        section_span = SpanWdg()
-
-        section_span.add('File Name: ')
-        section_span.add(get_text_input_wdg('file_name', get_attribute_or_none(self, 'file_name'), 600))
-
-        return section_span
 
     def get_program_format_table(self):
         program_format_table = Table()
