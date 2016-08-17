@@ -1,12 +1,13 @@
 from qc_reports.audio_configuration_lines_wdg import AudioLinesTableWdg
 from qc_reports.element_eval_lines_wdg import ElementEvalLinesWdg
 from tactic.ui.common import BaseRefreshWdg
-from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import CalendarInputWdg, ButtonNewWdg
 
 from pyasm.search import Search
 from pyasm.web import Table, DivWdg, SpanWdg
 from pyasm.widget import SelectWdg, TextAreaWdg
+
+from utils import get_attribute_or_none, get_text_input_wdg
 
 
 class ElementEvalWdg(BaseRefreshWdg):
@@ -670,21 +671,10 @@ window.open(file_path);
 
         return behavior
 
-    def get_text_input_wdg(self, field_name, width=200):
-        textbox_wdg = TextInputWdg()
-        textbox_wdg.set_id(field_name)
-        textbox_wdg.set_name(field_name)
-        textbox_wdg.add_style('width', '{0}px'.format(width))
-
-        if hasattr(self, field_name):
-            textbox_wdg.set_value(getattr(self, field_name))
-
-        return textbox_wdg
-
     def get_name_section(self):
         section_div = DivWdg()
 
-        name_wdg = self.get_text_input_wdg('name_data', 500)
+        name_wdg = get_text_input_wdg('name_data', get_attribute_or_none(self, 'name_data'), 500)
 
         section_div.add('Name: ')
         section_div.add(name_wdg)
@@ -755,7 +745,7 @@ window.open(file_path);
 
         operator_table.add_cell(self.get_date_calendar_wdg())
 
-        operator_table.add_cell(self.get_text_input_wdg('operator'))
+        operator_table.add_cell(get_text_input_wdg('operator', get_attribute_or_none(self, 'operator')))
 
         operator_table.add_cell(self.get_style_select())
         operator_table.add_cell(self.get_bay_select())
@@ -843,7 +833,7 @@ window.open(file_path);
 
         section_span.add('Title: ')
 
-        section_span.add(self.get_text_input_wdg('title_data', 400))
+        section_span.add(get_text_input_wdg('title_data', get_attribute_or_none(self, 'title_data'), 400))
 
         return section_span
 
@@ -887,7 +877,7 @@ window.open(file_path);
 
         section_span.add('Season: ')
 
-        section_span.add(self.get_text_input_wdg('season', 400))
+        section_span.add(get_text_input_wdg('season', get_attribute_or_none(self, 'season'), 400))
 
         return section_span
 
@@ -927,7 +917,7 @@ window.open(file_path);
         section_span.add_style('display', 'inline-block')
 
         section_span.add('Episode: ')
-        section_span.add(self.get_text_input_wdg('episode', 400))
+        section_span.add(get_text_input_wdg('episode', get_attribute_or_none(self, 'episode'), 400))
 
         return section_span
 
@@ -990,7 +980,7 @@ window.open(file_path);
         section_span.add_style('display', 'inline-block')
 
         section_span.add('Version: ')
-        section_span.add(self.get_text_input_wdg('version', 400))
+        section_span.add(get_text_input_wdg('version', get_attribute_or_none(self, 'version'), 400))
 
         return section_span
 
@@ -999,7 +989,7 @@ window.open(file_path);
         section_span.add_style('display', 'inline-block')
 
         section_span.add('PO #: ')
-        section_span.add(self.get_text_input_wdg('po_number', 100))
+        section_span.add(get_text_input_wdg('po_number', get_attribute_or_none(self, 'po_number'), 100))
 
         return section_span
 
@@ -1014,7 +1004,7 @@ window.open(file_path);
         section_span = SpanWdg()
 
         section_span.add('File Name: ')
-        section_span.add(self.get_text_input_wdg('file_name', 600))
+        section_span.add(get_text_input_wdg('file_name', get_attribute_or_none(self, 'file_name'), 600))
 
         return section_span
 
@@ -1036,11 +1026,11 @@ window.open(file_path);
             ('End of Program', 'end_of_program')
         ]
 
-        self.setup_table_rows_with_input_boxes(program_format_table, text_input_name_id_pairs)
+        self.setup_table_rows_with_input_boxes(program_format_table, text_input_name_id_pairs, timecode=True)
 
         return program_format_table
 
-    def setup_table_rows_with_input_boxes(self, table, text_input_name_id_pairs):
+    def setup_table_rows_with_input_boxes(self, table, text_input_name_id_pairs, timecode=False):
         for text_input_name_id_pair in text_input_name_id_pairs:
             table.add_row()
 
@@ -1048,7 +1038,9 @@ window.open(file_path);
             text_input_id = str(text_input_name_id_pair[1])
 
             table.add_cell(text_input_name)
-            table.add_cell(self.get_text_input_wdg(text_input_id, 300))
+
+            table.add_cell(get_text_input_wdg(text_input_id, get_attribute_or_none(self, text_input_id), 300,
+                                              timecode=timecode))
 
     def get_video_measurements_table(self):
         video_measurements_table = Table()
@@ -1078,33 +1070,40 @@ window.open(file_path);
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Total Runtime')
-        element_profile_table.add_cell(self.get_text_input_wdg('total_runtime', 300))
+        element_profile_table.add_cell(get_text_input_wdg('total_runtime',
+                                                          get_attribute_or_none(self, 'total_runtime'), 300))
         element_profile_table.add_cell('Language')
         element_profile_table.add_cell(self.get_language_select())
 
         element_profile_table.add_row()
         element_profile_table.add_cell('TV/Feature/Trailer')
-        element_profile_table.add_cell(self.get_text_input_wdg('tv_feature_trailer', 300))
+        element_profile_table.add_cell(get_text_input_wdg('tv_feature_trailer',
+                                                          get_attribute_or_none(self, 'tv_feature_trailer'), 300))
         element_profile_table.add_cell('(CC)/Subtitles')
-        element_profile_table.add_cell(self.get_text_input_wdg('cc_subtitles', 300))
+        element_profile_table.add_cell(get_text_input_wdg('cc_subtitles',
+                                                          get_attribute_or_none(self, 'cc_subtitles'), 300))
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Video Aspect Ratio')
         element_profile_table.add_cell(self.get_video_aspect_ratio_select_wdg())
         element_profile_table.add_cell('VITC')
-        element_profile_table.add_cell(self.get_text_input_wdg('vitc', 300))
+        element_profile_table.add_cell(get_text_input_wdg('vitc', get_attribute_or_none(self, 'vitc'), 300))
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Textless @ Tail')
-        element_profile_table.add_cell(self.get_text_input_wdg('textless_tail', 300))
+        element_profile_table.add_cell(get_text_input_wdg('textless_tail',
+                                                          get_attribute_or_none(self, 'textless_tail'), 300))
         element_profile_table.add_cell('Source Barcode')
-        element_profile_table.add_cell(self.get_text_input_wdg('source_barcode', 300))
+        element_profile_table.add_cell(get_text_input_wdg('source_barcode',
+                                                          get_attribute_or_none(self, 'source_barcode'), 300))
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Notices')
-        element_profile_table.add_cell(self.get_text_input_wdg('notices', 300))
+        element_profile_table.add_cell(get_text_input_wdg('notices',
+                                                          get_attribute_or_none(self, 'notices'), 300))
         element_profile_table.add_cell('Element QC Barcode')
-        element_profile_table.add_cell(self.get_text_input_wdg('element_qc_barcode', 300))
+        element_profile_table.add_cell(get_text_input_wdg('element_qc_barcode',
+                                                          get_attribute_or_none(self, 'element_qc_barcode'), 300))
 
         element_profile_table.add_row()
         element_profile_table.add_cell('Label')

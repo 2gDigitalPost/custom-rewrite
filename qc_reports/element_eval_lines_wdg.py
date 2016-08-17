@@ -7,7 +7,7 @@ from pyasm.search import Search
 from pyasm.web import DivWdg, SpanWdg, Table
 from pyasm.widget import SelectWdg
 
-from utils import get_add_colons_for_time_behavior
+from utils import get_text_input_wdg
 
 
 class ElementEvalLinesWdg(BaseRefreshWdg):
@@ -252,19 +252,6 @@ catch(err) {
 
         return textbox_wdg
 
-    def get_timecode_textbox(self, name, width=200, line_data=None):
-        timecode_textbox = TextInputWdg()
-        timecode_textbox.set_id(name)
-        timecode_textbox.set_name(name)
-        timecode_textbox.add_style('width', '{0}px'.format(width))
-
-        timecode_textbox.add_behavior(get_add_colons_for_time_behavior())
-
-        if line_data:
-            timecode_textbox.set_value(line_data)
-
-        return timecode_textbox
-
     @staticmethod
     def get_select_wdg(name, options, saved_value=None):
         select_wdg = SelectWdg(name)
@@ -341,38 +328,39 @@ catch(err) {
                 current_row.add_attr('code', line.get_code())
 
                 table.add_cell(
-                    self.get_timecode_textbox('timecode-in-{0}'.format(iterator), 150, line.get_value('timecode_in'))
+                    get_text_input_wdg('timecode-in-{0}'.format(iterator), line.get_value('timecode_in'), 150,
+                                       timecode=True)
                 )
                 table.add_cell(
-                    self.get_text_input_wdg_for_element_eval_lines('field-in-{0}'.format(iterator), 30,
-                                                                   line.get_value('field_in'))
+                    get_text_input_wdg('field-in-{0}'.format(iterator), line.get_value('field_in'), 30)
                 )
                 table.add_cell(
-                    self.get_text_input_wdg_for_element_eval_lines('description-{0}'.format(iterator), 400,
-                                                                   line.get_value('description'))
+                    get_text_input_wdg('description-{0}'.format(iterator), line.get_value('description'), 400)
                 )
                 table.add_cell(
                     self.get_select_wdg('in-safe-{0}'.format(iterator), in_safe_options, line.get_value('in_safe'))
                 )
                 table.add_cell(
-                    self.get_timecode_textbox('timecode-out-{0}'.format(iterator), 150, line.get_value('timecode_out'))
+                    get_text_input_wdg('timecode-out-{0}'.format(iterator), line.get_value('timecode_out'), 150,
+                                       timecode=True)
                 )
                 table.add_cell(
-                    self.get_text_input_wdg_for_element_eval_lines('field-out-{0}'.format(iterator), 30,
-                                                                   line.get_value('field_out'))
+                    get_text_input_wdg('field-out-{0}'.format(iterator), line.get_value('field_out'), 30)
                 )
                 table.add_cell(
-                    self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options, line.get_value('type_code'))
+                    self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options,
+                                        line.get_value('type_code'))
                 )
                 table.add_cell(
                     self.get_select_wdg('scale-{0}'.format(iterator), scale_select_options, line.get_value('scale'))
                 )
                 table.add_cell(
-                    self.get_text_input_wdg_for_element_eval_lines('sector-or-channel-{0}'.format(iterator), 150,
-                                                                   line.get_value('sector_or_channel'))
+                    get_text_input_wdg('sector-or-channel-{0}'.format(iterator), line.get_value('sector_or_channel'),
+                                       150)
                 )
                 table.add_cell(
-                    self.get_select_wdg('in-source-{0}'.format(iterator), in_source_options, line.get_value('in_source'))
+                    self.get_select_wdg('in-source-{0}'.format(iterator), in_source_options,
+                                        line.get_value('in_source'))
                 )
                 table.add_cell(
                     self.get_remove_row_button(line.get_code())
