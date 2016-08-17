@@ -13,10 +13,10 @@ from reportlab.platypus.flowables import HRFlowable
 from pdf_export_utils import get_name_from_code, get_top_table, NumberedCanvas
 
 
-def get_paragraph(text):
+def get_paragraph(text, style_sheet_type='BodyText'):
     style_sheet = getSampleStyleSheet()
 
-    return Paragraph(text, style_sheet['BodyText'])
+    return Paragraph(text, style_sheet[style_sheet_type])
 
 
 def get_title_table(element_eval_sobject):
@@ -42,8 +42,7 @@ def get_title_table(element_eval_sobject):
         ]
     ]
 
-    title_table = Table(title_table_data, hAlign='LEFT', colWidths=[(1 * inch), (2 * inch), (1 * inch),
-                                                                (2 * inch)])
+    title_table = Table(title_table_data, hAlign='LEFT', colWidths=[(1 * inch), (2 * inch), (1 * inch), (2 * inch)])
 
     return title_table
 
@@ -58,14 +57,12 @@ def get_audio_configuration_table(element_eval_sobject):
     if not audio_configuration_lines:
         return None
 
-    styleSheet = getSampleStyleSheet()
-
     audio_configuration_table_data = [
         [
-            Paragraph('<strong>Channel</strong>', styleSheet['BodyText']),
-            Paragraph('<strong>Content</strong>', styleSheet['BodyText']),
-            Paragraph('<strong>Tone</strong>', styleSheet['BodyText']),
-            Paragraph('<strong>Peak</strong>', styleSheet['BodyText'])
+            get_paragraph('<strong>Channel</strong>'),
+            get_paragraph('<strong>Content</strong>'),
+            get_paragraph('<strong>Tone</strong>'),
+            get_paragraph('<strong>Peak</strong>')
         ]
     ]
 
@@ -110,9 +107,6 @@ def get_element_eval_lines_table(element_eval_sobject):
     # If no element eval lines exist for this element evaluation, return None so that the PDF won't display a table
     if not element_eval_lines:
         return None
-
-    styleSheet = getSampleStyleSheet()
-    styleSheet.fontSize = 10
 
     element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'F', 'Code',
                                       'Scale', 'Sector/Ch', 'In Source']]
@@ -182,21 +176,19 @@ def get_element_eval_lines_table(element_eval_sobject):
 
 
 def get_program_format_table(element_eval_sobject):
-    styleSheet = getSampleStyleSheet()
-
     program_format_table_data = [
-        [Paragraph('<strong>Roll-up (blank)</strong>', styleSheet['BodyText']),
+        [get_paragraph('<strong>Roll-up (blank)</strong>'),
          element_eval_sobject.get('roll_up_blank')],
-        [Paragraph('<strong>Bars/Tone</strong>', styleSheet['BodyText']), element_eval_sobject.get('bars_tone')],
-        [Paragraph('<strong>Black/Silence</strong>', styleSheet['BodyText']),
+        [get_paragraph('<strong>Bars/Tone</strong>'), element_eval_sobject.get('bars_tone')],
+        [get_paragraph('<strong>Black/Silence</strong>'),
          element_eval_sobject.get('black_silence_1')],
-        [Paragraph('<strong>Slate/Silence</strong>', styleSheet['BodyText']),
+        [get_paragraph('<strong>Slate/Silence</strong>'),
          element_eval_sobject.get('slate_silence')],
-        [Paragraph('<strong>Black/Silence</strong>', styleSheet['BodyText']),
+        [get_paragraph('<strong>Black/Silence</strong>'),
          element_eval_sobject.get('black_silence_2')],
-        [Paragraph('<strong>Start of Program</strong>', styleSheet['BodyText']),
+        [get_paragraph('<strong>Start of Program</strong>'),
          element_eval_sobject.get('start_of_program')],
-        [Paragraph('<strong>End of Program</strong>', styleSheet['BodyText']),
+        [get_paragraph('<strong>End of Program</strong>'),
          element_eval_sobject.get('end_of_program')]
     ]
 
@@ -206,22 +198,14 @@ def get_program_format_table(element_eval_sobject):
 
 
 def get_video_measurements_table(element_eval_sobject):
-    styleSheet = getSampleStyleSheet()
-
     video_measurements_table_data = [
-        [Paragraph('<strong>Active Video Begins</strong>', styleSheet['BodyText']),
-         element_eval_sobject.get('active_video_begins')],
-        [Paragraph('<strong>Active Video Ends</strong>', styleSheet['BodyText']),
-         element_eval_sobject.get('active_video_ends')],
-        [Paragraph('<strong>Horizontal Blanking</strong>', styleSheet['BodyText']),
-         element_eval_sobject.get('horizontal_blanking')],
-        [Paragraph('<strong>Luminance Peak</strong>', styleSheet['BodyText']),
-         element_eval_sobject.get('luminance_peak')],
-        [Paragraph('<strong>Chroma Peak</strong>', styleSheet['BodyText']), element_eval_sobject.get('chroma_peak')],
-        [Paragraph('<strong>Head Logo</strong>', styleSheet['BodyText']),
-         Paragraph(element_eval_sobject.get('head_logo'), styleSheet['BodyText'])],
-        [Paragraph('<strong>Tail Logo</strong>', styleSheet['BodyText']),
-         Paragraph(element_eval_sobject.get('tail_logo'), styleSheet['BodyText'])]
+        [get_paragraph('<strong>Active Video Begins</strong>'), element_eval_sobject.get('active_video_begins')],
+        [get_paragraph('<strong>Active Video Ends</strong>'), element_eval_sobject.get('active_video_ends')],
+        [get_paragraph('<strong>Horizontal Blanking</strong>'), element_eval_sobject.get('horizontal_blanking')],
+        [get_paragraph('<strong>Luminance Peak</strong>'), element_eval_sobject.get('luminance_peak')],
+        [get_paragraph('<strong>Chroma Peak</strong>'), element_eval_sobject.get('chroma_peak')],
+        [get_paragraph('<strong>Head Logo</strong>'), get_paragraph(element_eval_sobject.get('head_logo'))],
+        [get_paragraph('<strong>Tail Logo</strong>'), get_paragraph(element_eval_sobject.get('tail_logo'))]
     ]
 
     video_measurements_table = Table(video_measurements_table_data, hAlign='LEFT', colWidths=[(1.4 * inch),
@@ -230,44 +214,31 @@ def get_video_measurements_table(element_eval_sobject):
 
 
 def get_element_profile_table(element_eval_sobject):
-    styleSheet = getSampleStyleSheet()
-
     element_profile_table_data = [
         [
-            Paragraph('<strong>Total Runtime</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('total_runtime'),
-            Paragraph('<strong>Language</strong>', styleSheet['BodyText']),
-            get_name_from_code(element_eval_sobject.get('language_code'), 'twog/language')
+            get_paragraph('<strong>Total Runtime</strong>'), element_eval_sobject.get('total_runtime'),
+            get_paragraph('<strong>Language</strong>'), get_name_from_code(element_eval_sobject.get('language_code'),
+                                                                           'twog/language')
         ],
         [
-            Paragraph('<strong>TV/Feature/Trailer</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('tv_feature_trailer'),
-            Paragraph('<strong>(CC)/Subtitles</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('cc_subtitles')
+            get_paragraph('<strong>TV/Feature/Trailer</strong>'), element_eval_sobject.get('tv_feature_trailer'),
+            get_paragraph('<strong>(CC)/Subtitles</strong>'), element_eval_sobject.get('cc_subtitles')
         ],
         [
-            Paragraph('<strong>Video Aspect Ratio</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('video_aspect_ratio'),
-            Paragraph('<strong>VITC</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('vitc')
+            get_paragraph('<strong>Video Aspect Ratio</strong>'), element_eval_sobject.get('video_aspect_ratio'),
+            get_paragraph('<strong>VITC</strong>'), element_eval_sobject.get('vitc')
         ],
         [
-            Paragraph('<strong>Textless @ Tail</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('textless_tail'),
-            Paragraph('<strong>Source Barcode</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('source_barcode')
+            get_paragraph('<strong>Textless @ Tail</strong>'), element_eval_sobject.get('textless_tail'),
+            get_paragraph('<strong>Source Barcode</strong>'), element_eval_sobject.get('source_barcode')
         ],
         [
-            Paragraph('<strong>Notices</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('notices'),
-            Paragraph('<strong>Element QC Barcode</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('element_qc_barcode')
+            get_paragraph('<strong>Notices</strong>'), element_eval_sobject.get('notices'),
+            get_paragraph('<strong>Element QC Barcode</strong>'), element_eval_sobject.get('element_qc_barcode')
         ],
         [
-            Paragraph('<strong>Label</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('label'),
-            Paragraph('<strong>Record Date</strong>', styleSheet['BodyText']),
-            element_eval_sobject.get('record_date')
+            get_paragraph('<strong>Label</strong>'), element_eval_sobject.get('label'),
+            get_paragraph('<strong>Record Date</strong>'), element_eval_sobject.get('record_date')
         ]
     ]
 
@@ -296,13 +267,11 @@ class ExportElementEvalCommand(Command):
 
         elements = []
 
-        styleSheet = getSampleStyleSheet()
+        image = Image(os.path.dirname(os.path.realpath(__file__)) + '/2g_logo.png')
+        image.drawHeight = 1.25 * inch * image.drawHeight / image.drawWidth
+        image.drawWidth = 1.25 * inch
 
-        I = Image(os.path.dirname(os.path.realpath(__file__)) + '/2g_logo.png')
-        I.drawHeight = 1.25 * inch * I.drawHeight / I.drawWidth
-        I.drawWidth = 1.25 * inch
-
-        top_address_paragraph = Paragraph('<strong>2G Digital Post, Inc.</strong>', styleSheet["BodyText"])
+        top_address_paragraph = get_paragraph('<strong>2G Digital Post, Inc.</strong>')
 
         address_table_data = [
             [top_address_paragraph],
@@ -315,8 +284,8 @@ class ExportElementEvalCommand(Command):
         address_table = Table(address_table_data)
 
         approved_rejected_status = element_eval_sobject.get('status')
-        approved_rejected_table_data = [[Paragraph('Status: <strong>{0}</strong>'.format(approved_rejected_status),
-                                                   styleSheet["BodyText"])]]
+        approved_rejected_table_data = [
+            [get_paragraph('Status: <strong>{0}</strong>'.format(approved_rejected_status))]]
 
         approved_rejected_table = Table(approved_rejected_table_data)
 
@@ -326,22 +295,22 @@ class ExportElementEvalCommand(Command):
         if not client_name:
             client_name = "Element Evaluation"
 
-        P = Paragraph('<strong>{0}</strong>'.format(client_name), styleSheet["Heading2"])
+        client_paragraph = get_paragraph('<strong>{0}</strong>'.format(client_name), "Heading2")
 
-        header_table = Table([[I, address_table, P, approved_rejected_table]])
+        header_table = Table([[image, address_table, client_paragraph, approved_rejected_table]])
 
         elements.append(header_table)
 
-        program_format_header = Paragraph('Program Format', styleSheet['Heading3'])
+        program_format_header = get_paragraph('Program Format', 'Heading3')
 
-        video_measurements_header = Paragraph('Video Measurements', styleSheet['Heading3'])
+        video_measurements_header = get_paragraph('Video Measurements', 'Heading3')
 
-        element_profile_header = Paragraph('Element Profile', styleSheet['Heading3'])
+        element_profile_header = get_paragraph('Element Profile', 'Heading3')
 
-        audio_configuration_header = Paragraph('Audio Configuration', styleSheet['Heading3'])
+        audio_configuration_header = get_paragraph('Audio Configuration', 'Heading3')
 
-        general_comments_header = Paragraph('General Comments', styleSheet['Heading3'])
-        general_comments = Paragraph(element_eval_sobject.get('general_comments'), styleSheet['BodyText'])
+        general_comments_header = get_paragraph('General Comments', 'Heading3')
+        general_comments = get_paragraph(element_eval_sobject.get('general_comments'))
 
         top_table = get_top_table(element_eval_sobject)
 
@@ -374,12 +343,12 @@ class ExportElementEvalCommand(Command):
             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black)
         ]), tables_to_style)
 
-        hrFlowable = HRFlowable(color=colors.gray, width='100%')
+        hr_flowable = HRFlowable(color=colors.gray, width='100%')
 
         # Add the segments to the report, regardless of whether or not there is data in the tables
         elements.append(top_table)
         elements.append(title_table)
-        elements.append(hrFlowable)
+        elements.append(hr_flowable)
         elements.append(program_format_video_measurements_header_table)
         elements.append(program_format_video_measurements_table)
         elements.append(element_profile_header)
