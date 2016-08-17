@@ -13,14 +13,33 @@ from reportlab.platypus.flowables import HRFlowable
 from pdf_export_utils import get_name_from_code, get_top_table, NumberedCanvas
 
 
+def get_paragraph(text):
+    style_sheet = getSampleStyleSheet()
+
+    return Paragraph(text, style_sheet['BodyText'])
+
+
 def get_title_table(element_eval_sobject):
     title_table_data = [
-        ['Title:', element_eval_sobject.get('title'), 'Format:', element_eval_sobject.get('format')],
-        ['Season:', element_eval_sobject.get('season'), 'Standard:', element_eval_sobject.get('standard')],
-        ['Episode:', element_eval_sobject.get('episode'),
-         'Frame Rate:', get_name_from_code(element_eval_sobject.get('frame_rate_code'), 'twog/frame_rate')],
-        ['Version:', element_eval_sobject.get('version'), 'PO #:', element_eval_sobject.get('po_number')],
-        ['File Name:', element_eval_sobject.get('file_name')]
+        [
+            'Title:', get_paragraph(element_eval_sobject.get('title')),
+            'Format:', get_paragraph(element_eval_sobject.get('format'))
+        ],
+        [
+            'Season:', get_paragraph(element_eval_sobject.get('season')),
+            'Standard:', get_paragraph(element_eval_sobject.get('standard'))],
+        [
+            'Episode:', get_paragraph(element_eval_sobject.get('episode')),
+            'Frame Rate:', get_paragraph(get_name_from_code(element_eval_sobject.get('frame_rate_code'),
+                                                            'twog/frame_rate'))
+        ],
+        [
+            'Version:', get_paragraph(element_eval_sobject.get('version')),
+            'PO #:', get_paragraph(element_eval_sobject.get('po_number'))
+        ],
+        [
+            'File Name:', element_eval_sobject.get('file_name')
+        ]
     ]
 
     title_table = Table(title_table_data, hAlign='LEFT', colWidths=[(1 * inch), (2 * inch), (1 * inch),
