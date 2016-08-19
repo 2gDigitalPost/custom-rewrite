@@ -1075,16 +1075,11 @@ window.open(file_path);
         video_aspect_ratio_sel.add_style('display', 'inline-block')
         video_aspect_ratio_sel.add_empty_option()
 
-        video_aspect_ratios = (
-            '16x9 1.33', '16x9 1.33 Pan & Scan', '16x9 1.78 Anamorphic', '16x9 1.78 Full Frame', '16x9 1.85 Letterbox',
-            '16x9 1.85 Matted', '16x9 1.85 Matted Anamorphic', '16x9 2.00 Letterbox', '16x9 2.10 Letterbox',
-            '16x9 2.20 Letterbox', '16x9 2.35 Anamorphic', '16x9 2.35 Letterbox', '16x9 2.39 Letterbox',
-            '16x9 2.40 Letterbox', '16x9 2.55 Letterbox', '4x3 1.33 Full Frame', '4x3 1.78 Letterbox',
-            '4x3 1.85 Letterbox', '4x3 2.35 Letterbox', '4x3 2.40 Letterbox'
-        )
+        video_aspect_ratios_search = Search('twog/aspect_ratio')
+        video_aspect_ratios = video_aspect_ratios_search.get_sobjects()
 
         for video_aspect_ratio in video_aspect_ratios:
-            video_aspect_ratio_sel.append_option(video_aspect_ratio, video_aspect_ratio)
+            video_aspect_ratio_sel.append_option(video_aspect_ratio.get('name'), video_aspect_ratio.get('name'))
 
         if hasattr(self, 'video_aspect_ratio'):
             video_aspect_ratio_sel.set_value(self.video_aspect_ratio)
