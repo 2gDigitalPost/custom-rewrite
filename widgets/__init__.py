@@ -1,0 +1,1 @@
+from assign_pipeline_wdg import AssignPipelineWdg
