@@ -7,7 +7,7 @@ from pyasm.widget import SelectWdg, SubmitWdg
 from order_builder.order_builder_utils import get_label_widget, get_widget_header
 
 
-def get_pipeline_select_wdg():
+def get_pipeline_select_wdg(pipeline_code):
     pipeline_sel = SelectWdg('pipeline_select')
     pipeline_sel.set_id('pipeline_select')
     pipeline_sel.add_style('width', '135px')
@@ -20,6 +20,9 @@ def get_pipeline_select_wdg():
     for pipeline in pipelines:
         pipeline_sel.append_option(pipeline.get_value('name'), pipeline.get_code())
 
+    if pipeline_code:
+        pipeline_sel.set_value(pipeline_code)
+
     return pipeline_sel
 
 
@@ -29,7 +32,7 @@ def get_submit_behavior():
         'type': 'click_up',
         'cbjs_action': '''
 try {
-    
+
 }
 catch(err) {
     spt.app_busy.hide();
@@ -49,7 +52,7 @@ def get_submit_widget():
 
 class AssignPipelineWdg(BaseRefreshWdg):
     def init(self):
-        title_order_sobject = self.get_sobject_from_kwargs()
+        self.title_order_sobject = self.get_sobject_from_kwargs()
 
     def get_display(self):
         outer_div = DivWdg()
@@ -59,7 +62,13 @@ class AssignPipelineWdg(BaseRefreshWdg):
         outer_div.add(get_widget_header(page_label))
 
         outer_div.add(get_label_widget('Pipeline'))
-        outer_div.add(get_pipeline_select_wdg())
+
+        if self.title_order_sobject:
+            pipeline_code = self.title_order_sobject.get_value('pipeline_code')
+        else:
+            pipeline_code = None
+
+        outer_div.add(get_pipeline_select_wdg(pipeline_code))
 
         outer_div.add(get_submit_widget())
 

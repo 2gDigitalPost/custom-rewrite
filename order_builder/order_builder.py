@@ -13,7 +13,7 @@ def get_assign_pipeline_behavior(title_order_code):
         'type': 'click_up',
         'cbjs_action': '''
 try {
-    spt.api.load_popup('Assign Pipeline', 'widgets.AssignPipelineWdg', {'title_order_code': '%s'});
+    spt.api.load_popup('Assign Pipeline', 'widgets.AssignPipelineWdg', {'search_key': '%s'});
 }
 catch(err) {
     spt.app_busy.hide();
@@ -209,8 +209,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
                                                                                   title_order.get('due_date')))
             change_due_date_button.add_style('display', 'inline-block')
 
-            assign_pipeline_button = ButtonNewWdg(title='Assign Pipeline', icon='WORKFLOW')
-            assign_pipeline_button.add_behavior(get_assign_pipeline_behavior(title_order.get_code()))
+            assign_pipeline_button = ButtonNewWdg(title='Assign Pipeline', icon='PIPELINE')
+            assign_pipeline_button.add_behavior(get_assign_pipeline_behavior(title_order.get_search_key()))
             assign_pipeline_button.add_style('display', 'inline-block')
 
             add_task_button = ButtonNewWdg(title='Add Task', icon='INSERT')
