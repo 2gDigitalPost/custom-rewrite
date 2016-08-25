@@ -253,6 +253,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
             package_priority_div = DivWdg()
             package_priority_div.add('Priority: {0}'.format(package.get('priority')))
 
+            package_platform_div = DivWdg()
+            platform_code = package.get('platform_code')
+
+            if platform_code:
+                platform = obu.get_platform(platform_code)
+
+                if platform:
+                    package_platform_div.add('Platform: {0}'.format(platform.get('name')))
+
             package_due_date_div = DivWdg()
 
             if package.get('due_date'):
@@ -275,6 +284,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             package_div.add(package_description_div)
             package_div.add(package_priority_div)
             package_div.add(package_due_date_div)
+            package_div.add(package_platform_div)
             package_div.add(button_row_div)
 
             package_list_div = DivWdg()

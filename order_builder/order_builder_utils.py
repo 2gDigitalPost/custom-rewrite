@@ -202,6 +202,13 @@ def get_tasks_for_title_order(title_order):
     return task_search.get_sobjects()
 
 
+def get_platform(platform_code):
+    platform_search = Search('twog/platform')
+    platform_search.add_code_filter(platform_code)
+
+    return platform_search.get_sobject()
+
+
 def get_server():
     """
 
