@@ -36,7 +36,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_sobject_search.add_code_filter(self.order_code)
         self.order_sobject = order_sobject_search.get_sobject()
 
-        self.titles_in_order = obu.get_titles_from_order(self.order_sobject.get('code'))
+        self.packages_in_order = obu.get_packages_from_order(self.order_sobject.get_code())
+        # self.titles_in_order = obu.get_titles_from_order(self.order_sobject.get('code'))
 
     def setup_order_information(self):
         """
@@ -92,7 +93,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         return order_div
 
     @staticmethod
-    def get_task_div(task, instructions):
+    def get_task_div(task):
         """
         Take a task object and set up the Div to display it.
 
@@ -146,20 +147,143 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(task.get_search_key()))
+        note_button.add_style('display', 'inline-block')
 
         instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
         instructions_button.add_behavior(obu.load_task_instructions_behavior(task.get_search_key()))
-        instructions_button.add_style('display', 'inline-block')
 
         task_div.add(process_div)
         task_div.add(status_div)
         task_div.add(priority_div)
         task_div.add(assigned_div)
         task_div.add(department_div)
-        task_div.add(note_button)
         task_div.add(instructions_button)
+        task_div.add(note_button)
 
         return task_div
+
+    def setup_html_list_for_components_in_package(self, package):
+        components_list = HtmlElement.ul()
+        components_list.add_style('list-style-type', 'none')
+
+        component_search = Search('twog/component')
+        component_search.add_filter('package_code', package.get_code())
+        components = component_search.get_sobjects()
+
+        for component in components:
+            component_name_div = DivWdg()
+            component_name_div.add_style('font-weight', 'bold')
+            component_name_div.add(component.get('name'))
+
+            component_description_div = DivWdg()
+            component_description_div.add_style('font-style', 'italic')
+            component_description_div.add(component.get('description'))
+
+            component_priority_div = DivWdg()
+            component_priority_div.add(component.get('priority'))
+
+            component_div = DivWdg()
+            component_div.add_style('background-color', '#d9edcf')
+            component_div.add_style('padding', '10px')
+            component_div.add_style('border-radius', '10px')
+
+            component_div.add(component_name_div)
+            component_div.add(component_description_div)
+            component_div.add(component_priority_div)
+
+            instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
+            instructions_button.add_behavior(self.get_component_instructions_wdg(component.get_search_key()))
+            instructions_button.add_style('display', 'inline-block')
+
+            note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+            note_button.add_behavior(obu.get_add_notes_behavior(component.get_search_key()))
+            note_button.add_style('display', 'inline-block')
+
+            button_row_div = SpanWdg()
+            button_row_div.add_style('display', 'inline-block')
+            button_row_div.add(instructions_button)
+            button_row_div.add(note_button)
+
+            component_div.add(button_row_div)
+
+            tasks = obu.get_tasks_for_component(component)
+
+            component_task_div = DivWdg()
+            component_task_div.add_style('width', '100%')
+            component_task_div.add_style('margin-left', '30px')
+
+            # If there are tasks associated with the component, add them as a sub-list below it
+            if tasks:
+                task_list = DivWdg()
+
+                for task in tasks:
+                    task_div = DivWdg()
+                    task_div.add(self.get_task_div(task))
+                    task_list.add(task_div)
+
+                component_task_div.add(task_list)
+
+            component_outer_div = DivWdg()
+            component_outer_div.add(component_div)
+            component_outer_div.add(component_task_div)
+
+            components_list.add(component_outer_div)
+
+        return components_list
+
+    def setup_html_list_for_packages_in_orders(self):
+        """
+        Add the packages that go into the order to an HTML style unordered list
+
+        :return: HtmlElement.ul containing the packages
+        """
+
+        packages_list = HtmlElement.ul()
+        packages_list.add_style('list-style-type', 'none')
+
+        for package in self.packages_in_order:
+            package_name_div = DivWdg()
+            package_name_div.add_style('font-weight', 'bold')
+            package_name_div.add(package.get('name'))
+
+            package_description_div = DivWdg()
+            package_description_div.add_style('font-style', 'italic')
+            package_description_div.add(package.get('description'))
+
+            package_priority_div = DivWdg()
+            package_priority_div.add('Priority: {0}'.format(package.get('priority')))
+
+            package_due_date_div = DivWdg()
+
+            if package.get('due_date'):
+                package_due_date_div.add('Due: {0}'.format(package.get('due_date')))
+
+            note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+            note_button.add_behavior(obu.get_add_notes_behavior(package.get_search_key()))
+            note_button.add_style('display', 'inline-block')
+
+            button_row_div = SpanWdg()
+            button_row_div.add_style('display', 'inline-block')
+            button_row_div.add(note_button)
+
+            package_div = DivWdg()
+            package_div.add_style('background-color', '#d9edf7')
+            package_div.add_style('padding', '10px')
+            package_div.add_style('border-radius', '10px')
+
+            package_div.add(package_name_div)
+            package_div.add(package_description_div)
+            package_div.add(package_priority_div)
+            package_div.add(package_due_date_div)
+            package_div.add(button_row_div)
+
+            package_list_div = DivWdg()
+            package_list_div.add(package_div)
+            package_list_div.add(self.setup_html_list_for_components_in_package(package))
+
+            packages_list.add(package_list_div)
+
+        return packages_list
 
     def setup_html_list_for_title_orders(self):
         """
@@ -201,7 +325,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             note_button.add_style('display', 'inline-block')
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
-            instructions_button.add_behavior(self.get_title_instructions_wdg(title_order.get_code()))
+            instructions_button.add_behavior(self.get_title_instructions_wdg(title_order.get_search_key()))
             instructions_button.add_style('display', 'inline-block')
 
             change_due_date_button = ButtonNewWdg(title='Change Due Date', icon='DATE')
@@ -250,7 +374,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
                 for task in tasks:
                     task_div = DivWdg()
-                    task_div.add(self.get_task_div(task, title_order.get('instructions')))
+                    task_div.add(self.get_task_div(task))
                     task_list.add(task_div)
 
                 title_task_div.add(task_list)
@@ -346,12 +470,35 @@ catch(err) {
             'type': 'click_up',
             'cbjs_action': '''
 try {
-    spt.api.load_popup('Instructions', 'order_builder.InstructionsWdg', {'title_order_code': '%s'});
+    spt.api.load_popup('Instructions', 'order_builder.TitleOrderInstructionsWdg', {'search_key': '%s'});
 }
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }''' % code
+        }
+
+        return behavior
+
+    @staticmethod
+    def get_component_instructions_wdg(search_key):
+        """
+        Load the instructions for the component.
+
+        :param search_key: Component's search key (unique ID)
+        :return: Behavior (Instructions Widget)
+        """
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    spt.api.load_popup('Instructions', 'order_builder.ComponentInstructionsWdg', {'search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % search_key
         }
 
         return behavior
@@ -403,13 +550,12 @@ catch(err) {
         order_div = DivWdg()
 
         order_div.add(self.setup_order_information())
-        # outer_div.add(order_div)
 
-        title_orders_div = DivWdg()
-        title_orders_div.add_style('display', 'inline-block')
-        title_orders_div.add_style('width', '600px')
-        title_orders_div.add(self.setup_html_list_for_title_orders())
-        order_div.add(title_orders_div)
+        packages_div = DivWdg()
+        packages_div.add_style('display', 'inline-block')
+        packages_div.add_style('width', '600px')
+        packages_div.add(self.setup_html_list_for_packages_in_orders())
+        order_div.add(packages_div)
 
         outer_div.add(order_div)
 

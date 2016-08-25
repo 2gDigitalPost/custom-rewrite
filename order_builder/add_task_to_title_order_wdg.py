@@ -2,7 +2,7 @@ from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.input import TextInputWdg
 
 from pyasm.web import DivWdg
-from pyasm.widget import SelectWdg, SubmitWdg
+from pyasm.widget import SubmitWdg
 
 from order_builder_utils import get_label_widget, get_widget_header
 

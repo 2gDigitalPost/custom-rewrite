@@ -153,6 +153,18 @@ def get_titles_from_order(order_code):
     return titles_in_order_search.get_sobjects()
 
 
+def get_packages_from_order(order_code):
+    """
+    Using the Order's code, find all packages that are associated to it.
+
+    :return: A list of sobjects (packages)
+    """
+    packages_search = Search('twog/package')
+    packages_search.add_filter('order_code', order_code)
+
+    return packages_search.get_sobjects()
+
+
 def get_client_name_from_code(client_code):
     """
     Get the client's name, using their code to search
@@ -168,6 +180,19 @@ def get_client_name_from_code(client_code):
         return client.get('name')
     else:
         return None
+
+
+def get_tasks_for_component(component):
+    """
+    Get all the tasks associated with a component
+
+    :param component: Component sobject (twog/component)
+    :return: Sobject list
+    """
+    task_search = Search('sthpw/task')
+    task_search.add_parent_filter(component)
+
+    return task_search.get_sobjects()
 
 
 def get_tasks_for_title_order(title_order):
