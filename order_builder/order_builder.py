@@ -24,6 +24,30 @@ catch(err) {
     return behavior
 
 
+def get_add_packages_behavior(order_search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    spt.api.load_popup('Add Title to Order', 'order_builder.InsertPackageInOrderWdg', {'search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % order_search_key
+    }
+
+    return behavior
+
+
+def get_add_package_button(order_search_key):
+    add_titles_button = ButtonNewWdg(title='Add Package', icon='ADD')
+    add_titles_button.add_behavior(get_add_packages_behavior(order_search_key))
+
+    return add_titles_button
+
+
 class OrderBuilderWdg(BaseRefreshWdg):
     """
     My attempt at rewriting the Order Builder module.
@@ -78,9 +102,9 @@ class OrderBuilderWdg(BaseRefreshWdg):
         note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
         note_button.add_style('display', 'inline-block')
 
-        add_titles_button = ButtonNewWdg(title='Add Title', icon='ADD')
-        add_titles_button.add_behavior(self.get_add_titles_behavior(self.order_code))
-        add_titles_button.add_style('display', 'inline-block')
+        add_packages_button = ButtonNewWdg(title='Add Package', icon='ADD')
+        add_packages_button.add_behavior(get_add_packages_behavior(self.order_sobject.get_search_key()))
+        add_packages_button.add_style('display', 'inline-block')
 
         # Add the divs to the outer_div for display
         order_div.add(order_name_div)
@@ -88,7 +112,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(po_number_div)
         order_div.add(description_div)
         order_div.add(note_button)
-        order_div.add(add_titles_button)
+        order_div.add(add_packages_button)
 
         return order_div
 
@@ -296,25 +320,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
         return packages_list
 
     @staticmethod
-    def get_add_titles_behavior(order_code):
-        behavior = {
-            'css_class': 'clickme',
-            'type': 'click_up',
-            'cbjs_action': '''
-try {
-    var order_code = '%s';
-
-    spt.api.load_popup('Add Title to Order', 'order_builder.InsertTitleInOrderWdg', {'code': order_code});
-}
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}''' % order_code
-        }
-
-        return behavior
-
-    @staticmethod
     def get_external_rejection_button_behavior():
         behavior = {
             'css_class': 'clickme',
@@ -421,12 +426,6 @@ catch(err) {
         }
 
         return behavior
-
-    def get_add_titles_button(self):
-        add_titles_button = ButtonNewWdg(title='Add Title', icon='ADD')
-        add_titles_button.add_behavior(self.get_add_titles_behavior(self.order_code))
-
-        return add_titles_button
 
     def get_display(self):
         outer_div = DivWdg()

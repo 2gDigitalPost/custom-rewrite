@@ -4,6 +4,7 @@ from pyasm.search import Search
 from pyasm.widget import SelectWdg
 
 from pyasm.web import DivWdg, HtmlElement
+from tactic.ui.input import TextInputWdg
 
 from tactic_client_lib import tactic_server_stub
 
@@ -239,6 +240,15 @@ def get_base_url(server=None, project='twog'):
 
     url = 'http://{0}/tactic/{1}/'.format(server.server_name, project)
     return url
+
+
+def get_text_input_wdg(name, width=200):
+    textbox_wdg = TextInputWdg()
+    textbox_wdg.set_id(name)
+    textbox_wdg.set_name(name)
+    textbox_wdg.add_style('width', '{0}px'.format(width))
+
+    return textbox_wdg
 
 
 def get_order_builder_url(order_code, server=None, project='twog'):
