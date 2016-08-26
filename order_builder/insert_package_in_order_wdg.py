@@ -1,9 +1,7 @@
 from tactic.ui.common import BaseRefreshWdg
-from tactic.ui.input import TextAreaInputWdg
 
-from pyasm.search import Search
 from pyasm.web import DivWdg
-from pyasm.widget import MultiSelectWdg, SubmitWdg
+from pyasm.widget import SubmitWdg
 
 import order_builder_utils as obu
 
@@ -46,16 +44,11 @@ try {
     var containing_element = bvr.src_el.getParent("#insert-package-in-order");
     var new_package_values = spt.api.get_input_values(containing_element, null, false);
 
-    console.log(new_package_values);
-
     // Get the form values
     var order_code = '%s';
     var name = new_package_values.new_package_name;
     var platform_code = new_package_values.platform_code;
 
-    console.log(name);
-
-    // Set up the object for the new package entry.
     // Set up the object for the new package entry.
     var new_package = {
         'name': name,

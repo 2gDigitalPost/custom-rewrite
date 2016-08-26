@@ -30,12 +30,29 @@ def get_add_packages_behavior(order_search_key):
         'type': 'click_up',
         'cbjs_action': '''
 try {
-    spt.api.load_popup('Add Title to Order', 'order_builder.InsertPackageInOrderWdg', {'search_key': '%s'});
+    spt.api.load_popup('Add Package to Order', 'order_builder.InsertPackageInOrderWdg', {'search_key': '%s'});
 }
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }''' % order_search_key
+    }
+
+    return behavior
+
+
+def get_reassign_component_behavior(component_search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+    try {
+        spt.api.load_popup('Reassign Component', 'order_builder.ReassignComponentToPackage', {'search_key': '%s'});
+    }
+    catch(err) {
+        spt.app_busy.hide();
+        spt.alert(spt.exception.handler(err));
+    }''' % component_search_key
     }
 
     return behavior
@@ -219,6 +236,10 @@ class OrderBuilderWdg(BaseRefreshWdg):
             instructions_button.add_behavior(self.get_component_instructions_wdg(component.get_search_key()))
             instructions_button.add_style('display', 'inline-block')
 
+            reassign_button = ButtonNewWdg(title='Reassign to another Package', icon="TABLE_ROW")
+            reassign_button.add_behavior(get_reassign_component_behavior(component.get_search_key()))
+            reassign_button.add_style('display', 'inline-block')
+
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(obu.get_add_notes_behavior(component.get_search_key()))
             note_button.add_style('display', 'inline-block')
@@ -226,6 +247,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(instructions_button)
+            button_row_div.add(reassign_button)
             button_row_div.add(note_button)
 
             component_div.add(button_row_div)
