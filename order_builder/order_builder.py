@@ -41,6 +41,23 @@ catch(err) {
     return behavior
 
 
+def get_add_component_in_package_wdg(package_search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    spt.api.load_popup('Add Component to Package', 'order_builder.InsertComponentInPackageWdg', {'search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % package_search_key
+    }
+
+    return behavior
+
+
 def get_add_component_by_language_behavior(package_search_key):
     behavior = {
         'css_class': 'clickme',
@@ -131,21 +148,21 @@ class OrderBuilderWdg(BaseRefreshWdg):
         else:
             description_div.add('No description available')
 
-        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
-        note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
-        note_button.add_style('display', 'inline-block')
-
         add_packages_button = ButtonNewWdg(title='Add Package', icon='ADD')
         add_packages_button.add_behavior(get_add_packages_behavior(self.order_sobject.get_search_key()))
         add_packages_button.add_style('display', 'inline-block')
+
+        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+        note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
+        note_button.add_style('display', 'inline-block')
 
         # Add the divs to the outer_div for display
         order_div.add(order_name_div)
         order_div.add(client_name_div)
         order_div.add(po_number_div)
         order_div.add(description_div)
-        order_div.add(note_button)
         order_div.add(add_packages_button)
+        order_div.add(note_button)
 
         return order_div
 
@@ -262,7 +279,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             instructions_button.add_behavior(self.get_component_instructions_wdg(component.get_search_key()))
             instructions_button.add_style('display', 'inline-block')
 
-            reassign_button = ButtonNewWdg(title='Reassign to another Package', icon="TABLE_ROW")
+            reassign_button = ButtonNewWdg(title='Reassign to another Package', icon="TABLE_UPDATE_ENTRY")
             reassign_button.add_behavior(get_reassign_component_behavior(component.get_search_key()))
             reassign_button.add_style('display', 'inline-block')
 
@@ -339,17 +356,23 @@ class OrderBuilderWdg(BaseRefreshWdg):
             if package.get('due_date'):
                 package_due_date_div.add('Due: {0}'.format(package.get('due_date')))
 
+            add_component_button = ButtonNewWdg(title='Add Component', icon='INSERT')
+            add_component_button.add_behavior(get_add_component_in_package_wdg(package.get_search_key()))
+            add_component_button.add_style('display', 'inline-block')
+
+            add_component_by_language_button = ButtonNewWdg(title='Add Component By Language', icon='INSERT_MULTI')
+            add_component_by_language_button.add_behavior(
+                get_add_component_by_language_behavior(package.get_search_key()))
+            add_component_by_language_button.add_style('display', 'inline-block')
+
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(obu.get_add_notes_behavior(package.get_search_key()))
             note_button.add_style('display', 'inline-block')
 
-            add_component_button = ButtonNewWdg(title='Add Component By Language', icon='INSERT_MULTI')
-            add_component_button.add_behavior(get_add_component_by_language_behavior(package.get_search_key()))
-            add_component_button.add_style('display', 'inline-block')
-
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(add_component_button)
+            button_row_div.add(add_component_by_language_button)
             button_row_div.add(note_button)
 
             package_div = DivWdg()

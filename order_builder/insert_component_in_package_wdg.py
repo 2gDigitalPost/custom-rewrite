@@ -2,9 +2,27 @@ from tactic.ui.common import BaseRefreshWdg
 
 from pyasm.search import Search
 from pyasm.web import DivWdg, Table
-from pyasm.widget import CheckboxWdg, MultiSelectWdg, SelectWdg, SubmitWdg
+from pyasm.widget import CheckboxWdg, SelectWdg, SubmitWdg
 
 import order_builder_utils as obu
+
+
+def get_language_select_wdg():
+    language_select_wdg = SelectWdg('language_select')
+    language_select_wdg.set_id('language_code')
+    language_select_wdg.add_style('width', '300px')
+    language_select_wdg.add_style('display', 'inline-block')
+    language_select_wdg.add_empty_option()
+
+    language_search = Search('twog/language')
+    languages = language_search.get_sobjects()
+
+    languages = sorted(languages, key=lambda x: x.get_value('name'))
+
+    for language in languages:
+        language_select_wdg.append_option(language.get_value('name'), language.get_code())
+
+    return language_select_wdg
 
 
 def get_languages_checkboxes():
@@ -52,6 +70,65 @@ def get_pipeline_select_wdg(search_type, width=300):
     return pipeline_select_wdg
 
 
+class InsertComponentInPackageWdg(BaseRefreshWdg):
+    def init(self):
+        self.package_sobject = self.get_sobject_from_kwargs()
+
+    def get_display(self):
+        outer_div = DivWdg()
+        outer_div.set_id('insert-component-in-package')
+
+        outer_div.add(obu.get_label_widget('Name'))
+        outer_div.add(obu.get_text_input_wdg('new_component_name', 400))
+
+        outer_div.add(obu.get_label_widget('Language'))
+        outer_div.add(get_language_select_wdg())
+
+        outer_div.add(obu.get_label_widget('Pipeline'))
+        outer_div.add(get_pipeline_select_wdg('twog/component'))
+
+        submit_button = SubmitWdg('Submit')
+        submit_button.add_behavior(self.get_submit_button_behavior(self.package_sobject.get_code()))
+        outer_div.add(submit_button)
+
+        return outer_div
+
+    @staticmethod
+    def get_submit_button_behavior(package_code):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    // Get the server object
+    var server = TacticServerStub.get();
+    var containing_element = bvr.src_el.getParent("#insert-component-in-package");
+    var new_component_values = spt.api.get_input_values(containing_element, null, false);
+
+    // Get the form values
+    var package_code = '%s';
+    var name = new_component_values.new_component_name;
+    var language_code = new_component_values.language_code;
+    var pipeline_code = new_component_values.pipeline_code;
+
+    var new_component = {
+        'name': name,
+        'package_code': package_code,
+        'language_code': language_code,
+        'pipeline_code': pipeline_code
+    }
+
+    server.insert('twog/component', new_component);
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % package_code
+        }
+
+        return behavior
+
+
 class InsertComponentByLanguageWdg(BaseRefreshWdg):
     def init(self):
         self.package_sobject = self.get_sobject_from_kwargs()
@@ -62,6 +139,7 @@ class InsertComponentByLanguageWdg(BaseRefreshWdg):
 
         outer_div.add(obu.get_label_widget('Name'))
         outer_div.add(obu.get_text_input_wdg('new_component_name', 400))
+
         outer_div.add(get_languages_checkboxes())
 
         outer_div.add(obu.get_label_widget('Pipeline'))
@@ -69,21 +147,9 @@ class InsertComponentByLanguageWdg(BaseRefreshWdg):
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior(self.package_sobject.get_code()))
-
         outer_div.add(submit_button)
 
         return outer_div
-
-    @staticmethod
-    def get_languages_wdg(outer_div):
-        languages_search = Search('twog/language')
-
-        languages_wdg = MultiSelectWdg('languages')
-        languages_wdg.add_empty_option('----')
-        languages_wdg.set_search_for_options(languages_search, label_column='name', value_column='code')
-
-        outer_div.add(obu.get_label_widget('Language'))
-        outer_div.add(languages_wdg)
 
     @staticmethod
     def get_submit_button_behavior(package_code):
@@ -101,8 +167,6 @@ try {
     var package_code = '%s';
     var name = new_component_values.new_component_name;
     var pipeline_code = new_component_values.pipeline_code;
-
-    console.log(new_component_values);
 
     var languages = server.eval("@SOBJECT(twog/language)")
 
