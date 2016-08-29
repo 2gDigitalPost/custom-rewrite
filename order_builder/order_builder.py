@@ -239,6 +239,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_priority_div = DivWdg()
             component_priority_div.add(component.get('priority'))
 
+            component_pipeline_div = DivWdg()
+            component_pipeline_name = obu.get_pipeline_name_by_code(component.get('pipeline_code'))
+
+            if component_pipeline_name:
+                component_pipeline_div.add('Pipeline: <i>{0}</i>'.format(
+                    obu.get_pipeline_name_by_code(component.get('pipeline_code'))))
+            else:
+                component_pipeline_div.add('<i>No Pipeline Assigned</i>')
+
             component_div = DivWdg()
             component_div.add_style('background-color', '#d9edcf')
             component_div.add_style('padding', '10px')
@@ -247,6 +256,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(component_name_div)
             component_div.add(component_description_div)
             component_div.add(component_priority_div)
+            component_div.add(component_pipeline_div)
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
             instructions_button.add_behavior(self.get_component_instructions_wdg(component.get_search_key()))
@@ -333,7 +343,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             note_button.add_behavior(obu.get_add_notes_behavior(package.get_search_key()))
             note_button.add_style('display', 'inline-block')
 
-            add_component_button = ButtonNewWdg(title='Add Component', icon='ADD')
+            add_component_button = ButtonNewWdg(title='Add Component By Language', icon='INSERT_MULTI')
             add_component_button.add_behavior(get_add_component_by_language_behavior(package.get_search_key()))
             add_component_button.add_style('display', 'inline-block')
 
