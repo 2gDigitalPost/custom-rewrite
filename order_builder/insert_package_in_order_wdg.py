@@ -1,9 +1,21 @@
 from tactic.ui.common import BaseRefreshWdg
+from tactic.ui.widget import CalendarInputWdg
 
 from pyasm.web import DivWdg
 from pyasm.widget import SubmitWdg
 
 import order_builder_utils as obu
+
+
+def get_date_calendar_wdg():
+    date_calendar_wdg = CalendarInputWdg("due_date")
+    date_calendar_wdg.set_option('show_activator', 'true')
+    date_calendar_wdg.set_option('show_time', 'false')
+    date_calendar_wdg.set_option('width', '300px')
+    date_calendar_wdg.set_option('id', 'due_date')
+    date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
+
+    return date_calendar_wdg
 
 
 class InsertPackageInOrderWdg(BaseRefreshWdg):
@@ -16,6 +28,9 @@ class InsertPackageInOrderWdg(BaseRefreshWdg):
 
         outer_div.add(obu.get_text_input_wdg('new_package_name', 400))
         self.get_platform_select_widget(outer_div)
+
+        outer_div.add(obu.get_label_widget('Due Date'))
+        outer_div.add(get_date_calendar_wdg())
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior(self.order_sobject.get_code()))
@@ -48,12 +63,14 @@ try {
     var order_code = '%s';
     var name = new_package_values.new_package_name;
     var platform_code = new_package_values.platform_code;
+    var due_date = new_package_values.due_date;
 
     // Set up the object for the new package entry.
     var new_package = {
         'name': name,
         'order_code': order_code,
         'platform_code': platform_code.value,
+        'due_date': due_date
     }
 
     server.insert('twog/package', new_package);

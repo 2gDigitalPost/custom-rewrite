@@ -4,8 +4,6 @@ from pyasm.search import Search
 from pyasm.web import DivWdg
 from pyasm.widget import SelectWdg, SubmitWdg
 
-import order_builder_utils as obu
-
 
 class ReassignComponentToPackage(BaseRefreshWdg):
     def init(self):
