@@ -7,17 +7,6 @@ from pyasm.widget import SubmitWdg
 import order_builder_utils as obu
 
 
-def get_date_calendar_wdg():
-    date_calendar_wdg = CalendarInputWdg("due_date")
-    date_calendar_wdg.set_option('show_activator', 'true')
-    date_calendar_wdg.set_option('show_time', 'false')
-    date_calendar_wdg.set_option('width', '300px')
-    date_calendar_wdg.set_option('id', 'due_date')
-    date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
-
-    return date_calendar_wdg
-
-
 class InsertPackageInOrderWdg(BaseRefreshWdg):
     def init(self):
         self.order_sobject = self.get_sobject_from_kwargs()
@@ -30,7 +19,7 @@ class InsertPackageInOrderWdg(BaseRefreshWdg):
         self.get_platform_select_widget(outer_div)
 
         outer_div.add(obu.get_label_widget('Due Date'))
-        outer_div.add(get_date_calendar_wdg())
+        outer_div.add(obu.get_date_calendar_wdg())
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior(self.order_sobject.get_code()))

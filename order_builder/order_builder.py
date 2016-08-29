@@ -41,6 +41,23 @@ catch(err) {
     return behavior
 
 
+def get_add_component_by_language_behavior(package_search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    spt.api.load_popup('Add Component to Package', 'order_builder.InsertComponentByLanguageWdg', {'search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % package_search_key
+    }
+
+    return behavior
+
+
 def get_reassign_component_behavior(component_search_key):
     behavior = {
         'css_class': 'clickme',
@@ -78,7 +95,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
         self.order_sobject = order_sobject_search.get_sobject()
 
         self.packages_in_order = obu.get_packages_from_order(self.order_sobject.get_code())
-        # self.titles_in_order = obu.get_titles_from_order(self.order_sobject.get('code'))
 
     def setup_order_information(self):
         """
@@ -317,8 +333,13 @@ class OrderBuilderWdg(BaseRefreshWdg):
             note_button.add_behavior(obu.get_add_notes_behavior(package.get_search_key()))
             note_button.add_style('display', 'inline-block')
 
+            add_component_button = ButtonNewWdg(title='Add Component', icon='ADD')
+            add_component_button.add_behavior(get_add_component_by_language_behavior(package.get_search_key()))
+            add_component_button.add_style('display', 'inline-block')
+
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
+            button_row_div.add(add_component_button)
             button_row_div.add(note_button)
 
             package_div = DivWdg()

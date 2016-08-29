@@ -1,10 +1,11 @@
 from xml.etree import ElementTree
 
 from pyasm.search import Search
+from pyasm.web import DivWdg, HtmlElement
 from pyasm.widget import SelectWdg
 
-from pyasm.web import DivWdg, HtmlElement
 from tactic.ui.input import TextInputWdg
+from tactic.ui.widget import CalendarInputWdg
 
 from tactic_client_lib import tactic_server_stub
 
@@ -208,6 +209,17 @@ def get_platform(platform_code):
     platform_search.add_code_filter(platform_code)
 
     return platform_search.get_sobject()
+
+
+def get_date_calendar_wdg():
+    date_calendar_wdg = CalendarInputWdg("due_date")
+    date_calendar_wdg.set_option('show_activator', 'true')
+    date_calendar_wdg.set_option('show_time', 'false')
+    date_calendar_wdg.set_option('width', '300px')
+    date_calendar_wdg.set_option('id', 'due_date')
+    date_calendar_wdg.set_option('display_format', 'MM/DD/YYYY')
+
+    return date_calendar_wdg
 
 
 def get_server():
