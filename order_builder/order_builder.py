@@ -257,13 +257,20 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_priority_div.add(component.get('priority'))
 
             component_pipeline_div = DivWdg()
-            component_pipeline_name = obu.get_pipeline_name_by_code(component.get('pipeline_code'))
+            component_pipeline_name = obu.get_sobject_name_by_code('sthpw/pipeline', component.get('pipeline_code'))
 
             if component_pipeline_name:
-                component_pipeline_div.add('Pipeline: <i>{0}</i>'.format(
-                    obu.get_pipeline_name_by_code(component.get('pipeline_code'))))
+                component_pipeline_div.add('Pipeline: <i>{0}</i>'.format(component_pipeline_name))
             else:
                 component_pipeline_div.add('<i>No Pipeline Assigned</i>')
+
+            component_language_div = DivWdg()
+            component_language = obu.get_sobject_name_by_code('twog/language', component.get_value('language_code'))
+
+            if component_language:
+                component_language_div.add('Language: <i>{0}</i>'.format(component_language))
+            else:
+                component_language_div.add('<i>No language selected</i>')
 
             component_div = DivWdg()
             component_div.add_style('background-color', '#d9edcf')
@@ -274,6 +281,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(component_description_div)
             component_div.add(component_priority_div)
             component_div.add(component_pipeline_div)
+            component_div.add(component_language_div)
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
             instructions_button.add_behavior(self.get_component_instructions_wdg(component.get_search_key()))

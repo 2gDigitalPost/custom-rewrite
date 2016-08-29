@@ -197,12 +197,15 @@ def get_tasks_for_component(component):
     return task_search.get_sobjects()
 
 
-def get_pipeline_name_by_code(pipeline_code):
-    pipeline_search = Search('sthpw/pipeline')
-    pipeline_search.add_code_filter(pipeline_code)
-    pipeline = pipeline_search.get_sobject()
+def get_sobject_name_by_code(search_type, sobject_code):
+    search = Search(search_type)
+    search.add_code_filter(sobject_code)
+    search_result = search.get_sobject()
 
-    return pipeline.get_value('name')
+    if search_result:
+        return search_result.get_value('name')
+    else:
+        return None
 
 
 def get_tasks_for_title_order(title_order):
