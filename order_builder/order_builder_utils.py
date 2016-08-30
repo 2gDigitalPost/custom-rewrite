@@ -208,13 +208,6 @@ def get_sobject_name_by_code(search_type, sobject_code):
         return None
 
 
-def get_tasks_for_title_order(title_order):
-    task_search = Search('sthpw/task')
-    task_search.add_parent_filter(title_order)
-
-    return task_search.get_sobjects()
-
-
 def get_platform(platform_code):
     platform_search = Search('twog/platform')
     platform_search.add_code_filter(platform_code)

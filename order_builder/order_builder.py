@@ -249,6 +249,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_name_div.add_style('font-weight', 'bold')
             component_name_div.add(component.get('name'))
 
+            component_title_div = DivWdg()
+            component_title_div.add_style('text-decoration', 'underline')
+            component_title = obu.get_sobject_name_by_code('twog/title', component.get('title_code'))
+
+            if component_title:
+                component_title_div.add('Title: {0}'.format(component_title))
+            else:
+                component_title_div.add('No Title Selected')
+
             component_description_div = DivWdg()
             component_description_div.add_style('font-style', 'italic')
             component_description_div.add(component.get('description'))
@@ -278,6 +287,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add_style('border-radius', '10px')
 
             component_div.add(component_name_div)
+            component_div.add(component_title_div)
             component_div.add(component_description_div)
             component_div.add(component_priority_div)
             component_div.add(component_pipeline_div)
