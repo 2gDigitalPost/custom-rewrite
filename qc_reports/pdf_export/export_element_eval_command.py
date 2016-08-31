@@ -164,7 +164,8 @@ def get_element_eval_lines_table(element_eval_sobject):
     element_eval_lines_table = Table(element_eval_lines_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5,
                                      colWidths=[(.7 * inch), (.19 * inch), (inch * 3.3), (.4 * inch), (.82 * inch),
                                                 (.19 * inch), (.5 * inch), (.3 * inch), (.55 * inch),
-                                                (.75 * inch)])
+                                                (.75 * inch)],
+                                     repeatRows=1)
 
     element_eval_lines_table.setStyle([('BOX', (0, 0), (-1, -1), 0.2, colors.black),
                                        ('INNERGRID', (0, 0), (-1, -1), 0.2, colors.black),
