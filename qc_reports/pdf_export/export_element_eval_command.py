@@ -162,9 +162,9 @@ def get_element_eval_lines_table(element_eval_sobject):
             element_eval_lines_table_data.append(line_data)
 
     element_eval_lines_table = Table(element_eval_lines_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5,
-                                     colWidths=[(.7 * inch), (.19 * inch), (inch * 2.6), (.4 * inch), (.82 * inch),
-                                                (.19 * inch), (.75 * inch), (.3 * inch), (.55 * inch),
-                                                (.55 * inch)])
+                                     colWidths=[(.7 * inch), (.19 * inch), (inch * 3), (.4 * inch), (.82 * inch),
+                                                (.19 * inch), (.5 * inch), (.3 * inch), (.55 * inch),
+                                                (.75 * inch)])
 
     element_eval_lines_table.setStyle([('BOX', (0, 0), (-1, -1), 0.2, colors.black),
                                        ('INNERGRID', (0, 0), (-1, -1), 0.2, colors.black),
@@ -366,6 +366,6 @@ class ExportElementEvalCommand(Command):
         if element_eval_lines_table:
             elements.append(element_eval_lines_table)
 
-        doc = SimpleDocTemplate(saved_file_path)
+        doc = SimpleDocTemplate(saved_file_path, leftMargin=20, rightMargin=20, topMargin=30, bottomMargin=40)
 
         doc.build(elements, canvasmaker=NumberedCanvas)
