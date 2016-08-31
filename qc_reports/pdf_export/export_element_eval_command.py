@@ -367,6 +367,6 @@ class ExportElementEvalCommand(Command):
         if element_eval_lines_table:
             elements.append(element_eval_lines_table)
 
-        doc = SimpleDocTemplate(saved_file_path, leftMargin=10, rightMargin=10, topMargin=30, bottomMargin=40)
+        doc = SimpleDocTemplate(saved_file_path, leftMargin=10, rightMargin=10, topMargin=15, bottomMargin=40)
 
         doc.build(elements, canvasmaker=NumberedCanvas)
