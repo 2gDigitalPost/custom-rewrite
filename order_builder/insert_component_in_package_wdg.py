@@ -47,6 +47,21 @@ def get_languages_checkboxes():
     return languages_checkbox_table
 
 
+def get_title_select_wdg(width=300):
+    title_select_wdg = SelectWdg('title_code')
+    title_select_wdg.set_id('title_code')
+    title_select_wdg.add_style('width', '{0}px'.format(width))
+    title_select_wdg.add_empty_option()
+
+    title_search = Search('twog/title')
+    titles = title_search.get_sobjects()
+
+    for title in titles:
+        title_select_wdg.append_option(title.get_value('name'), title.get_code())
+
+    return title_select_wdg
+
+
 def get_pipeline_select_wdg(search_type, width=300):
     """
     Given a search type, return a select widget with the pipelines available for that search type
@@ -72,12 +87,12 @@ def get_pipeline_select_wdg(search_type, width=300):
 
 def get_instructions_select_wdg():
     """
+    Get a Select Widget with all the instructions options
 
-    :return:
+    :return: SelectWdg
     """
 
     instructions_search = Search('twog/instructions')
-    # instructions_options = instructions_search.get_sobjects()
 
     instructions_select_widget = SelectWdg('instructions_code')
     instructions_select_widget.set_id('instructions_code')
@@ -97,6 +112,9 @@ class InsertComponentInPackageWdg(BaseRefreshWdg):
 
         outer_div.add(obu.get_label_widget('Name'))
         outer_div.add(obu.get_text_input_wdg('new_component_name', 400))
+
+        outer_div.add(obu.get_label_widget('Title'))
+        outer_div.add(get_title_select_wdg(400))
 
         outer_div.add(obu.get_label_widget('Language'))
         outer_div.add(get_language_select_wdg())
@@ -119,33 +137,40 @@ class InsertComponentInPackageWdg(BaseRefreshWdg):
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
-try {
-    // Get the server object
-    var server = TacticServerStub.get();
-    var containing_element = bvr.src_el.getParent("#insert-component-in-package");
-    var new_component_values = spt.api.get_input_values(containing_element, null, false);
 
-    // Get the form values
-    var package_code = '%s';
-    var name = new_component_values.new_component_name;
-    var language_code = new_component_values.language_code;
-    var pipeline_code = new_component_values.pipeline_code;
-    var instructions_code = new_component_values.instructions_code;
+spt.app_busy.show("Saving...");
 
-    var new_component = {
-        'name': name,
-        'package_code': package_code,
-        'language_code': language_code,
-        'pipeline_code': pipeline_code,
-        'instructions_code': instructions_code
-    }
+// Get the server object
+var server = TacticServerStub.get();
+var containing_element = bvr.src_el.getParent("#insert-component-in-package");
+var new_component_values = spt.api.get_input_values(containing_element, null, false);
 
-    server.insert('twog/component', new_component);
+// Get the form values
+var package_code = '%s';
+var name = new_component_values.new_component_name;
+var language_code = new_component_values.language_code;
+var pipeline_code = new_component_values.pipeline_code;
+var instructions_code = new_component_values.instructions_code;
+var title_code = new_component_values.title_code;
+
+var new_component = {
+    'name': name,
+    'package_code': package_code,
+    'language_code': language_code,
+    'pipeline_code': pipeline_code,
+    'instructions_code': instructions_code,
+    'title_code': title_code
 }
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}''' % package_code
+
+server.insert('twog/component', new_component);
+
+spt.app_busy.hide();
+spt.popup.close(spt.popup.get_popup(bvr.src_el));
+
+spt.panel.refresh(spt.api.get_parent(bvr.src_el, ".spt_tab_content"));
+
+//spt.api.refresh_panel(top, {}, {auto_find: true});
+''' % package_code
         }
 
         return behavior
@@ -161,6 +186,9 @@ class InsertComponentByLanguageWdg(BaseRefreshWdg):
 
         outer_div.add(obu.get_label_widget('Name'))
         outer_div.add(obu.get_text_input_wdg('new_component_name', 400))
+
+        outer_div.add(obu.get_label_widget('Title'))
+        outer_div.add(get_title_select_wdg(400))
 
         outer_div.add(get_languages_checkboxes())
 
@@ -183,6 +211,8 @@ class InsertComponentByLanguageWdg(BaseRefreshWdg):
             'type': 'click_up',
             'cbjs_action': '''
 try {
+    spt.app_busy.show("Saving...");
+
     // Get the server object
     var server = TacticServerStub.get();
     var containing_element = bvr.src_el.getParent("#insert-component-in-package");
@@ -193,8 +223,9 @@ try {
     var name = new_component_values.new_component_name;
     var pipeline_code = new_component_values.pipeline_code;
     var instructions_code = new_component_values.instructions_code;
+    var title_code = new_component_values.title_code;
 
-    var languages = server.eval("@SOBJECT(twog/language)")
+    var languages = server.eval("@SOBJECT(twog/language)");
 
     for (var i = 0; i < languages.length; i++) {
         var language_code = languages[i].code;
@@ -209,12 +240,16 @@ try {
                 'package_code': package_code,
                 'language_code': language_code,
                 'pipeline_code': pipeline_code,
-                'instructions_code': instructions_code
+                'instructions_code': instructions_code,
+                'title_code': title_code
             }
 
             server.insert('twog/component', new_component);
         }
     }
+
+    spt.app_busy.hide();
+    spt.popup.close(spt.popup.get_popup(bvr.src_el));
 }
 catch(err) {
     spt.app_busy.hide();
