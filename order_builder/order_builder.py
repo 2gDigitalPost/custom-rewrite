@@ -227,8 +227,9 @@ class OrderBuilderWdg(BaseRefreshWdg):
                                                                             component.get_search_key()))
             instructions_button.add_style('display', 'inline-block')
 
-            change_instructions_button = ButtonNewWdg(title='Change Instructions', icon='')
-            # change_instructions_button.add_behavior(get_load_popup_widget_behavior('', component.get_search_key()))
+            change_instructions_button = ButtonNewWdg(title='Change Instructions', icon='DOCUMENTATION')
+            change_instructions_button.add_behavior(get_load_popup_widget_behavior(
+                'order_builder.ChangeInstructionsWdg', component.get_search_key()))
             change_instructions_button.add_style('display', 'inline-block')
 
             change_title_button = ButtonNewWdg(title='Change Title', icon='')
