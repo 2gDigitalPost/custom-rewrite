@@ -75,18 +75,35 @@ catch(err) {
     return behavior
 
 
+def get_change_title_behavior(component_search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    spt.api.load_popup('Change Title', 'order_builder.ChangeTitleWdg', {'search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % component_search_key
+    }
+
+    return behavior
+
+
 def get_reassign_component_behavior(component_search_key):
     behavior = {
         'css_class': 'clickme',
         'type': 'click_up',
         'cbjs_action': '''
-    try {
-        spt.api.load_popup('Reassign Component', 'order_builder.ReassignComponentToPackage', {'search_key': '%s'});
-    }
-    catch(err) {
-        spt.app_busy.hide();
-        spt.alert(spt.exception.handler(err));
-    }''' % component_search_key
+try {
+    spt.api.load_popup('Reassign Component', 'order_builder.ReassignComponentToPackage', {'search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % component_search_key
     }
 
     return behavior
@@ -297,6 +314,10 @@ class OrderBuilderWdg(BaseRefreshWdg):
             instructions_button.add_behavior(self.get_component_instructions_wdg(component.get_search_key()))
             instructions_button.add_style('display', 'inline-block')
 
+            change_title_button = ButtonNewWdg(title='Change Title', icon='')
+            change_title_button.add_behavior(get_change_title_behavior(component.get_search_key()))
+            change_title_button.add_style('display', 'inline-block')
+
             reassign_button = ButtonNewWdg(title='Reassign to another Package', icon="TABLE_UPDATE_ENTRY")
             reassign_button.add_behavior(get_reassign_component_behavior(component.get_search_key()))
             reassign_button.add_style('display', 'inline-block')
@@ -308,6 +329,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(instructions_button)
+            button_row_div.add(change_title_button)
             button_row_div.add(reassign_button)
             button_row_div.add(note_button)
 

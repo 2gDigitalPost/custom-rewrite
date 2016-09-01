@@ -1,5 +1,6 @@
 from add_task_to_title_order_wdg import AddTaskToTitleOrderWdg
 from change_due_date_wdg import ChangeDueDateWdg
+from change_title_wdg import ChangeTitleWdg
 from component_instructions_wdg import ComponentInstructionsWdg
 from external_rejection_on_title_order_wdg import ExternalRejectionOnTitleOrderWdg
 from insert_component_in_package_wdg import InsertComponentByLanguageWdg, InsertComponentInPackageWdg
