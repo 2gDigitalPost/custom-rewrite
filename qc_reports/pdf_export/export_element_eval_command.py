@@ -150,7 +150,7 @@ def get_element_eval_lines_table(element_eval_sobject):
             for attribute in [timecode_in, field_in, description, in_safe, timecode_out, field_out, type_code, scale,
                               sector_or_channel, in_source]:
                 paragraph_style = ParagraphStyle(attribute)
-                paragraph_style.fontSize = 8
+                paragraph_style.fontSize = 7
 
                 if scale == '3':
                     paragraph = Paragraph('<b>' + attribute + '</b>', paragraph_style)
@@ -162,8 +162,8 @@ def get_element_eval_lines_table(element_eval_sobject):
             element_eval_lines_table_data.append(line_data)
 
     element_eval_lines_table = Table(element_eval_lines_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5,
-                                     colWidths=[(.7 * inch), (.19 * inch), (inch * 3.3), (.4 * inch), (.82 * inch),
-                                                (.19 * inch), (.5 * inch), (.3 * inch), (.55 * inch),
+                                     colWidths=[(.7 * inch), (.19 * inch), (inch * 3.5), (.4 * inch), (.82 * inch),
+                                                (.19 * inch), (.3 * inch), (.3 * inch), (.55 * inch),
                                                 (.75 * inch)],
                                      repeatRows=1)
 
