@@ -7,113 +7,24 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 import order_builder_utils as obu
 
 
-def get_assign_pipeline_behavior(title_order_code):
+def get_load_popup_widget_behavior(widget_name, search_key):
     behavior = {
         'css_class': 'clickme',
         'type': 'click_up',
         'cbjs_action': '''
 try {
-    spt.api.load_popup('Assign Pipeline', 'widgets.AssignPipelineWdg', {'search_key': '%s'});
+    var widget_name = '%s';
+    var search_key = '%s';
+
+    spt.api.load_popup('Reassign Component', widget_name, {'search_key': search_key});
 }
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
-}''' % title_order_code
+}''' % (widget_name, search_key)
     }
 
     return behavior
-
-
-def get_add_packages_behavior(order_search_key):
-    behavior = {
-        'css_class': 'clickme',
-        'type': 'click_up',
-        'cbjs_action': '''
-try {
-    spt.api.load_popup('Add Package to Order', 'order_builder.InsertPackageInOrderWdg', {'search_key': '%s'});
-}
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}''' % order_search_key
-    }
-
-    return behavior
-
-
-def get_add_component_in_package_wdg(package_search_key):
-    behavior = {
-        'css_class': 'clickme',
-        'type': 'click_up',
-        'cbjs_action': '''
-try {
-    spt.api.load_popup('Add Component to Package', 'order_builder.InsertComponentInPackageWdg', {'search_key': '%s'});
-}
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}''' % package_search_key
-    }
-
-    return behavior
-
-
-def get_add_component_by_language_behavior(package_search_key):
-    behavior = {
-        'css_class': 'clickme',
-        'type': 'click_up',
-        'cbjs_action': '''
-try {
-    spt.api.load_popup('Add Component to Package', 'order_builder.InsertComponentByLanguageWdg', {'search_key': '%s'});
-}
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}''' % package_search_key
-    }
-
-    return behavior
-
-
-def get_change_title_behavior(component_search_key):
-    behavior = {
-        'css_class': 'clickme',
-        'type': 'click_up',
-        'cbjs_action': '''
-try {
-    spt.api.load_popup('Change Title', 'order_builder.ChangeTitleWdg', {'search_key': '%s'});
-}
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}''' % component_search_key
-    }
-
-    return behavior
-
-
-def get_reassign_component_behavior(component_search_key):
-    behavior = {
-        'css_class': 'clickme',
-        'type': 'click_up',
-        'cbjs_action': '''
-try {
-    spt.api.load_popup('Reassign Component', 'order_builder.ReassignComponentToPackage', {'search_key': '%s'});
-}
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}''' % component_search_key
-    }
-
-    return behavior
-
-
-def get_add_package_button(order_search_key):
-    add_titles_button = ButtonNewWdg(title='Add Package', icon='ADD')
-    add_titles_button.add_behavior(get_add_packages_behavior(order_search_key))
-
-    return add_titles_button
 
 
 class OrderBuilderWdg(BaseRefreshWdg):
@@ -166,7 +77,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
             description_div.add('No description available')
 
         add_packages_button = ButtonNewWdg(title='Add Package', icon='ADD')
-        add_packages_button.add_behavior(get_add_packages_behavior(self.order_sobject.get_search_key()))
+        add_packages_button.add_behavior(get_load_popup_widget_behavior('order_builder.InsertPackageInOrderWdg',
+                                                                        self.order_sobject.get_search_key()))
         add_packages_button.add_style('display', 'inline-block')
 
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
@@ -311,15 +223,22 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(component_language_div)
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
-            instructions_button.add_behavior(self.get_component_instructions_wdg(component.get_search_key()))
+            instructions_button.add_behavior(get_load_popup_widget_behavior('order_builder.ComponentInstructionsWdg',
+                                                                            component.get_search_key()))
             instructions_button.add_style('display', 'inline-block')
 
+            change_instructions_button = ButtonNewWdg(title='Change Instructions', icon='')
+            # change_instructions_button.add_behavior(get_load_popup_widget_behavior('', component.get_search_key()))
+            change_instructions_button.add_style('display', 'inline-block')
+
             change_title_button = ButtonNewWdg(title='Change Title', icon='')
-            change_title_button.add_behavior(get_change_title_behavior(component.get_search_key()))
+            change_title_button.add_behavior(get_load_popup_widget_behavior('order_builder.ChangeTitleWdg',
+                                                                            component.get_search_key()))
             change_title_button.add_style('display', 'inline-block')
 
             reassign_button = ButtonNewWdg(title='Reassign to another Package', icon="TABLE_UPDATE_ENTRY")
-            reassign_button.add_behavior(get_reassign_component_behavior(component.get_search_key()))
+            reassign_button.add_behavior(get_load_popup_widget_behavior('order_builder.ReassignComponentToPackage',
+                                                                        component.get_search_key()))
             reassign_button.add_style('display', 'inline-block')
 
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
@@ -329,6 +248,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(instructions_button)
+            button_row_div.add(change_instructions_button)
             button_row_div.add(change_title_button)
             button_row_div.add(reassign_button)
             button_row_div.add(note_button)
@@ -397,12 +317,13 @@ class OrderBuilderWdg(BaseRefreshWdg):
                 package_due_date_div.add('Due: {0}'.format(package.get('due_date')))
 
             add_component_button = ButtonNewWdg(title='Add Component', icon='INSERT')
-            add_component_button.add_behavior(get_add_component_in_package_wdg(package.get_search_key()))
+            add_component_button.add_behavior(get_load_popup_widget_behavior(
+                'order_builder.InsertComponentInPackageWdg', package.get_search_key()))
             add_component_button.add_style('display', 'inline-block')
 
             add_component_by_language_button = ButtonNewWdg(title='Add Component By Language', icon='INSERT_MULTI')
             add_component_by_language_button.add_behavior(
-                get_add_component_by_language_behavior(package.get_search_key()))
+                get_load_popup_widget_behavior('order_builder.InsertComponentByLanguageWdg', package.get_search_key()))
             add_component_by_language_button.add_style('display', 'inline-block')
 
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
