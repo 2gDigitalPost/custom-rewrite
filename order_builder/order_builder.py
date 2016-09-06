@@ -77,11 +77,17 @@ class OrderBuilderWdg(BaseRefreshWdg):
         else:
             description_div.add('No description available')
 
-        add_packages_button = ButtonNewWdg(title='Add Package', icon='ADD')
+        add_packages_button = ButtonNewWdg(title='Add Package', icon='INSERT')
         add_packages_button.add_behavior(get_load_popup_widget_behavior('Insert Package',
                                                                         'order_builder.InsertPackageInOrderWdg',
                                                                         self.order_sobject.get_search_key()))
         add_packages_button.add_style('display', 'inline-block')
+
+        add_packages_by_platform = ButtonNewWdg(title='Add Package By Platform', icon='INSERT_MULTI')
+        add_packages_by_platform.add_behavior(get_load_popup_widget_behavior('Insert Packages by Platform',
+                                                                             'order_builder.InsertPackageByPlatformWdg',
+                                                                             self.order_sobject.get_search_key()))
+        add_packages_by_platform.add_style('display', 'inline-block')
 
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
@@ -93,6 +99,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(po_number_div)
         order_div.add(description_div)
         order_div.add(add_packages_button)
+        order_div.add(add_packages_by_platform)
         order_div.add(note_button)
 
         return order_div
