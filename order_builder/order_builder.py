@@ -7,21 +7,22 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 import order_builder_utils as obu
 
 
-def get_load_popup_widget_behavior(widget_name, search_key):
+def get_load_popup_widget_behavior(widget_title, widget_name, search_key):
     behavior = {
         'css_class': 'clickme',
         'type': 'click_up',
         'cbjs_action': '''
 try {
+    var widget_title = '%s';
     var widget_name = '%s';
     var search_key = '%s';
 
-    spt.api.load_popup('Reassign Component', widget_name, {'search_key': search_key});
+    spt.api.load_popup(widget_title, widget_name, {'search_key': search_key});
 }
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
-}''' % (widget_name, search_key)
+}''' % (widget_title, widget_name, search_key)
     }
 
     return behavior
@@ -77,7 +78,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
             description_div.add('No description available')
 
         add_packages_button = ButtonNewWdg(title='Add Package', icon='ADD')
-        add_packages_button.add_behavior(get_load_popup_widget_behavior('order_builder.InsertPackageInOrderWdg',
+        add_packages_button.add_behavior(get_load_popup_widget_behavior('Insert Package',
+                                                                        'order_builder.InsertPackageInOrderWdg',
                                                                         self.order_sobject.get_search_key()))
         add_packages_button.add_style('display', 'inline-block')
 
@@ -223,22 +225,25 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(component_language_div)
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
-            instructions_button.add_behavior(get_load_popup_widget_behavior('order_builder.ComponentInstructionsWdg',
+            instructions_button.add_behavior(get_load_popup_widget_behavior('Component Instructions',
+                                                                            'order_builder.ComponentInstructionsWdg',
                                                                             component.get_search_key()))
             instructions_button.add_style('display', 'inline-block')
 
             change_instructions_button = ButtonNewWdg(title='Change Instructions', icon='DOCUMENTATION')
             change_instructions_button.add_behavior(get_load_popup_widget_behavior(
-                'order_builder.ChangeInstructionsWdg', component.get_search_key()))
+                'Change Instructions', 'order_builder.ChangeInstructionsWdg', component.get_search_key()))
             change_instructions_button.add_style('display', 'inline-block')
 
             change_title_button = ButtonNewWdg(title='Change Title', icon='')
-            change_title_button.add_behavior(get_load_popup_widget_behavior('order_builder.ChangeTitleWdg',
+            change_title_button.add_behavior(get_load_popup_widget_behavior('Change Title',
+                                                                            'order_builder.ChangeTitleWdg',
                                                                             component.get_search_key()))
             change_title_button.add_style('display', 'inline-block')
 
             reassign_button = ButtonNewWdg(title='Reassign to another Package', icon="TABLE_UPDATE_ENTRY")
-            reassign_button.add_behavior(get_load_popup_widget_behavior('order_builder.ReassignComponentToPackage',
+            reassign_button.add_behavior(get_load_popup_widget_behavior('Reassign Component',
+                                                                        'order_builder.ReassignComponentToPackage',
                                                                         component.get_search_key()))
             reassign_button.add_style('display', 'inline-block')
 
@@ -319,12 +324,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             add_component_button = ButtonNewWdg(title='Add Component', icon='INSERT')
             add_component_button.add_behavior(get_load_popup_widget_behavior(
-                'order_builder.InsertComponentInPackageWdg', package.get_search_key()))
+                'Insert Component', 'order_builder.InsertComponentInPackageWdg', package.get_search_key()))
             add_component_button.add_style('display', 'inline-block')
 
             add_component_by_language_button = ButtonNewWdg(title='Add Component By Language', icon='INSERT_MULTI')
             add_component_by_language_button.add_behavior(
-                get_load_popup_widget_behavior('order_builder.InsertComponentByLanguageWdg', package.get_search_key()))
+                get_load_popup_widget_behavior('Insert Component by Language',
+                                               'order_builder.InsertComponentByLanguageWdg',
+                                               package.get_search_key())
+            )
             add_component_by_language_button.add_style('display', 'inline-block')
 
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
