@@ -310,8 +310,15 @@ class ExportElementEvalCommand(Command):
 
         audio_configuration_header = get_paragraph('Audio Configuration', 'Heading3')
 
+        general_comments_text = element_eval_sobject.get('general_comments')
+
+        # For some reason, ampersands get a semicolon added on to the letter following them. Escaping them seems to
+        # solve the problem
+        if general_comments_text:
+            general_comments_text = general_comments_text.replace('&', '&amp;')
+
         general_comments_header = get_paragraph('General Comments', 'Heading3')
-        general_comments = get_paragraph(element_eval_sobject.get('general_comments'))
+        general_comments = get_paragraph(general_comments_text)
 
         top_table = get_top_table(element_eval_sobject)
 
