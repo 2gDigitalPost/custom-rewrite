@@ -158,7 +158,7 @@ try {
 
             // Set up the object for the new package entry.
             var new_package = {
-                'name': name,
+                'name': name + " - " + platform_name,
                 'order_code': order_code,
                 'platform_code': platform_code,
                 'due_date': due_date
