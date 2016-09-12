@@ -123,6 +123,19 @@ def get_assigned_group_from_xml(xml, process):
         return None
 
 
+def get_next_tasks_codes_from_xml(xml, process):
+    xml_tree = ElementTree.fromstring(xml)
+
+    connected_processes = []
+
+    for connect_xml in xml_tree.iter('connect'):
+        if connect_xml.attrib.get('from') == process:
+            connected_processes.append(connect_xml.attrib.get('to'))
+
+
+
+
+
 def get_assigned_group_from_task(task):
     process = task.get_value('process')
 

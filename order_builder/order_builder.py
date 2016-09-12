@@ -28,6 +28,58 @@ catch(err) {
     return behavior
 
 
+def get_task_data_div(task_code):
+    outer_div = DivWdg()
+
+    task_data_search = Search('twog/task_data')
+    task_data_search.add_filter('task_code', task_code)
+    task_data = task_data_search.get_sobject()
+
+    in_file_search = Search('twog/task_data_in_file')
+    in_file_search.add_filter('task_data_code', task_data.get_code())
+    in_files = in_file_search.get_sobjects()
+
+    out_file_search = Search('twog/task_data_out_file')
+    out_file_search.add_filter('task_data_code', task_data.get_code())
+    out_files = out_file_search.get_sobjects()
+
+    if in_files:
+        outer_div.add(obu.get_label_widget("In Files:"))
+
+        in_files_list = HtmlElement.ul()
+        in_files_list.add_style('list-style-type', 'none')
+
+        for in_file in in_files:
+            file_search = Search('twog/file')
+            file_search.add_code_filter(in_file.get('file_code'))
+            file_sobject = file_search.get_sobject()
+
+            file_li = HtmlElement.li()
+            file_li.add(file_sobject.get('file_path'))
+            in_files_list.add(file_li)
+
+        outer_div.add(in_files_list)
+
+    if out_files:
+        outer_div.add(obu.get_label_widget("Out Files:"))
+
+        out_files_list = HtmlElement.ul()
+        out_files_list.add_style('list-style-type', 'none')
+
+        for out_file in out_files:
+            file_search = Search('twog/file')
+            file_search.add_code_filter(out_file.get('file_code'))
+            file_sobject = file_search.get_sobject()
+
+            file_li = HtmlElement.li()
+            file_li.add(file_sobject.get('file_path'))
+            out_files_list.add(file_li)
+
+        outer_div.add(out_files_list)
+
+    return outer_div
+
+
 class OrderBuilderWdg(BaseRefreshWdg):
     """
     My attempt at rewriting the Order Builder module.
@@ -157,6 +209,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
         else:
             department_div.add('No department assigned')
 
+        task_data_div = get_task_data_div(task.get_code())
+
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(task.get_search_key()))
         note_button.add_style('display', 'inline-block')
@@ -169,6 +223,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         task_div.add(priority_div)
         task_div.add(assigned_div)
         task_div.add(department_div)
+        task_div.add(task_data_div)
         task_div.add(instructions_button)
         task_div.add(note_button)
 
@@ -248,6 +303,11 @@ class OrderBuilderWdg(BaseRefreshWdg):
                                                                             component.get_search_key()))
             change_title_button.add_style('display', 'inline-block')
 
+            add_task_button = ButtonNewWdg(title='Add Task', icon='INSERT')
+            add_task_button.add_behavior(get_load_popup_widget_behavior('Add Task', 'order_builder.InsertTaskWdg',
+                                                                        component.get_search_key()))
+            add_task_button.add_style('display', 'inline-block')
+
             reassign_button = ButtonNewWdg(title='Reassign to another Package', icon="TABLE_UPDATE_ENTRY")
             reassign_button.add_behavior(get_load_popup_widget_behavior('Reassign Component',
                                                                         'order_builder.ReassignComponentToPackage',
@@ -263,6 +323,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div.add(instructions_button)
             button_row_div.add(change_instructions_button)
             button_row_div.add(change_title_button)
+            button_row_div.add(add_task_button)
             button_row_div.add(reassign_button)
             button_row_div.add(note_button)
 
