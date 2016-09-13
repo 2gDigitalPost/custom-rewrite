@@ -106,7 +106,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         # Show some information for the order at the top.
         order_name = self.order_sobject.get('name')
-        client_name = obu.get_client_name_from_code(self.order_sobject.get('client_code'))
+        division_name = obu.get_division_name_from_code(self.order_sobject.get('division_code'))
+        client_name = obu.get_client_name_from_division_code(self.order_sobject.get('division_code'))
         po_number = self.order_sobject.get_value('po_number') or 'None'
         description = self.order_sobject.get('description')
 
@@ -116,7 +117,16 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_name_div.add('Order: ' + order_name)
 
         client_name_div = DivWdg()
-        client_name_div.add('Client: ' + client_name)
+
+        if division_name:
+            client_text = 'Client: ' + division_name
+
+            if client_name:
+                client_text += ' - ' + client_name
+        else:
+            client_text = 'No Client Selected'
+
+        client_name_div.add(client_text)
 
         po_number_div = DivWdg()
         po_number_div.add('PO Number: ' + po_number)
@@ -218,6 +228,9 @@ class OrderBuilderWdg(BaseRefreshWdg):
         instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
         instructions_button.add_behavior(obu.load_task_instructions_behavior(task.get_search_key()))
 
+        inspect_button = ButtonNewWdg(title='Inspect', icon='WORK')
+        inspect_button.add_behavior(obu.load_task_inspect_widget(task.get_search_key()))
+
         task_div.add(process_div)
         task_div.add(status_div)
         task_div.add(priority_div)
@@ -225,6 +238,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         task_div.add(department_div)
         task_div.add(task_data_div)
         task_div.add(instructions_button)
+        task_div.add(inspect_button)
         task_div.add(note_button)
 
         return task_div

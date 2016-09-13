@@ -133,9 +133,6 @@ def get_next_tasks_codes_from_xml(xml, process):
             connected_processes.append(connect_xml.attrib.get('to'))
 
 
-
-
-
 def get_assigned_group_from_task(task):
     process = task.get_value('process')
 
@@ -195,6 +192,45 @@ def get_client_name_from_code(client_code):
         return client.get('name')
     else:
         return None
+
+
+def get_division_name_from_code(division_code):
+    """
+    Get the client division's name, using their code to search
+
+    :param division_code: A unique division code
+    :return: The division's name
+    """
+    division_search = Search('twog/division')
+    division_search.add_code_filter(division_code)
+    division = division_search.get_sobject()
+
+    if division:
+        return division.get('name')
+    else:
+        return None
+
+
+def get_client_name_from_division_code(division_code):
+    """
+    Get the name of the client that owns the division.
+
+    :param division_code: A unique division code
+    :return: The client's name
+    """
+    division_search = Search('twog/division')
+    division_search.add_code_filter(division_code)
+    division = division_search.get_sobject()
+
+    if division:
+        client_search = Search('twog/client')
+        client_search.add_code_filter(division.get('client_code'))
+        client = client_search.get_sobject()
+
+        if client:
+            return client.get('name')
+
+    return None
 
 
 def get_tasks_for_component(component):
@@ -325,7 +361,28 @@ def load_task_instructions_behavior(task_search_key):
 try {
     var task_search_key = '%s';
 
-    spt.tab.add_new('instructions_' + task_search_key, 'Instructions', 'order_builder.TaskInstructionsWdg', {'search_key': task_search_key});
+    spt.tab.add_new('instructions_' + task_search_key, 'Instructions', 'order_builder.TaskInstructionsWdg',
+                    {'search_key': task_search_key});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % task_search_key
+    }
+
+    return behavior
+
+
+def load_task_inspect_widget(task_search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    var task_search_key = '%s';
+
+    spt.tab.add_new('instructions_' + task_search_key, 'Instructions', 'widgets.TaskInspectWdg',
+                    {'search_key': task_search_key});
 }
 catch(err) {
     spt.app_busy.hide();
