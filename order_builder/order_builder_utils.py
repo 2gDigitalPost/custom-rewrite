@@ -391,3 +391,24 @@ catch(err) {
     }
 
     return behavior
+
+
+def get_load_popup_widget_behavior(widget_title, widget_name, search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    var widget_title = '%s';
+    var widget_name = '%s';
+    var search_key = '%s';
+
+    spt.api.load_popup(widget_title, widget_name, {'search_key': search_key});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % (widget_title, widget_name, search_key)
+    }
+
+    return behavior
