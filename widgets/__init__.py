@@ -1,3 +1,4 @@
 from add_files_to_order_wdg import AddFilesToOrderWdg
+from add_files_to_task import AddInputFilesToTaskWdg
 from assign_pipeline_wdg import AssignPipelineWdg
 from task_inspect_wdg import TaskInspectWdg

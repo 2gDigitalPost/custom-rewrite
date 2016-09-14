@@ -6,6 +6,8 @@ from pyasm.web import DivWdg, HtmlElement
 
 import order_builder.order_builder_utils as obu
 
+from common_tools import get_task_data_sobject_from_task_code
+
 
 def get_page_header(string):
     """
@@ -16,24 +18,6 @@ def get_page_header(string):
     """
 
     return HtmlElement.h2(string)
-
-
-def get_task_data_sobject_from_task_code(task_code):
-    """
-    Given a task code, find the task_data sobject associated with it
-
-    :param task_code: Unique ID for a task
-    :return: task_data sobject
-    """
-
-    task_data_search = Search('twog/task_data')
-    task_data_search.add_filter('task_code', task_code)
-    task_data = task_data_search.get_sobject()
-
-    if task_data:
-        return task_data
-    else:
-        return None
 
 
 class TaskInspectWdg(BaseRefreshWdg):
@@ -104,7 +88,7 @@ class TaskInspectWdg(BaseRefreshWdg):
         add_input_file_button.add_behavior(
             obu.get_load_popup_widget_behavior('Add Input Files',
                                                'widgets.AddInputFilesToTaskWdg',
-                                               self.task_data.get_search_key())
+                                               self.task_sobject.get_search_key())
         )
         add_input_file_button.add_style('display', 'inline-block')
 
