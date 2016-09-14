@@ -131,6 +131,12 @@ class OrderBuilderWdg(BaseRefreshWdg):
                                                self.order_sobject.get_search_key()))
         add_packages_by_platform.add_style('display', 'inline-block')
 
+        add_file_to_order_button = ButtonNewWdg(title='Add Files to Order', icon='ADD')
+        add_file_to_order_button.add_behavior(obu.get_load_popup_widget_behavior('Add Files to Order',
+                                                                                 'widgets.AddFilesToOrderWdg',
+                                                                                 self.order_sobject.get_search_key()))
+        add_file_to_order_button.add_style('display', 'inline-block')
+
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
         note_button.add_style('display', 'inline-block')
@@ -142,6 +148,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(description_div)
         order_div.add(add_packages_button)
         order_div.add(add_packages_by_platform)
+        order_div.add(add_file_to_order_button)
         order_div.add(note_button)
 
         return order_div

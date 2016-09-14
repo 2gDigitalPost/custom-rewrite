@@ -1,7 +1,8 @@
+from tactic.ui.common import BaseRefreshWdg
+from tactic.ui.widget import ButtonNewWdg
+
 from pyasm.search import Search
 from pyasm.web import DivWdg, HtmlElement
-
-from tactic.ui.common import BaseRefreshWdg
 
 import order_builder.order_builder_utils as obu
 
@@ -10,16 +11,35 @@ def get_page_header(string):
     """
     Given a string, return a DivWdg containing the string in an H1 tag
 
-    :param label_text: String
+    :param string: String
     :return: HtmlElement.label
     """
 
     return HtmlElement.h2(string)
 
 
+def get_task_data_sobject_from_task_code(task_code):
+    """
+    Given a task code, find the task_data sobject associated with it
+
+    :param task_code: Unique ID for a task
+    :return: task_data sobject
+    """
+
+    task_data_search = Search('twog/task_data')
+    task_data_search.add_filter('task_code', task_code)
+    task_data = task_data_search.get_sobject()
+
+    if task_data:
+        return task_data
+    else:
+        return None
+
+
 class TaskInspectWdg(BaseRefreshWdg):
     def init(self):
         self.task_sobject = self.get_sobject_from_kwargs()
+        self.task_data = get_task_data_sobject_from_task_code(self.task_sobject.get_code())
         self.parent_component = self.task_sobject.get_parent()
 
     @staticmethod
@@ -73,9 +93,6 @@ class TaskInspectWdg(BaseRefreshWdg):
         div_wdg.add(HtmlElement.h4('Code: {0}'.format(self.task_sobject.get_code())))
         div_wdg.add(HtmlElement.h4('Component: {0} ({1})'.format(self.parent_component.get('name'),
                                                                  self.parent_component.get_code())))
-        # div_wdg.add(get_page_header('{0} ({1}) for {2}'.format(self.task_sobject.get('process'),
-        #                                                        self.task_sobject.get_code(),
-        #                                                        self.task_sobject.get_parent().get('name'))))
 
         div_wdg.add(HtmlElement.h4('<u>Instructions</u>'))
         instructions = self.get_instructions_for_task_name(self.task_sobject.get_value('process'),
@@ -83,9 +100,18 @@ class TaskInspectWdg(BaseRefreshWdg):
                                                                self.task_sobject
                                                            ))
 
+        add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
+        add_input_file_button.add_behavior(
+            obu.get_load_popup_widget_behavior('Add Input Files',
+                                               'widgets.AddInputFilesToTaskWdg',
+                                               self.task_data.get_search_key())
+        )
+        add_input_file_button.add_style('display', 'inline-block')
+
         if not instructions:
             instructions = 'Sorry, instructions have not been added yet.'
 
         div_wdg.add(self.parse_instruction_text(instructions))
+        div_wdg.add(add_input_file_button)
 
         return div_wdg
