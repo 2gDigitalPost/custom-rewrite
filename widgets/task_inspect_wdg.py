@@ -20,6 +20,60 @@ def get_page_header(string):
     return HtmlElement.h2(string)
 
 
+def get_in_files_list(task_data_code):
+    in_files_search = Search('twog/task_data_in_file')
+    in_files_search.add_filter('task_data_code', task_data_code)
+    in_files = in_files_search.get_sobjects()
+
+    div_wdg = DivWdg()
+    files_list = HtmlElement.ul()
+
+    if in_files:
+        div_wdg.add('<u>Input Files</u>')
+
+        for in_file in in_files:
+            file_search = Search('twog/file')
+            file_search.add_code_filter(in_file.get('file_code'))
+            file_sobject = file_search.get_sobject()
+
+            file_li = HtmlElement.li()
+            file_li.add(file_sobject.get('file_path'))
+            files_list.add(file_li)
+
+        div_wdg.add(files_list)
+    else:
+        div_wdg.add('No input files exist for this task')
+
+    return div_wdg
+
+
+def get_out_files_list(task_data_code):
+    out_files_search = Search('twog/task_data_out_file')
+    out_files_search.add_filter('task_data_code', task_data_code)
+    out_files = out_files_search.get_sobjects()
+
+    div_wdg = DivWdg()
+    files_list = HtmlElement.ul()
+
+    if out_files:
+        div_wdg.add('<u>Output Files</u>')
+
+        for out_file in out_files:
+            file_search = Search('twog/file')
+            file_search.add_code_filter(out_file.get('file_code'))
+            file_sobject = file_search.get_sobject()
+
+            file_li = HtmlElement.li()
+            file_li.add(file_sobject.get('file_path'))
+            files_list.add(file_li)
+
+        div_wdg.add(files_list)
+    else:
+        div_wdg.add('No output files exist for this task')
+
+    return div_wdg
+
+
 class TaskInspectWdg(BaseRefreshWdg):
     def init(self):
         self.task_sobject = self.get_sobject_from_kwargs()
@@ -84,6 +138,14 @@ class TaskInspectWdg(BaseRefreshWdg):
                                                                self.task_sobject
                                                            ))
 
+        if not instructions:
+            instructions = 'Sorry, instructions have not been added yet.'
+
+        div_wdg.add(self.parse_instruction_text(instructions))
+
+        div_wdg.add(get_in_files_list(self.task_data.get_code()))
+        div_wdg.add(get_out_files_list(self.task_data.get_code()))
+
         add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
         add_input_file_button.add_behavior(
             obu.get_load_popup_widget_behavior('Add Input Files',
@@ -92,10 +154,15 @@ class TaskInspectWdg(BaseRefreshWdg):
         )
         add_input_file_button.add_style('display', 'inline-block')
 
-        if not instructions:
-            instructions = 'Sorry, instructions have not been added yet.'
+        add_output_file_button = ButtonNewWdg(title='Add Output Files', icon='INSERT_MULTI')
+        add_output_file_button.add_behavior(
+            obu.get_load_popup_widget_behavior('Add output Files',
+                                               'widgets.AddOutputFilesToTaskWdg',
+                                               self.task_sobject.get_search_key())
+        )
+        add_output_file_button.add_style('display', 'inline-block')
 
-        div_wdg.add(self.parse_instruction_text(instructions))
         div_wdg.add(add_input_file_button)
+        div_wdg.add(add_output_file_button)
 
         return div_wdg

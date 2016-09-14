@@ -98,7 +98,7 @@ spt.popup.close(spt.popup.get_popup(bvr.src_el));
         outer_div.add(self.get_files_checkbox_for_task())
 
         submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior(self.task_sobject.get_code()))
+        submit_button.add_behavior(self.get_submit_button_behavior(self.task_data.get_code()))
 
         outer_div.add(submit_button)
 
