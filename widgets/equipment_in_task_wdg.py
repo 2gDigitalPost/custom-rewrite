@@ -5,31 +5,6 @@ from pyasm.web import DivWdg, Table
 from pyasm.widget import CheckboxWdg, SelectWdg, SubmitWdg
 
 
-def get_title_select_wdg():
-    """
-    Get a SelectWdg that contains all the possible titles that the component can switch to.
-
-    :return: SelectWdg
-    """
-
-    # Set up a basic select widget with an empty object
-    title_select_wdg = SelectWdg('title_select')
-    title_select_wdg.set_id('title_select')
-    title_select_wdg.add_style('width', '300px')
-    title_select_wdg.add_empty_option()
-
-    # Get the titles
-    titles_search = Search('twog/title')
-    titles = titles_search.get_sobjects()
-
-    # Add the title names as the labels and the codes as the values
-    for title in titles:
-        title_select_wdg.append_option(title.get_value('name'), title.get_code())
-
-    # Return the SelectWdg
-    return title_select_wdg
-
-
 class EquipmentInTaskWdg(BaseRefreshWdg):
     def init(self):
         self.task_sobject = self.get_sobject_from_kwargs()
