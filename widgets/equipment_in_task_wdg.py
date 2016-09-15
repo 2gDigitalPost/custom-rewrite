@@ -41,16 +41,14 @@ class EquipmentInTaskWdg(BaseRefreshWdg):
         equipment_in_task_data_search = Search('twog/equipment_in_task_data')
         equipment_in_task_data_search.add_filter('task_data_code', self.task_data.get_code())
         equipment_in_task_data = equipment_in_task_data_search.get_sobjects()
+        equipment_in_task_data_string = ','.join(
+            ["'{0}'".format(equipment.get('equipment_code')) for equipment in equipment_in_task_data])
 
         self.selected_equipment = []
 
-        for equipment_in_task_data_entry in equipment_in_task_data:
-            equipment_search = Search('twog/equipment')
-            equipment_search.add_code_filter(equipment_in_task_data_entry.get('equipment_code'))
-            equipment_sobject = equipment_search.get_sobject()
-
-            if equipment_sobject:
-                self.selected_equipment.append(equipment_sobject)
+        equipment_search = Search('twog/equipment')
+        equipment_search.add_where('\"code\" in ({0})'.format(equipment_in_task_data_string))
+        self.selected_equipment = equipment_search.get_sobjects()
 
     def get_display(self):
         outer_div = DivWdg()
