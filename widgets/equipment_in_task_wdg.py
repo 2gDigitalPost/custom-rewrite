@@ -4,6 +4,8 @@ from pyasm.search import Search
 from pyasm.web import DivWdg, Table
 from pyasm.widget import CheckboxWdg, SubmitWdg
 
+from common_tools.utils import get_task_data_equipment
+
 
 class EquipmentInTaskWdg(BaseRefreshWdg):
     def init(self):
@@ -13,15 +15,7 @@ class EquipmentInTaskWdg(BaseRefreshWdg):
         task_data_search.add_filter('task_code', self.task_sobject.get_code())
         self.task_data = task_data_search.get_sobject()
 
-        equipment_in_task_data_search = Search('twog/equipment_in_task_data')
-        equipment_in_task_data_search.add_filter('task_data_code', self.task_data.get_code())
-        equipment_in_task_data = equipment_in_task_data_search.get_sobjects()
-        equipment_in_task_data_string = ','.join(
-            ["'{0}'".format(equipment.get('equipment_code')) for equipment in equipment_in_task_data])
-
-        equipment_search = Search('twog/equipment')
-        equipment_search.add_where('\"code\" in ({0})'.format(equipment_in_task_data_string))
-        self.selected_equipment = equipment_search.get_sobjects()
+        self.selected_equipment = get_task_data_equipment(self.task_data.get_code())
 
     def get_display(self):
         outer_div = DivWdg()

@@ -6,7 +6,7 @@ from pyasm.web import DivWdg, HtmlElement
 
 import order_builder.order_builder_utils as obu
 
-from common_tools import get_task_data_sobject_from_task_code
+from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment
 
 
 def get_page_header(string):
@@ -70,6 +70,27 @@ def get_out_files_list(task_data_code):
         div_wdg.add(files_list)
     else:
         div_wdg.add('No output files exist for this task')
+
+    return div_wdg
+
+
+def get_equipment_list(task_data_code):
+    equipment_sobjects_list = get_task_data_equipment(task_data_code)
+
+    div_wdg = DivWdg()
+
+    if equipment_sobjects_list:
+        div_wdg.add(obu.get_label_widget('Equipment:'))
+        equipment_unordered_html_list = HtmlElement.ul()
+
+        for name in [equipment_sobject.get('name') for equipment_sobject in equipment_sobjects_list]:
+            equipment_li = HtmlElement.li()
+            equipment_li.add(name)
+            equipment_unordered_html_list.add(equipment_li)
+
+        div_wdg.add(equipment_unordered_html_list)
+    else:
+        div_wdg.add('No equipment is assigned to this task')
 
     return div_wdg
 
@@ -145,6 +166,7 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         div_wdg.add(get_in_files_list(self.task_data.get_code()))
         div_wdg.add(get_out_files_list(self.task_data.get_code()))
+        div_wdg.add(get_equipment_list(self.task_data.get_code()))
 
         add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
         add_input_file_button.add_behavior(
@@ -156,13 +178,22 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         add_output_file_button = ButtonNewWdg(title='Add Output Files', icon='INSERT_MULTI')
         add_output_file_button.add_behavior(
-            obu.get_load_popup_widget_behavior('Add output Files',
+            obu.get_load_popup_widget_behavior('Add Output Files',
                                                'widgets.AddOutputFilesToTaskWdg',
                                                self.task_sobject.get_search_key())
         )
         add_output_file_button.add_style('display', 'inline-block')
 
+        add_equipment_button = ButtonNewWdg(title='Add Equipment', icon='EQUIPMENT')
+        add_equipment_button.add_behavior(
+            obu.get_load_popup_widget_behavior('Add Equipment',
+                                               'widgets.EquipmentInTaskWdg',
+                                               self.task_sobject.get_search_key())
+        )
+        add_equipment_button.add_style('display', 'inline-block')
+
         div_wdg.add(add_input_file_button)
         div_wdg.add(add_output_file_button)
+        div_wdg.add(add_equipment_button)
 
         return div_wdg
