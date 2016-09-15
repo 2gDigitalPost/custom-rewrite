@@ -722,7 +722,7 @@ window.open(file_path);
         status_sel.add_style('width', '135px')
         status_sel.add_empty_option()
 
-        statuses = ('Approved', 'Rejected')
+        statuses = ('Approved', 'In Progress', 'Rejected')
 
         for status in statuses:
             status_sel.append_option(status, status)
