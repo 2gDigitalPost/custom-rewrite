@@ -22,6 +22,10 @@ def get_task_data_div(task_code):
     out_file_search.add_filter('task_data_code', task_data.get_code())
     out_files = out_file_search.get_sobjects()
 
+    equipment_in_task_data_search = Search('twog/equipment_in_task_data')
+    equipment_in_task_data_search.add_filter('task_data_code', task_data.get_code())
+    equipment_in_task_data = equipment_in_task_data_search.get_sobjects()
+
     if in_files:
         outer_div.add(obu.get_label_widget("In Files:"))
 
@@ -55,6 +59,22 @@ def get_task_data_div(task_code):
             out_files_list.add(file_li)
 
         outer_div.add(out_files_list)
+
+    if equipment_in_task_data:
+        outer_div.add(obu.get_label_widget('Equipment:'))
+
+        equipment_list = HtmlElement.ul()
+
+        for equipment_in_task_data_sobject in equipment_in_task_data:
+            equipment_search = Search('twog/equipment')
+            equipment_search.add_code_filter(equipment_in_task_data_sobject.get('equipment_code'))
+            equipment_sobject = equipment_search.get_sobject()
+
+            equipment_li = HtmlElement.li()
+            equipment_li.add(equipment_sobject.get('name'))
+            equipment_list.add(equipment_li)
+
+        outer_div.add(equipment_list)
 
     return outer_div
 
@@ -208,15 +228,20 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         task_data_div = get_task_data_div(task.get_code())
 
-        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
-        note_button.add_behavior(obu.get_add_notes_behavior(task.get_search_key()))
-        note_button.add_style('display', 'inline-block')
-
         instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
         instructions_button.add_behavior(obu.load_task_instructions_behavior(task.get_search_key()))
 
         inspect_button = ButtonNewWdg(title='Inspect', icon='WORK')
         inspect_button.add_behavior(obu.load_task_inspect_widget(task.get_search_key()))
+
+        equipment_button = ButtonNewWdg(title='Equipment', icon='EQUIPMENT')
+        equipment_button.add_behavior(obu.get_load_popup_widget_behavior('Equipment',
+                                                                         'widgets.EquipmentInTaskWdg',
+                                                                         task.get_search_key()))
+
+        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+        note_button.add_behavior(obu.get_add_notes_behavior(task.get_search_key()))
+        note_button.add_style('display', 'inline-block')
 
         task_div.add(process_div)
         task_div.add(status_div)
@@ -226,6 +251,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         task_div.add(task_data_div)
         task_div.add(instructions_button)
         task_div.add(inspect_button)
+        task_div.add(equipment_button)
         task_div.add(note_button)
 
         return task_div
