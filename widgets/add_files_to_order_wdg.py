@@ -6,9 +6,10 @@ from pyasm.web import DivWdg, HtmlElement, Table
 from pyasm.widget import CheckboxWdg, MultiSelectWdg, SubmitWdg
 
 import order_builder.order_builder_utils as obu
+from common_tools.utils import get_files_for_order
 
 
-def get_files_checkboxes_for_division(division_code):
+def get_files_checkboxes_for_division(division_code, order_code):
     file_search = Search('twog/file')
     file_search.add_filter('division_code', division_code)
     files = file_search.get_sobjects()
@@ -20,13 +21,19 @@ def get_files_checkboxes_for_division(division_code):
     header.add_style('text-align', 'center')
     header.add_style('text-decoration', 'underline')
 
+    files_in_order = get_files_for_order(order_code)
+    files_in_order_codes = [file_in_order.get_code() for file_in_order in files_in_order]
+
     for file_sobject in files:
         checkbox = CheckboxWdg(name=file_sobject.get_code())
+
+        if (file_sobject.get_code() in files_in_order_codes):
+            checkbox.set_checked()
 
         checkbox_row = files_checkbox_table.add_row()
 
         files_checkbox_table.add_cell(data=checkbox, row=checkbox_row)
-        files_checkbox_table.add_cell(data=file_sobject.get_value('name'), row=checkbox_row)
+        files_checkbox_table.add_cell(data=file_sobject.get_value('file_path'), row=checkbox_row)
 
     return files_checkbox_table
 
@@ -59,13 +66,27 @@ for (var i = 0; i < files.length; i++) {
 
     var file_checkbox_value = values[file_code];
 
-    if (file_checkbox_value == "on") {
-        var new_entry = {
-            'order_code': order_code,
-            'file_code': file_code
-        }
+    var existing_entry = server.eval("@SOBJECT(twog/file_in_order['file_code', '" + file_code +
+                                     "']['order_code',  '" + order_code + "'])");
 
-        server.insert('twog/file_in_order', new_entry);
+    if (file_checkbox_value == "on") {
+        // Only insert a new entry if one does not already exist.
+        if (existing_entry.length == 0) {
+            var new_entry = {
+                'order_code': order_code,
+                'file_code': file_code
+            }
+
+            server.insert('twog/file_in_order', new_entry);
+        }
+    }
+    else {
+        // If a box is unchecked, remove any entries in the database that exist (in other words, if a box was checked
+        // but is now unchecked, the user meant to remove the connection)
+        if (existing_entry.length > 0)
+        {
+            server.delete_sobject(existing_entry[0].__search_key__);
+        }
     }
 }
 
@@ -80,7 +101,8 @@ spt.popup.close(spt.popup.get_popup(bvr.src_el));
         outer_div = DivWdg()
         outer_div.set_id('add_files_to_order')
 
-        outer_div.add(get_files_checkboxes_for_division(self.division_sobject.get_code()))
+        outer_div.add(get_files_checkboxes_for_division(self.division_sobject.get_code(),
+                                                        self.order_sobject.get_code()))
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior(self.order_sobject.get_code()))
