@@ -1,13 +1,10 @@
 from tactic.ui.common import BaseRefreshWdg
-from tactic.ui.widget import ButtonNewWdg
 
 from pyasm.search import Search
-from pyasm.web import DivWdg, HtmlElement, Table
-from pyasm.widget import CheckboxWdg, MultiSelectWdg, SubmitWdg
+from pyasm.web import DivWdg, Table
+from pyasm.widget import CheckboxWdg, SubmitWdg
 
-import order_builder.order_builder_utils as obu
-
-from common_tools import get_task_data_sobject_from_task_code
+from common_tools import get_task_data_sobject_from_task_code, get_files_for_order, get_task_data_in_files
 
 
 class AddInputFilesToTaskWdg(BaseRefreshWdg):
@@ -24,16 +21,8 @@ class AddInputFilesToTaskWdg(BaseRefreshWdg):
         order_search.add_code_filter(package.get('order_code'))
         order = order_search.get_sobject()
 
-        files_in_order_search = Search('twog/file_in_order')
-        files_in_order_search.add_filter('order_code', order.get_code())
-        files_in_order = files_in_order_search.get_sobjects()
-
-        self.files = []
-
-        for file_in_order in files_in_order:
-            file_search = Search('twog/file')
-            file_search.add_code_filter(file_in_order.get('file_code'))
-            self.files.append(file_search.get_sobject())
+        self.order_files = get_files_for_order(order.get_code())
+        self.selected_files = get_task_data_in_files(self.task_data.get_code())
 
     def get_files_checkbox_for_task(self):
         files_checkbox_table = Table()
@@ -43,8 +32,11 @@ class AddInputFilesToTaskWdg(BaseRefreshWdg):
         header.add_style('text-align', 'center')
         header.add_style('text-decoration', 'underline')
 
-        for file_sobject in self.files:
+        for file_sobject in self.order_files:
             checkbox = CheckboxWdg(name=file_sobject.get_code())
+
+            if file_sobject.get_code() in [selected_file.get_code() for selected_file in self.selected_files]:
+                checkbox.set_checked()
 
             checkbox_row = files_checkbox_table.add_row()
 
@@ -74,13 +66,27 @@ for (var i = 0; i < files.length; i++) {
 
     var file_checkbox_value = values[file_code];
 
-    if (file_checkbox_value == "on") {
-        var new_entry = {
-            'task_data_code': task_data_code,
-            'file_code': file_code
-        }
+    var existing_entry = server.eval("@SOBJECT(twog/task_data_in_file['file_code', '" + file_code +
+                                     "']['task_data_code',  '" + task_data_code + "'])");
 
-        server.insert('twog/task_data_in_file', new_entry);
+    if (file_checkbox_value == "on") {
+        // Only insert a new entry if one does not already exist.
+        if (existing_entry.length == 0) {
+            var new_entry = {
+                'task_data_code': task_data_code,
+                'file_code': file_code
+            }
+
+            server.insert('twog/task_data_in_file', new_entry);
+        }
+    }
+    else {
+        // If a box is unchecked, remove any entries in the database that exist (in other words, if a box was checked
+        // but is now unchecked, the user meant to remove the connection)
+        if (existing_entry.length > 0)
+        {
+            server.delete_sobject(existing_entry[0].__search_key__);
+        }
     }
 }
 

@@ -44,6 +44,12 @@ def get_task_data_equipment(task_data_code):
 
 
 def get_task_data_in_files(task_data_code):
+    """
+    Given the code for a task_data entry, get all the input files associated with it in a list.
+
+    :param task_data_code: task_data sobject's unique code
+    :return: List of file sobjects
+    """
     in_files_search = Search('twog/task_data_in_file')
     in_files_search.add_filter('task_data_code', task_data_code)
     in_files = in_files_search.get_sobjects()
@@ -61,6 +67,12 @@ def get_task_data_in_files(task_data_code):
 
 
 def get_task_data_out_files(task_data_code):
+    """
+    Given the code for a task_data entry, get all the output files associated with it in a list.
+
+    :param task_data_code: task_data sobject's unique code
+    :return: List of file sobjects
+    """
     out_files_search = Search('twog/task_data_out_file')
     out_files_search.add_filter('task_data_code', task_data_code)
     out_files = out_files_search.get_sobjects()
@@ -70,6 +82,32 @@ def get_task_data_out_files(task_data_code):
 
         files_search = Search('twog/file')
         files_search.add_where('\"code\" in ({0})'.format(out_files_string))
+        files = files_search.get_sobjects()
+
+        return files
+    else:
+        return []
+
+
+def get_files_for_order(order_code):
+    """
+    Given the code for an order, get all the files that are associated with it in a list.
+
+    :param order_code: order sobject's unique code
+    :return: List of file sobjects
+    """
+
+    files_in_order_search = Search('twog/file_in_order')
+    files_in_order_search.add_filter('order_code', order_code)
+    files_in_order = files_in_order_search.get_sobjects()
+
+    if len(files_in_order) > 0:
+        files_string = ','.join(
+            ["'{0}'".format(file_in_order.get('file_code')) for file_in_order in files_in_order]
+        )
+
+        files_search = Search('twog/file')
+        files_search.add_where('\"code\" in ({0})'.format(files_string))
         files = files_search.get_sobjects()
 
         return files
