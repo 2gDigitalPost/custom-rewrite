@@ -31,7 +31,6 @@ def get_task_data_equipment(task_data_code):
     equipment_in_task_data = equipment_in_task_data_search.get_sobjects()
 
     if len(equipment_in_task_data) > 0:
-        print(equipment_in_task_data)
         equipment_in_task_data_string = ','.join(
             ["'{0}'".format(equipment.get('equipment_code')) for equipment in equipment_in_task_data])
 
@@ -40,5 +39,39 @@ def get_task_data_equipment(task_data_code):
         equipment = equipment_search.get_sobjects()
 
         return equipment
+    else:
+        return []
+
+
+def get_task_data_in_files(task_data_code):
+    in_files_search = Search('twog/task_data_in_file')
+    in_files_search.add_filter('task_data_code', task_data_code)
+    in_files = in_files_search.get_sobjects()
+
+    if len(in_files) > 0:
+        in_files_string = ','.join(["'{0}'".format(in_file.get('file_code')) for in_file in in_files])
+
+        files_search = Search('twog/file')
+        files_search.add_where('\"code\" in ({0})'.format(in_files_string))
+        files = files_search.get_sobjects()
+
+        return files
+    else:
+        return []
+
+
+def get_task_data_out_files(task_data_code):
+    out_files_search = Search('twog/task_data_out_file')
+    out_files_search.add_filter('task_data_code', task_data_code)
+    out_files = out_files_search.get_sobjects()
+
+    if len(out_files) > 0:
+        out_files_string = ','.join(["'{0}'".format(out_file.get('file_code')) for out_file in out_files])
+
+        files_search = Search('twog/file')
+        files_search.add_where('\"code\" in ({0})'.format(out_files_string))
+        files = files_search.get_sobjects()
+
+        return files
     else:
         return []

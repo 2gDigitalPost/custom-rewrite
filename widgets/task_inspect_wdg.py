@@ -6,7 +6,8 @@ from pyasm.web import DivWdg, HtmlElement
 
 import order_builder.order_builder_utils as obu
 
-from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment
+from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
+    get_task_data_out_files
 
 
 def get_page_header(string):
@@ -21,26 +22,20 @@ def get_page_header(string):
 
 
 def get_in_files_list(task_data_code):
-    in_files_search = Search('twog/task_data_in_file')
-    in_files_search.add_filter('task_data_code', task_data_code)
-    in_files = in_files_search.get_sobjects()
+    in_files_list = get_task_data_in_files(task_data_code)
 
     div_wdg = DivWdg()
-    files_list = HtmlElement.ul()
 
-    if in_files:
+    if in_files_list:
         div_wdg.add('<u>Input Files</u>')
+        in_files_unordered_html_list = HtmlElement.ul()
 
-        for in_file in in_files:
-            file_search = Search('twog/file')
-            file_search.add_code_filter(in_file.get('file_code'))
-            file_sobject = file_search.get_sobject()
-
+        for file_path in sorted([in_file.get('file_path') for in_file in in_files_list]):
             file_li = HtmlElement.li()
-            file_li.add(file_sobject.get('file_path'))
-            files_list.add(file_li)
+            file_li.add(file_path)
+            in_files_unordered_html_list.add(file_li)
 
-        div_wdg.add(files_list)
+        div_wdg.add(in_files_unordered_html_list)
     else:
         div_wdg.add('No input files exist for this task')
 
@@ -48,26 +43,20 @@ def get_in_files_list(task_data_code):
 
 
 def get_out_files_list(task_data_code):
-    out_files_search = Search('twog/task_data_out_file')
-    out_files_search.add_filter('task_data_code', task_data_code)
-    out_files = out_files_search.get_sobjects()
+    out_files_list = get_task_data_out_files(task_data_code)
 
     div_wdg = DivWdg()
-    files_list = HtmlElement.ul()
 
-    if out_files:
+    if out_files_list:
         div_wdg.add('<u>Output Files</u>')
+        out_files_unordered_html_list = HtmlElement.ul()
 
-        for out_file in out_files:
-            file_search = Search('twog/file')
-            file_search.add_code_filter(out_file.get('file_code'))
-            file_sobject = file_search.get_sobject()
-
+        for file_path in sorted([out_file.get('file_path') for out_file in out_files_list]):
             file_li = HtmlElement.li()
-            file_li.add(file_sobject.get('file_path'))
-            files_list.add(file_li)
+            file_li.add(file_path)
+            out_files_unordered_html_list.add(file_li)
 
-        div_wdg.add(files_list)
+        div_wdg.add(out_files_unordered_html_list)
     else:
         div_wdg.add('No output files exist for this task')
 
