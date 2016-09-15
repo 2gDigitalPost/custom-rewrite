@@ -6,6 +6,8 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 
 import order_builder_utils as obu
 
+from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment
+
 
 def get_task_data_div(task_code):
     outer_div = DivWdg()
@@ -14,71 +16,45 @@ def get_task_data_div(task_code):
     task_data_search.add_filter('task_code', task_code)
     task_data = task_data_search.get_sobject()
 
-    in_file_search = Search('twog/task_data_in_file')
-    in_file_search.add_filter('task_data_code', task_data.get_code())
-    in_files = in_file_search.get_sobjects()
+    in_files_list = get_task_data_in_files(task_data.get_code())
+    out_files_list = get_task_data_out_files(task_data.get_code())
+    equipment_list = get_task_data_equipment(task_data.get_code())
 
-    out_file_search = Search('twog/task_data_out_file')
-    out_file_search.add_filter('task_data_code', task_data.get_code())
-    out_files = out_file_search.get_sobjects()
+    if in_files_list:
+        outer_div.add(obu.get_label_widget('In Files:'))
 
-    equipment_in_task_data_search = Search('twog/equipment_in_task_data')
-    equipment_in_task_data_search.add_filter('task_data_code', task_data.get_code())
-    equipment_in_task_data = equipment_in_task_data_search.get_sobjects()
+        unordered_html_list = HtmlElement.ul()
 
-    if in_files:
-        outer_div.add(obu.get_label_widget("In Files:"))
+        for file_path in [in_file.get('file_path') for in_file in in_files_list]:
+            li = HtmlElement.li()
+            li.add(file_path)
+            unordered_html_list.add(li)
 
-        in_files_list = HtmlElement.ul()
-        in_files_list.add_style('list-style-type', 'none')
+        outer_div.add(unordered_html_list)
 
-        for in_file in in_files:
-            file_search = Search('twog/file')
-            file_search.add_code_filter(in_file.get('file_code'))
-            file_sobject = file_search.get_sobject()
+    if out_files_list:
+        outer_div.add(obu.get_label_widget('Out Files:'))
 
-            file_li = HtmlElement.li()
-            file_li.add(file_sobject.get('file_path'))
-            in_files_list.add(file_li)
+        unordered_html_list = HtmlElement.ul()
 
-        outer_div.add(in_files_list)
+        for file_path in [out_file.get('file_path') for out_file in out_files_list]:
+            li = HtmlElement.li()
+            li.add(file_path)
+            unordered_html_list.add(li)
 
-    if out_files:
-        outer_div.add(obu.get_label_widget("Out Files:"))
+        outer_div.add(unordered_html_list)
 
-        out_files_list = HtmlElement.ul()
-        out_files_list.add_style('list-style-type', 'none')
-
-        for out_file in out_files:
-            file_search = Search('twog/file')
-            file_search.add_code_filter(out_file.get('file_code'))
-            file_sobject = file_search.get_sobject()
-
-            file_li = HtmlElement.li()
-            file_li.add(file_sobject.get('file_path'))
-            out_files_list.add(file_li)
-
-        outer_div.add(out_files_list)
-
-    if equipment_in_task_data:
+    if equipment_list:
         outer_div.add(obu.get_label_widget('Equipment:'))
 
-        equipment_list = HtmlElement.ul()
+        unordered_html_list = HtmlElement.ul()
 
-        equipment_in_task_data_string = ','.join(
-            ["'{0}'".format(equipment.get('equipment_code')) for equipment in equipment_in_task_data])
+        for name in [equipment.get('name') for equipment in equipment_list]:
+            li = HtmlElement.li()
+            li.add(name)
+            unordered_html_list.add(li)
 
-        equipment_search = Search('twog/equipment')
-        equipment_search.add_where('\"code\" in ({0})'.format(equipment_in_task_data_string))
-        equipment = equipment_search.get_sobjects()
-        equipment_names = sorted([equipment_sobject.get('name') for equipment_sobject in equipment])
-
-        for equipment_name in equipment_names:
-            equipment_li = HtmlElement.li()
-            equipment_li.add(equipment_name)
-            equipment_list.add(equipment_li)
-
-        outer_div.add(equipment_list)
+        outer_div.add(unordered_html_list)
 
     return outer_div
 
