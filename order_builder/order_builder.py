@@ -65,13 +65,17 @@ def get_task_data_div(task_code):
 
         equipment_list = HtmlElement.ul()
 
-        for equipment_in_task_data_sobject in equipment_in_task_data:
-            equipment_search = Search('twog/equipment')
-            equipment_search.add_code_filter(equipment_in_task_data_sobject.get('equipment_code'))
-            equipment_sobject = equipment_search.get_sobject()
+        equipment_in_task_data_string = ','.join(
+            ["'{0}'".format(equipment.get('equipment_code')) for equipment in equipment_in_task_data])
 
+        equipment_search = Search('twog/equipment')
+        equipment_search.add_where('\"code\" in ({0})'.format(equipment_in_task_data_string))
+        equipment = equipment_search.get_sobjects()
+        equipment_names = sorted([equipment_sobject.get('name') for equipment_sobject in equipment])
+
+        for equipment_name in equipment_names:
             equipment_li = HtmlElement.li()
-            equipment_li.add(equipment_sobject.get('name'))
+            equipment_li.add(equipment_name)
             equipment_list.add(equipment_li)
 
         outer_div.add(equipment_list)

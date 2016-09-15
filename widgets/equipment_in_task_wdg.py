@@ -2,7 +2,7 @@ from tactic.ui.common import BaseRefreshWdg
 
 from pyasm.search import Search
 from pyasm.web import DivWdg, Table
-from pyasm.widget import CheckboxWdg, SelectWdg, SubmitWdg
+from pyasm.widget import CheckboxWdg, SubmitWdg
 
 
 class EquipmentInTaskWdg(BaseRefreshWdg):
@@ -18,8 +18,6 @@ class EquipmentInTaskWdg(BaseRefreshWdg):
         equipment_in_task_data = equipment_in_task_data_search.get_sobjects()
         equipment_in_task_data_string = ','.join(
             ["'{0}'".format(equipment.get('equipment_code')) for equipment in equipment_in_task_data])
-
-        self.selected_equipment = []
 
         equipment_search = Search('twog/equipment')
         equipment_search.add_where('\"code\" in ({0})'.format(equipment_in_task_data_string))
