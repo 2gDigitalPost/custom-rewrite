@@ -46,11 +46,27 @@ class AddInputFilesToTaskWdg(BaseRefreshWdg):
         return files_checkbox_table
 
     @staticmethod
-    def get_submit_button_behavior(task_data_code):
+    def get_submit_button_behavior(task_data_code, task_search_key):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
+function getAllElementsWithAttribute(attribute)
+{
+  var matchingElements = [];
+  var allElements = document.getElementsByTagName('spt_class_name');
+  for (var i = 0, n = allElements.length; i < n; i++)
+  {
+    if (allElements[i].getAttribute(attribute) !== null)
+    {
+      // Element exists with attribute. Add to array.
+      matchingElements.push(allElements[i]);
+    }
+  }
+  return matchingElements;
+}
+
+
 // Get the server object
 var server = TacticServerStub.get();
 var containing_element = bvr.src_el.getParent("#add_files_to_task");
@@ -92,7 +108,14 @@ for (var i = 0; i < files.length; i++) {
 
 spt.app_busy.hide();
 spt.popup.close(spt.popup.get_popup(bvr.src_el));
-            ''' % task_data_code
+
+var task_search_key = '%s';
+
+var widget_name = document.querySelector("div[spt_title]");
+console.log(widget_name);
+
+spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_key});
+            ''' % (task_data_code, task_search_key)
         }
 
         return behavior
@@ -104,7 +127,8 @@ spt.popup.close(spt.popup.get_popup(bvr.src_el));
         outer_div.add(self.get_files_checkbox_for_task())
 
         submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior(self.task_data.get_code()))
+        submit_button.add_behavior(self.get_submit_button_behavior(self.task_data.get_code(),
+                                                                   self.task_sobject.get_search_key()))
 
         outer_div.add(submit_button)
 
