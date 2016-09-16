@@ -33,6 +33,10 @@ class InsertPackageInOrderWdg(BaseRefreshWdg):
     def init(self):
         self.order_sobject = self.get_sobject_from_kwargs()
 
+        self.parent_widget_title = self.kwargs.get('parent_widget_title')
+        self.parent_widget_name = self.kwargs.get('parent_widget_name')
+        self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
+
     def get_display(self):
         outer_div = DivWdg()
         outer_div.set_id('insert-package-in-order')
@@ -46,7 +50,7 @@ class InsertPackageInOrderWdg(BaseRefreshWdg):
         outer_div.add(obu.get_date_calendar_wdg())
 
         submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior(self.order_sobject.get_code()))
+        submit_button.add_behavior(self.get_submit_button_behavior())
 
         outer_div.add(submit_button)
 
@@ -60,8 +64,7 @@ class InsertPackageInOrderWdg(BaseRefreshWdg):
         outer_div.add(obu.get_label_widget('Platform'))
         outer_div.add(platform_select_wdg)
 
-    @staticmethod
-    def get_submit_button_behavior(order_code):
+    def get_submit_button_behavior(self):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -92,11 +95,17 @@ try {
 
     spt.app_busy.hide();
     spt.popup.close(spt.popup.get_popup(bvr.src_el));
+
+    var parent_widget_title = '%s';
+    var parent_widget_name = '%s';
+    var parent_widget_search_key = '%s';
+
+    spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_widget_search_key});
 }
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
-}''' % (order_code)
+}''' % (self.order_sobject.get_code(), self.parent_widget_title, self.parent_widget_name, self.parent_widget_search_key)
         }
 
         return behavior
@@ -105,6 +114,10 @@ catch(err) {
 class InsertPackageByPlatformWdg(BaseRefreshWdg):
     def init(self):
         self.order_sobject = self.get_sobject_from_kwargs()
+
+        self.parent_widget_title = self.kwargs.get('parent_widget_title')
+        self.parent_widget_name = self.kwargs.get('parent_widget_name')
+        self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
 
     def get_display(self):
         outer_div = DivWdg()
@@ -119,14 +132,13 @@ class InsertPackageByPlatformWdg(BaseRefreshWdg):
         outer_div.add(obu.get_date_calendar_wdg())
 
         submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior(self.order_sobject.get_code()))
+        submit_button.add_behavior(self.get_submit_button_behavior())
 
         outer_div.add(submit_button)
 
         return outer_div
 
-    @staticmethod
-    def get_submit_button_behavior(order_code):
+    def get_submit_button_behavior(self):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -142,7 +154,6 @@ try {
     // Get the form values
     var order_code = '%s';
     var name = new_package_values.new_package_name;
-    // var platform_code = new_package_values.platform_code;
     var due_date = new_package_values.due_date;
 
     // Get all the platforms saved in the database
@@ -170,11 +181,17 @@ try {
 
     spt.app_busy.hide();
     spt.popup.close(spt.popup.get_popup(bvr.src_el));
+
+    var parent_widget_title = '%s';
+    var parent_widget_name = '%s';
+    var parent_widget_search_key = '%s';
+
+    spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_widget_search_key});
 }
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
-}''' % (order_code)
+}''' % (self.order_sobject.get_code(), self.parent_widget_title, self.parent_widget_name, self.parent_widget_search_key)
         }
 
         return behavior

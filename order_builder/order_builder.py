@@ -113,16 +113,23 @@ class OrderBuilderWdg(BaseRefreshWdg):
             description_div.add('No description available')
 
         add_packages_button = ButtonNewWdg(title='Add Package', icon='INSERT')
-        add_packages_button.add_behavior(obu.get_load_popup_widget_behavior('Insert Package',
-                                                                            'order_builder.InsertPackageInOrderWdg',
-                                                                            self.order_sobject.get_search_key()))
+        add_packages_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior('Insert Package', 'order_builder.InsertPackageInOrderWdg',
+                                                           self.order_sobject.get_search_key(), 'Order Builder',
+                                                           'order_builder.OrderBuilderWdg',
+                                                           self.order_sobject.get_search_key())
+        )
+
         add_packages_button.add_style('display', 'inline-block')
 
         add_packages_by_platform = ButtonNewWdg(title='Add Package By Platform', icon='INSERT_MULTI')
         add_packages_by_platform.add_behavior(
-            obu.get_load_popup_widget_behavior('Insert Packages by Platform',
-                                               'order_builder.InsertPackageByPlatformWdg',
-                                               self.order_sobject.get_search_key()))
+            obu.get_load_popup_widget_with_reload_behavior('Insert Packages by Platform',
+                                                           'order_builder.InsertPackageByPlatformWdg',
+                                                           self.order_sobject.get_search_key(), 'Order Builder',
+                                                           'order_builder.OrderBuilderWdg',
+                                                           self.order_sobject.get_search_key())
+        )
         add_packages_by_platform.add_style('display', 'inline-block')
 
         add_file_to_order_button = ButtonNewWdg(title='Add Files to Order', icon='ADD')
