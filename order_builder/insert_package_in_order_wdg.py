@@ -153,7 +153,7 @@ try {
 
     // Get the form values
     var order_code = '%s';
-    var name = new_package_values.new_package_name;
+    var new_name = new_package_values.new_package_name;
     var due_date = new_package_values.due_date;
 
     // Get all the platforms saved in the database
@@ -169,7 +169,7 @@ try {
 
             // Set up the object for the new package entry.
             var new_package = {
-                'name': name + " - " + platform_name,
+                'name': new_name + " - " + platform_name,
                 'order_code': order_code,
                 'platform_code': platform_code,
                 'due_date': due_date
