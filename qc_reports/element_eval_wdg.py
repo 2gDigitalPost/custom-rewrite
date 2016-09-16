@@ -882,7 +882,7 @@ window.open(file_path);
         standard_select.add_style('display', 'inline-block')
         standard_select.add_empty_option()
 
-        for standard in ('625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC'):
+        for standard in ('625', '525', '720', '1080 (4:4:4)', '1080', 'PAL', 'NTSC', '3840', '4160'):
             standard_select.append_option(standard, standard)
 
         try:
