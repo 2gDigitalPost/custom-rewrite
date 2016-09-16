@@ -10,6 +10,9 @@ from common_tools.utils import get_task_data_equipment
 class EquipmentInTaskWdg(BaseRefreshWdg):
     def init(self):
         self.task_sobject = self.get_sobject_from_kwargs()
+        self.parent_widget_title = self.kwargs.get('parent_widget_title')
+        self.parent_widget_name = self.kwargs.get('parent_widget_name')
+        self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
 
         task_data_search = Search('twog/task_data')
         task_data_search.add_filter('task_code', self.task_sobject.get_code())
@@ -24,7 +27,7 @@ class EquipmentInTaskWdg(BaseRefreshWdg):
         outer_div.add(self.get_equipment_checkboxes())
 
         submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior(self.task_data.get_code()))
+        submit_button.add_behavior(self.get_submit_button_behavior())
 
         outer_div.add(submit_button)
 
@@ -49,8 +52,7 @@ class EquipmentInTaskWdg(BaseRefreshWdg):
 
         return equipment_checkbox_table
 
-    @staticmethod
-    def get_submit_button_behavior(task_data_code):
+    def get_submit_button_behavior(self):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -62,6 +64,9 @@ var values = spt.api.get_input_values(containing_element, null, false);
 
 // Get the form values
 var task_data_code = '%s';
+var parent_widget_title = '%s';
+var parent_widget_name = '%s';
+var parent_widget_search_key = '%s';
 
 var equipment = server.eval("@SOBJECT(twog/equipment)");
 
@@ -96,7 +101,10 @@ for (var i = 0; i < equipment.length; i++) {
 
 spt.app_busy.hide();
 spt.popup.close(spt.popup.get_popup(bvr.src_el));
-            ''' % task_data_code
+
+spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_widget_search_key});
+            ''' % (self.task_data.get_code(), self.parent_widget_title, self.parent_widget_name,
+                   self.parent_widget_search_key)
         }
 
         return behavior

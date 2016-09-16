@@ -147,8 +147,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         return order_div
 
-    @staticmethod
-    def get_task_div(task):
+    def get_task_div(self, task):
         """
         Take a task object and set up the Div to display it.
 
@@ -209,9 +208,11 @@ class OrderBuilderWdg(BaseRefreshWdg):
         inspect_button.add_behavior(obu.load_task_inspect_widget(task.get_search_key()))
 
         equipment_button = ButtonNewWdg(title='Equipment', icon='EQUIPMENT')
-        equipment_button.add_behavior(obu.get_load_popup_widget_behavior('Equipment',
-                                                                         'widgets.EquipmentInTaskWdg',
-                                                                         task.get_search_key()))
+        equipment_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior('Equipment', 'widgets.EquipmentInTaskWdg',
+                                                           task.get_search_key(), 'Order Builder',
+                                                           'order_builder.OrderBuilderWdg',
+                                                           self.order_sobject.get_search_key()))
 
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(task.get_search_key()))

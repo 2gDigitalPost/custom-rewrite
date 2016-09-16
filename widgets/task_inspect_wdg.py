@@ -175,9 +175,9 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         add_equipment_button = ButtonNewWdg(title='Add Equipment', icon='EQUIPMENT')
         add_equipment_button.add_behavior(
-            obu.get_load_popup_widget_behavior('Add Equipment',
-                                               'widgets.EquipmentInTaskWdg',
-                                               self.task_sobject.get_search_key())
+            obu.get_load_popup_widget_with_reload_behavior('Add Equipment', 'widgets.EquipmentInTaskWdg',
+                                                           self.task_sobject.get_search_key(), 'Task',
+                                                           'widgets.TaskInspectWdg', self.task_sobject.get_search_key())
         )
         add_equipment_button.add_style('display', 'inline-block')
 

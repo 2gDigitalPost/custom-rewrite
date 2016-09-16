@@ -111,9 +111,6 @@ spt.popup.close(spt.popup.get_popup(bvr.src_el));
 
 var task_search_key = '%s';
 
-var widget_name = document.querySelector("div[spt_title]");
-console.log(widget_name);
-
 spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_key});
             ''' % (task_data_code, task_search_key)
         }
