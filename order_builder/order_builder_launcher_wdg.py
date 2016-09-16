@@ -14,9 +14,10 @@ class OrderBuilderLauncherWdg(BaseTableElementWdg):
         # TODO: Make this open a new tab rather than reloading the current one
         behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
 try {
-    var order_code = '%s';
+    var order_search_key = '%s';
 
-    spt.api.load_tab('Order Builder', 'order_builder.OrderBuilderWdg', {'search_key': order_code});
+    spt.tab.add_new('order_' + order_search_key, 'Order Builder', 'order_builder.OrderBuilderWdg',
+                    {'search_key': order_search_key});
 }
 catch(err){
     spt.app_busy.hide();
