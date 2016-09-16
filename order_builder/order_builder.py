@@ -65,11 +65,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
     """
 
     def init(self):
-        self.order_code = self.get_kwargs().get('code')
-
-        order_sobject_search = Search('twog/order')
-        order_sobject_search.add_code_filter(self.order_code)
-        self.order_sobject = order_sobject_search.get_sobject()
+        self.order_sobject = self.get_sobject_from_kwargs()
 
         self.packages_in_order = obu.get_packages_from_order(self.order_sobject.get_code())
 
