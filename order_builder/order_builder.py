@@ -67,8 +67,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
     def init(self):
         self.order_sobject = self.get_sobject_from_kwargs()
 
-        self.packages_in_order = obu.get_packages_from_order(self.order_sobject.get_code())
-
     def setup_order_information(self):
         """
         Set up a div widget to go at the top of the page. It will hold information about the order, including it's
@@ -371,7 +369,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         packages_list = HtmlElement.ul()
         packages_list.add_style('list-style-type', 'none')
 
-        for package in self.packages_in_order:
+        for package in obu.get_packages_from_order(self.order_sobject.get_code()):
             package_name_div = DivWdg()
             package_name_div.add_style('font-weight', 'bold')
             package_name_div.add(package.get('name'))
