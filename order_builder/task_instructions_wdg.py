@@ -23,7 +23,7 @@ class TaskInstructionsWdg(BaseRefreshWdg):
             if within_instructions:
                 instructions_lines.append(line)
 
-        return '\n'.join(instructions_lines)
+        return '\n'.join(instructions_lines).encode('utf-8')
 
     @staticmethod
     def parse_instruction_text(instructions):

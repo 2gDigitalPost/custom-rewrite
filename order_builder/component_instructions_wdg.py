@@ -36,7 +36,7 @@ class ComponentInstructionsWdg(BaseRefreshWdg):
 
             instructions = instructions_search.get_sobject()
 
-            instructions_text = instructions.get('instructions_text')
+            instructions_text = instructions.get('instructions_text').encode('utf-8')
         else:
             instructions_text = 'Sorry, instructions have not been added yet.'
 
