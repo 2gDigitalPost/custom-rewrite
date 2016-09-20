@@ -304,15 +304,20 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             change_instructions_button = ButtonNewWdg(title='Change Instructions', icon='DOCUMENTATION')
             change_instructions_button.add_behavior(
-                obu.get_load_popup_widget_behavior('Change Instructions',
-                                                   'order_builder.ChangeInstructionsWdg',
-                                                   component.get_search_key()))
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Change Instructions', 'order_builder.ChangeInstructionsWdg', component.get_search_key(),
+                    'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+                )
+            )
             change_instructions_button.add_style('display', 'inline-block')
 
             change_title_button = ButtonNewWdg(title='Change Title', icon='')
-            change_title_button.add_behavior(obu.get_load_popup_widget_behavior('Change Title',
-                                                                                'order_builder.ChangeTitleWdg',
-                                                                                component.get_search_key()))
+            change_title_button.add_behavior(
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Change Title', 'order_builder.ChangeTitleWdg', component.get_search_key(),
+                    'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+                )
+            )
             change_title_button.add_style('display', 'inline-block')
 
             add_task_button = ButtonNewWdg(title='Add Task', icon='INSERT')

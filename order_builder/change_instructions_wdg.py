@@ -10,6 +10,9 @@ from common_tools.utils import get_instructions_template_select_wdg
 class ChangeInstructionsWdg(BaseRefreshWdg):
     def init(self):
         self.component_sobject = self.get_sobject_from_kwargs()
+        self.parent_widget_title = self.kwargs.get('parent_widget_title')
+        self.parent_widget_name = self.kwargs.get('parent_widget_name')
+        self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
 
     def get_display(self):
         outer_div = DivWdg()
@@ -30,14 +33,13 @@ class ChangeInstructionsWdg(BaseRefreshWdg):
         outer_div.add(get_instructions_template_select_wdg())
 
         submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior(self.component_sobject.get_code()))
+        submit_button.add_behavior(self.get_submit_button_behavior())
 
         outer_div.add(submit_button)
 
         return outer_div
 
-    @staticmethod
-    def get_submit_button_behavior(component_code):
+    def get_submit_button_behavior(self):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -62,11 +64,21 @@ try {
 
     // Send the update to the server
     server.update(search_key, kwargs);
+
+    spt.app_busy.hide();
+    spt.popup.close(spt.popup.get_popup(bvr.src_el));
+
+    var parent_widget_title = '%s';
+    var parent_widget_name = '%s';
+    var parent_widget_search_key = '%s';
+
+    spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_widget_search_key});
 }
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
-}''' % (component_code)
+}''' % (self.component_sobject.get_code(), self.parent_widget_title, self.parent_widget_name,
+        self.parent_widget_search_key)
         }
 
         return behavior
