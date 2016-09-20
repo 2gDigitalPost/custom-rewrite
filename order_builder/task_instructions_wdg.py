@@ -2,29 +2,12 @@ from pyasm.web import DivWdg
 
 from tactic.ui.common import BaseRefreshWdg
 
-from common_tools.utils import get_component_instructions_from_task_sobject
+from common_tools.utils import get_task_instructions_text_from_instructions_template_code
 
 
 class TaskInstructionsWdg(BaseRefreshWdg):
     def init(self):
         self.task_sobject = self.get_sobject_from_kwargs()
-
-    @staticmethod
-    def get_instructions_for_task_name(name, instructions):
-        instructions_lines = []
-        within_instructions = False
-
-        for line in instructions.split('\n'):
-            if line.startswith('#'):
-                if line == '# {0}'.format(name):
-                    within_instructions = True
-                else:
-                    within_instructions = False
-
-            if within_instructions:
-                instructions_lines.append(line)
-
-        return '\n'.join(instructions_lines).encode('utf-8')
 
     @staticmethod
     def parse_instruction_text(instructions):
@@ -43,14 +26,13 @@ class TaskInstructionsWdg(BaseRefreshWdg):
 
         return output_html
 
-
     def get_display(self):
         div_wdg = DivWdg()
 
-        instructions = self.get_instructions_for_task_name(self.task_sobject.get_value('process'),
-                                                           get_component_instructions_from_task_sobject(
-                                                               self.task_sobject
-                                                           ))
+        parent_component = self.task_sobject.get_parent()
+        instructions_template_code = parent_component.get('instructions_template_code')
+        instructions = get_task_instructions_text_from_instructions_template_code(instructions_template_code,
+                                                                                  self.task_sobject.get('process'))
 
         if not instructions:
             instructions = 'Sorry, instructions have not been added yet.'

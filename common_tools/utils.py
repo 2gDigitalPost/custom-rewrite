@@ -190,7 +190,26 @@ def get_instructions_text_for_instructions_template_code(instructions_template_c
         return None
 
 
-def get_component_instructions_from_task_sobject(task):
+def get_component_instructions_text_from_task_sobject(task):
     component_sobject = task.get_parent()
 
     return get_instructions_text_for_instructions_template_code(component_sobject.get('instructions_template_code'))
+
+
+def get_task_instructions_text_from_instructions_template_code(instructions_template_code, task_name):
+    """
+    Given an instructions_template code and a task name, get the task's instruction text from the instructions
+    template. If none exists, return a string in its place.
+
+    :param instructions_template_code: instructions_template unique code
+    :param task_name: Task name (process)
+    :return: String
+    """
+    department_instructions_sobjects = get_department_instructions_sobjects_for_instructions_template_code(
+        instructions_template_code)
+
+    for department_instructions_sobject in department_instructions_sobjects:
+        if department_instructions_sobject.get('name') == task_name:
+            return department_instructions_sobject.get('instructions_text')
+    else:
+        return 'No instructions available'

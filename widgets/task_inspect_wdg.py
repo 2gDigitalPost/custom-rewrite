@@ -7,7 +7,7 @@ from pyasm.web import DivWdg, HtmlElement
 import order_builder.order_builder_utils as obu
 
 from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
-    get_task_data_out_files, get_component_instructions_from_task_sobject
+    get_task_data_out_files, get_task_instructions_text_from_instructions_template_code
 
 
 def get_page_header(string):
@@ -91,23 +91,6 @@ class TaskInspectWdg(BaseRefreshWdg):
         self.parent_component = self.task_sobject.get_parent()
 
     @staticmethod
-    def get_instructions_for_task_name(name, instructions):
-        instructions_lines = []
-        within_instructions = False
-
-        for line in instructions.split('\n'):
-            if line.startswith('#'):
-                if line == '# {0}'.format(name):
-                    within_instructions = True
-                else:
-                    within_instructions = False
-
-            if within_instructions:
-                instructions_lines.append(line)
-
-        return '\n'.join(instructions_lines[1:])
-
-    @staticmethod
     def parse_instruction_text(instructions):
         output_html = ''
 
@@ -133,10 +116,10 @@ class TaskInspectWdg(BaseRefreshWdg):
                                                                  self.parent_component.get_code())))
 
         div_wdg.add(HtmlElement.h4('<u>Instructions</u>'))
-        instructions = self.get_instructions_for_task_name(self.task_sobject.get_value('process'),
-                                                           get_component_instructions_from_task_sobject(
-                                                               self.task_sobject
-                                                           ))
+
+        instructions_template_code = self.parent_component.get('instructions_template_code')
+        instructions = get_task_instructions_text_from_instructions_template_code(instructions_template_code,
+                                                                                  self.task_sobject.get('process'))
 
         if not instructions:
             instructions = 'Sorry, instructions have not been added yet.'
