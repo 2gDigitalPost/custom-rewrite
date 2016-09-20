@@ -410,9 +410,11 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             add_component_button = ButtonNewWdg(title='Add Component', icon='INSERT')
             add_component_button.add_behavior(
-                obu.get_load_popup_widget_behavior('Insert Component',
-                                                   'order_builder.InsertComponentInPackageWdg',
-                                                   package.get_search_key()))
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Insert Component', 'order_builder.InsertComponentInPackageWdg', package.get_search_key(),
+                    'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+                )
+            )
             add_component_button.add_style('display', 'inline-block')
 
             add_component_by_language_button = ButtonNewWdg(title='Add Component By Language', icon='INSERT_MULTI')
@@ -420,6 +422,13 @@ class OrderBuilderWdg(BaseRefreshWdg):
                 obu.get_load_popup_widget_behavior('Insert Component by Language',
                                                    'order_builder.InsertComponentByLanguageWdg',
                                                    package.get_search_key())
+            )
+            add_component_by_language_button.add_behavior(
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Insert Component by Language', 'order_builder.InsertComponentByLanguageWdg',
+                    package.get_search_key(), 'Order Builder', 'order_builder.OrderBuilderWdg',
+                    self.order_sobject.get_search_key()
+                )
             )
             add_component_by_language_button.add_style('display', 'inline-block')
 
