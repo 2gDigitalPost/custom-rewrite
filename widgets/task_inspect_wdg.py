@@ -7,7 +7,7 @@ from pyasm.web import DivWdg, HtmlElement
 import order_builder.order_builder_utils as obu
 
 from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
-    get_task_data_out_files
+    get_task_data_out_files, get_component_instructions_from_task_sobject
 
 
 def get_page_header(string):
@@ -124,16 +124,6 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         return output_html
 
-    @staticmethod
-    def get_title_order_instructions_from_task(task):
-        title_order_sobject = task.get_parent()
-
-        instructions_search = Search('twog/instructions')
-        instructions_search.add_code_filter(title_order_sobject.get('instructions_code'))
-        instructions = instructions_search.get_sobject()
-
-        return instructions.get('instructions_text')
-
     def get_display(self):
         div_wdg = DivWdg()
 
@@ -144,7 +134,7 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         div_wdg.add(HtmlElement.h4('<u>Instructions</u>'))
         instructions = self.get_instructions_for_task_name(self.task_sobject.get_value('process'),
-                                                           self.get_title_order_instructions_from_task(
+                                                           get_component_instructions_from_task_sobject(
                                                                self.task_sobject
                                                            ))
 

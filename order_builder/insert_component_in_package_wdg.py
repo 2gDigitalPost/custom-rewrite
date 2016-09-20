@@ -6,6 +6,8 @@ from pyasm.widget import CheckboxWdg, SelectWdg, SubmitWdg
 
 import order_builder_utils as obu
 
+from common_tools.utils import get_instructions_template_select_wdg
+
 
 def get_language_select_wdg():
     language_select_wdg = SelectWdg('language_select')
@@ -85,23 +87,6 @@ def get_pipeline_select_wdg(search_type, width=300):
     return pipeline_select_wdg
 
 
-def get_instructions_select_wdg():
-    """
-    Get a Select Widget with all the instructions options
-
-    :return: SelectWdg
-    """
-
-    instructions_search = Search('twog/instructions')
-
-    instructions_select_widget = SelectWdg('instructions_code')
-    instructions_select_widget.set_id('instructions_code')
-    instructions_select_widget.add_empty_option()
-    instructions_select_widget.set_search_for_options(instructions_search, 'code', 'name')
-
-    return instructions_select_widget
-
-
 class InsertComponentInPackageWdg(BaseRefreshWdg):
     def init(self):
         self.package_sobject = self.get_sobject_from_kwargs()
@@ -123,7 +108,7 @@ class InsertComponentInPackageWdg(BaseRefreshWdg):
         outer_div.add(get_pipeline_select_wdg('twog/component'))
 
         outer_div.add(obu.get_label_widget('Instructions'))
-        outer_div.add(get_instructions_select_wdg())
+        outer_div.add(get_instructions_template_select_wdg())
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior(self.package_sobject.get_code()))
@@ -150,7 +135,7 @@ var package_code = '%s';
 var name = new_component_values.new_component_name;
 var language_code = new_component_values.language_code;
 var pipeline_code = new_component_values.pipeline_code;
-var instructions_code = new_component_values.instructions_code;
+var instructions_template_code = new_component_values.instructions_template_select;
 var title_code = new_component_values.title_code;
 
 var new_component = {
@@ -158,7 +143,7 @@ var new_component = {
     'package_code': package_code,
     'language_code': language_code,
     'pipeline_code': pipeline_code,
-    'instructions_code': instructions_code,
+    'instructions_template_code': instructions_template_code,
     'title_code': title_code
 }
 
@@ -196,7 +181,7 @@ class InsertComponentByLanguageWdg(BaseRefreshWdg):
         outer_div.add(get_pipeline_select_wdg('twog/component'))
 
         outer_div.add(obu.get_label_widget('Instructions'))
-        outer_div.add(get_instructions_select_wdg())
+        outer_div.add(get_instructions_template_select_wdg())
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior(self.package_sobject.get_code()))
@@ -222,7 +207,7 @@ try {
     var package_code = '%s';
     var name = new_component_values.new_component_name;
     var pipeline_code = new_component_values.pipeline_code;
-    var instructions_code = new_component_values.instructions_code;
+    var instructions_template_code = new_component_values.instructions_template_select;
     var title_code = new_component_values.title_code;
 
     var languages = server.eval("@SOBJECT(twog/language)");
@@ -240,7 +225,7 @@ try {
                 'package_code': package_code,
                 'language_code': language_code,
                 'pipeline_code': pipeline_code,
-                'instructions_code': instructions_code,
+                'instructions_template_code': instructions_template_code,
                 'title_code': title_code
             }
 

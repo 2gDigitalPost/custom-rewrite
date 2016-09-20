@@ -1,4 +1,5 @@
 from pyasm.search import Search
+from pyasm.widget import SelectWdg
 
 
 def get_task_data_sobject_from_task_code(task_code):
@@ -113,3 +114,83 @@ def get_files_for_order(order_code):
         return files
     else:
         return []
+
+
+def get_instructions_template_select_wdg():
+    """
+    Get a Select Widget with all the instructions template options
+
+    :return: SelectWdg
+    """
+
+    instructions_search = Search('twog/instructions_template')
+
+    instructions_template_select_wdg = SelectWdg('instructions_template_select')
+    instructions_template_select_wdg.set_id('instructions_template_select')
+    instructions_template_select_wdg.add_empty_option()
+    instructions_template_select_wdg.set_search_for_options(instructions_search, 'code', 'name')
+
+    return instructions_template_select_wdg
+
+
+def get_department_instructions_sobjects_for_instructions_template_code(instructions_template_code):
+    """
+    Given the code to an instructions template, return a list of the corresponding department instructions sobjects.
+
+    :param instructions_template_code: twog/instructions_template unique code
+    :return: List of twog/department_instructions sobjects (possibly empty)
+    """
+
+    department_instructions_in_template_search = Search('twog/department_instructions_in_template')
+    department_instructions_in_template_search.add_filter('instructions_template_code', instructions_template_code)
+    department_instructions_in_template_sobjects = department_instructions_in_template_search.get_sobjects()
+
+    if len(department_instructions_in_template_sobjects) > 0:
+        department_instructions_codes = [department_instructions_in_template_sobject.get('department_instructions_code')
+                                         for department_instructions_in_template_sobject
+                                         in department_instructions_in_template_sobjects]
+
+        department_instructions_code_string = ','.join(
+            ["'{0}'".format(department_instructions_code) for department_instructions_code
+             in department_instructions_codes]
+        )
+
+        department_instructions_search = Search('twog/department_instructions')
+        department_instructions_search.add_where('\"code\" in ({0})'.format(department_instructions_code_string))
+        department_instructions_sobjects = department_instructions_search.get_sobjects()
+
+        return department_instructions_sobjects
+    else:
+        return []
+
+
+def get_instructions_text_for_instructions_template_code(instructions_template_code):
+    """
+    Given the code to an instructions template, return the collected text of all the corresponding department
+    instructions.
+
+    :param instructions_template_code: twog/instructions_template unique code
+    :return: Text (string) or None
+    """
+
+    department_instructions_sobjects = get_department_instructions_sobjects_for_instructions_template_code(
+        instructions_template_code)
+
+    if department_instructions_sobjects:
+        full_instructions_text = ''
+
+        for department_instructions_sobject in department_instructions_sobjects:
+            full_instructions_text += department_instructions_sobject.get('name')
+            full_instructions_text += '\n\n'
+            full_instructions_text += department_instructions_sobject.get('instructions_text')
+            full_instructions_text += '\n\n'
+
+        return full_instructions_text.encode('utf-8')
+    else:
+        return None
+
+
+def get_component_instructions_from_task_sobject(task):
+    component_sobject = task.get_parent()
+
+    return get_instructions_text_for_instructions_template_code(component_sobject.get('instructions_template_code'))

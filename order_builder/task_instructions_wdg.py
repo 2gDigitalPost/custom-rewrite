@@ -1,7 +1,8 @@
-from pyasm.search import Search
 from pyasm.web import DivWdg
 
 from tactic.ui.common import BaseRefreshWdg
+
+from common_tools.utils import get_component_instructions_from_task_sobject
 
 
 class TaskInstructionsWdg(BaseRefreshWdg):
@@ -42,21 +43,12 @@ class TaskInstructionsWdg(BaseRefreshWdg):
 
         return output_html
 
-    @staticmethod
-    def get_title_order_instructions_from_task(task):
-        title_order_sobject = task.get_parent()
-
-        instructions_search = Search('twog/instructions')
-        instructions_search.add_code_filter(title_order_sobject.get('instructions_code'))
-        instructions = instructions_search.get_sobject()
-
-        return instructions.get('instructions_text')
 
     def get_display(self):
         div_wdg = DivWdg()
 
         instructions = self.get_instructions_for_task_name(self.task_sobject.get_value('process'),
-                                                           self.get_title_order_instructions_from_task(
+                                                           get_component_instructions_from_task_sobject(
                                                                self.task_sobject
                                                            ))
 

@@ -1,7 +1,8 @@
-from pyasm.search import Search
 from pyasm.web import DivWdg
 
 from tactic.ui.common import BaseRefreshWdg
+
+from common_tools.utils import get_instructions_text_for_instructions_template_code
 
 
 class ComponentInstructionsWdg(BaseRefreshWdg):
@@ -28,15 +29,10 @@ class ComponentInstructionsWdg(BaseRefreshWdg):
     def get_display(self):
         div_wdg = DivWdg()
 
-        instructions_code = self.component_sobject.get('instructions_code')
+        instructions_template_code = self.component_sobject.get('instructions_template_code')
 
-        if instructions_code:
-            instructions_search = Search('twog/instructions')
-            instructions_search.add_code_filter(instructions_code)
-
-            instructions = instructions_search.get_sobject()
-
-            instructions_text = instructions.get('instructions_text').encode('utf-8')
+        if instructions_template_code:
+            instructions_text = get_instructions_text_for_instructions_template_code(instructions_template_code)
         else:
             instructions_text = 'Sorry, instructions have not been added yet.'
 
