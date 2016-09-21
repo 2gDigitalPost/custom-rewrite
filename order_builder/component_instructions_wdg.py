@@ -2,7 +2,7 @@ from pyasm.web import DivWdg
 
 from tactic.ui.common import BaseRefreshWdg
 
-from common_tools.utils import get_instructions_text_for_instructions_template_code
+from common_tools.utils import get_instructions_text_from_instructions_code
 
 
 class ComponentInstructionsWdg(BaseRefreshWdg):
@@ -15,10 +15,8 @@ class ComponentInstructionsWdg(BaseRefreshWdg):
 
         for line in instructions.split('\n'):
             if line:
-                if line[0] == '*':
-                    formatted_line = '<h2>{0}</h2>'.format(line[2:])
-                elif line[0] == '#':
-                    formatted_line = '<h4>{0}</h4>'.format(line[2:])
+                if line[0:3] == '###':
+                    formatted_line = '<h4>{0}</h4>'.format(line[4:])
                 else:
                     formatted_line = '<p>{0}</p>'.format(line)
 
@@ -29,10 +27,10 @@ class ComponentInstructionsWdg(BaseRefreshWdg):
     def get_display(self):
         div_wdg = DivWdg()
 
-        instructions_template_code = self.component_sobject.get('instructions_template_code')
+        instructions_code = self.component_sobject.get('instructions_code')
 
-        if instructions_template_code:
-            instructions_text = get_instructions_text_for_instructions_template_code(instructions_template_code)
+        if instructions_code:
+            instructions_text = get_instructions_text_from_instructions_code(instructions_code)
         else:
             instructions_text = 'Sorry, instructions have not been added yet.'
 

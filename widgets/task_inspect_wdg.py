@@ -7,7 +7,7 @@ from pyasm.web import DivWdg, HtmlElement
 import order_builder.order_builder_utils as obu
 
 from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
-    get_task_data_out_files, get_task_instructions_text_from_instructions_template_code
+    get_task_data_out_files, get_task_instructions_text_from_instructions_code
 
 
 def get_page_header(string):
@@ -96,10 +96,8 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         for line in instructions.split('\n'):
             if line:
-                if line[0] == '*':
-                    formatted_line = '<h2>{0}</h2>'.format(line[2:])
-                elif line[0] == '#':
-                    formatted_line = '<h4>{0}</h4>'.format(line[2:])
+                if line[0:3] == '###':
+                    formatted_line = '<h4>{0}</h4>'.format(line[4:])
                 else:
                     formatted_line = '<p>{0}</p>'.format(line)
 
@@ -117,9 +115,9 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         div_wdg.add(HtmlElement.h4('<u>Instructions</u>'))
 
-        instructions_template_code = self.parent_component.get('instructions_template_code')
-        instructions = get_task_instructions_text_from_instructions_template_code(instructions_template_code,
-                                                                                  self.task_sobject.get('process'))
+        instructions_code = self.parent_component.get('instructions_code')
+        instructions = get_task_instructions_text_from_instructions_code(instructions_code,
+                                                                         self.task_sobject.get('process'))
 
         if not instructions:
             instructions = 'Sorry, instructions have not been added yet.'

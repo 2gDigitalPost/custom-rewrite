@@ -5,7 +5,6 @@ from pyasm.search import Search
 from pyasm.web import DivWdg, HtmlElement, Table
 from pyasm.widget import CheckboxWdg, MultiSelectWdg, SubmitWdg
 
-import order_builder.order_builder_utils as obu
 from common_tools.utils import get_files_for_order
 
 

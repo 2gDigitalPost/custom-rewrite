@@ -22,10 +22,8 @@ class InstructionsWdg(BaseRefreshWdg):
 
         for line in instructions.split('\n'):
             if line:
-                if line[0] == '*':
-                    formatted_line = '<h2>{0}</h2>'.format(line[2:])
-                elif line[0] == '#':
-                    formatted_line = '<h4>{0}</h4>'.format(line[2:])
+                if line[0:3] == '###':
+                    formatted_line = '<h4>{0}</h4>'.format(line[4:])
                 else:
                     formatted_line = '<p>{0}</p>'.format(line)
 
