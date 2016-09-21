@@ -1,8 +1,7 @@
 from tactic.ui.common import BaseRefreshWdg
 
-from pyasm.search import Search
-from pyasm.web import DivWdg, Table
-from pyasm.widget import CheckboxWdg, SelectWdg, SubmitWdg
+from pyasm.web import DivWdg
+from pyasm.widget import SelectWdg, SubmitWdg
 
 import order_builder.order_builder_utils as obu
 
@@ -78,34 +77,19 @@ var file_path = values["new_file_path"];
 var classification = values["classification"];
 var original_file_code = values["file_select"];
 
-for (var i = 0; i < files.length; i++) {
-    var file_code = files[i].code;
-
-    var file_checkbox_value = values[file_code];
-
-    var existing_entry = server.eval("@SOBJECT(twog/task_data_in_file['file_code', '" + file_code +
-                                     "']['task_data_code',  '" + task_data_code + "'])");
-
-    if (file_checkbox_value == "on") {
-        // Only insert a new entry if one does not already exist.
-        if (existing_entry.length == 0) {
-            var new_entry = {
-                'task_data_code': task_data_code,
-                'file_code': file_code
-            }
-
-            server.insert('twog/task_data_in_file', new_entry);
-        }
-    }
-    else {
-        // If a box is unchecked, remove any entries in the database that exist (in other words, if a box was checked
-        // but is now unchecked, the user meant to remove the connection)
-        if (existing_entry.length > 0)
-        {
-            server.delete_sobject(existing_entry[0].__search_key__);
-        }
-    }
+// Set up an object to hold the data
+var kwargs = {
+    'file_path': file_path,
+    'classification': classification,
+    'original_file': original_file_code
 }
+
+// Save the new file sobject, and get the code that it saved as
+var inserted_file = server.insert('twog/file', kwargs);
+var file_code = inserted_file['code'];
+
+// Using the code from the saved file, insert an entry into task_data's output files
+server.insert('twog/task_data_out_file', {'task_data_code': task_data_code, 'file_code': file_code});
 
 spt.app_busy.hide();
 spt.popup.close(spt.popup.get_popup(bvr.src_el));
