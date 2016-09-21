@@ -144,7 +144,16 @@ class TaskInspectWdg(BaseRefreshWdg):
         )
         add_output_file_button.add_style('display', 'inline-block')
 
-        add_equipment_button = ButtonNewWdg(title='Add Equipment', icon='EQUIPMENT')
+        move_input_file_to_output_button = ButtonNewWdg(title='Move Input File to Output', icon='RIGHT')
+        move_input_file_to_output_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Move Input File to Output', 'widgets.MoveInputFileToOutputWdg', self.task_sobject.get_search_key(),
+                'Task', 'widgets.TaskInspectWdg', self.task_sobject.get_search_key()
+            )
+        )
+        move_input_file_to_output_button.add_style('display', 'inline-block')
+
+        add_equipment_button = ButtonNewWdg(title='Add Equipment', icon='GEAR')
         add_equipment_button.add_behavior(
             obu.get_load_popup_widget_with_reload_behavior('Add Equipment', 'widgets.EquipmentInTaskWdg',
                                                            self.task_sobject.get_search_key(), 'Task',
@@ -154,6 +163,7 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         div_wdg.add(add_input_file_button)
         div_wdg.add(add_output_file_button)
+        div_wdg.add(move_input_file_to_output_button)
         div_wdg.add(add_equipment_button)
 
         return div_wdg
