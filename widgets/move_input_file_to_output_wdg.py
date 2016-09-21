@@ -5,7 +5,8 @@ from pyasm.widget import SelectWdg, SubmitWdg
 
 import order_builder.order_builder_utils as obu
 
-from common_tools.utils import get_task_data_in_files, get_task_data_sobject_from_task_code
+from common_tools.utils import get_task_data_in_files, get_task_data_sobject_from_task_code,\
+    get_client_division_sobject_for_task_sobject
 
 
 def get_file_select_wdg_from_file_list(files, width=400):
@@ -37,6 +38,8 @@ class MoveInputFileToOutputWdg(BaseRefreshWdg):
         self.task_sobject = self.get_sobject_from_kwargs()
         self.task_data = get_task_data_sobject_from_task_code(self.task_sobject.get_code())
 
+        self.division = get_client_division_sobject_for_task_sobject(self.task_sobject)
+
     def get_display(self):
         outer_div = DivWdg()
         outer_div.set_id('insert-component-in-package')
@@ -54,13 +57,14 @@ class MoveInputFileToOutputWdg(BaseRefreshWdg):
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior(self.task_data.get_code(),
+                                                                   self.division.get_code(),
                                                                    self.task_sobject.get_search_key()))
         outer_div.add(submit_button)
 
         return outer_div
 
     @staticmethod
-    def get_submit_button_behavior(task_data_code, task_search_key):
+    def get_submit_button_behavior(task_data_code, division_code, task_search_key):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -76,12 +80,14 @@ var task_data_code = '%s';
 var file_path = values["new_file_path"];
 var classification = values["classification"];
 var original_file_code = values["file_select"];
+var division_code = '%s';
 
 // Set up an object to hold the data
 var kwargs = {
     'file_path': file_path,
     'classification': classification,
-    'original_file': original_file_code
+    'original_file': original_file_code,
+    'division_code': division_code
 }
 
 // Save the new file sobject, and get the code that it saved as
@@ -97,7 +103,7 @@ spt.popup.close(spt.popup.get_popup(bvr.src_el));
 var task_search_key = '%s';
 
 spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_key});
-            ''' % (task_data_code, task_search_key)
+            ''' % (task_data_code, division_code, task_search_key)
         }
 
         return behavior
