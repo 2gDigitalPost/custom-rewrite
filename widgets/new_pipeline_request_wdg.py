@@ -44,6 +44,8 @@ class NewPipelineRequestWdg(BaseRefreshWdg):
 var submit_form = function(values) {
     spt.api.app_busy_show('Saving...');
 
+    var server = TacticServerStub.get();
+
     var env = spt.Environment.get();
     var login = env.user;
 
@@ -52,16 +54,17 @@ var submit_form = function(values) {
     var description = values.description;
     var due_date = values.due_date;
 
+    // Find the pipeline saved that has the name 'twog_pipeline_request', and get its code
+    var pipeline_code = server.eval("@GET(sthpw/pipeline['name', 'twog_pipeline_request'].code)");
+
     // Set up the object for the new task.
     var new_pipeline_request = {
         'process': process,
         'description': description,
         'bid_end_date': due_date,
         'login': login,
-        'pipeline_code': 'twog_pipeline_request'
+        'pipeline_code': pipeline_code
     }
-
-    var server = TacticServerStub.get();
 
     server.insert('sthpw/task', new_pipeline_request);
 
