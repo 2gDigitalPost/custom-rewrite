@@ -348,6 +348,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(button_row_div)
 
             tasks = obu.get_tasks_for_component(component)
+            tasks = component.get_all_children('sthpw/task')
 
             component_task_div = DivWdg()
             component_task_div.add_style('width', '100%')
