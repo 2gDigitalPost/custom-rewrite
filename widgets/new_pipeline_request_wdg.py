@@ -63,7 +63,8 @@ var submit_form = function(values) {
         'description': description,
         'bid_end_date': due_date,
         'login': login,
-        'pipeline_code': pipeline_code
+        'pipeline_code': pipeline_code,
+        'status': 'Ready'
     }
 
     server.insert('sthpw/task', new_pipeline_request);
