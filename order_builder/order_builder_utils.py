@@ -2,7 +2,7 @@ from xml.etree import ElementTree
 
 from pyasm.search import Search
 from pyasm.web import DivWdg, HtmlElement
-from pyasm.widget import SelectWdg
+from pyasm.widget import SelectWdg, TextAreaWdg
 
 from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import CalendarInputWdg
@@ -314,6 +314,21 @@ def get_text_input_wdg(name, width=200):
     textbox_wdg.add_style('width', '{0}px'.format(width))
 
     return textbox_wdg
+
+
+def get_text_area_input_wdg(name, width=400, styles=None):
+    textarea_wdg = TextAreaWdg()
+    textarea_wdg.set_id(name)
+    textarea_wdg.set_name(name)
+    textarea_wdg.add_style('width', '{0}px'.format(width))
+
+    if styles is None:
+        styles = []
+
+    for style in styles:
+        textarea_wdg.add_style(style[0], style[1])
+
+    return textarea_wdg
 
 
 def get_order_builder_url(order_code, server=None, project='twog'):

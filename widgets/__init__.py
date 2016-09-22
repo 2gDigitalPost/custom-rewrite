@@ -4,4 +4,5 @@ from assign_pipeline_wdg import AssignPipelineWdg
 from equipment_in_task_wdg import EquipmentInTaskWdg
 from instructions_template_builder_wdg import InstructionsTemplateBuilderWdg
 from move_input_file_to_output_wdg import MoveInputFileToOutputWdg
+from new_pipeline_request_wdg import NewPipelineRequestWdg
 from task_inspect_wdg import TaskInspectWdg
