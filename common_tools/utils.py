@@ -116,6 +116,31 @@ def get_files_for_order(order_code):
         return []
 
 
+def get_files_for_package(package_code):
+    """
+    Given the code for a package, get all the files that are associated with it in a list
+
+    :param package_code: twog/package sobject's unique code
+    :return: List of file sobjects
+    """
+    files_in_package_search = Search('twog/file_in_package')
+    files_in_package_search.add_filter('package_code', package_code)
+    files_in_package = files_in_package_search.get_sobjects()
+
+    if len(files_in_package) > 0:
+        files_in_package_string = ','.join(
+            ["'{0}'".format(file_in_package.get('file_code')) for file_in_package in files_in_package]
+        )
+
+        files_search = Search('twog/file')
+        files_search.add_where('\"code\" in ({0})'.format(files_in_package_string))
+        files = files_search.get_sobjects()
+
+        return files
+    else:
+        return []
+
+
 def get_instructions_select_wdg():
     """
     Get a Select Widget with all the instructions options
@@ -302,3 +327,27 @@ def get_client_division_sobject_for_task_sobject(task):
     division = division_search.get_sobject()
 
     return division
+
+
+def get_deliverable_files_in_order(order_sobject):
+    """
+    Given an order sobject, return all the deliverable files associated with it.
+
+    :param order_sobject: twog/order sobject
+    :return: List of twog/file sobjects
+    """
+
+    files_in_order_search = Search('twog/file_in_order')
+    files_in_order_search.add_filter('order_code', order_sobject.get_code())
+    files_in_order = files_in_order_search.get_sobjects()
+
+    files_in_order_string = ','.join(
+        ["'{0}'".format(files_in_order.get('file_code')) for files_in_order in files_in_order]
+    )
+
+    deliverable_files_search = Search('twog/file')
+    deliverable_files_search.add_where('\"code\" in ({0})'.format(files_in_order_string))
+    deliverable_files_search.add_filter('classification', 'deliverable')
+    deliverable_files = deliverable_files_search.get_sobjects()
+
+    return deliverable_files

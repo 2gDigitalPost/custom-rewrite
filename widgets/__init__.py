@@ -1,3 +1,4 @@
+from add_deliverable_files_to_package_wdg import AddDeliverableFilesToPackageWdg
 from add_files_to_order_wdg import AddFilesToOrderWdg
 from add_files_to_task import AddInputFilesToTaskWdg
 from assign_pipeline_wdg import AssignPipelineWdg

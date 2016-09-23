@@ -6,7 +6,8 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 
 import order_builder_utils as obu
 
-from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment
+from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment,\
+    get_files_for_package
 
 
 def get_task_data_div(task_code):
@@ -357,7 +358,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div.add(change_instructions_button)
             button_row_div.add(change_title_button)
             button_row_div.add(add_task_button)
-            # button_row_div.add(reassign_button)
             button_row_div.add(note_button)
 
             component_div.add(button_row_div)
@@ -398,6 +398,11 @@ class OrderBuilderWdg(BaseRefreshWdg):
         packages_list.add_style('list-style-type', 'none')
 
         for package in obu.get_packages_from_order(self.order_sobject.get_code()):
+            package_div = DivWdg()
+            package_div.add_style('background-color', '#d9edf7')
+            package_div.add_style('padding', '10px')
+            package_div.add_style('border-radius', '10px')
+
             package_name_div = DivWdg()
             package_name_div.add_style('font-weight', 'bold')
             package_name_div.add(package.get('name'))
@@ -423,24 +428,44 @@ class OrderBuilderWdg(BaseRefreshWdg):
             if package.get('due_date'):
                 package_due_date_div.add('Due: {0}'.format(package.get('due_date')))
 
+            add_deliverable_file_to_package_button = ButtonNewWdg(title='Add Deliverable File', icon='ADD')
+            add_deliverable_file_to_package_button.add_behavior(
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Add Deliverable Files', 'widgets.AddDeliverableFilesToPackageWdg', package.get_search_key(),
+                    'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+                )
+            )
+            add_deliverable_file_to_package_button.add_style('display', 'inline-block')
+
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(obu.get_add_notes_behavior(package.get_search_key()))
             note_button.add_style('display', 'inline-block')
 
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
+            button_row_div.add(add_deliverable_file_to_package_button)
             button_row_div.add(note_button)
-
-            package_div = DivWdg()
-            package_div.add_style('background-color', '#d9edf7')
-            package_div.add_style('padding', '10px')
-            package_div.add_style('border-radius', '10px')
 
             package_div.add(package_name_div)
             package_div.add(package_description_div)
             package_div.add(package_priority_div)
             package_div.add(package_due_date_div)
             package_div.add(package_platform_div)
+
+            files_in_package_list = get_files_for_package(package.get_code())
+
+            if files_in_package_list:
+                package_div.add(obu.get_label_widget('Deliverable Files:'))
+
+                unordered_html_list = HtmlElement.ul()
+
+                for file_path in [file_in_package.get('file_path') for file_in_package in files_in_package_list]:
+                    li = HtmlElement.li()
+                    li.add(file_path)
+                    unordered_html_list.add(li)
+
+                    package_div.add(unordered_html_list)
+
             package_div.add(button_row_div)
 
             package_list_div = DivWdg()

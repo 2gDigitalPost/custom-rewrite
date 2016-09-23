@@ -8,17 +8,7 @@ import order_builder.order_builder_utils as obu
 from common_tools.utils import get_task_data_in_files, get_task_data_sobject_from_task_code,\
     get_client_division_sobject_for_task_sobject
 
-
-def get_file_select_wdg_from_file_list(files, width=400):
-    file_select_wdg = SelectWdg('file_select')
-    file_select_wdg.set_id('file_select')
-    file_select_wdg.add_style('width', '{0}px'.format(width))
-    file_select_wdg.add_empty_option()
-
-    for file_sobject in files:
-        file_select_wdg.append_option(file_sobject.get('file_path'), file_sobject.get_code())
-
-    return file_select_wdg
+from input_widgets import get_file_select_wdg_from_file_list
 
 
 def get_file_classification_select_wdg(width):
