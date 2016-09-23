@@ -233,19 +233,6 @@ def get_client_name_from_division_code(division_code):
     return None
 
 
-def get_tasks_for_component(component):
-    """
-    Get all the tasks associated with a component
-
-    :param component: Component sobject (twog/component)
-    :return: Sobject list
-    """
-    task_search = Search('sthpw/task')
-    task_search.add_parent_filter(component)
-
-    return task_search.get_sobjects()
-
-
 def get_sobject_name_by_code(search_type, sobject_code):
     search = Search(search_type)
     search.add_code_filter(sobject_code)

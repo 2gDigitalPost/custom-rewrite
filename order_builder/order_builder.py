@@ -132,6 +132,25 @@ class OrderBuilderWdg(BaseRefreshWdg):
         )
         add_packages_by_platform.add_style('display', 'inline-block')
 
+        add_component_button = ButtonNewWdg(title='Add Component', icon='INSERT')
+        add_component_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Insert Component', 'order_builder.InsertComponentInOrderWdg', self.order_sobject.get_search_key(),
+                'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+            )
+        )
+        add_component_button.add_style('display', 'inline-block')
+
+        add_component_by_language_button = ButtonNewWdg(title='Add Component By Language', icon='INSERT_MULTI')
+        add_component_by_language_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Insert Component by Language', 'order_builder.InsertComponentByLanguageWdg',
+                self.order_sobject.get_search_key(), 'Order Builder', 'order_builder.OrderBuilderWdg',
+                self.order_sobject.get_search_key()
+            )
+        )
+        add_component_by_language_button.add_style('display', 'inline-block')
+
         add_file_to_order_button = ButtonNewWdg(title='Add Files to Order', icon='ADD')
         add_file_to_order_button.add_behavior(obu.get_load_popup_widget_behavior('Add Files to Order',
                                                                                  'widgets.AddFilesToOrderWdg',
@@ -149,6 +168,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(description_div)
         order_div.add(add_packages_button)
         order_div.add(add_packages_by_platform)
+        order_div.add(add_component_button)
+        order_div.add(add_component_by_language_button)
         order_div.add(add_file_to_order_button)
         order_div.add(note_button)
 
@@ -238,12 +259,12 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         return task_div
 
-    def setup_html_list_for_components_in_package(self, package):
+    def setup_html_list_for_components_in_order(self):
         components_list = HtmlElement.ul()
         components_list.add_style('list-style-type', 'none')
 
         component_search = Search('twog/component')
-        component_search.add_filter('package_code', package.get_code())
+        component_search.add_filter('order_code', self.order_sobject.get_code())
         components = component_search.get_sobjects()
 
         for component in components:
@@ -326,12 +347,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
                                                                             component.get_search_key()))
             add_task_button.add_style('display', 'inline-block')
 
-            reassign_button = ButtonNewWdg(title='Reassign to another Package', icon="TABLE_UPDATE_ENTRY")
-            reassign_button.add_behavior(obu.get_load_popup_widget_behavior('Reassign Component',
-                                                                            'order_builder.ReassignComponentToPackage',
-                                                                            component.get_search_key()))
-            reassign_button.add_style('display', 'inline-block')
-
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(obu.get_add_notes_behavior(component.get_search_key()))
             note_button.add_style('display', 'inline-block')
@@ -342,12 +357,11 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div.add(change_instructions_button)
             button_row_div.add(change_title_button)
             button_row_div.add(add_task_button)
-            button_row_div.add(reassign_button)
+            # button_row_div.add(reassign_button)
             button_row_div.add(note_button)
 
             component_div.add(button_row_div)
 
-            tasks = obu.get_tasks_for_component(component)
             tasks = component.get_all_children('sthpw/task')
 
             component_task_div = DivWdg()
@@ -409,38 +423,12 @@ class OrderBuilderWdg(BaseRefreshWdg):
             if package.get('due_date'):
                 package_due_date_div.add('Due: {0}'.format(package.get('due_date')))
 
-            add_component_button = ButtonNewWdg(title='Add Component', icon='INSERT')
-            add_component_button.add_behavior(
-                obu.get_load_popup_widget_with_reload_behavior(
-                    'Insert Component', 'order_builder.InsertComponentInPackageWdg', package.get_search_key(),
-                    'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
-                )
-            )
-            add_component_button.add_style('display', 'inline-block')
-
-            add_component_by_language_button = ButtonNewWdg(title='Add Component By Language', icon='INSERT_MULTI')
-            add_component_by_language_button.add_behavior(
-                obu.get_load_popup_widget_behavior('Insert Component by Language',
-                                                   'order_builder.InsertComponentByLanguageWdg',
-                                                   package.get_search_key())
-            )
-            add_component_by_language_button.add_behavior(
-                obu.get_load_popup_widget_with_reload_behavior(
-                    'Insert Component by Language', 'order_builder.InsertComponentByLanguageWdg',
-                    package.get_search_key(), 'Order Builder', 'order_builder.OrderBuilderWdg',
-                    self.order_sobject.get_search_key()
-                )
-            )
-            add_component_by_language_button.add_style('display', 'inline-block')
-
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(obu.get_add_notes_behavior(package.get_search_key()))
             note_button.add_style('display', 'inline-block')
 
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
-            button_row_div.add(add_component_button)
-            button_row_div.add(add_component_by_language_button)
             button_row_div.add(note_button)
 
             package_div = DivWdg()
@@ -457,7 +445,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             package_list_div = DivWdg()
             package_list_div.add(package_div)
-            package_list_div.add(self.setup_html_list_for_components_in_package(package))
 
             packages_list.add(package_list_div)
 
@@ -574,14 +561,23 @@ catch(err) {
     def get_display(self):
         outer_div = DivWdg()
         outer_div.add_class('order-builder')
+        outer_div.add_style('display', 'inline-block')
 
         order_div = DivWdg()
 
         order_div.add(self.setup_order_information())
 
+        components_div = DivWdg()
+        components_div.add_style('display', 'inline-block')
+        components_div.add_style('width', '600px')
+        components_div.add_style('float', 'left')
+        components_div.add(self.setup_html_list_for_components_in_order())
+        order_div.add(components_div)
+
         packages_div = DivWdg()
         packages_div.add_style('display', 'inline-block')
         packages_div.add_style('width', '600px')
+        packages_div.add_style('float', 'left')
         packages_div.add(self.setup_html_list_for_packages_in_orders())
         order_div.add(packages_div)
 

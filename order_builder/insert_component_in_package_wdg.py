@@ -6,7 +6,7 @@ from pyasm.widget import CheckboxWdg, SelectWdg, SubmitWdg
 
 import order_builder_utils as obu
 
-from common_tools.utils import get_instructions_template_select_wdg
+from common_tools.utils import get_instructions_select_wdg
 
 
 def get_language_select_wdg():
@@ -87,16 +87,16 @@ def get_pipeline_select_wdg(search_type, width=300):
     return pipeline_select_wdg
 
 
-class InsertComponentInPackageWdg(BaseRefreshWdg):
+class InsertComponentInOrderWdg(BaseRefreshWdg):
     def init(self):
-        self.package_sobject = self.get_sobject_from_kwargs()
+        self.order_sobject = self.get_sobject_from_kwargs()
         self.parent_widget_title = self.kwargs.get('parent_widget_title')
         self.parent_widget_name = self.kwargs.get('parent_widget_name')
         self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
 
     def get_display(self):
         outer_div = DivWdg()
-        outer_div.set_id('insert-component-in-package')
+        outer_div.set_id('insert-component-in-order')
 
         outer_div.add(obu.get_label_widget('Name'))
         outer_div.add(obu.get_text_input_wdg('new_component_name', 400))
@@ -111,7 +111,7 @@ class InsertComponentInPackageWdg(BaseRefreshWdg):
         outer_div.add(get_pipeline_select_wdg('twog/component'))
 
         outer_div.add(obu.get_label_widget('Instructions'))
-        outer_div.add(get_instructions_template_select_wdg())
+        outer_div.add(get_instructions_select_wdg())
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior())
@@ -129,23 +129,23 @@ spt.app_busy.show("Saving...");
 
 // Get the server object
 var server = TacticServerStub.get();
-var containing_element = bvr.src_el.getParent("#insert-component-in-package");
+var containing_element = bvr.src_el.getParent("#insert-component-in-order");
 var new_component_values = spt.api.get_input_values(containing_element, null, false);
 
 // Get the form values
-var package_code = '%s';
+var order_code = '%s';
 var name = new_component_values.new_component_name;
 var language_code = new_component_values.language_code;
 var pipeline_code = new_component_values.pipeline_code;
-var instructions_template_code = new_component_values.instructions_template_select;
+var instructions_code = new_component_values.instructions_select;
 var title_code = new_component_values.title_code;
 
 var new_component = {
     'name': name,
-    'package_code': package_code,
+    'order_code': order_code,
     'language_code': language_code,
     'pipeline_code': pipeline_code,
-    'instructions_template_code': instructions_template_code,
+    'instructions_code': instructions_code,
     'title_code': title_code
 }
 
@@ -159,7 +159,7 @@ var parent_widget_name = '%s';
 var parent_widget_search_key = '%s';
 
 spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_widget_search_key});
-''' % (self.package_sobject.get_code(), self.parent_widget_title, self.parent_widget_name,
+''' % (self.order_sobject.get_code(), self.parent_widget_title, self.parent_widget_name,
        self.parent_widget_search_key)
         }
 
@@ -168,14 +168,14 @@ spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_
 
 class InsertComponentByLanguageWdg(BaseRefreshWdg):
     def init(self):
-        self.package_sobject = self.get_sobject_from_kwargs()
+        self.order_sobject = self.get_sobject_from_kwargs()
         self.parent_widget_title = self.kwargs.get('parent_widget_title')
         self.parent_widget_name = self.kwargs.get('parent_widget_name')
         self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
 
     def get_display(self):
         outer_div = DivWdg()
-        outer_div.set_id('insert-component-in-package')
+        outer_div.set_id('insert-component-in-order-by-language')
 
         outer_div.add(obu.get_label_widget('Name'))
         outer_div.add(obu.get_text_input_wdg('new_component_name', 400))
@@ -189,7 +189,7 @@ class InsertComponentByLanguageWdg(BaseRefreshWdg):
         outer_div.add(get_pipeline_select_wdg('twog/component'))
 
         outer_div.add(obu.get_label_widget('Instructions'))
-        outer_div.add(get_instructions_template_select_wdg())
+        outer_div.add(get_instructions_select_wdg())
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior())
@@ -207,14 +207,14 @@ try {
 
     // Get the server object
     var server = TacticServerStub.get();
-    var containing_element = bvr.src_el.getParent("#insert-component-in-package");
+    var containing_element = bvr.src_el.getParent("#insert-component-in-order-by-language");
     var new_component_values = spt.api.get_input_values(containing_element, null, false);
 
     // Get the form values
-    var package_code = '%s';
+    var order_code = '%s';
     var name = new_component_values.new_component_name;
     var pipeline_code = new_component_values.pipeline_code;
-    var instructions_template_code = new_component_values.instructions_template_select;
+    var instructions_code = new_component_values.instructions_select;
     var title_code = new_component_values.title_code;
 
     var languages = server.eval("@SOBJECT(twog/language)");
@@ -229,10 +229,10 @@ try {
 
             var new_component = {
                 'name': name + ' - ' + language_name,
-                'package_code': package_code,
+                'order_code': order_code,
                 'language_code': language_code,
                 'pipeline_code': pipeline_code,
-                'instructions_template_code': instructions_template_code,
+                'instructions_code': instructions_code,
                 'title_code': title_code
             }
 
@@ -252,7 +252,7 @@ try {
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
-}''' % (self.package_sobject.get_code(), self.parent_widget_title, self.parent_widget_name,
+}''' % (self.order_sobject.get_code(), self.parent_widget_title, self.parent_widget_name,
         self.parent_widget_search_key)
         }
 
