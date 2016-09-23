@@ -1,6 +1,8 @@
-from pyasm.widget import SelectWdg
+from pyasm.search import Search
 from pyasm.web import Table
-from pyasm.widget import CheckboxWdg
+from pyasm.widget import CheckboxWdg, SelectWdg
+
+from common_tools.utils import get_files_for_order
 
 
 def get_file_select_wdg_from_file_list(files, width=400):
@@ -43,6 +45,45 @@ def get_files_checkbox_from_file_list(file_sobjects, selected_file_sobjects):
         checkbox = CheckboxWdg(name=file_sobject.get_code())
 
         if file_sobject.get_code() in [selected_file.get_code() for selected_file in selected_file_sobjects]:
+            checkbox.set_checked()
+
+        checkbox_row = files_checkbox_table.add_row()
+
+        files_checkbox_table.add_cell(data=checkbox, row=checkbox_row)
+        files_checkbox_table.add_cell(data=file_sobject.get_value('file_path'), row=checkbox_row)
+
+    return files_checkbox_table
+
+
+def get_files_checkboxes_for_division(division_code, order_code):
+    """
+    Given a division code and order code, get a list of Checkbox widgets of the source files associated with a
+    division. If the file is already selected in the order, check the checkbox automatically.
+
+    :param division_code: twog/division code
+    :param order_code: twog/order code
+    :return: Table (of CheckboxWdg)
+    """
+
+    file_search = Search('twog/file')
+    file_search.add_filter('division_code', division_code)
+    file_search.add_filter('classification', 'source')
+    files = file_search.get_sobjects()
+
+    files_checkbox_table = Table()
+
+    header_row = files_checkbox_table.add_row()
+    header = files_checkbox_table.add_header(data='Files', row=header_row)
+    header.add_style('text-align', 'center')
+    header.add_style('text-decoration', 'underline')
+
+    files_in_order = get_files_for_order(order_code)
+    files_in_order_codes = [file_in_order.get_code() for file_in_order in files_in_order]
+
+    for file_sobject in files:
+        checkbox = CheckboxWdg(name=file_sobject.get_code())
+
+        if file_sobject.get_code() in files_in_order_codes:
             checkbox.set_checked()
 
         checkbox_row = files_checkbox_table.add_row()

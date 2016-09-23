@@ -136,14 +136,6 @@ class TaskInspectWdg(BaseRefreshWdg):
         )
         add_input_file_button.add_style('display', 'inline-block')
 
-        add_output_file_button = ButtonNewWdg(title='Add Output Files', icon='INSERT_MULTI')
-        add_output_file_button.add_behavior(
-            obu.get_load_popup_widget_behavior('Add Output Files',
-                                               'widgets.AddOutputFilesToTaskWdg',
-                                               self.task_sobject.get_search_key())
-        )
-        add_output_file_button.add_style('display', 'inline-block')
-
         move_input_file_to_output_button = ButtonNewWdg(title='Move Input File to Output', icon='RIGHT')
         move_input_file_to_output_button.add_behavior(
             obu.get_load_popup_widget_with_reload_behavior(
@@ -162,7 +154,6 @@ class TaskInspectWdg(BaseRefreshWdg):
         add_equipment_button.add_style('display', 'inline-block')
 
         div_wdg.add(add_input_file_button)
-        div_wdg.add(add_output_file_button)
         div_wdg.add(move_input_file_to_output_button)
         div_wdg.add(add_equipment_button)
 

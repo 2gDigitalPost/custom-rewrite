@@ -1,51 +1,20 @@
 from tactic.ui.common import BaseRefreshWdg
-from tactic.ui.widget import ButtonNewWdg
 
 from pyasm.search import Search
-from pyasm.web import DivWdg, HtmlElement, Table
-from pyasm.widget import CheckboxWdg, MultiSelectWdg, SubmitWdg
+from pyasm.web import DivWdg
+from pyasm.widget import SubmitWdg
 
-from common_tools.utils import get_files_for_order
+from widgets.input_widgets import get_files_checkboxes_for_division
 
-
-def get_files_checkboxes_for_division(division_code, order_code):
-    file_search = Search('twog/file')
-    file_search.add_filter('division_code', division_code)
-    files = file_search.get_sobjects()
-
-    files_checkbox_table = Table()
-
-    header_row = files_checkbox_table.add_row()
-    header = files_checkbox_table.add_header(data='Files', row=header_row)
-    header.add_style('text-align', 'center')
-    header.add_style('text-decoration', 'underline')
-
-    files_in_order = get_files_for_order(order_code)
-    files_in_order_codes = [file_in_order.get_code() for file_in_order in files_in_order]
-
-    for file_sobject in files:
-        checkbox = CheckboxWdg(name=file_sobject.get_code())
-
-        if (file_sobject.get_code() in files_in_order_codes):
-            checkbox.set_checked()
-
-        checkbox_row = files_checkbox_table.add_row()
-
-        files_checkbox_table.add_cell(data=checkbox, row=checkbox_row)
-        files_checkbox_table.add_cell(data=file_sobject.get_value('file_path'), row=checkbox_row)
-
-    return files_checkbox_table
 
 class AddFilesToOrderWdg(BaseRefreshWdg):
     def init(self):
         self.order_sobject = self.get_sobject_from_kwargs()
+        self.parent_widget_title = self.kwargs.get('parent_widget_title')
+        self.parent_widget_name = self.kwargs.get('parent_widget_name')
+        self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
 
-        division_search = Search('twog/division')
-        division_search.add_code_filter(self.order_sobject.get('division_code'))
-        self.division_sobject = division_search.get_sobject()
-
-    @staticmethod
-    def get_submit_button_behavior(order_code):
+    def get_submit_button_behavior(self):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -91,7 +60,14 @@ for (var i = 0; i < files.length; i++) {
 
 spt.app_busy.hide();
 spt.popup.close(spt.popup.get_popup(bvr.src_el));
-            ''' % order_code
+
+var parent_widget_title = '%s';
+var parent_widget_name = '%s';
+var parent_widget_search_key = '%s';
+
+spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_widget_search_key});
+            ''' % (self.order_sobject.get_code(), self.parent_widget_title, self.parent_widget_name,
+                   self.parent_widget_search_key)
         }
 
         return behavior
@@ -100,11 +76,14 @@ spt.popup.close(spt.popup.get_popup(bvr.src_el));
         outer_div = DivWdg()
         outer_div.set_id('add_files_to_order')
 
-        outer_div.add(get_files_checkboxes_for_division(self.division_sobject.get_code(),
-                                                        self.order_sobject.get_code()))
+        division_search = Search('twog/division')
+        division_search.add_code_filter(self.order_sobject.get('division_code'))
+        division_sobject = division_search.get_sobject()
+
+        outer_div.add(get_files_checkboxes_for_division(division_sobject.get_code(), self.order_sobject.get_code()))
 
         submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior(self.order_sobject.get_code()))
+        submit_button.add_behavior(self.get_submit_button_behavior())
 
         outer_div.add(submit_button)
 

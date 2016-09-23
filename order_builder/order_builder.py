@@ -153,9 +153,12 @@ class OrderBuilderWdg(BaseRefreshWdg):
         add_component_by_language_button.add_style('display', 'inline-block')
 
         add_file_to_order_button = ButtonNewWdg(title='Add Files to Order', icon='ADD')
-        add_file_to_order_button.add_behavior(obu.get_load_popup_widget_behavior('Add Files to Order',
-                                                                                 'widgets.AddFilesToOrderWdg',
-                                                                                 self.order_sobject.get_search_key()))
+        add_file_to_order_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Add Files to Order', 'widgets.AddFilesToOrderWdg', self.order_sobject.get_search_key(),
+                'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+            )
+        )
         add_file_to_order_button.add_style('display', 'inline-block')
 
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
