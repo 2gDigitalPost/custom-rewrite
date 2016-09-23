@@ -42,7 +42,7 @@ class MoveInputFileToOutputWdg(BaseRefreshWdg):
 
     def get_display(self):
         outer_div = DivWdg()
-        outer_div.set_id('insert-component-in-package')
+        outer_div.set_id('move_input_file_to_output')
 
         outer_div.add(obu.get_label_widget('Path'))
         outer_div.add(obu.get_text_input_wdg('new_file_path', 800))
@@ -71,7 +71,7 @@ class MoveInputFileToOutputWdg(BaseRefreshWdg):
             'cbjs_action': '''
 // Get the server object
 var server = TacticServerStub.get();
-var containing_element = bvr.src_el.getParent("#add_files_to_task");
+var containing_element = bvr.src_el.getParent("#move_input_files_to_output");
 var values = spt.api.get_input_values(containing_element, null, false);
 
 // Get the form values

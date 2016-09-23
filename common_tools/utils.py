@@ -284,7 +284,7 @@ def get_task_instructions_text_from_instructions_code(instructions_code, task_na
 
 def get_client_division_sobject_for_task_sobject(task):
     """
-    Given a task sobject, travel up the chain of Component, Package, and Order to get the Division the order is assigned
+    Given a task sobject, travel up the chain of Component and Order to get the Division the order is assigned
     to. This will only work for tasks that are assigned to components.
 
     :param task: task sobject
@@ -293,12 +293,8 @@ def get_client_division_sobject_for_task_sobject(task):
 
     parent_component = task.get_parent()
 
-    package_search = Search('twog/package')
-    package_search.add_code_filter(parent_component.get('package_code'))
-    package = package_search.get_sobject()
-
     order_search = Search('twog/order')
-    order_search.add_code_filter(package.get('order_code'))
+    order_search.add_code_filter(parent_component.get('order_code'))
     order = order_search.get_sobject()
 
     division_search = Search('twog/division')

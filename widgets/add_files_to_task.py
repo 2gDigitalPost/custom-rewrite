@@ -13,12 +13,8 @@ class AddInputFilesToTaskWdg(BaseRefreshWdg):
         self.task_data = get_task_data_sobject_from_task_code(self.task_sobject.get_code())
         component = self.task_sobject.get_parent()
 
-        package_search = Search('twog/package')
-        package_search.add_code_filter(component.get('package_code'))
-        package = package_search.get_sobject()
-
         order_search = Search('twog/order')
-        order_search.add_code_filter(package.get('order_code'))
+        order_search.add_code_filter(component.get('order_code'))
         order = order_search.get_sobject()
 
         self.order_files = get_files_for_order(order.get_code())
