@@ -383,7 +383,7 @@ def load_task_inspect_widget(task_search_key):
 try {
     var task_search_key = '%s';
 
-    spt.tab.add_new('instructions_' + task_search_key, 'Instructions', 'widgets.TaskInspectWdg',
+    spt.tab.add_new('task_inspect_' + task_search_key, 'Task', 'widgets.TaskInspectWdg',
                     {'search_key': task_search_key});
 }
 catch(err) {

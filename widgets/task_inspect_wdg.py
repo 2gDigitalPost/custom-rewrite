@@ -1,8 +1,9 @@
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.widget import ButtonNewWdg
 
-from pyasm.search import Search
+from pyasm.biz import Pipeline
 from pyasm.web import DivWdg, HtmlElement
+from pyasm.widget import SelectWdg, SubmitWdg
 
 import order_builder.order_builder_utils as obu
 
@@ -84,6 +85,33 @@ def get_equipment_list(task_data_code):
     return div_wdg
 
 
+def get_task_status_select_wdg(task_sobject):
+    task_status_select = SelectWdg('task_status_select')
+    task_status_select.set_id('task_status_select')
+    task_status_select.add_style('width: 135px;')
+    task_status_select.add_empty_option()
+
+    task_pipe_code = task_sobject.get_value('pipeline_code')
+
+    # if the current task has no pipeline, then search for
+    # any task pipeline
+    if not task_pipe_code:
+        # just use the default
+        task_pipe_code = 'task'
+
+    pipeline = Pipeline.get_by_code(task_pipe_code)
+    if not pipeline:
+        pipeline = Pipeline.get_by_code('task')
+
+    for status in pipeline.get_process_names():
+        task_status_select.append_option(status, status)
+
+    if task_sobject.get('status'):
+        task_status_select.set_value(task_sobject.get('status'))
+
+    return task_status_select
+
+
 class TaskInspectWdg(BaseRefreshWdg):
     def init(self):
         self.task_sobject = self.get_sobject_from_kwargs()
@@ -105,8 +133,39 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         return output_html
 
+    def submit_button_behavior(self):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+var task_code = '%s';
+var task_search_key = '%s';
+
+// Get the server object
+var server = TacticServerStub.get();
+var containing_element = bvr.src_el.getParent("#task_inspect_" + task_code);
+var values = spt.api.get_input_values(containing_element, null, false);
+
+var task_status = values["task_status_select"];
+
+// Set up an object to hold the data
+var kwargs = {
+    'status': task_status
+}
+
+server.update(task_search_key, kwargs);
+
+spt.app_busy.hide();
+
+spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_key});
+''' % (self.task_sobject.get_code(), self.task_sobject.get_search_key())
+        }
+
+        return behavior
+
     def get_display(self):
         div_wdg = DivWdg()
+        div_wdg.set_id('task_inspect_{0}'.format(self.task_sobject.get_code()))
 
         div_wdg.add(get_page_header(self.task_sobject.get('process')))
         div_wdg.add(HtmlElement.h4('Code: {0}'.format(self.task_sobject.get_code())))
@@ -127,6 +186,7 @@ class TaskInspectWdg(BaseRefreshWdg):
         div_wdg.add(get_in_files_list(self.task_data.get_code()))
         div_wdg.add(get_out_files_list(self.task_data.get_code()))
         div_wdg.add(get_equipment_list(self.task_data.get_code()))
+        div_wdg.add(get_task_status_select_wdg(self.task_sobject))
 
         add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
         add_input_file_button.add_behavior(
@@ -153,8 +213,13 @@ class TaskInspectWdg(BaseRefreshWdg):
         )
         add_equipment_button.add_style('display', 'inline-block')
 
+        submit_button = SubmitWdg('Submit Changes')
+        submit_button.add_behavior(self.submit_button_behavior())
+        submit_button.add_style('display', 'block')
+
         div_wdg.add(add_input_file_button)
         div_wdg.add(move_input_file_to_output_button)
         div_wdg.add(add_equipment_button)
+        div_wdg.add(submit_button)
 
         return div_wdg
