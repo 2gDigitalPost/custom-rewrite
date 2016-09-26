@@ -60,6 +60,23 @@ def get_task_data_div(task_code):
     return outer_div
 
 
+def get_load_assign_tasks_wdg(search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+var popup_id = 'Add Tasks to Selected';
+var class_name = 'tactic.ui.app.AddTaskWdg';
+var task_search_key = '%s';
+
+var options = {'search_key_list': [task_search_key], 'table_id': 'Add Tasks'};
+spt.panel.load_popup(popup_id, class_name, options);
+''' % search_key
+    }
+
+    return behavior
+
+
 class OrderBuilderWdg(BaseRefreshWdg):
     """
     My attempt at rewriting the Order Builder module.
@@ -345,6 +362,10 @@ class OrderBuilderWdg(BaseRefreshWdg):
             )
             change_title_button.add_style('display', 'inline-block')
 
+            add_tasks_from_pipeline_wdg = ButtonNewWdg(title='Add Tasks from Pipeline', icon='INSERT_MULTI')
+            add_tasks_from_pipeline_wdg.add_behavior(get_load_assign_tasks_wdg(component.get_search_key()))
+            add_tasks_from_pipeline_wdg.add_style('display', 'inline-block')
+
             add_task_button = ButtonNewWdg(title='Add Task', icon='INSERT')
             add_task_button.add_behavior(obu.get_load_popup_widget_behavior('Add Task',
                                                                             'order_builder.InsertTaskWdg',
@@ -360,6 +381,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div.add(instructions_button)
             button_row_div.add(change_instructions_button)
             button_row_div.add(change_title_button)
+            button_row_div.add(add_tasks_from_pipeline_wdg)
             button_row_div.add(add_task_button)
             button_row_div.add(note_button)
 
