@@ -72,9 +72,6 @@ var classification = values["file_classification_select"];
 var original_file_code = values["file_select"];
 var division_code = '%s';
 
-console.log(values);
-console.log(classification);
-
 // Set up an object to hold the data
 var kwargs = {
     'file_path': file_path,

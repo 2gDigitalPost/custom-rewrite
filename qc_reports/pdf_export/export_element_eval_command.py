@@ -37,14 +37,23 @@ def get_title_table(element_eval_sobject):
             'Version:', get_paragraph(element_eval_sobject.get('version')),
             'PO #:', get_paragraph(element_eval_sobject.get('po_number'))
         ],
-        [
-            'File Name:', element_eval_sobject.get('file_name')
-        ]
     ]
 
     title_table = Table(title_table_data, hAlign='LEFT', colWidths=[(1 * inch), (2 * inch), (1 * inch), (2 * inch)])
 
     return title_table
+
+
+def get_file_path_table(element_eval_sobject):
+    file_path_table_data = [
+        [
+            'File Name:', get_paragraph(element_eval_sobject.get('file_name'))
+        ]
+    ]
+
+    file_path_table = Table(file_path_table_data, hAlign='LEFT', colWidths=[(1 * inch), (6 * inch)])
+
+    return file_path_table
 
 
 def get_audio_configuration_table(element_eval_sobject):
@@ -324,6 +333,8 @@ class ExportElementEvalCommand(Command):
 
         title_table = get_title_table(element_eval_sobject)
 
+        file_path_table = get_file_path_table(element_eval_sobject)
+
         program_format_table = get_program_format_table(element_eval_sobject)
 
         video_measurements_table = get_video_measurements_table(element_eval_sobject)
@@ -356,6 +367,7 @@ class ExportElementEvalCommand(Command):
         # Add the segments to the report, regardless of whether or not there is data in the tables
         elements.append(top_table)
         elements.append(title_table)
+        elements.append(file_path_table)
         elements.append(hr_flowable)
         elements.append(program_format_video_measurements_header_table)
         elements.append(program_format_video_measurements_table)
