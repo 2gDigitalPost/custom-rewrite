@@ -92,3 +92,22 @@ def get_files_checkboxes_for_division(division_code, order_code):
         files_checkbox_table.add_cell(data=file_sobject.get_value('file_path'), row=checkbox_row)
 
     return files_checkbox_table
+
+
+def get_file_classification_select_wdg(width=200):
+    """
+    Get a SelectWdg with the three options available for a file's classification (source, intermediate, and
+    deliverable).
+
+    :param width: Width of the widget in pixels (optional)
+    :return: SelectWdg
+    """
+    classification_select_wdg = SelectWdg('file_classification_select')
+    classification_select_wdg.set_id('file_classification_select')
+    classification_select_wdg.add_style('width', '{0}px'.format(width))
+
+    classification_select_wdg.append_option('Source', 'source')
+    classification_select_wdg.append_option('Intermediate', 'intermediate')
+    classification_select_wdg.append_option('Deliverable', 'deliverable')
+
+    return classification_select_wdg

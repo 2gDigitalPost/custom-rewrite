@@ -190,11 +190,20 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
 
         add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
         add_input_file_button.add_behavior(
-            obu.get_load_popup_widget_behavior('Add Input Files',
+            obu.get_load_popup_widget_behavior('Add Input Files from Order',
                                                'widgets.AddInputFilesToTaskWdg',
                                                self.task_sobject.get_search_key())
         )
         add_input_file_button.add_style('display', 'inline-block')
+
+        create_input_file_button = ButtonNewWdg(title='Create a new Input File', icon='NEW')
+        create_input_file_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Create a new Input File', 'widgets.CreateNewInputFileForTaskWdg', self.task_sobject.get_search_key(),
+                'Task', 'widgets.TaskInspectWdg', self.task_sobject.get_search_key()
+            )
+        )
+        create_input_file_button.add_style('display', 'inline-block')
 
         move_input_file_to_output_button = ButtonNewWdg(title='Move Input File to Output', icon='RIGHT')
         move_input_file_to_output_button.add_behavior(
@@ -218,6 +227,7 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         submit_button.add_style('display', 'block')
 
         div_wdg.add(add_input_file_button)
+        div_wdg.add(create_input_file_button)
         div_wdg.add(move_input_file_to_output_button)
         div_wdg.add(add_equipment_button)
         div_wdg.add(submit_button)

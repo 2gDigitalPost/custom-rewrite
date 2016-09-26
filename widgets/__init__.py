@@ -1,6 +1,6 @@
 from add_deliverable_files_to_package_wdg import AddDeliverableFilesToPackageWdg
 from add_files_to_order_wdg import AddFilesToOrderWdg
-from add_files_to_task import AddInputFilesToTaskWdg
+from add_files_to_task import AddInputFilesToTaskWdg, CreateNewInputFileForTaskWdg
 from assign_pipeline_wdg import AssignPipelineWdg
 from equipment_in_task_wdg import EquipmentInTaskWdg
 from instructions_template_builder_wdg import InstructionsTemplateBuilderWdg

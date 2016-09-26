@@ -1,26 +1,14 @@
 from tactic.ui.common import BaseRefreshWdg
 
 from pyasm.web import DivWdg
-from pyasm.widget import SelectWdg, SubmitWdg
+from pyasm.widget import SubmitWdg
 
 import order_builder.order_builder_utils as obu
 
 from common_tools.utils import get_task_data_in_files, get_task_data_sobject_from_task_code,\
     get_client_division_sobject_for_task_sobject
 
-from input_widgets import get_file_select_wdg_from_file_list
-
-
-def get_file_classification_select_wdg(width):
-    classification_select_wdg = SelectWdg('file_classification_select')
-    classification_select_wdg.set_id('file_classification_select')
-    classification_select_wdg.add_style('width', '{0}px'.format(width))
-
-    classification_select_wdg.append_option('Source', 'source')
-    classification_select_wdg.append_option('Intermediate', 'intermediate')
-    classification_select_wdg.append_option('Deliverable', 'deliverable')
-
-    return classification_select_wdg
+from input_widgets import get_file_select_wdg_from_file_list, get_file_classification_select_wdg
 
 
 class MoveInputFileToOutputWdg(BaseRefreshWdg):
@@ -38,7 +26,7 @@ class MoveInputFileToOutputWdg(BaseRefreshWdg):
         outer_div.add(obu.get_text_input_wdg('new_file_path', 800))
 
         outer_div.add(obu.get_label_widget('Classification'))
-        outer_div.add(get_file_classification_select_wdg(200))
+        outer_div.add(get_file_classification_select_wdg())
 
         files = get_task_data_in_files(self.task_data.get_code())
 
