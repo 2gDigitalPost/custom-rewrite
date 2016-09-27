@@ -8,7 +8,7 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 import order_builder_utils as obu
 
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
-    get_files_for_package, get_client_division_sobject_from_order_sobject
+    get_files_for_package
 
 
 def get_task_data_div(task_code):
@@ -85,7 +85,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
     def init(self):
         self.order_sobject = self.get_sobject_from_kwargs()
-        self.division_sobject = get_client_division_sobject_from_order_sobject(self.order_sobject)
 
     def setup_order_information(self):
         """
