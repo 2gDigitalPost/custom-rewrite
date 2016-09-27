@@ -116,6 +116,48 @@ def get_files_for_order(order_code):
         return []
 
 
+def get_files_for_package(package_code):
+    """
+    Given the code for a package, get all the files that are associated with it in a list
+
+    :param package_code: twog/package sobject's unique code
+    :return: List of file sobjects
+    """
+    files_in_package_search = Search('twog/file_in_package')
+    files_in_package_search.add_filter('package_code', package_code)
+    files_in_package = files_in_package_search.get_sobjects()
+
+    if len(files_in_package) > 0:
+        files_in_package_string = ','.join(
+            ["'{0}'".format(file_in_package.get('file_code')) for file_in_package in files_in_package]
+        )
+
+        files_search = Search('twog/file')
+        files_search.add_where('\"code\" in ({0})'.format(files_in_package_string))
+        files = files_search.get_sobjects()
+
+        return files
+    else:
+        return []
+
+
+def get_instructions_select_wdg():
+    """
+    Get a Select Widget with all the instructions options
+
+    :return: SelectWdg
+    """
+
+    instructions_search = Search('twog/instructions')
+
+    instructions_select_wdg = SelectWdg('instructions_select')
+    instructions_select_wdg.set_id('instructions_select')
+    instructions_select_wdg.add_empty_option()
+    instructions_select_wdg.set_search_for_options(instructions_search, 'code', 'name')
+
+    return instructions_select_wdg
+
+
 def get_instructions_template_select_wdg():
     """
     Get a Select Widget with all the instructions template options
@@ -196,20 +238,116 @@ def get_component_instructions_text_from_task_sobject(task):
     return get_instructions_text_for_instructions_template_code(component_sobject.get('instructions_template_code'))
 
 
-def get_task_instructions_text_from_instructions_template_code(instructions_template_code, task_name):
+def get_instructions_sobject_from_instructions_code(instructions_code):
     """
-    Given an instructions_template code and a task name, get the task's instruction text from the instructions
-    template. If none exists, return a string in its place.
+    Given an instructions code, return the sobject that it refers to. If an instructions sobject is not found,
+    return None
 
-    :param instructions_template_code: instructions_template unique code
+    :param instructions_code: instructions unique code
+    :return: twog/instructions sobject or None
+    """
+
+    instructions_search = Search('twog/instructions')
+    instructions_search.add_code_filter(instructions_code)
+    instructions = instructions_search.get_sobject()
+
+    return instructions or None
+
+
+def get_instructions_text_from_instructions_code(instructions_code):
+    """
+    Given an instructions code, search for the instructions sobject, and return its text.
+
+    :param instructions_code: instructions unique code
+    :return: String
+    """
+
+    instructions = get_instructions_sobject_from_instructions_code(instructions_code)
+
+    if instructions:
+        return instructions.get('instructions_text')
+    else:
+        return 'Sorry, no instructions are available yet.'
+
+
+def get_task_instructions_text_from_instructions_code(instructions_code, task_name):
+    """
+    Given an instructions code and a task name, get the task's instruction text from the instructions document.
+    If none exists, return a string in its place.
+
+    :param instructions_code: instructions unique code
     :param task_name: Task name (process)
     :return: String
     """
-    department_instructions_sobjects = get_department_instructions_sobjects_for_instructions_template_code(
-        instructions_template_code)
 
-    for department_instructions_sobject in department_instructions_sobjects:
-        if department_instructions_sobject.get('name') == task_name:
-            return department_instructions_sobject.get('instructions_text')
+    instructions = get_instructions_sobject_from_instructions_code(instructions_code)
+
+    if instructions:
+        instructions_text = instructions.get('instructions_text')
     else:
-        return 'No instructions available'
+        return 'Sorry, no instructions are available for this task.'
+
+    task_instructions_text = ''
+    instruction_text_in_task = False
+
+    for line in instructions_text.split('\n'):
+        if line:
+            if line[0:3] == '###':
+                if task_name == line[4:]:
+                    task_instructions_text += line[4:] + '\n'
+                    instruction_text_in_task = True
+                else:
+                    instruction_text_in_task = False
+            elif instruction_text_in_task:
+                task_instructions_text += line + '\n'
+
+    if not task_instructions_text:
+        task_instructions_text = 'Sorry, no instructions are available for this task.'
+
+    return task_instructions_text
+
+
+def get_client_division_sobject_for_task_sobject(task):
+    """
+    Given a task sobject, travel up the chain of Component and Order to get the Division the order is assigned
+    to. This will only work for tasks that are assigned to components.
+
+    :param task: task sobject
+    :return: twog/division sobject
+    """
+
+    parent_component = task.get_parent()
+
+    order_search = Search('twog/order')
+    order_search.add_code_filter(parent_component.get('order_code'))
+    order = order_search.get_sobject()
+
+    division_search = Search('twog/division')
+    division_search.add_code_filter(order.get('division_code'))
+    division = division_search.get_sobject()
+
+    return division
+
+
+def get_deliverable_files_in_order(order_sobject):
+    """
+    Given an order sobject, return all the deliverable files associated with it.
+
+    :param order_sobject: twog/order sobject
+    :return: List of twog/file sobjects
+    """
+
+    files_in_order_search = Search('twog/file_in_order')
+    files_in_order_search.add_filter('order_code', order_sobject.get_code())
+    files_in_order = files_in_order_search.get_sobjects()
+
+    files_in_order_string = ','.join(
+        ["'{0}'".format(files_in_order.get('file_code')) for files_in_order in files_in_order]
+    )
+
+    deliverable_files_search = Search('twog/file')
+    deliverable_files_search.add_where('\"code\" in ({0})'.format(files_in_order_string))
+    deliverable_files_search.add_filter('classification', 'deliverable')
+    deliverable_files = deliverable_files_search.get_sobjects()
+
+    return deliverable_files

@@ -2,7 +2,7 @@ from xml.etree import ElementTree
 
 from pyasm.search import Search
 from pyasm.web import DivWdg, HtmlElement
-from pyasm.widget import SelectWdg
+from pyasm.widget import SelectWdg, TextAreaWdg
 
 from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import CalendarInputWdg
@@ -233,19 +233,6 @@ def get_client_name_from_division_code(division_code):
     return None
 
 
-def get_tasks_for_component(component):
-    """
-    Get all the tasks associated with a component
-
-    :param component: Component sobject (twog/component)
-    :return: Sobject list
-    """
-    task_search = Search('sthpw/task')
-    task_search.add_parent_filter(component)
-
-    return task_search.get_sobjects()
-
-
 def get_sobject_name_by_code(search_type, sobject_code):
     search = Search(search_type)
     search.add_code_filter(sobject_code)
@@ -316,6 +303,21 @@ def get_text_input_wdg(name, width=200):
     return textbox_wdg
 
 
+def get_text_area_input_wdg(name, width=400, styles=None):
+    textarea_wdg = TextAreaWdg()
+    textarea_wdg.set_id(name)
+    textarea_wdg.set_name(name)
+    textarea_wdg.add_style('width', '{0}px'.format(width))
+
+    if styles is None:
+        styles = []
+
+    for style in styles:
+        textarea_wdg.add_style(style[0], style[1])
+
+    return textarea_wdg
+
+
 def get_order_builder_url(order_code, server=None, project='twog'):
     """
     Gets the order builder url for the given order code.
@@ -381,7 +383,7 @@ def load_task_inspect_widget(task_search_key):
 try {
     var task_search_key = '%s';
 
-    spt.tab.add_new('instructions_' + task_search_key, 'Instructions', 'widgets.TaskInspectWdg',
+    spt.tab.add_new('task_inspect_' + task_search_key, 'Task', 'widgets.TaskInspectWdg',
                     {'search_key': task_search_key});
 }
 catch(err) {

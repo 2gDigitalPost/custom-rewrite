@@ -9,26 +9,27 @@ class ElementEvalLauncherWdg(BaseTableElementWdg):
     """
 
     @staticmethod
-    def get_launch_behavior(element_eval_code):
-        # TODO: Make this open a new tab rather than reloading the current one
+    def get_launch_behavior(element_eval_search_key):
         behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
 try {
-    var element_eval_code = '%s';
+    var element_eval_search_key = '%s';
 
-    spt.api.load_tab('Element Evaluation', 'qc_reports.ElementEvalWdg', {'search_type': 'twog/element_evaluation', 'code': element_eval_code});
+    spt.tab.add_new('element_eval_' + element_eval_search_key, 'Element Evaluation', 'qc_reports.ElementEvalWdg',
+                    {'search_key': element_eval_search_key});
 }
 catch(err){
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }
-''' % element_eval_code
+''' % element_eval_search_key
                     }
         return behavior
 
     def get_display(self):
-        element_eval_code = self.get_current_sobject().get_code()
+        element_evaluation = self.get_current_sobject()
 
-        element_eval_button = ButtonNewWdg(title='Element Evaluation for {0}'.format(element_eval_code), icon='WORK')
-        element_eval_button.add_behavior(self.get_launch_behavior(element_eval_code))
+        element_eval_button = ButtonNewWdg(title='Element Evaluation for {0}'.format(element_evaluation.get_code()),
+                                           icon='WORK')
+        element_eval_button.add_behavior(self.get_launch_behavior(element_evaluation.get_search_key()))
 
         return element_eval_button
