@@ -80,7 +80,10 @@ spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_
         division_search.add_code_filter(self.order_sobject.get('division_code'))
         division_sobject = division_search.get_sobject()
 
-        outer_div.add(get_files_checkboxes_for_division(division_sobject.get_code(), self.order_sobject.get_code()))
+        if division_sobject:
+            outer_div.add(get_files_checkboxes_for_division(division_sobject.get_code(), self.order_sobject.get_code()))
+        else:
+            outer_div.add('<div>You cannot add files to an Order until a Client Division has been selected.</div>')
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior())

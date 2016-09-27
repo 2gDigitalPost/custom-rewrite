@@ -69,15 +69,18 @@ spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_
         outer_div = DivWdg()
         outer_div.set_id('add_new_files_to_task')
 
-        outer_div.add(get_label_widget('Path'))
-        outer_div.add(get_text_input_wdg('new_file_path', 800))
+        if self.division_sobject:
+            outer_div.add(get_label_widget('Path'))
+            outer_div.add(get_text_input_wdg('new_file_path', 800))
 
-        outer_div.add(get_label_widget('Classification'))
-        outer_div.add(get_file_classification_select_wdg())
+            outer_div.add(get_label_widget('Classification'))
+            outer_div.add(get_file_classification_select_wdg())
 
-        submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior())
+            submit_button = SubmitWdg('Submit')
+            submit_button.add_behavior(self.get_submit_button_behavior())
 
-        outer_div.add(submit_button)
+            outer_div.add(submit_button)
+        else:
+            outer_div.add('<div>You cannot add files to an Order until a Client Division has been selected.</div>')
 
         return outer_div
