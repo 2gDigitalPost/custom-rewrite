@@ -178,6 +178,16 @@ class OrderBuilderWdg(BaseRefreshWdg):
         )
         add_file_to_order_button.add_style('display', 'inline-block')
 
+        create_file_for_order_button = ButtonNewWdg(title='Create a new File for this Order', icon='NEW')
+        create_file_for_order_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Create a new File for this Order', 'widgets.CreateFileForOrderWdg',
+                self.order_sobject.get_search_key(), 'Order Builder', 'order_builder.OrderBuilderWdg',
+                self.order_sobject.get_search_key()
+            )
+        )
+        create_file_for_order_button.add_style('display', 'inline-block')
+
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
         note_button.add_style('display', 'inline-block')
@@ -192,6 +202,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(add_component_button)
         order_div.add(add_component_by_language_button)
         order_div.add(add_file_to_order_button)
+        order_div.add(create_file_for_order_button)
         order_div.add(note_button)
 
         return order_div
