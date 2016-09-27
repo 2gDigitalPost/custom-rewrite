@@ -1,6 +1,6 @@
 from pyasm.search import Search
 from pyasm.web import Table
-from pyasm.widget import CheckboxWdg, SelectWdg
+from pyasm.widget import CheckboxWdg, SelectWdg, MultiSelectWdg
 
 from common_tools.utils import get_files_for_order
 
@@ -17,6 +17,25 @@ def get_file_select_wdg_from_file_list(files, width=400):
     file_select_wdg.set_id('file_select')
     file_select_wdg.add_style('width', '{0}px'.format(width))
     file_select_wdg.add_empty_option()
+
+    for file_sobject in files:
+        file_select_wdg.append_option(file_sobject.get('file_path'), file_sobject.get_code())
+
+    return file_select_wdg
+
+
+def get_file_multi_select_wdg_from_file_list(files, width=400):
+    """
+    Given a list of file sobjects, return a MultiSelectWdg using the file paths and codes
+
+    :param files: List of file sobjects
+    :param width: Width of the SelectWdg
+    :return: SelectWdg
+    """
+
+    file_select_wdg = MultiSelectWdg('file_multi_select')
+    file_select_wdg.set_id('file_multi_select')
+    file_select_wdg.add_style('width', '{0}px'.format(width))
 
     for file_sobject in files:
         file_select_wdg.append_option(file_sobject.get('file_path'), file_sobject.get_code())
