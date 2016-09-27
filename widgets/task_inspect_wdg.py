@@ -1,3 +1,4 @@
+import widgets.html_widgets
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.widget import ButtonNewWdg
 
@@ -70,7 +71,7 @@ def get_equipment_list(task_data_code):
     div_wdg = DivWdg()
 
     if equipment_sobjects_list:
-        div_wdg.add(obu.get_label_widget('Equipment:'))
+        div_wdg.add(widgets.html_widgets.get_label_widget('Equipment:'))
         equipment_unordered_html_list = HtmlElement.ul()
 
         for name in [equipment_sobject.get('name') for equipment_sobject in equipment_sobjects_list]:

@@ -1,3 +1,4 @@
+import widgets.html_widgets
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.input import TextAreaInputWdg
 
@@ -40,7 +41,7 @@ class InsertTitleInOrderWdg(BaseRefreshWdg):
                                                                   search_order_bys=['name'])
         title_select_wdg.set_id('new-title-code')
 
-        outer_div.add(obu.get_label_widget('Title'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Title'))
         outer_div.add(title_select_wdg)
 
     @staticmethod
@@ -49,7 +50,7 @@ class InsertTitleInOrderWdg(BaseRefreshWdg):
         description_input.set_name('description')
         description_input.add_class('new-title-order-description')
 
-        outer_div.add(obu.get_label_widget('Description'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Description'))
         outer_div.add(description_input)
 
     @staticmethod
@@ -57,7 +58,7 @@ class InsertTitleInOrderWdg(BaseRefreshWdg):
         platform_select_wdg = obu.get_select_widget_from_search_type('twog/platform', 'platform_code', 'name', 'code')
         platform_select_wdg.set_id('new-platform-code')
 
-        outer_div.add(obu.get_label_widget('Platform'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Platform'))
         outer_div.add(platform_select_wdg)
 
     @staticmethod
@@ -68,14 +69,14 @@ class InsertTitleInOrderWdg(BaseRefreshWdg):
         languages_wdg.add_empty_option('----')
         languages_wdg.set_search_for_options(languages_search, label_column='name', value_column='code')
 
-        outer_div.add(obu.get_label_widget('Language'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Language'))
         outer_div.add(languages_wdg)
 
     @staticmethod
     def get_territory_widget(outer_div):
         territory_wdg = obu.get_select_widget_from_search_type('twog/territory', 'territory', 'name', 'code')
 
-        outer_div.add(obu.get_label_widget('Territory'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Territory'))
         outer_div.add(territory_wdg)
 
     @staticmethod

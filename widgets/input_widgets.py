@@ -3,6 +3,7 @@ from pyasm.web import Table
 from pyasm.widget import CheckboxWdg, SelectWdg, MultiSelectWdg
 
 from common_tools.utils import get_files_for_order
+from tactic.ui.input import TextInputWdg
 
 
 def get_file_select_wdg_from_file_list(files, width=400):
@@ -130,3 +131,12 @@ def get_file_classification_select_wdg(width=200):
     classification_select_wdg.append_option('Deliverable', 'deliverable')
 
     return classification_select_wdg
+
+
+def get_text_input_wdg(name, width=200):
+    textbox_wdg = TextInputWdg()
+    textbox_wdg.set_id(name)
+    textbox_wdg.set_name(name)
+    textbox_wdg.add_style('width', '{0}px'.format(width))
+
+    return textbox_wdg

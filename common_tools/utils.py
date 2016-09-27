@@ -307,6 +307,24 @@ def get_task_instructions_text_from_instructions_code(instructions_code, task_na
     return task_instructions_text
 
 
+def get_client_division_sobject_from_order_sobject(order_sobject):
+    """
+    Given an order sobject, get the division code associated with it. If there isn't one, return None
+
+    :param order_sobject: twog/order sobject
+    :return: twog/division sobject or None
+    """
+
+    division_search = Search('twog/division')
+    division_search.add_code_filter(order_sobject.get('division_code'))
+    division_sobject = division_search.get_sobject()
+
+    if division_sobject:
+        return division_sobject
+    else:
+        return None
+
+
 def get_client_division_sobject_for_task_sobject(task):
     """
     Given a task sobject, travel up the chain of Component and Order to get the Division the order is assigned

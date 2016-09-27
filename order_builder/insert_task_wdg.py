@@ -1,3 +1,5 @@
+import widgets.html_widgets
+import widgets.input_widgets
 from tactic_client_lib import TacticServerStub
 
 from tactic.ui.common import BaseRefreshWdg
@@ -19,7 +21,7 @@ class InsertTaskWdg(BaseRefreshWdg):
         outer_div = DivWdg()
         outer_div.set_id('insert-task-in-component')
 
-        outer_div.add(obu.get_text_input_wdg('process'))
+        outer_div.add(widgets.input_widgets.get_text_input_wdg('process'))
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior(self.component_sobject.get_code()))

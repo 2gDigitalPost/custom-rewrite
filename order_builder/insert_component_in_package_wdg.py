@@ -1,3 +1,5 @@
+import widgets.html_widgets
+import widgets.input_widgets
 from tactic.ui.common import BaseRefreshWdg
 
 from pyasm.search import Search
@@ -98,19 +100,19 @@ class InsertComponentInOrderWdg(BaseRefreshWdg):
         outer_div = DivWdg()
         outer_div.set_id('insert-component-in-order')
 
-        outer_div.add(obu.get_label_widget('Name'))
-        outer_div.add(obu.get_text_input_wdg('new_component_name', 400))
+        outer_div.add(widgets.html_widgets.get_label_widget('Name'))
+        outer_div.add(widgets.input_widgets.get_text_input_wdg('new_component_name', 400))
 
-        outer_div.add(obu.get_label_widget('Title'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Title'))
         outer_div.add(get_title_select_wdg(400))
 
-        outer_div.add(obu.get_label_widget('Language'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Language'))
         outer_div.add(get_language_select_wdg())
 
-        outer_div.add(obu.get_label_widget('Pipeline'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Pipeline'))
         outer_div.add(get_pipeline_select_wdg('twog/component'))
 
-        outer_div.add(obu.get_label_widget('Instructions'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Instructions'))
         outer_div.add(get_instructions_select_wdg())
 
         submit_button = SubmitWdg('Submit')
@@ -177,18 +179,18 @@ class InsertComponentByLanguageWdg(BaseRefreshWdg):
         outer_div = DivWdg()
         outer_div.set_id('insert-component-in-order-by-language')
 
-        outer_div.add(obu.get_label_widget('Name'))
-        outer_div.add(obu.get_text_input_wdg('new_component_name', 400))
+        outer_div.add(widgets.html_widgets.get_label_widget('Name'))
+        outer_div.add(widgets.input_widgets.get_text_input_wdg('new_component_name', 400))
 
-        outer_div.add(obu.get_label_widget('Title'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Title'))
         outer_div.add(get_title_select_wdg(400))
 
         outer_div.add(get_languages_checkboxes())
 
-        outer_div.add(obu.get_label_widget('Pipeline'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Pipeline'))
         outer_div.add(get_pipeline_select_wdg('twog/component'))
 
-        outer_div.add(obu.get_label_widget('Instructions'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Instructions'))
         outer_div.add(get_instructions_select_wdg())
 
         submit_button = SubmitWdg('Submit')

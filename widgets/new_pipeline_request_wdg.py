@@ -1,3 +1,5 @@
+import widgets.html_widgets
+import widgets.input_widgets
 from tactic.ui.common import BaseRefreshWdg
 
 from pyasm.web import DivWdg
@@ -16,13 +18,13 @@ class NewPipelineRequestWdg(BaseRefreshWdg):
                      "notification when the request is complete.</div><br/>"
         outer_div.add(page_label)
 
-        outer_div.add(obu.get_label_widget('Process'))
-        outer_div.add(obu.get_text_input_wdg('process', 800))
+        outer_div.add(widgets.html_widgets.get_label_widget('Process'))
+        outer_div.add(widgets.input_widgets.get_text_input_wdg('process', 800))
 
-        outer_div.add(obu.get_label_widget('Description'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Description'))
         outer_div.add(obu.get_text_area_input_wdg('description', 800, [('display', 'block')]))
 
-        outer_div.add(obu.get_label_widget('Due Date'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Due Date'))
         outer_div.add(obu.get_date_calendar_wdg())
 
         self.get_submit_widget(outer_div)

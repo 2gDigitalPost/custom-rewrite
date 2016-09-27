@@ -6,9 +6,9 @@ from pyasm.widget import CheckboxWdg, SubmitWdg
 
 from common_tools.utils import get_files_for_order, get_client_division_sobject_for_task_sobject,\
     get_task_data_in_files, get_task_data_sobject_from_task_code
-from input_widgets import get_file_classification_select_wdg
 
-from order_builder import order_builder_utils as obu
+from widgets.html_widgets import get_label_widget
+from widgets.input_widgets import get_text_input_wdg, get_file_classification_select_wdg
 
 
 class AddInputFilesToTaskWdg(BaseRefreshWdg):
@@ -179,10 +179,10 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         outer_div = DivWdg()
         outer_div.set_id('add_new_files_to_task')
 
-        outer_div.add(obu.get_label_widget('Path'))
-        outer_div.add(obu.get_text_input_wdg('new_file_path', 800))
+        outer_div.add(get_label_widget('Path'))
+        outer_div.add(get_text_input_wdg('new_file_path', 800))
 
-        outer_div.add(obu.get_label_widget('Classification'))
+        outer_div.add(get_label_widget('Classification'))
         outer_div.add(get_file_classification_select_wdg())
 
         submit_button = SubmitWdg('Submit')

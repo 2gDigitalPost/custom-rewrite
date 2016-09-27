@@ -1,3 +1,4 @@
+import widgets.html_widgets
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.widget import ButtonNewWdg
 
@@ -6,8 +7,8 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 
 import order_builder_utils as obu
 
-from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment,\
-    get_files_for_package
+from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
+    get_files_for_package, get_client_division_sobject_from_order_sobject
 
 
 def get_task_data_div(task_code):
@@ -22,7 +23,7 @@ def get_task_data_div(task_code):
     equipment_list = get_task_data_equipment(task_data.get_code())
 
     if in_files_list:
-        outer_div.add(obu.get_label_widget('In Files:'))
+        outer_div.add(widgets.html_widgets.get_label_widget('In Files:'))
 
         unordered_html_list = HtmlElement.ul()
 
@@ -34,7 +35,7 @@ def get_task_data_div(task_code):
         outer_div.add(unordered_html_list)
 
     if out_files_list:
-        outer_div.add(obu.get_label_widget('Out Files:'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Out Files:'))
 
         unordered_html_list = HtmlElement.ul()
 
@@ -46,7 +47,7 @@ def get_task_data_div(task_code):
         outer_div.add(unordered_html_list)
 
     if equipment_list:
-        outer_div.add(obu.get_label_widget('Equipment:'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Equipment:'))
 
         unordered_html_list = HtmlElement.ul()
 
@@ -84,6 +85,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
     def init(self):
         self.order_sobject = self.get_sobject_from_kwargs()
+        self.division_sobject = get_client_division_sobject_from_order_sobject(self.order_sobject)
 
     def setup_order_information(self):
         """
@@ -491,7 +493,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             files_in_package_list = get_files_for_package(package.get_code())
 
             if files_in_package_list:
-                package_div.add(obu.get_label_widget('Deliverable Files:'))
+                package_div.add(widgets.html_widgets.get_label_widget('Deliverable Files:'))
 
                 unordered_html_list = HtmlElement.ul()
 

@@ -4,7 +4,8 @@ from tactic.ui.input import TextInputWdg
 from pyasm.web import DivWdg
 from pyasm.widget import SubmitWdg
 
-from order_builder_utils import get_label_widget, get_widget_header
+from order_builder_utils import get_widget_header
+from widgets.html_widgets import get_label_widget
 
 
 def get_process_widget():

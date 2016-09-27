@@ -1,3 +1,5 @@
+import widgets.html_widgets
+import widgets.input_widgets
 from tactic.ui.common import BaseRefreshWdg
 
 from pyasm.web import DivWdg
@@ -22,15 +24,15 @@ class MoveInputFileToOutputWdg(BaseRefreshWdg):
         outer_div = DivWdg()
         outer_div.set_id('move_input_file_to_output')
 
-        outer_div.add(obu.get_label_widget('Path'))
-        outer_div.add(obu.get_text_input_wdg('new_file_path', 800))
+        outer_div.add(widgets.html_widgets.get_label_widget('Path'))
+        outer_div.add(widgets.input_widgets.get_text_input_wdg('new_file_path', 800))
 
-        outer_div.add(obu.get_label_widget('Classification'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Classification'))
         outer_div.add(get_file_classification_select_wdg())
 
         files = get_task_data_in_files(self.task_data.get_code())
 
-        outer_div.add(obu.get_label_widget('Original File'))
+        outer_div.add(widgets.html_widgets.get_label_widget('Original File'))
         outer_div.add(get_file_select_wdg_from_file_list(files))
 
         submit_button = SubmitWdg('Submit')

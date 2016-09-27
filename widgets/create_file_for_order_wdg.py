@@ -4,9 +4,8 @@ from pyasm.search import Search
 from pyasm.web import DivWdg
 from pyasm.widget import SubmitWdg
 
-from widgets.input_widgets import get_file_classification_select_wdg
-
-from order_builder import order_builder_utils as obu
+from widgets.input_widgets import get_file_classification_select_wdg, get_text_input_wdg
+from widgets.html_widgets import get_label_widget
 
 
 class CreateFileForOrderWdg(BaseRefreshWdg):
@@ -70,10 +69,10 @@ spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_
         outer_div = DivWdg()
         outer_div.set_id('add_new_files_to_task')
 
-        outer_div.add(obu.get_label_widget('Path'))
-        outer_div.add(obu.get_text_input_wdg('new_file_path', 800))
+        outer_div.add(get_label_widget('Path'))
+        outer_div.add(get_text_input_wdg('new_file_path', 800))
 
-        outer_div.add(obu.get_label_widget('Classification'))
+        outer_div.add(get_label_widget('Classification'))
         outer_div.add(get_file_classification_select_wdg())
 
         submit_button = SubmitWdg('Submit')

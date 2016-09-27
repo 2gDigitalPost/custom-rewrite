@@ -4,7 +4,8 @@ from pyasm.search import Search
 from pyasm.web import DivWdg
 from pyasm.widget import SelectWdg, SubmitWdg
 
-from order_builder.order_builder_utils import get_label_widget, get_widget_header
+from order_builder.order_builder_utils import get_widget_header
+from widgets.html_widgets import get_label_widget
 
 
 def get_pipeline_select_wdg(pipeline_code):

@@ -1,12 +1,9 @@
 from xml.etree import ElementTree
 
 from pyasm.search import Search
-from pyasm.web import DivWdg, HtmlElement
+from pyasm.web import DivWdg
 from pyasm.widget import SelectWdg, TextAreaWdg
-
-from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import CalendarInputWdg
-
 from tactic_client_lib import tactic_server_stub
 
 
@@ -20,17 +17,6 @@ TASK_COLORS = {
     "Approved":        "#00c611",
     "Complete":        "#a3d991"
 }
-
-
-def get_label_widget(label_text):
-    """
-    Given a label string, return a DivWdg containing the label
-
-    :param label_text: String
-    :return: HtmlElement.label
-    """
-
-    return HtmlElement.label(label_text)
 
 
 def get_widget_header(text):
@@ -292,15 +278,6 @@ def get_base_url(server=None, project='twog'):
 
     url = 'http://{0}/tactic/{1}/'.format(server.server_name, project)
     return url
-
-
-def get_text_input_wdg(name, width=200):
-    textbox_wdg = TextInputWdg()
-    textbox_wdg.set_id(name)
-    textbox_wdg.set_name(name)
-    textbox_wdg.add_style('width', '{0}px'.format(width))
-
-    return textbox_wdg
 
 
 def get_text_area_input_wdg(name, width=400, styles=None):
