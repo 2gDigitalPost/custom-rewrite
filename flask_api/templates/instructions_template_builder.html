@@ -67,7 +67,7 @@
         $(document).ready(function() {
             $.getJSON( "instructions_template", function( data ) {
                 $.each( data["department_instructions_list"], function( key, val ) {
-                    $('#sortable2').append($('<li>').text(val["name"]).attr('id', val["code"]).attr('class', 'department_instruction'));
+                    $('#sortable2').append($('<li>').text(val["descriptive_name"]).attr('id', val["code"]).attr('class', 'department_instruction'));
                 });
 
                 // Bind this function after the JSON has loaded
@@ -84,7 +84,7 @@
                         var department_instructions_object = data["department_instructions_list"][i];
 
                         if (department_instructions_object["code"] == $(this).attr('id')) {
-                            department_instructions_text_header = department_instructions_object["name"];
+                            department_instructions_text_header = department_instructions_object["descriptive_name"];
                             department_instructions_text = department_instructions_object["instructions_text"];
                         }
                     }
