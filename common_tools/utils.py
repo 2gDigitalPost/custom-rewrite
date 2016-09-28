@@ -178,6 +178,7 @@ def get_instructions_template_select_wdg():
 def get_department_instructions_sobjects_for_instructions_template_code(instructions_template_code):
     """
     Given the code to an instructions template, return a list of the corresponding department instructions sobjects.
+    The list of department instructions will be sorted by the sort_order column in the join table.
 
     :param instructions_template_code: twog/instructions_template unique code
     :return: List of twog/department_instructions sobjects (possibly empty)
@@ -187,21 +188,35 @@ def get_department_instructions_sobjects_for_instructions_template_code(instruct
     department_instructions_in_template_search.add_filter('instructions_template_code', instructions_template_code)
     department_instructions_in_template_sobjects = department_instructions_in_template_search.get_sobjects()
 
-    if len(department_instructions_in_template_sobjects) > 0:
-        department_instructions_codes = [department_instructions_in_template_sobject.get('department_instructions_code')
-                                         for department_instructions_in_template_sobject
-                                         in department_instructions_in_template_sobjects]
+    # Sort the entries by their sort order
+    department_instructions_in_template_sobjects = sorted(department_instructions_in_template_sobjects,
+                                                          key=lambda x: x.get('sort_order'))
+    # Get a list of the department_instructions codes, sorted
+    sorted_department_instructions_codes = [
+        department_instructions_in_template_sobject.get('department_instructions_code')
+        for department_instructions_in_template_sobject in department_instructions_in_template_sobjects
+        ]
 
+    if len(department_instructions_in_template_sobjects) > 0:
         department_instructions_code_string = ','.join(
             ["'{0}'".format(department_instructions_code) for department_instructions_code
-             in department_instructions_codes]
+             in sorted_department_instructions_codes]
         )
 
         department_instructions_search = Search('twog/department_instructions')
         department_instructions_search.add_where('\"code\" in ({0})'.format(department_instructions_code_string))
         department_instructions_sobjects = department_instructions_search.get_sobjects()
 
-        return department_instructions_sobjects
+        # Sort the department_instructions sobjects
+        sorted_department_instructions_sobjects = []
+
+        for department_instructions_sobject in department_instructions_sobjects:
+            department_instructions_code = department_instructions_sobject.get_code()
+            index = sorted_department_instructions_codes.index(department_instructions_code)
+
+            sorted_department_instructions_sobjects.insert(index, department_instructions_sobject)
+
+        return sorted_department_instructions_sobjects
     else:
         return []
 

@@ -1,10 +1,11 @@
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.widget import ButtonNewWdg
 
-from pyasm.search import Search
-from pyasm.web import DivWdg, HtmlElement, SpanWdg
+from pyasm.web import DivWdg, HtmlElement
 
 from common_tools.utils import get_department_instructions_sobjects_for_instructions_template_code
+
+from order_builder.order_builder_utils import get_load_popup_widget_behavior
 
 
 class InstructionsTemplateBuilderWdg(BaseRefreshWdg):
@@ -60,5 +61,16 @@ class InstructionsTemplateBuilderWdg(BaseRefreshWdg):
         outer_div.set_id('instructions_template_builder')
         outer_div.add(instructions_template_div)
         outer_div.add(department_instructions_div)
+
+        create_new_instructions_document_button = ButtonNewWdg(
+            title='Create an Instructions Document from this Template', icon='ADD')
+        create_new_instructions_document_button.add_behavior(
+            get_load_popup_widget_behavior(
+                'Create an Instructions Document', 'widgets.CreateInstructionsDocumentFromTemplateWdg',
+                self.instructions_template_sobject.get_search_key()
+            )
+        )
+
+        outer_div.add(create_new_instructions_document_button)
 
         return outer_div
