@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, render_template, request
-from flask_restful import Resource, Api
+from flask_restful import reqparse, Resource, Api
 
 import os, sys, inspect
 
@@ -28,10 +28,16 @@ url = config.get('server', 'dev')
 # Get a server object to perform queries
 server = TacticServerStub(server=url, project=project, user=user, password=password)
 
+parser = reqparse.RequestParser()
 
 @app.route('/hello')
 def hello():
     return render_template('hello.html')
+
+
+@app.route('/files_select')
+def files_select():
+    return render_template('files_select.html')
 
 
 class HelloWorld(Resource):
@@ -48,6 +54,31 @@ class DepartmentInstructions(Resource):
         return {'department_instructions_list': department_instructions}
 
 
+class NewInstructionsTemplate(Resource):
+    def get(self):
+
+        department_instructions = server.eval('@SOBJECT(twog/department_instructions)')
+
+        return {'department_instructions_list': department_instructions}
+
+    def post(self):
+        json_data = request.get_json()
+
+        print(json_data)
+
+        inserted_template = server.insert('twog/instructions_template', {'name': json_data.get('name')})
+
+        for department_instruction in json_data.get('department_instructions'):
+            server.insert('twog/department_instructions_in_template',
+                          {'instructions_template_code': inserted_template.get('code'),
+                           'department_instructions_code': department_instruction.get('code'),
+                           'sort_order': department_instruction.get('sort_order')
+                           }
+                          )
+
+        return {'status': 200}
+
+
 class InstructionsTemplate(Resource):
     def get(self, instructions_template_id):
         instructions_template_sobject = server.eval('@SOBJECT(twog/instructions_template["code", "{0}"])'.format(instructions_template_id))
@@ -59,9 +90,15 @@ class InstructionsTemplate(Resource):
                 'department_instructions_in_template': department_instructions_sobjects_in_template,
                 'department_instructions_not_in_template': department_instructions_sobjects_not_in_template}
 
+    def post(self):
+        args = parser.parse_args()
+
+        print(args)
+
 
 api.add_resource(HelloWorld, '/')
 api.add_resource(DepartmentInstructions, '/department_instructions')
+api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
 
 if __name__ == '__main__':
