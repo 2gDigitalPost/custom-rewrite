@@ -5,7 +5,10 @@ import os, sys, inspect
 
 import ConfigParser
 
-sys.path.append('/home/apache/tactic/src/client')
+config = ConfigParser.ConfigParser()
+config.read('config.ini')
+
+sys.path.append(config.get('tacticpath', 'path'))
 
 from tactic_client_lib import TacticServerStub
 
@@ -14,8 +17,6 @@ sys.path.append('/opt/spt/custom')
 app = Flask(__name__)
 api = Api(app)
 
-config = ConfigParser.ConfigParser()
-config.read('config.ini')
 
 # Get credentials from config file
 user = config.get('credentials', 'user')
@@ -102,5 +103,5 @@ api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
 
