@@ -53,6 +53,11 @@
     </div>
 
     <div>
+        <h3 id="department_instructions_description_header">Select a department instructions item to see its description</h3>
+        <p id="department_instructions_description"></p>
+    </div>
+
+    <div>
             <button type="submit" name="Submit" value="Submit" id="submit_button">Submit</button>
     </div>
 
@@ -61,11 +66,35 @@
     <script type=text/javascript>
         $(document).ready(function() {
             $.getJSON( "instructions_template", function( data ) {
-                console.log(data);
-                console.log(data["department_instructions_list"]);
-
                 $.each( data["department_instructions_list"], function( key, val ) {
-                    $('#sortable2').append($('<li>').text(val["name"]).attr('id', val["code"]));
+                    $('#sortable2').append($('<li>').text(val["name"]).attr('id', val["code"]).attr('class', 'department_instruction'));
+                });
+
+                // Bind this function after the JSON has loaded
+                $(".department_instruction").click(function(){
+                    var department_instruction_description_section_header = $('#department_instructions_description_header');
+                    var department_instruction_description_section = $('#department_instructions_description');
+                    department_instruction_description_section.html($(this).attr('id'));
+
+                    var department_instructions_text_header = "Select a department instructions item to see its description";
+                    var department_instructions_text = "";
+
+                    for (var i = 0; i < data["department_instructions_list"].length; i++)
+                    {
+                        var department_instructions_object = data["department_instructions_list"][i];
+
+                        if (department_instructions_object["code"] == $(this).attr('id')) {
+                            department_instructions_text_header = department_instructions_object["name"];
+                            department_instructions_text = department_instructions_object["instructions_text"];
+                        }
+                    }
+
+                    if (department_instructions_text === "") {
+                        department_instructions_text = "No instruction text is available."
+                    }
+
+                    department_instruction_description_section_header.html(department_instructions_text_header);
+                    department_instruction_description_section.html(department_instructions_text);
                 });
             });
 
@@ -74,6 +103,7 @@
                     connectWith: ".connectedSortable"
                 }).disableSelection();
             } );
+
 
             $("#submit_button").click(function () {
                 var department_instructions_list = [];
@@ -91,8 +121,6 @@
                         department_instructions_list.push(department_instructions_entry);
                     });
                 });
-
-                console.log(department_instructions_list);
 
                 var new_template_name = $('#new_instructions_template_name').val();
 
