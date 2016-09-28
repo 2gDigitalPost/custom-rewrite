@@ -31,21 +31,14 @@ server = TacticServerStub(server=url, project=project, user=user, password=passw
 
 parser = reqparse.RequestParser()
 
-@app.route('/hello')
+@app.route('/instructions_template_builder')
 def hello():
-    return render_template('hello.html')
+    return render_template('instructions_template_builder.html')
 
 
 @app.route('/files_select')
 def files_select():
     return render_template('files_select.html')
-
-
-class HelloWorld(Resource):
-    def get(self):
-        existing_languages = server.eval('@SOBJECT(twog/department_instructions)')
-
-        return {'hello': existing_languages}
 
 
 class DepartmentInstructions(Resource):
@@ -97,7 +90,6 @@ class InstructionsTemplate(Resource):
         print(args)
 
 
-api.add_resource(HelloWorld, '/')
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')

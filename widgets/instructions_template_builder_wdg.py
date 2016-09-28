@@ -51,16 +51,9 @@ class InstructionsTemplateBuilderWdg(BaseRefreshWdg):
         instructions_template_div.add(instructions_template_name_div)
         instructions_template_div.add(self.get_selected_department_instructions_section())
 
-        department_instructions_div = DivWdg()
-        department_instructions_div.set_id('department_instructions')
-        department_instructions_div.add_style('display', 'inline-block')
-
-        department_instructions_div.add('Test')
-
         outer_div = DivWdg()
         outer_div.set_id('instructions_template_builder')
         outer_div.add(instructions_template_div)
-        outer_div.add(department_instructions_div)
 
         create_new_instructions_document_button = ButtonNewWdg(
             title='Create an Instructions Document from this Template', icon='ADD')
