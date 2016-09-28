@@ -49,6 +49,7 @@ for (var i = 0; i < department_instructions_sobjects.length; i++) {
 
         if ((j + 1) === department_instructions_in_template_sobject['sort_order']) {
             sorted_department_instructions_sobjects.push(department_instructions_sobjects[i]);
+            j = department_instructions_in_template_sobjects.length + 1;
         }
     }
 }
