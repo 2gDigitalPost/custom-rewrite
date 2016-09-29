@@ -35,6 +35,6 @@ class TaskInstructionsWdg(BaseRefreshWdg):
         if not instructions:
             instructions = 'Sorry, instructions have not been added yet.'
 
-        div_wdg.add(self.parse_instruction_text(instructions))
+        div_wdg.add(self.parse_instruction_text(instructions.encode('utf-8')))
 
         return div_wdg
