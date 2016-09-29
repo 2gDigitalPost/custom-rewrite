@@ -184,11 +184,49 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         div_wdg.add(HtmlElement.h4('<u>Input Files</u>'))
         div_wdg.add(get_in_files_list(self.task_data.get_code()))
 
+        add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
+        add_input_file_button.add_behavior(
+            obu.get_load_popup_widget_behavior('Add Input Files from Order',
+                                               'widgets.AddInputFilesToTaskWdg',
+                                               self.task_sobject.get_search_key())
+        )
+        add_input_file_button.add_style('display', 'inline-block')
+        div_wdg.add(add_input_file_button)
+
+        create_input_file_button = ButtonNewWdg(title='Create a new Input File', icon='ADD')
+        create_input_file_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Create a new Input File', 'widgets.CreateNewInputFileForTaskWdg', self.task_sobject.get_search_key(),
+                'Task', 'widgets.TaskInspectWdg', self.task_sobject.get_search_key()
+            )
+        )
+        create_input_file_button.add_style('display', 'inline-block')
+        div_wdg.add(create_input_file_button)
+
         div_wdg.add(HtmlElement.h4('<u>Output Files</u>'))
         div_wdg.add(get_out_files_list(self.task_data.get_code()))
 
+        move_input_file_to_output_button = ButtonNewWdg(title='Move Input File to Output', icon='RIGHT')
+        move_input_file_to_output_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Move Input File to Output', 'widgets.MoveInputFileToOutputWdg', self.task_sobject.get_search_key(),
+                'Task', 'widgets.TaskInspectWdg', self.task_sobject.get_search_key()
+            )
+        )
+        move_input_file_to_output_button.add_style('display', 'inline-block')
+        div_wdg.add(move_input_file_to_output_button)
+
         div_wdg.add(HtmlElement.h4('<u>Equipment</u>'))
         div_wdg.add(get_equipment_list(self.task_data.get_code()))
+
+        add_equipment_button = ButtonNewWdg(title='Add Equipment', icon='INSERT_MULTI')
+        add_equipment_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior('Add Equipment', 'widgets.EquipmentInTaskWdg',
+                                                           self.task_sobject.get_search_key(), 'Task',
+                                                           'widgets.TaskInspectWdg', self.task_sobject.get_search_key())
+        )
+        add_equipment_button.add_style('display', 'inline-block')
+        div_wdg.add(add_equipment_button)
 
         div_wdg.add(HtmlElement.h4('<u>Instructions</u>'))
 
@@ -201,48 +239,10 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
 
         div_wdg.add(self.parse_instruction_text(instructions.encode('utf-8')))
 
-        add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
-        add_input_file_button.add_behavior(
-            obu.get_load_popup_widget_behavior('Add Input Files from Order',
-                                               'widgets.AddInputFilesToTaskWdg',
-                                               self.task_sobject.get_search_key())
-        )
-        add_input_file_button.add_style('display', 'inline-block')
-
-        create_input_file_button = ButtonNewWdg(title='Create a new Input File', icon='NEW')
-        create_input_file_button.add_behavior(
-            obu.get_load_popup_widget_with_reload_behavior(
-                'Create a new Input File', 'widgets.CreateNewInputFileForTaskWdg', self.task_sobject.get_search_key(),
-                'Task', 'widgets.TaskInspectWdg', self.task_sobject.get_search_key()
-            )
-        )
-        create_input_file_button.add_style('display', 'inline-block')
-
-        move_input_file_to_output_button = ButtonNewWdg(title='Move Input File to Output', icon='RIGHT')
-        move_input_file_to_output_button.add_behavior(
-            obu.get_load_popup_widget_with_reload_behavior(
-                'Move Input File to Output', 'widgets.MoveInputFileToOutputWdg', self.task_sobject.get_search_key(),
-                'Task', 'widgets.TaskInspectWdg', self.task_sobject.get_search_key()
-            )
-        )
-        move_input_file_to_output_button.add_style('display', 'inline-block')
-
-        add_equipment_button = ButtonNewWdg(title='Add Equipment', icon='GEAR')
-        add_equipment_button.add_behavior(
-            obu.get_load_popup_widget_with_reload_behavior('Add Equipment', 'widgets.EquipmentInTaskWdg',
-                                                           self.task_sobject.get_search_key(), 'Task',
-                                                           'widgets.TaskInspectWdg', self.task_sobject.get_search_key())
-        )
-        add_equipment_button.add_style('display', 'inline-block')
-
         submit_button = SubmitWdg('Submit Changes')
         submit_button.add_behavior(self.submit_button_behavior())
         submit_button.add_style('display', 'block')
 
-        div_wdg.add(add_input_file_button)
-        div_wdg.add(create_input_file_button)
-        div_wdg.add(move_input_file_to_output_button)
-        div_wdg.add(add_equipment_button)
         div_wdg.add(submit_button)
 
         return div_wdg
