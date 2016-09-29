@@ -105,13 +105,16 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         outer_div = DivWdg()
         outer_div.set_id('add_files_to_task')
 
-        outer_div.add(self.get_files_checkbox_for_task())
+        if self.order_files:
+            outer_div.add(self.get_files_checkbox_for_task())
 
-        submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior(self.task_data.get_code(),
-                                                                   self.task_sobject.get_search_key()))
+            submit_button = SubmitWdg('Submit')
+            submit_button.add_behavior(self.get_submit_button_behavior(self.task_data.get_code(),
+                                                                       self.task_sobject.get_search_key()))
 
-        outer_div.add(submit_button)
+            outer_div.add(submit_button)
+        else:
+            outer_div.add('<div>No files exist for this Order yet.</div>')
 
         return outer_div
 
