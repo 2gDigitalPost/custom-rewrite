@@ -8,7 +8,7 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 import order_builder_utils as obu
 
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
-    get_files_for_package, get_delivery_task_for_package
+    get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click
 
 
 def get_task_data_div(task_code):
@@ -84,7 +84,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
     """
 
     def init(self):
-        self.order_sobject = self.get_sobject_from_kwargs()
+        # Have to determine if the search_key or the code is being passed in. The Loader widget will pass in the
+        # search_key, but the custom URL will pass in the code
+        if self.kwargs.get('search_key'):
+            self.order_sobject = self.get_sobject_from_kwargs()
+        elif self.kwargs.get('code'):
+            # search_type isn't passed in by default, but is needed to get the sobject if passing in the code, so
+            # specify it before doing the search
+            self.kwargs['search_type'] = 'twog/order'
+            self.order_sobject = self.get_sobject_from_kwargs()
 
     def setup_order_information(self):
         """
@@ -193,6 +201,11 @@ class OrderBuilderWdg(BaseRefreshWdg):
         note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
         note_button.add_style('display', 'inline-block')
 
+        order_url = obu.get_order_builder_url(self.order_sobject.get_code())
+        copy_url_button = ButtonNewWdg(title='Copy URL to Clipboard', icon='LINK')
+        copy_url_button.add_behavior(get_order_builder_url_on_click(order_url))
+        copy_url_button.add_style('display', 'inline-block')
+
         # Add the divs to the outer_div for display
         order_div.add(order_name_div)
         order_div.add(client_name_div)
@@ -205,6 +218,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(add_file_to_order_button)
         order_div.add(create_file_for_order_button)
         order_div.add(note_button)
+        order_div.add(copy_url_button)
 
         return order_div
 
