@@ -8,7 +8,7 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 import order_builder_utils as obu
 
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
-    get_files_for_package
+    get_files_for_package, get_delivery_task_for_package
 
 
 def get_task_data_div(task_code):
@@ -465,6 +465,12 @@ class OrderBuilderWdg(BaseRefreshWdg):
             if package.get('due_date'):
                 package_due_date_div.add('Due: {0}'.format(package.get('due_date')))
 
+            package_delivery_task_div = DivWdg()
+            package_delivery_task = get_delivery_task_for_package(package.get_code())
+
+            if package_delivery_task:
+                package_delivery_task_div.add('Delivery Status: {0}'.format(package_delivery_task.get('status')))
+
             add_deliverable_file_to_package_button = ButtonNewWdg(title='Add Deliverable File', icon='ADD')
             add_deliverable_file_to_package_button.add_behavior(
                 obu.get_load_popup_widget_with_reload_behavior(
@@ -487,6 +493,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             package_div.add(package_description_div)
             package_div.add(package_priority_div)
             package_div.add(package_due_date_div)
+            package_div.add(package_delivery_task_div)
             package_div.add(package_platform_div)
 
             files_in_package_list = get_files_for_package(package.get_code())

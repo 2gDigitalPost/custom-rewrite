@@ -384,3 +384,23 @@ def get_deliverable_files_in_order(order_sobject):
     deliverable_files = deliverable_files_search.get_sobjects()
 
     return deliverable_files
+
+
+def get_delivery_task_for_package(package_code):
+    """
+
+    :param package_code:
+    :return:
+    """
+
+    package_search = Search('twog/package')
+    package_search.add_code_filter(package_code)
+    package_sobject = package_search.get_sobject()
+
+    package_tasks = package_sobject.get_all_children('sthpw/task')
+
+    for package_task in package_tasks:
+        if package_task.get('process').lower() == 'deliver':
+            return package_task
+
+    return None
