@@ -624,23 +624,6 @@ catch(err) {
 
         return behavior
 
-    @staticmethod
-    def get_add_task_behavior(title_order_search_key):
-        behavior = {
-            'css_class': 'clickme',
-            'type': 'click_up',
-            'cbjs_action': '''
-try {
-    spt.api.load_popup('Instructions', 'order_builder.AddTaskToTitleOrderWdg', {'title_order_search_key': '%s'});
-}
-catch(err) {
-    spt.app_busy.hide();
-    spt.alert(spt.exception.handler(err));
-}''' % title_order_search_key
-        }
-
-        return behavior
-
     def get_display(self):
         outer_div = DivWdg()
         outer_div.add_class('order-builder')

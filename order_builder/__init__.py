@@ -1,4 +1,3 @@
-from add_task_to_title_order_wdg import AddTaskToTitleOrderWdg
 from change_due_date_wdg import ChangeDueDateWdg
 from change_instructions_wdg import ChangeInstructionsWdg
 from change_title_wdg import ChangeTitleWdg
