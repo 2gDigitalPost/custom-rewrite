@@ -10,7 +10,7 @@ import order_builder.order_builder_utils as obu
 from widgets.html_widgets import get_label_widget
 
 from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
-    get_task_data_out_files, get_task_instructions_text_from_instructions_code
+    get_task_data_out_files, get_task_instructions_text_from_instructions_code, get_order_sobject_from_component_sobject
 
 
 def get_page_header(string):
@@ -72,7 +72,7 @@ def get_equipment_list(task_data_code):
     div_wdg = DivWdg()
 
     if equipment_sobjects_list:
-        div_wdg.add(widgets.html_widgets.get_label_widget('Equipment:'))
+        div_wdg.add(get_label_widget('Equipment:'))
         equipment_unordered_html_list = HtmlElement.ul()
 
         for name in [equipment_sobject.get('name') for equipment_sobject in equipment_sobjects_list]:
@@ -173,6 +173,10 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         div_wdg.add(HtmlElement.h4('Code: {0}'.format(self.task_sobject.get_code())))
         div_wdg.add(HtmlElement.h4('Component: {0} ({1})'.format(self.parent_component.get('name'),
                                                                  self.parent_component.get_code())))
+
+        # Get the order that contains the parent component and display its information
+        order_sobject = get_order_sobject_from_component_sobject(self.parent_component)
+        div_wdg.add(HtmlElement.h4('Order: {0} ({1})'.format(order_sobject.get('name'), order_sobject.get_code())))
 
         div_wdg.add(HtmlElement.h4('<u>Status</u>'))
         div_wdg.add(get_task_status_select_wdg(self.task_sobject))

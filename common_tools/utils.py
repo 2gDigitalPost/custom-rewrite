@@ -2,6 +2,21 @@ from pyasm.search import Search
 from pyasm.widget import SelectWdg
 
 
+def get_order_sobject_from_component_sobject(component_sobject):
+    """
+    Given a twog/component code, get the order that it is assigned to.
+
+    :param component_code: twog/component unique code
+    :return: twog/order sobject
+    """
+
+    order_search = Search('twog/order')
+    order_search.add_code_filter(component_sobject.get('order_code'))
+    order_sobject = order_search.get_sobject()
+
+    return order_sobject
+
+
 def get_task_data_sobject_from_task_code(task_code):
     """
     Given a task code, find the task_data sobject associated with it
