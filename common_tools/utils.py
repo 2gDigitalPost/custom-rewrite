@@ -374,16 +374,19 @@ def get_deliverable_files_in_order(order_sobject):
     files_in_order_search.add_filter('order_code', order_sobject.get_code())
     files_in_order = files_in_order_search.get_sobjects()
 
-    files_in_order_string = ','.join(
-        ["'{0}'".format(files_in_order.get('file_code')) for files_in_order in files_in_order]
-    )
+    if files_in_order:
+        files_in_order_string = ','.join(
+            ["'{0}'".format(files_in_order.get('file_code')) for files_in_order in files_in_order]
+        )
 
-    deliverable_files_search = Search('twog/file')
-    deliverable_files_search.add_where('\"code\" in ({0})'.format(files_in_order_string))
-    deliverable_files_search.add_filter('classification', 'deliverable')
-    deliverable_files = deliverable_files_search.get_sobjects()
+        deliverable_files_search = Search('twog/file')
+        deliverable_files_search.add_where('\"code\" in ({0})'.format(files_in_order_string))
+        deliverable_files_search.add_filter('classification', 'deliverable')
+        deliverable_files = deliverable_files_search.get_sobjects()
 
-    return deliverable_files
+        return deliverable_files
+    else:
+        return []
 
 
 def get_delivery_task_for_package(package_code):

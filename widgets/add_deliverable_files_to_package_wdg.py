@@ -23,14 +23,17 @@ class AddDeliverableFilesToPackageWdg(BaseRefreshWdg):
         deliverable_files = get_deliverable_files_in_order(order_sobject)
         selected_files = get_files_for_package(self.package_sobject.get_code())
 
-        deliverable_file_select_wdg = get_files_checkbox_from_file_list(deliverable_files, selected_files)
+        # Only show the selectable files and the submit button if the parent order has any deliverable files
+        if deliverable_files:
+            deliverable_file_select_wdg = get_files_checkbox_from_file_list(deliverable_files, selected_files)
+            outer_div.add(deliverable_file_select_wdg)
 
-        outer_div.add(deliverable_file_select_wdg)
+            submit_button = SubmitWdg('Submit')
+            submit_button.add_behavior(self.get_submit_button_behavior())
 
-        submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior())
-
-        outer_div.add(submit_button)
+            outer_div.add(submit_button)
+        else:
+            outer_div.add('<div>No deliverable files are available for this Order yet.</div>')
 
         return outer_div
 
