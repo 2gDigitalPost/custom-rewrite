@@ -34,6 +34,6 @@ class ComponentInstructionsWdg(BaseRefreshWdg):
         else:
             instructions_text = 'Sorry, instructions have not been added yet.'
 
-        div_wdg.add(self.parse_instruction_text(instructions_text))
+        div_wdg.add(self.parse_instruction_text(instructions_text.encode('utf-8')))
 
         return div_wdg
