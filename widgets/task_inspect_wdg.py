@@ -1,4 +1,3 @@
-import widgets.html_widgets
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.widget import ButtonNewWdg
 
@@ -7,6 +6,8 @@ from pyasm.web import DivWdg, HtmlElement
 from pyasm.widget import SelectWdg, SubmitWdg
 
 import order_builder.order_builder_utils as obu
+
+from widgets.html_widgets import get_label_widget
 
 from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
     get_task_data_out_files, get_task_instructions_text_from_instructions_code
@@ -173,6 +174,18 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         div_wdg.add(HtmlElement.h4('Component: {0} ({1})'.format(self.parent_component.get('name'),
                                                                  self.parent_component.get_code())))
 
+        div_wdg.add(HtmlElement.h4('<u>Status</u>'))
+        div_wdg.add(get_task_status_select_wdg(self.task_sobject))
+
+        div_wdg.add(HtmlElement.h4('<u>Input Files</u>'))
+        div_wdg.add(get_in_files_list(self.task_data.get_code()))
+
+        div_wdg.add(HtmlElement.h4('<u>Output Files</u>'))
+        div_wdg.add(get_out_files_list(self.task_data.get_code()))
+
+        div_wdg.add(HtmlElement.h4('<u>Equipment</u>'))
+        div_wdg.add(get_equipment_list(self.task_data.get_code()))
+
         div_wdg.add(HtmlElement.h4('<u>Instructions</u>'))
 
         instructions_code = self.parent_component.get('instructions_code')
@@ -183,11 +196,6 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
             instructions = 'Sorry, instructions have not been added yet.'
 
         div_wdg.add(self.parse_instruction_text(instructions.encode('utf-8')))
-
-        div_wdg.add(get_in_files_list(self.task_data.get_code()))
-        div_wdg.add(get_out_files_list(self.task_data.get_code()))
-        div_wdg.add(get_equipment_list(self.task_data.get_code()))
-        div_wdg.add(get_task_status_select_wdg(self.task_sobject))
 
         add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
         add_input_file_button.add_behavior(
