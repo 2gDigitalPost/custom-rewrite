@@ -17,6 +17,20 @@ def get_order_sobject_from_component_sobject(component_sobject):
     return order_sobject
 
 
+def get_order_sobject_from_task_sobject(task_sobject):
+    """
+    Given a task sobject that is attached to a twog/component, travel up the foreign keys to get the parent twog/order
+    sobject. This only works if the task is attached to a component.
+
+    :param task_sobject: sthpw/task sobject
+    :return: twog/order sobject
+    """
+
+    component_sobject = task_sobject.get_parent()
+
+    return get_order_sobject_from_component_sobject(component_sobject)
+
+
 def get_task_data_sobject_from_task_code(task_code):
     """
     Given a task code, find the task_data sobject associated with it

@@ -7,8 +7,6 @@ from pyasm.widget import SelectWdg, SubmitWdg
 
 import order_builder.order_builder_utils as obu
 
-from widgets.html_widgets import get_label_widget
-
 from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
     get_task_data_out_files, get_task_instructions_text_from_instructions_code, get_order_sobject_from_component_sobject
 
@@ -30,7 +28,6 @@ def get_in_files_list(task_data_code):
     div_wdg = DivWdg()
 
     if in_files_list:
-        div_wdg.add('<u>Input Files</u>')
         in_files_unordered_html_list = HtmlElement.ul()
 
         for file_path in sorted([in_file.get('file_path') for in_file in in_files_list]):
@@ -51,7 +48,6 @@ def get_out_files_list(task_data_code):
     div_wdg = DivWdg()
 
     if out_files_list:
-        div_wdg.add('<u>Output Files</u>')
         out_files_unordered_html_list = HtmlElement.ul()
 
         for file_path in sorted([out_file.get('file_path') for out_file in out_files_list]):
@@ -72,7 +68,6 @@ def get_equipment_list(task_data_code):
     div_wdg = DivWdg()
 
     if equipment_sobjects_list:
-        div_wdg.add(get_label_widget('Equipment:'))
         equipment_unordered_html_list = HtmlElement.ul()
 
         for name in [equipment_sobject.get('name') for equipment_sobject in equipment_sobjects_list]:

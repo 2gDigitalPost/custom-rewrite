@@ -5,10 +5,8 @@ from tactic.ui.common import BaseRefreshWdg
 from pyasm.web import DivWdg
 from pyasm.widget import SubmitWdg
 
-import order_builder.order_builder_utils as obu
-
 from common_tools.utils import get_task_data_in_files, get_task_data_sobject_from_task_code,\
-    get_client_division_sobject_for_task_sobject
+    get_client_division_sobject_for_task_sobject, get_order_sobject_from_task_sobject
 
 from input_widgets import get_file_select_wdg_from_file_list, get_file_classification_select_wdg
 
@@ -35,16 +33,20 @@ class MoveInputFileToOutputWdg(BaseRefreshWdg):
         outer_div.add(widgets.html_widgets.get_label_widget('Original File'))
         outer_div.add(get_file_select_wdg_from_file_list(files))
 
+        order_sobject = get_order_sobject_from_task_sobject(self.task_sobject)
+        order_code = order_sobject.get_code()
+
         submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior(self.task_data.get_code(),
-                                                                   self.division.get_code(),
-                                                                   self.task_sobject.get_search_key()))
+        submit_button.add_behavior(
+            self.get_submit_button_behavior(self.task_data.get_code(), self.division.get_code(), order_code,
+                                            self.task_sobject.get_search_key())
+        )
         outer_div.add(submit_button)
 
         return outer_div
 
     @staticmethod
-    def get_submit_button_behavior(task_data_code, division_code, task_search_key):
+    def get_submit_button_behavior(task_data_code, division_code, order_code, task_search_key):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -77,13 +79,17 @@ var file_code = inserted_file['code'];
 // Using the code from the saved file, insert an entry into task_data's output files
 server.insert('twog/task_data_out_file', {'task_data_code': task_data_code, 'file_code': file_code});
 
+// Also add the file to the containing order in twog/file_in_order
+var order_code = '%s'
+server.insert('twog/file_in_order', {'order_code': order_code, 'file_code': file_code})
+
 spt.app_busy.hide();
 spt.popup.close(spt.popup.get_popup(bvr.src_el));
 
 var task_search_key = '%s';
 
 spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_key});
-            ''' % (task_data_code, division_code, task_search_key)
+            ''' % (task_data_code, division_code, order_code, task_search_key)
         }
 
         return behavior
