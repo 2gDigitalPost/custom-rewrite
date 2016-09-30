@@ -9,9 +9,7 @@ class OrderBuilderLauncherWdg(BaseTableElementWdg):
     """
 
     @staticmethod
-    # def get_launch_behavior(order_code):
     def get_launch_behavior(order_search_key):
-        # TODO: Make this open a new tab rather than reloading the current one
         behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
 try {
     var order_search_key = '%s';

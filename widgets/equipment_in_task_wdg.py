@@ -57,6 +57,8 @@ class EquipmentInTaskWdg(BaseRefreshWdg):
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
+spt.app_busy.show('Saving...');
+
 // Get the server object
 var server = TacticServerStub.get();
 var containing_element = bvr.src_el.getParent("#equipment-in-task");
