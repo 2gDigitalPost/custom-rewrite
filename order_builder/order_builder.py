@@ -8,7 +8,7 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 import order_builder_utils as obu
 
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
-    get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click
+    get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order
 
 
 def get_task_data_div(task_code):
@@ -236,7 +236,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         task_div.add_style('padding-left', '10px')
         task_div.add_style('padding-top', '10px')
         task_div.add_style('border-radius', '10px')
-        task_div.add_style('width', '100%')
+        task_div.add_style('width', '90%')
 
         process_div = DivWdg()
         process_div.add_style('font-weight', 'bold')
@@ -306,9 +306,11 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         return task_div
 
-    def setup_html_list_for_components_in_order(self):
+    def setup_html_list_for_components_in_order(self, width=600):
         components_list = HtmlElement.ul()
         components_list.add_style('list-style-type', 'none')
+        components_list.add_style('margin-left', '10px')
+        components_list.add_style('padding-left', '0px')
 
         component_search = Search('twog/component')
         component_search.add_filter('order_code', self.order_sobject.get_code())
@@ -416,8 +418,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
             tasks = component.get_all_children('sthpw/task')
 
             component_task_div = DivWdg()
-            component_task_div.add_style('width', '100%')
-            component_task_div.add_style('margin-left', '30px')
+            component_task_div.add_style('width', '{0}px'.format(width - 10))
+            component_task_div.add_style('margin-left', '10px')
 
             # If there are tasks associated with the component, add them as a sub-list below it
             if tasks:
@@ -447,6 +449,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         packages_list = HtmlElement.ul()
         packages_list.add_style('list-style-type', 'none')
+        packages_list.add_style('margin-left', '10px')
+        packages_list.add_style('padding-left', '0px')
 
         for package in obu.get_packages_from_order(self.order_sobject.get_code()):
             package_div = DivWdg()
@@ -532,6 +536,59 @@ class OrderBuilderWdg(BaseRefreshWdg):
             packages_list.add(package_list_div)
 
         return packages_list
+
+    def setup_files_in_order_div(self):
+        outer_div = DivWdg()
+
+        files_in_order = get_files_for_order(self.order_sobject.get_code())
+
+        if files_in_order:
+            outer_div.add('<h4>Files in this Order</h4>')
+
+            source_files_in_order = [file_in_order for file_in_order in files_in_order
+                                     if file_in_order.get('classification') == 'source']
+            intermediate_files_in_order = [file_in_order for file_in_order in files_in_order
+                                           if file_in_order.get('classification') == 'intermediate']
+            deliverable_files_in_order = [file_in_order for file_in_order in files_in_order
+                                          if file_in_order.get('classification') == 'deliverable']
+
+            if source_files_in_order:
+                outer_div.add('<div>Source Files:</div>')
+                source_files_html_list = HtmlElement.ul()
+
+                for file_path in [source_file_in_order.get('file_path')
+                                  for source_file_in_order in source_files_in_order]:
+                    li = HtmlElement.li()
+                    li.add(file_path)
+                    source_files_html_list.add(li)
+
+                outer_div.add(source_files_html_list)
+
+            if intermediate_files_in_order:
+                outer_div.add('<div>Intermediate Files:</div>')
+                intermediate_files_html_list = HtmlElement.ul()
+
+                for file_path in [intermediate_file_in_order.get('file_path')
+                                  for intermediate_file_in_order in intermediate_files_in_order]:
+                    li = HtmlElement.li()
+                    li.add(file_path)
+                    intermediate_files_html_list.add(li)
+
+                outer_div.add(intermediate_files_html_list)
+
+            if deliverable_files_in_order:
+                outer_div.add('<div>Deliverable Files:</div>')
+                deliverable_files_html_list = HtmlElement.ul()
+
+                for file_path in [deliverable_file_in_order.get('file_path')
+                                  for deliverable_file_in_order in deliverable_files_in_order]:
+                    li = HtmlElement.li()
+                    li.add(file_path)
+                    deliverable_files_html_list.add(li)
+
+                outer_div.add(deliverable_files_html_list)
+
+        return outer_div
 
     @staticmethod
     def get_external_rejection_button_behavior():
@@ -633,19 +690,29 @@ catch(err) {
 
         order_div.add(self.setup_order_information())
 
+        components_div_width = 500
+
         components_div = DivWdg()
         components_div.add_style('display', 'inline-block')
-        components_div.add_style('width', '600px')
+        components_div.add_style('width', '{0}px'.format(components_div_width))
         components_div.add_style('float', 'left')
-        components_div.add(self.setup_html_list_for_components_in_order())
+        components_div.add(self.setup_html_list_for_components_in_order(components_div_width))
         order_div.add(components_div)
 
         packages_div = DivWdg()
         packages_div.add_style('display', 'inline-block')
-        packages_div.add_style('width', '600px')
+        packages_div.add_style('width', '500px')
         packages_div.add_style('float', 'left')
         packages_div.add(self.setup_html_list_for_packages_in_orders())
         order_div.add(packages_div)
+
+        files_div = DivWdg()
+        files_div.add_style('display', 'inline-block')
+        files_div.add_style('width', '300px')
+        files_div.add_style('float', 'left')
+        files_div.add_style('margin-left', '20px')
+        files_div.add(self.setup_files_in_order_div())
+        order_div.add(files_div)
 
         outer_div.add(order_div)
 
