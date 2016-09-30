@@ -2,7 +2,7 @@ from pyasm.search import Search
 from pyasm.web import Table
 from pyasm.widget import CheckboxWdg, SelectWdg, MultiSelectWdg
 
-from common_tools.utils import get_files_for_order
+from common_tools.utils import get_files_for_order, get_files_for_division
 from tactic.ui.input import TextInputWdg
 
 
@@ -85,33 +85,10 @@ def get_files_checkboxes_for_division(division_code, order_code):
     :return: Table (of CheckboxWdg)
     """
 
-    file_search = Search('twog/file')
-    file_search.add_filter('division_code', division_code)
-    file_search.add_filter('classification', 'source')
-    files = file_search.get_sobjects()
-
-    files_checkbox_table = Table()
-
-    header_row = files_checkbox_table.add_row()
-    header = files_checkbox_table.add_header(data='Files', row=header_row)
-    header.add_style('text-align', 'center')
-    header.add_style('text-decoration', 'underline')
-
     files_in_order = get_files_for_order(order_code)
-    files_in_order_codes = [file_in_order.get_code() for file_in_order in files_in_order]
+    files_in_division = get_files_for_division(division_code)
 
-    for file_sobject in files:
-        checkbox = CheckboxWdg(name=file_sobject.get_code())
-
-        if file_sobject.get_code() in files_in_order_codes:
-            checkbox.set_checked()
-
-        checkbox_row = files_checkbox_table.add_row()
-
-        files_checkbox_table.add_cell(data=checkbox, row=checkbox_row)
-        files_checkbox_table.add_cell(data=file_sobject.get_value('file_path'), row=checkbox_row)
-
-    return files_checkbox_table
+    return get_files_checkbox_from_file_list(files_in_division, files_in_order)
 
 
 def get_file_classification_select_wdg(width=200):

@@ -131,6 +131,22 @@ def get_files_for_order(order_code):
         return []
 
 
+def get_files_for_division(division_code):
+    """
+    Given the unique code for a twog/division sobject, get all the files that are associated with it in a list
+
+    :param division_code: twog/division sobject's unique code
+    :return: List of file sobjects (possibly empty)
+    """
+
+    file_search = Search('twog/file')
+    file_search.add_filter('division_code', division_code)
+    file_search.add_filter('classification', 'source')
+    files = file_search.get_sobjects()
+
+    return files
+
+
 def get_files_for_package(package_code):
     """
     Given the code for a package, get all the files that are associated with it in a list
