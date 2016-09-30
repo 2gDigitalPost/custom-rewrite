@@ -1,4 +1,3 @@
-from pyasm.search import Search
 from pyasm.web import Table
 from pyasm.widget import CheckboxWdg, SelectWdg, MultiSelectWdg
 

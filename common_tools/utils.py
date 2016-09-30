@@ -4,9 +4,9 @@ from pyasm.widget import SelectWdg
 
 def get_order_sobject_from_component_sobject(component_sobject):
     """
-    Given a twog/component code, get the order that it is assigned to.
+    Given a twog/component sobject, get the order that it is assigned to.
 
-    :param component_code: twog/component unique code
+    :param component_sobject: twog/component sobject
     :return: twog/order sobject
     """
 
