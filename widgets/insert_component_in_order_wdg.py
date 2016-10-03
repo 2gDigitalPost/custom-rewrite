@@ -6,8 +6,6 @@ from pyasm.search import Search
 from pyasm.web import DivWdg, Table
 from pyasm.widget import CheckboxWdg, SelectWdg, SubmitWdg
 
-import order_builder_utils as obu
-
 from common_tools.utils import get_instructions_select_wdg
 
 
@@ -64,6 +62,21 @@ def get_title_select_wdg(width=300):
         title_select_wdg.append_option(title.get_value('name'), title.get_code())
 
     return title_select_wdg
+
+
+def get_title_collection_select_wdg(width=300):
+    title_collection_select_wdg = SelectWdg('title_collection_code')
+    title_collection_select_wdg.set_id('title_collection_code')
+    title_collection_select_wdg.add_style('width', '{0}px'.format(width))
+    title_collection_select_wdg.add_empty_option()
+
+    title_collection_search = Search('twog/title_collection')
+    title_collections = title_collection_search.get_sobjects()
+
+    for title_collection in title_collections:
+        title_collection_select_wdg.append_option(title_collection.get_value('name'), title_collection.get_code())
+
+    return title_collection_select_wdg
 
 
 def get_pipeline_select_wdg(search_type, width=300):
@@ -239,6 +252,110 @@ try {
             }
 
             server.insert('twog/component', new_component);
+        }
+    }
+
+    spt.app_busy.hide();
+    spt.popup.close(spt.popup.get_popup(bvr.src_el));
+
+    var parent_widget_title = '%s';
+    var parent_widget_name = '%s';
+    var parent_widget_search_key = '%s';
+
+    spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_widget_search_key});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % (self.order_sobject.get_code(), self.parent_widget_title, self.parent_widget_name,
+        self.parent_widget_search_key)
+        }
+
+        return behavior
+
+
+class InsertComponentByTitleCollectionWdg(BaseRefreshWdg):
+    def init(self):
+        self.order_sobject = self.get_sobject_from_kwargs()
+        self.parent_widget_title = self.kwargs.get('parent_widget_title')
+        self.parent_widget_name = self.kwargs.get('parent_widget_name')
+        self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
+
+    def get_display(self):
+        outer_div = DivWdg()
+        outer_div.set_id('insert-component-in-order-by-title-collection')
+
+        outer_div.add(widgets.html_widgets.get_label_widget('Name'))
+        outer_div.add(widgets.input_widgets.get_text_input_wdg('new_component_name', 400))
+
+        outer_div.add(widgets.html_widgets.get_label_widget('Title Collection'))
+        outer_div.add(get_title_collection_select_wdg(400))
+
+        outer_div.add(get_languages_checkboxes())
+
+        outer_div.add(widgets.html_widgets.get_label_widget('Pipeline'))
+        outer_div.add(get_pipeline_select_wdg('twog/component'))
+
+        outer_div.add(widgets.html_widgets.get_label_widget('Instructions'))
+        outer_div.add(get_instructions_select_wdg())
+
+        submit_button = SubmitWdg('Submit')
+        submit_button.add_behavior(self.get_submit_button_behavior())
+        outer_div.add(submit_button)
+
+        return outer_div
+
+    def get_submit_button_behavior(self):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    spt.app_busy.show("Saving...");
+
+    // Get the server object
+    var server = TacticServerStub.get();
+    var containing_element = bvr.src_el.getParent("#insert-component-in-order-by-title-collection");
+    var new_component_values = spt.api.get_input_values(containing_element, null, false);
+
+    // Get the form values
+    var order_code = '%s';
+    // var name = new_component_values.new_component_name;
+    var pipeline_code = new_component_values.pipeline_code;
+    var instructions_code = new_component_values.instructions_select;
+    var title_collection_code = new_component_values.title_collection_code;
+
+    console.log(title_collection_code);
+
+    var title_in_title_collection_sobjects = server.eval("@SOBJECT(twog/title_in_title_collection['title_collection_code', '" + title_collection_code + "'])");
+    console.log(title_in_title_collection_sobjects);
+
+    var languages = server.eval("@SOBJECT(twog/language)");
+
+    for (var i = 0; i < languages.length; i++) {
+        var language_code = languages[i].code;
+
+        var language_checkbox_value = new_component_values[language_code];
+
+        if (language_checkbox_value == "on") {
+            var language_name = languages[i].name;
+
+            for (var j = 0; j < title_in_title_collection_sobjects.length; j++) {
+                var title_code = title_in_title_collection_sobjects[j].title_code;
+
+                var title_name = server.eval("@GET(twog/title['code', '" + title_code + "'].name)")[0];
+
+                var new_component = {
+                    'name': title_name + ' - ' + language_name,
+                    'order_code': order_code,
+                    'language_code': language_code,
+                    'pipeline_code': pipeline_code,
+                    'instructions_code': instructions_code,
+                    'title_code': title_code
+                }
+
+                server.insert('twog/component', new_component);
+            }
         }
     }
 
