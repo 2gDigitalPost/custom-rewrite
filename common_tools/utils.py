@@ -161,6 +161,20 @@ def get_files_for_division(division_code):
     return files
 
 
+def get_file_in_package_sobjects_by_package_code(package_code):
+    """
+    Given a twog/package code, get all the entries associated with it in the twog/file_in_package table
+
+    :param package_code: twog/package unique code
+    :return: List of twog/file_in_package sobjects
+    """
+    files_in_package_search = Search('twog/file_in_package')
+    files_in_package_search.add_filter('package_code', package_code)
+    files_in_package = files_in_package_search.get_sobjects()
+
+    return files_in_package
+
+
 def get_files_for_package(package_code):
     """
     Given the code for a package, get all the files that are associated with it in a list
@@ -168,9 +182,7 @@ def get_files_for_package(package_code):
     :param package_code: twog/package sobject's unique code
     :return: List of file sobjects
     """
-    files_in_package_search = Search('twog/file_in_package')
-    files_in_package_search.add_filter('package_code', package_code)
-    files_in_package = files_in_package_search.get_sobjects()
+    files_in_package = get_file_in_package_sobjects_by_package_code(package_code)
 
     if len(files_in_package) > 0:
         files_in_package_string = ','.join(
@@ -184,6 +196,13 @@ def get_files_for_package(package_code):
         return files
     else:
         return []
+
+
+def get_file_in_package_status(file_sobject):
+    task_list = file_sobject.get_all_children('sthpw/task')
+    task = task_list[0]
+
+    return task.get('status')
 
 
 def get_instructions_select_wdg():

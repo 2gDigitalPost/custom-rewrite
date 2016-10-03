@@ -8,7 +8,8 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 import order_builder_utils as obu
 
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
-    get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order
+    get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order,\
+    get_file_in_package_status, get_file_in_package_sobjects_by_package_code
 
 
 def get_task_data_div(task_code):
@@ -526,6 +527,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             package_div.add(package_delivery_task_div)
             package_div.add(package_platform_div)
 
+            files_in_package_sobjects = get_file_in_package_sobjects_by_package_code(package.get_code())
             files_in_package_list = get_files_for_package(package.get_code())
 
             if files_in_package_list:
@@ -533,9 +535,20 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
                 unordered_html_list = HtmlElement.ul()
 
-                for file_path in [file_in_package.get('file_path') for file_in_package in files_in_package_list]:
+                # for file_path in [file_in_package.get('file_path') for file_in_package in files_in_package_list]:
+                    # li = HtmlElement.li()
+                    # li.add(file_path)
+                    # unordered_html_list.add(li)
+
+                    # package_div.add(unordered_html_list)
+
+                for file_sobject, file_in_package_sobject in zip(files_in_package_list, files_in_package_sobjects):
                     li = HtmlElement.li()
-                    li.add(file_path)
+
+                    task_status = get_file_in_package_status(file_in_package_sobject)
+                    text = file_sobject.get('file_path') + ' - Status: ' + task_status
+
+                    li.add(text)
                     unordered_html_list.add(li)
 
                     package_div.add(unordered_html_list)
