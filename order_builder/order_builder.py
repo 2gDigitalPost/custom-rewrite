@@ -403,6 +403,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
             )
             change_title_button.add_style('display', 'inline-block')
 
+            change_pipeline_button = ButtonNewWdg(title='Change Pipeline', icon='PIPELINE')
+            change_pipeline_button.add_behavior(
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Change Pipeline', 'widgets.AssignPipelineWdg', component.get_search_key(),
+                    'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+                )
+            )
+            change_pipeline_button.add_style('display', 'inline-block')
+
             add_tasks_from_pipeline_wdg = ButtonNewWdg(title='Add Tasks from Pipeline', icon='INSERT_MULTI')
             add_tasks_from_pipeline_wdg.add_behavior(get_load_assign_tasks_wdg(component.get_search_key()))
             add_tasks_from_pipeline_wdg.add_style('display', 'inline-block')
@@ -422,6 +431,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div.add(instructions_button)
             button_row_div.add(change_instructions_button)
             button_row_div.add(change_title_button)
+            button_row_div.add(change_pipeline_button)
             button_row_div.add(add_tasks_from_pipeline_wdg)
             button_row_div.add(add_task_button)
             button_row_div.add(note_button)
