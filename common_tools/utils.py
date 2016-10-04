@@ -175,18 +175,17 @@ def get_file_in_package_sobjects_by_package_code(package_code):
     return files_in_package
 
 
-def get_files_for_package(package_code):
+def get_file_sobjects_from_file_in_package_sobjects(file_in_package_sobjects):
     """
-    Given the code for a package, get all the files that are associated with it in a list
+    Given a list of twog/file_in_package sobjects, return a list containing the actual twog/file sobjects associated
+    with those entries.
 
-    :param package_code: twog/package sobject's unique code
-    :return: List of file sobjects
+    :param file_in_package_sobjects: List of twog/file_in_package sobjects
+    :return: List of twog/file sobjects
     """
-    files_in_package = get_file_in_package_sobjects_by_package_code(package_code)
-
-    if len(files_in_package) > 0:
+    if len(file_in_package_sobjects) > 0:
         files_in_package_string = ','.join(
-            ["'{0}'".format(file_in_package.get('file_code')) for file_in_package in files_in_package]
+            ["'{0}'".format(file_in_package.get('file_code')) for file_in_package in file_in_package_sobjects]
         )
 
         files_search = Search('twog/file')
@@ -196,6 +195,19 @@ def get_files_for_package(package_code):
         return files
     else:
         return []
+
+
+def get_files_for_package(package_code):
+    """
+    Given the code for a package, get all the files that are associated with it in a list
+
+    :param package_code: twog/package sobject's unique code
+    :return: List of file sobjects
+    """
+    files_in_package = get_file_in_package_sobjects_by_package_code(package_code)
+    files = get_file_sobjects_from_file_in_package_sobjects(files_in_package)
+
+    return files
 
 
 def get_file_in_package_status(file_sobject):

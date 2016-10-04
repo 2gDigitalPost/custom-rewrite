@@ -1,3 +1,4 @@
+from pyasm.biz import Pipeline
 from pyasm.web import Table
 from pyasm.widget import CheckboxWdg, SelectWdg, MultiSelectWdg
 
@@ -116,3 +117,38 @@ def get_text_input_wdg(name, width=200):
     textbox_wdg.add_style('width', '{0}px'.format(width))
 
     return textbox_wdg
+
+
+def get_task_status_select_wdg(task_sobject):
+    """
+    Given a sthpw/task sobject, return a SelectWdg with all its potential status options. This is done by looking up
+    what those options are through the parent Pipeline.
+
+    :param task_sobject: sthpw/task sobject
+    :return: SelectWdg
+    """
+
+    task_status_select = SelectWdg('task_status_select')
+    task_status_select.set_id('task_status_select')
+    task_status_select.add_style('width: 165px;')
+    task_status_select.add_empty_option()
+
+    task_pipe_code = task_sobject.get_value('pipeline_code')
+
+    # if the current task has no pipeline, then search for
+    # any task pipeline
+    if not task_pipe_code:
+        # just use the default
+        task_pipe_code = 'task'
+
+    pipeline = Pipeline.get_by_code(task_pipe_code)
+    if not pipeline:
+        pipeline = Pipeline.get_by_code('task')
+
+    for status in pipeline.get_process_names():
+        task_status_select.append_option(status, status)
+
+    if task_sobject.get('status'):
+        task_status_select.set_value(task_sobject.get('status'))
+
+    return task_status_select

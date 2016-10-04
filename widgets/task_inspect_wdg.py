@@ -1,14 +1,15 @@
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.widget import ButtonNewWdg
 
-from pyasm.biz import Pipeline
 from pyasm.web import DivWdg, HtmlElement
-from pyasm.widget import SelectWdg, SubmitWdg
+from pyasm.widget import SubmitWdg
 
 import order_builder.order_builder_utils as obu
 
 from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
     get_task_data_out_files, get_task_instructions_text_from_instructions_code, get_order_sobject_from_component_sobject
+
+from widgets.input_widgets import get_task_status_select_wdg
 
 
 def get_page_header(string):
@@ -80,33 +81,6 @@ def get_equipment_list(task_data_code):
         div_wdg.add('No equipment is assigned to this task')
 
     return div_wdg
-
-
-def get_task_status_select_wdg(task_sobject):
-    task_status_select = SelectWdg('task_status_select')
-    task_status_select.set_id('task_status_select')
-    task_status_select.add_style('width: 135px;')
-    task_status_select.add_empty_option()
-
-    task_pipe_code = task_sobject.get_value('pipeline_code')
-
-    # if the current task has no pipeline, then search for
-    # any task pipeline
-    if not task_pipe_code:
-        # just use the default
-        task_pipe_code = 'task'
-
-    pipeline = Pipeline.get_by_code(task_pipe_code)
-    if not pipeline:
-        pipeline = Pipeline.get_by_code('task')
-
-    for status in pipeline.get_process_names():
-        task_status_select.append_option(status, status)
-
-    if task_sobject.get('status'):
-        task_status_select.set_value(task_sobject.get('status'))
-
-    return task_status_select
 
 
 class TaskInspectWdg(BaseRefreshWdg):

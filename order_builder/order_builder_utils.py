@@ -372,6 +372,26 @@ catch(err) {
     return behavior
 
 
+def load_package_inspect_widget(task_search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    var package_search_key = '%s';
+
+    spt.tab.add_new('package_inspect_' + package_search_key, 'Package', 'widgets.PackageInspectWdg',
+                    {'search_key': package_search_key});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % task_search_key
+    }
+
+    return behavior
+
+
 def get_load_popup_widget_behavior(widget_title, widget_name, search_key):
     behavior = {
         'css_class': 'clickme',

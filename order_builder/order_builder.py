@@ -521,6 +521,10 @@ class OrderBuilderWdg(BaseRefreshWdg):
             )
             add_deliverable_file_to_package_button.add_style('display', 'inline-block')
 
+            inspect_package_button = ButtonNewWdg(title='Inspect', icon='WORK')
+            inspect_package_button.add_behavior(obu.load_package_inspect_widget(package.get_search_key()))
+            inspect_package_button.add_style('display', 'inline-block')
+
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(obu.get_add_notes_behavior(package.get_search_key()))
             note_button.add_style('display', 'inline-block')
@@ -528,6 +532,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(add_deliverable_file_to_package_button)
+            button_row_div.add(inspect_package_button)
             button_row_div.add(note_button)
 
             package_div.add(package_name_div)
