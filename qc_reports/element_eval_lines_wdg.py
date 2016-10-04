@@ -77,7 +77,7 @@ try {
         line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
         line_data['scale'] = document.getElementById("scale-" + String(i)).value;
         line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
+        line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
 
         var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
                                                  'twog');
@@ -157,7 +157,7 @@ try {
         line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
         line_data['scale'] = document.getElementById("scale-" + String(i)).value;
         line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        line_data['in_source'] = document.getElementById("in-source-" + String(i))[0].value;
+        line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
 
         var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
                                                  'twog');
