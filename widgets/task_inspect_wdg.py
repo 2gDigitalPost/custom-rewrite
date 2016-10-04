@@ -134,6 +134,17 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
 
         return behavior
 
+    def get_buttons_row(self):
+        outer_div = DivWdg()
+
+        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+        note_button.add_behavior(obu.get_add_notes_behavior(self.task_sobject.get_search_key()))
+        note_button.add_style('display', 'inline-block')
+
+        outer_div.add(note_button)
+
+        return outer_div
+
     def get_display(self):
         div_wdg = DivWdg()
         div_wdg.set_id('task_inspect_{0}'.format(self.task_sobject.get_code()))
@@ -207,6 +218,8 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
             instructions = 'Sorry, instructions have not been added yet.'
 
         div_wdg.add(self.parse_instruction_text(instructions.encode('utf-8')))
+
+        div_wdg.add(self.get_buttons_row())
 
         submit_button = SubmitWdg('Submit Changes')
         submit_button.add_behavior(self.submit_button_behavior())

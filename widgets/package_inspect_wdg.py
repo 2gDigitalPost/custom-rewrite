@@ -44,6 +44,17 @@ class PackageInspectWdg(BaseRefreshWdg):
 
         return outer_div
 
+    def get_buttons_row(self):
+        outer_div = DivWdg()
+
+        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+        note_button.add_behavior(obu.get_add_notes_behavior(self.package_sobject.get_search_key()))
+        note_button.add_style('display', 'inline-block')
+
+        outer_div.add(note_button)
+
+        return outer_div
+
     def get_display(self):
         outer_div = DivWdg()
         outer_div.set_id('package_inspect_{0}'.format(self.package_sobject.get_code()))
@@ -64,5 +75,7 @@ class PackageInspectWdg(BaseRefreshWdg):
 
         outer_div.add(HtmlElement.h4('<u>Files</u>'))
         outer_div.add(self.get_files_list())
+
+        outer_div.add(self.get_buttons_row())
 
         return outer_div
