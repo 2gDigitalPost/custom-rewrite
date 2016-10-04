@@ -246,7 +246,13 @@ def get_instructions_template_select_wdg():
     instructions_template_select_wdg = SelectWdg('instructions_template_select')
     instructions_template_select_wdg.set_id('instructions_template_select')
     instructions_template_select_wdg.add_empty_option()
-    instructions_template_select_wdg.set_search_for_options(instructions_search, 'code', 'name')
+
+    instructions_sobjects = instructions_search.get_sobjects()
+    instructions_sobjects = sorted(instructions_sobjects, key=lambda sobject: sobject.get('name'))
+
+    for instructions_sobject in instructions_sobjects:
+        instructions_template_select_wdg.append_option(instructions_sobject.get('name'),
+                                                       instructions_sobject.get_code())
 
     return instructions_template_select_wdg
 

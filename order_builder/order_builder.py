@@ -394,6 +394,16 @@ class OrderBuilderWdg(BaseRefreshWdg):
             )
             change_instructions_button.add_style('display', 'inline-block')
 
+            add_instructions_from_template_button = ButtonNewWdg(title='Add Instructions From Template', icon='')
+            add_instructions_from_template_button.add_behavior(
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Add Instructions From Template', 'widgets.AddInstructionsFromTemplateWdg',
+                    component.get_search_key(), 'Order Builder', 'order_builder.OrderBuilderWdg',
+                    self.order_sobject.get_search_key()
+                )
+            )
+            add_instructions_from_template_button.add_style('display', 'inline-block')
+
             change_title_button = ButtonNewWdg(title='Change Title', icon='')
             change_title_button.add_behavior(
                 obu.get_load_popup_widget_with_reload_behavior(
@@ -430,6 +440,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(instructions_button)
             button_row_div.add(change_instructions_button)
+            button_row_div.add(add_instructions_from_template_button)
             button_row_div.add(change_title_button)
             button_row_div.add(change_pipeline_button)
             button_row_div.add(add_tasks_from_pipeline_wdg)
