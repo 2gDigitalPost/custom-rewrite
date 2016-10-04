@@ -47,10 +47,21 @@ class PackageInspectWdg(BaseRefreshWdg):
     def get_buttons_row(self):
         outer_div = DivWdg()
 
+        edit_all_statuses_button = ButtonNewWdg(title='Edit All Statuses')
+        edit_all_statuses_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Change Statuses', 'widgets.ChangeMultipleFileStatusesOnPackageWdg',
+                self.package_sobject.get_search_key(), 'Package', 'widgets.PackageInspectWdg',
+                self.package_sobject.get_search_key()
+            )
+        )
+        edit_all_statuses_button.add_style('display', 'inline-block')
+
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(self.package_sobject.get_search_key()))
         note_button.add_style('display', 'inline-block')
 
+        outer_div.add(edit_all_statuses_button)
         outer_div.add(note_button)
 
         return outer_div
