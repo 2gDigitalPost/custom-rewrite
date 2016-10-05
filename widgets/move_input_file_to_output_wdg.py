@@ -23,7 +23,7 @@ class MoveInputFileToOutputWdg(BaseRefreshWdg):
         outer_div.set_id('move_input_file_to_output')
 
         outer_div.add(widgets.html_widgets.get_label_widget('Path'))
-        outer_div.add(widgets.input_widgets.get_text_input_wdg('new_file_path', 800))
+        outer_div.add(widgets.input_widgets.get_text_input_wdg('new_file_for_task_path', 800))
 
         outer_div.add(widgets.html_widgets.get_label_widget('Classification'))
         outer_div.add(get_file_classification_select_wdg())
@@ -59,7 +59,7 @@ var values = spt.api.get_input_values(containing_element, null, false);
 // Get the form values
 var task_data_code = '%s';
 
-var file_path = values["new_file_path"];
+var file_path = values["new_file_for_task_path"];
 var classification = values["file_classification_select"];
 var original_file_code = values["file_select"];
 var division_code = '%s';
