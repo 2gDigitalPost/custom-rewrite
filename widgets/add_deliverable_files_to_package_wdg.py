@@ -1,5 +1,6 @@
 from tactic.ui.common import BaseRefreshWdg
 
+from pyasm.search import Search
 from pyasm.web import DivWdg
 from pyasm.widget import SubmitWdg
 
@@ -19,7 +20,11 @@ class AddDeliverableFilesToPackageWdg(BaseRefreshWdg):
         outer_div = DivWdg()
         outer_div.set_id('add_deliverable_files_to_package')
 
-        order_sobject = self.package_sobject.get_parent()
+        order_code = self.package_sobject.get('order_code')
+        order_search = Search('twog/order')
+        order_search.add_code_filter(order_code)
+        order_sobject = order_search.get_sobject()
+
         deliverable_files = get_deliverable_files_in_order(order_sobject)
         selected_files = get_files_for_package(self.package_sobject.get_code())
 
