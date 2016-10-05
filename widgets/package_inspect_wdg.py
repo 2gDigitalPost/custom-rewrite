@@ -27,7 +27,7 @@ class PackageInspectWdg(BaseRefreshWdg):
             file_li = HtmlElement.li()
             file_li.add(file_sobject.get('file_path') + ' - ' + task_sobject.get('status'))
 
-            change_status_button = ButtonNewWdg(title='Change Status')
+            change_status_button = ButtonNewWdg(title='Change Status', icon='EDIT')
             change_status_button.add_behavior(
                 obu.get_load_popup_widget_with_reload_behavior(
                     'Change Status', 'widgets.ChangeStatusWdg', task_sobject.get_search_key(),
@@ -47,7 +47,7 @@ class PackageInspectWdg(BaseRefreshWdg):
     def get_buttons_row(self):
         outer_div = DivWdg()
 
-        edit_all_statuses_button = ButtonNewWdg(title='Edit All Statuses')
+        edit_all_statuses_button = ButtonNewWdg(title='Edit All Statuses', icon='EDIT')
         edit_all_statuses_button.add_behavior(
             obu.get_load_popup_widget_with_reload_behavior(
                 'Change Statuses', 'widgets.ChangeMultipleFileStatusesOnPackageWdg',
@@ -72,7 +72,7 @@ class PackageInspectWdg(BaseRefreshWdg):
 
         task_sobject = self.package_sobject.get_all_children('sthpw/task')[0]
 
-        change_status_button = ButtonNewWdg(title='Change Status')
+        change_status_button = ButtonNewWdg(title='Change Status', icon='EDIT')
         change_status_button.add_behavior(
             obu.get_load_popup_widget_with_reload_behavior(
                 'Change Status', 'widgets.ChangeStatusWdg', task_sobject.get_search_key(),

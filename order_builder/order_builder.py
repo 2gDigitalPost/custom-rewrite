@@ -399,7 +399,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             )
             change_instructions_button.add_style('display', 'inline-block')
 
-            add_instructions_from_template_button = ButtonNewWdg(title='Add Instructions From Template', icon='')
+            add_instructions_from_template_button = ButtonNewWdg(title='Add Instructions From Template', icon='EDIT')
             add_instructions_from_template_button.add_behavior(
                 obu.get_load_popup_widget_with_reload_behavior(
                     'Add Instructions From Template', 'widgets.AddInstructionsFromTemplateWdg',
