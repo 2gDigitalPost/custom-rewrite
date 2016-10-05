@@ -566,13 +566,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
                 unordered_html_list = HtmlElement.ul()
 
-                # for file_path in [file_in_package.get('file_path') for file_in_package in files_in_package_list]:
-                    # li = HtmlElement.li()
-                    # li.add(file_path)
-                    # unordered_html_list.add(li)
-
-                    # package_div.add(unordered_html_list)
-
                 for file_sobject, file_in_package_sobject in zip(files_in_package_list, files_in_package_sobjects):
                     li = HtmlElement.li()
 

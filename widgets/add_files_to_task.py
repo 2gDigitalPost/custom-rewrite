@@ -132,13 +132,13 @@ class CreateNewInputFileForTaskWdg(BaseRefreshWdg):
 
         order_search = Search('twog/order')
         order_search.add_code_filter(component.get('order_code'))
-        order = order_search.get_sobject()
+        self.order_sobject = order_search.get_sobject()
 
-        self.order_files = get_files_for_order(order.get_code())
+        self.order_files = get_files_for_order(self.order_sobject.get_code())
         self.selected_files = get_task_data_in_files(self.task_data.get_code())
 
     @staticmethod
-    def get_submit_button_behavior(task_data_code, division_code, task_search_key):
+    def get_submit_button_behavior(task_data_code, division_code, order_code, task_search_key):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -169,13 +169,18 @@ var file_code = inserted_file['code'];
 // Using the code from the saved file, insert an entry into task_data's input files
 server.insert('twog/task_data_in_file', {'task_data_code': task_data_code, 'file_code': file_code});
 
+// Also insert an entry into the file_in_order table, since this file is part of the order
+var order_code = '%s';
+
+server.insert('twog/file_in_order', {'file_code': file_code, 'order_code': order_code});
+
 spt.app_busy.hide();
 spt.popup.close(spt.popup.get_popup(bvr.src_el));
 
 var task_search_key = '%s';
 
 spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_key});
-            ''' % (task_data_code, division_code, task_search_key)
+            ''' % (task_data_code, division_code, order_code, task_search_key)
         }
 
         return behavior
@@ -193,6 +198,7 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.get_submit_button_behavior(self.task_data.get_code(),
                                                                    self.division.get_code(),
+                                                                   self.order_sobject.get_code(),
                                                                    self.task_sobject.get_search_key()))
 
         outer_div.add(submit_button)
