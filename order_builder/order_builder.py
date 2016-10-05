@@ -144,26 +144,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
         else:
             description_div.add('No description available')
 
-        add_packages_button = ButtonNewWdg(title='Add Package', icon='INSERT')
-        add_packages_button.add_behavior(
-            obu.get_load_popup_widget_with_reload_behavior('Insert Package', 'order_builder.InsertPackageInOrderWdg',
-                                                           self.order_sobject.get_search_key(), 'Order Builder',
-                                                           'order_builder.OrderBuilderWdg',
-                                                           self.order_sobject.get_search_key())
-        )
-
-        add_packages_button.add_style('display', 'inline-block')
-
-        add_packages_by_platform = ButtonNewWdg(title='Add Package By Platform', icon='INSERT_MULTI')
-        add_packages_by_platform.add_behavior(
-            obu.get_load_popup_widget_with_reload_behavior('Insert Packages by Platform',
-                                                           'order_builder.InsertPackageByPlatformWdg',
-                                                           self.order_sobject.get_search_key(), 'Order Builder',
-                                                           'order_builder.OrderBuilderWdg',
-                                                           self.order_sobject.get_search_key())
-        )
-        add_packages_by_platform.add_style('display', 'inline-block')
-
         add_component_button = ButtonNewWdg(title='Add Component', icon='INSERT')
         add_component_button.add_behavior(
             obu.get_load_popup_widget_with_reload_behavior(
@@ -193,6 +173,26 @@ class OrderBuilderWdg(BaseRefreshWdg):
             )
         )
         add_component_by_title_collection_button.add_style('display', 'inline-block')
+
+        add_packages_button = ButtonNewWdg(title='Add Package', icon='INSERT')
+        add_packages_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior('Insert Package', 'order_builder.InsertPackageInOrderWdg',
+                                                           self.order_sobject.get_search_key(), 'Order Builder',
+                                                           'order_builder.OrderBuilderWdg',
+                                                           self.order_sobject.get_search_key())
+        )
+
+        add_packages_button.add_style('display', 'inline-block')
+
+        add_packages_by_platform = ButtonNewWdg(title='Add Package By Platform', icon='INSERT_MULTI')
+        add_packages_by_platform.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior('Insert Packages by Platform',
+                                                           'order_builder.InsertPackageByPlatformWdg',
+                                                           self.order_sobject.get_search_key(), 'Order Builder',
+                                                           'order_builder.OrderBuilderWdg',
+                                                           self.order_sobject.get_search_key())
+        )
+        add_packages_by_platform.add_style('display', 'inline-block')
 
         add_file_to_order_button = ButtonNewWdg(title='Add Files to Order', icon='ADD')
         add_file_to_order_button.add_behavior(
@@ -228,11 +228,11 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(client_name_div)
         order_div.add(po_number_div)
         order_div.add(description_div)
-        order_div.add(add_packages_button)
-        order_div.add(add_packages_by_platform)
         order_div.add(add_component_button)
         order_div.add(add_component_by_language_button)
         order_div.add(add_component_by_title_collection_button)
+        order_div.add(add_packages_button)
+        order_div.add(add_packages_by_platform)
         order_div.add(add_file_to_order_button)
         order_div.add(create_file_for_order_button)
         order_div.add(note_button)
