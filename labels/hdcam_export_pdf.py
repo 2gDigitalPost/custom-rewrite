@@ -10,11 +10,11 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
 from reportlab.platypus.flowables import HRFlowable
 
-from reportlab.pdfgen import canvas
+from reportlab.pdfgen import canvas as reportlab_canvas
 from reportlab.lib.units import cm, inch
 
 def main():
-    c = canvas.Canvas("rotate.pdf")
+    c = reportlab_canvas.Canvas("rotate.pdf")
 
     c.saveState()
     c.setFont("Helvetica-Oblique", 8)
@@ -182,60 +182,66 @@ def main():
 
 
 
-
-
     c.restoreState()
-
     c.saveState()
-    '''
-    c.translate(2.34375 * inch, 0.125 * inch)
+
+    translate_x = 2.5
+    translate_y = 0.125
+
+    c.translate(translate_x * inch, translate_y * inch)
     c.rotate(90)
 
-    c.setFont("Helvetica", 12)
-    c.drawString(0, 2.2 * inch, '2G018653')
+    draw_side_binding(c, translate_x, translate_y)
 
-    image = Image(os.path.dirname(os.path.realpath(__file__)) + '/2g_logo.png')
-    image.drawHeight = .70 * inch * image.drawHeight / image.drawWidth
-    image.drawWidth = .70 * inch
-
-    image.drawOn(c, 0, 1.4 * inch)
-
-    paragraph1 = Paragraph('CH{0:02d}: {1}'.format(iterator + 1, channel_pair[0]), paragraph_style)
-
-    width1, height1 = paragraph1.wrap(1.2 * inch, 50)
-
-    c.setFont('Helvetica', 6)
-    c.drawString(0, 1.2 * inch, '2g Digital Post, Inc.')
-    c.drawString(0, 1.1 * inch, '280 East Magnolia Blvd')
-    c.drawString(0, 1.0 * inch, 'Burbank, CA 91502')
-    c.drawString(0, 0.9 * inch, '818.863.8900')
-    c.drawString(0, 0.7 * inch, '2016-08-17')
-    c.drawString(0, 0.6 * inch, 'Std: 1080')
-    c.drawString(0, 0.5 * inch, 'FR: 23.98PsF')
-    c.drawString(0, 0.4 * inch, 'Part: 1 of 1')
-    c.drawString(0, 0.3 * inch, 'TRT: 114:17')
-    '''
-
-    draw_side_binding(c, 2.5, 0.125)
+    draw_section_five(c)
 
     c.restoreState()
     c.saveState()
 
-    draw_side_binding(c, 5.2, 0.125)
+    translate_x = 5.2
+
+    c.translate(translate_x * inch, translate_y * inch)
+    c.rotate(90)
+
+    draw_side_binding(c, translate_x, translate_y)
+
+    c.drawString(1.3125 * inch, 2.2 * inch, "Sony")
+    c.setFont("Helvetica", 10)
+    c.drawString(1.3125 * inch, 2.0 * inch, "That's My Boy")
+
+    c.setFont("Helvetica", 8)
+    c.drawString(1.3125 * inch, 1.85 * inch, "Version: Theatrical")
+    c.drawString(1.3125 * inch, 1.76 * inch, "Latin American Spanish Foreign Language Master")
+    c.drawString(1.3125 * inch, 1.57 * inch, "Aspect Ratio: 16x9 1.78 Full Frame")
+    c.drawString(1.3125 * inch, 1.28 * inch, "Textless: Textless at Tail")
 
     c.restoreState()
     c.saveState()
 
-    draw_side_binding(c, 8.3, 0.125)
+    translate_x = 8.3
+
+    c.translate(translate_x * inch, translate_y * inch)
+    c.rotate(90)
+
+    draw_side_binding(c, translate_x, translate_y)
+
+    c.drawString(1.3125 * inch, 2.6 * inch, "Sony")
+    c.setFont("Helvetica", 10)
+    c.drawString(1.3125 * inch, 2.4 * inch, "That's My Boy")
+
+    c.setFont("Helvetica", 5)
+    c.drawString(1.3125 * inch, 2.25 * inch, "Version: Theatrical")
+    c.drawString(1.3125 * inch, 2.16 * inch, "Latin American Spanish Foreign Language Master")
+    c.drawString(1.3125 * inch, 2.07 * inch, "Aspect Ratio: 16x9 1.78 Full Frame")
+    c.drawString(1.3125 * inch, 1.98 * inch, "Textless: Textless at Tail")
+
+
 
     c.showPage()
     c.save()
 
 
 def draw_side_binding(canvas, translate_x, translate_y):
-    canvas.translate(translate_x * inch, translate_y * inch)
-    canvas.rotate(90)
-
     canvas.setFont("Helvetica", 12)
     canvas.drawString(0, 2.2 * inch, '2G018653')
 
@@ -244,10 +250,6 @@ def draw_side_binding(canvas, translate_x, translate_y):
     image.drawWidth = .70 * inch
 
     image.drawOn(canvas, 0, 1.4 * inch)
-
-    # paragraph1 = Paragraph('CH{0:02d}: {1}'.format(iterator + 1, channel_pair[0]), paragraph_style)
-
-    # width1, height1 = paragraph1.wrap(1.2 * inch, 50)
 
     paragraph_style = ParagraphStyle('paraStyle')
     paragraph_style.fontSize = 6
@@ -273,16 +275,45 @@ def draw_side_binding(canvas, translate_x, translate_y):
 
         current_y -= .1
 
-    canvas.setFont('Helvetica', 6)
-    # canvas.drawString(0, 1.2 * inch, '2g Digital Post, Inc.')
-    # canvas.drawString(0, 1.1 * inch, '280 East Magnolia Blvd')
-    # canvas.drawString(0, 1.0 * inch, 'Burbank, CA 91502')
-    # canvas.drawString(0, 0.9 * inch, '818.863.8900')
-    # canvas.drawString(0, 0.8 * inch, '2016-08-17')
-    # canvas.drawString(0, 0.7 * inch, 'Std: 1080')
-    # canvas.drawString(0, 0.6 * inch, 'FR: 23.98PsF')
-    # canvas.drawString(0, 0.5 * inch, 'Part: 1 of 1')
-    # canvas.drawString(0, 0.4 * inch, 'TRT: 114:17')
+
+def draw_section_five(canvas):
+
+    client = 'Sony'
+    title = "That's My Boy"
+    version = 'Version: Theatrical'
+    language = 'Latin American Spanish Foreign Language Master'
+    aspect_ratio = 'Aspect Ratio: 16x9 1.78 Full Frame'
+    textless = 'Textless: Textless at Tail'
+
+    client_paragraph_style = ParagraphStyle('clientStyle')
+    client_paragraph_style.fontSize = 8
+    client_paragraph_style.leading = 10
+
+    client_paragraph = Paragraph(client, client_paragraph_style)
+    client_paragraph.wrap(2.0 * inch, 0.6 * inch)
+    client_paragraph.drawOn(canvas, 1.3125 * inch, 2.2 * inch)
+
+    title_paragraph_style = ParagraphStyle('titleStyle')
+    title_paragraph_style.fontSize = 10
+    title_paragraph_style.leading = 12
+
+    title_paragraph = Paragraph(title, title_paragraph_style)
+    title_paragraph.wrap(2.0 * inch, 1.0 * inch)
+    title_paragraph.drawOn(canvas, 1.3125 * inch, 2.0 * inch)
+
+    paragraph_style = ParagraphStyle('detailStyle')
+    paragraph_style.fontSize = 6
+    paragraph_style.leading = 8
+
+    current_height = 1.95 * inch
+
+    for detail_text in (version, language, aspect_ratio, textless):
+        paragraph = Paragraph(detail_text, paragraph_style)
+        paragraph.wrap(2.0 * inch, 0.6 * inch)
+
+        current_height -= paragraph.height
+
+        paragraph.drawOn(canvas, 1.3125 * inch, current_height)
 
 
 if __name__ == '__main__':
