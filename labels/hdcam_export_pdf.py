@@ -17,6 +17,14 @@ from reportlab.lib.units import cm, inch
 def main():
     canvas = reportlab_canvas.Canvas("hdcam.pdf")
 
+    client = 'Sony'
+    title = "That's My Boy"
+    version = 'Version: Theatrical'
+    language = 'Latin American Spanish Foreign Language Master'
+    aspect_ratio = 'Aspect Ratio: 16x9 1.78 Full Frame'
+    textless = 'Textless: Textless at Tail'
+    barcode = '2G018653'
+
     channel_one_text = 'Latin American Spanish Left Total'
     channel_two_text = 'Latin American Spanish Right Total'
     channel_three_text = 'English Left Total'
@@ -44,7 +52,7 @@ def main():
     ]
 
     canvas.saveState()
-    draw_section_one(canvas, channel_pairs)
+    draw_section_one(canvas, client, title, version, language, aspect_ratio, textless, barcode, channel_pairs)
     canvas.restoreState()
 
 
@@ -148,7 +156,7 @@ def main():
     canvas.rotate(90)
 
     draw_side_binding(canvas)
-    draw_section_five(canvas)
+    draw_section_five(canvas, client, title, version, language, aspect_ratio, textless)
 
     canvas.restoreState()
     canvas.saveState()
@@ -159,7 +167,7 @@ def main():
     canvas.rotate(90)
 
     draw_side_binding(canvas)
-    draw_section_six(canvas)
+    draw_section_six(canvas, client, title, version, language, aspect_ratio, textless)
 
     canvas.restoreState()
     canvas.saveState()
@@ -170,25 +178,25 @@ def main():
     canvas.rotate(90)
 
     draw_side_binding(canvas)
-    draw_section_seven(canvas)
+    draw_section_seven(canvas, client, title, version, language, aspect_ratio, textless)
 
     canvas.showPage()
     canvas.save()
 
 
-def draw_section_one(canvas, channel_list):
+def draw_section_one(canvas, client, title, version, language, aspect_ratio, textless, barcode, channel_list):
     canvas.setFont("Helvetica-Oblique", 8)
     canvas.translate(.25 * inch, 8.75 * inch)
-    canvas.drawString(0, 2.6 * inch, "Sony")
+    canvas.drawString(0, 2.6 * inch, client)
 
     canvas.setFont("Helvetica", 12)
-    canvas.drawString(0, 2.4 * inch, "That's My Boy")
+    canvas.drawString(0, 2.4 * inch, title)
 
     canvas.setFont("Helvetica", 7)
-    canvas.drawString(0, 2.25 * inch, "Version: Theatrical")
-    canvas.drawString(0, 2.10 * inch, "Latin American Spanish Foreign Language Master")
-    canvas.drawString(0, 1.95 * inch, "Aspect Ratio: 16x9 1.78 Full Frame")
-    canvas.drawString(0, 1.8 * inch, "Textless: Textless at Tail")
+    canvas.drawString(0, 2.25 * inch, version)
+    canvas.drawString(0, 2.10 * inch, language)
+    canvas.drawString(0, 1.95 * inch, aspect_ratio)
+    canvas.drawString(0, 1.8 * inch, textless)
 
     canvas.setFont("Helvetica", 6)
 
@@ -217,7 +225,7 @@ def draw_section_one(canvas, channel_list):
     canvas.saveState()
     canvas.setFont("Helvetica", 12)
     canvas.translate(2.8 * inch, 8.75 * inch)
-    canvas.drawString(0, 2.6 * inch, '2G018653')
+    canvas.drawString(0, 2.6 * inch, barcode)
 
     image = Image(os.path.dirname(os.path.realpath(__file__)) + '/2g_logo.png')
     image.drawHeight = .70 * inch * image.drawHeight / image.drawWidth
@@ -272,15 +280,7 @@ def draw_side_binding(canvas):
         current_y -= .1
 
 
-def draw_section_five(canvas):
-
-    client = 'Sony'
-    title = "That's My Boy"
-    version = 'Version: Theatrical'
-    language = 'Latin American Spanish Foreign Language Master'
-    aspect_ratio = 'Aspect Ratio: 16x9 1.78 Full Frame'
-    textless = 'Textless: Textless at Tail'
-
+def draw_section_five(canvas, client, title, version, language, aspect_ratio, textless):
     client_paragraph_style = ParagraphStyle('clientStyle')
     client_paragraph_style.fontSize = 8
     client_paragraph_style.leading = 10
@@ -312,15 +312,7 @@ def draw_section_five(canvas):
         paragraph.drawOn(canvas, 1.3125 * inch, current_height)
 
 
-def draw_section_six(canvas):
-
-    client = 'Sony'
-    title = "That's My Boy"
-    version = 'Version: Theatrical'
-    language = 'Latin American Spanish Foreign Language Master'
-    aspect_ratio = 'Aspect Ratio: 16x9 1.78 Full Frame'
-    textless = 'Textless: Textless at Tail'
-
+def draw_section_six(canvas, client, title, version, language, aspect_ratio, textless):
     client_paragraph_style = ParagraphStyle('clientStyle')
     client_paragraph_style.fontSize = 8
     client_paragraph_style.leading = 10
@@ -352,15 +344,7 @@ def draw_section_six(canvas):
         paragraph.drawOn(canvas, 1.3125 * inch, current_height)
 
 
-def draw_section_seven(canvas):
-
-    client = 'Sony'
-    title = "That's My Boy"
-    version = 'Version: Theatrical'
-    language = 'Latin American Spanish Foreign Language Master'
-    aspect_ratio = 'Aspect Ratio: 16x9 1.78 Full Frame'
-    textless = 'Textless: Textless at Tail'
-
+def draw_section_seven(canvas, client, title, version, language, aspect_ratio, textless):
     client_paragraph_style = ParagraphStyle('clientStyle')
     client_paragraph_style.fontSize = 8
     client_paragraph_style.leading = 10
