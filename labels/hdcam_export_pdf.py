@@ -191,8 +191,7 @@ def main():
     c.translate(translate_x * inch, translate_y * inch)
     c.rotate(90)
 
-    draw_side_binding(c, translate_x, translate_y)
-
+    draw_side_binding(c)
     draw_section_five(c)
 
     c.restoreState()
@@ -203,17 +202,8 @@ def main():
     c.translate(translate_x * inch, translate_y * inch)
     c.rotate(90)
 
-    draw_side_binding(c, translate_x, translate_y)
-
-    c.drawString(1.3125 * inch, 2.2 * inch, "Sony")
-    c.setFont("Helvetica", 10)
-    c.drawString(1.3125 * inch, 2.0 * inch, "That's My Boy")
-
-    c.setFont("Helvetica", 8)
-    c.drawString(1.3125 * inch, 1.85 * inch, "Version: Theatrical")
-    c.drawString(1.3125 * inch, 1.76 * inch, "Latin American Spanish Foreign Language Master")
-    c.drawString(1.3125 * inch, 1.57 * inch, "Aspect Ratio: 16x9 1.78 Full Frame")
-    c.drawString(1.3125 * inch, 1.28 * inch, "Textless: Textless at Tail")
+    draw_side_binding(c)
+    draw_section_six(c)
 
     c.restoreState()
     c.saveState()
@@ -223,25 +213,14 @@ def main():
     c.translate(translate_x * inch, translate_y * inch)
     c.rotate(90)
 
-    draw_side_binding(c, translate_x, translate_y)
-
-    c.drawString(1.3125 * inch, 2.6 * inch, "Sony")
-    c.setFont("Helvetica", 10)
-    c.drawString(1.3125 * inch, 2.4 * inch, "That's My Boy")
-
-    c.setFont("Helvetica", 5)
-    c.drawString(1.3125 * inch, 2.25 * inch, "Version: Theatrical")
-    c.drawString(1.3125 * inch, 2.16 * inch, "Latin American Spanish Foreign Language Master")
-    c.drawString(1.3125 * inch, 2.07 * inch, "Aspect Ratio: 16x9 1.78 Full Frame")
-    c.drawString(1.3125 * inch, 1.98 * inch, "Textless: Textless at Tail")
-
-
+    draw_side_binding(c)
+    draw_section_seven(c)
 
     c.showPage()
     c.save()
 
 
-def draw_side_binding(canvas, translate_x, translate_y):
+def draw_side_binding(canvas):
     canvas.setFont("Helvetica", 12)
     canvas.drawString(0, 2.2 * inch, '2G018653')
 
@@ -277,6 +256,86 @@ def draw_side_binding(canvas, translate_x, translate_y):
 
 
 def draw_section_five(canvas):
+
+    client = 'Sony'
+    title = "That's My Boy"
+    version = 'Version: Theatrical'
+    language = 'Latin American Spanish Foreign Language Master'
+    aspect_ratio = 'Aspect Ratio: 16x9 1.78 Full Frame'
+    textless = 'Textless: Textless at Tail'
+
+    client_paragraph_style = ParagraphStyle('clientStyle')
+    client_paragraph_style.fontSize = 8
+    client_paragraph_style.leading = 10
+
+    client_paragraph = Paragraph(client, client_paragraph_style)
+    client_paragraph.wrap(2.0 * inch, 0.6 * inch)
+    client_paragraph.drawOn(canvas, 1.3125 * inch, 2.2 * inch)
+
+    title_paragraph_style = ParagraphStyle('titleStyle')
+    title_paragraph_style.fontSize = 10
+    title_paragraph_style.leading = 12
+
+    title_paragraph = Paragraph(title, title_paragraph_style)
+    title_paragraph.wrap(2.0 * inch, 1.0 * inch)
+    title_paragraph.drawOn(canvas, 1.3125 * inch, 2.0 * inch)
+
+    paragraph_style = ParagraphStyle('detailStyle')
+    paragraph_style.fontSize = 6
+    paragraph_style.leading = 8
+
+    current_height = 1.95 * inch
+
+    for detail_text in (version, language, aspect_ratio, textless):
+        paragraph = Paragraph(detail_text, paragraph_style)
+        paragraph.wrap(2.0 * inch, 0.6 * inch)
+
+        current_height -= paragraph.height
+
+        paragraph.drawOn(canvas, 1.3125 * inch, current_height)
+
+
+def draw_section_six(canvas):
+
+    client = 'Sony'
+    title = "That's My Boy"
+    version = 'Version: Theatrical'
+    language = 'Latin American Spanish Foreign Language Master'
+    aspect_ratio = 'Aspect Ratio: 16x9 1.78 Full Frame'
+    textless = 'Textless: Textless at Tail'
+
+    client_paragraph_style = ParagraphStyle('clientStyle')
+    client_paragraph_style.fontSize = 8
+    client_paragraph_style.leading = 10
+
+    client_paragraph = Paragraph(client, client_paragraph_style)
+    client_paragraph.wrap(2.0 * inch, 0.6 * inch)
+    client_paragraph.drawOn(canvas, 1.3125 * inch, 2.2 * inch)
+
+    title_paragraph_style = ParagraphStyle('titleStyle')
+    title_paragraph_style.fontSize = 10
+    title_paragraph_style.leading = 12
+
+    title_paragraph = Paragraph(title, title_paragraph_style)
+    title_paragraph.wrap(2.0 * inch, 1.0 * inch)
+    title_paragraph.drawOn(canvas, 1.3125 * inch, 2.0 * inch)
+
+    paragraph_style = ParagraphStyle('detailStyle')
+    paragraph_style.fontSize = 6
+    paragraph_style.leading = 8
+
+    current_height = 1.95 * inch
+
+    for detail_text in (version, language, aspect_ratio, textless):
+        paragraph = Paragraph(detail_text, paragraph_style)
+        paragraph.wrap(2.0 * inch, 0.6 * inch)
+
+        current_height -= paragraph.height
+
+        paragraph.drawOn(canvas, 1.3125 * inch, current_height)
+
+
+def draw_section_seven(canvas):
 
     client = 'Sony'
     title = "That's My Boy"
