@@ -25,6 +25,16 @@ def main():
     textless = 'Textless: Textless at Tail'
     barcode = '2G018653'
 
+    company_name = '2g Digital Post, Inc.'
+    address_one = '280 East Magnolia Blvd'
+    address_two = 'Burbank, CA 91502'
+    phone_number = '818.863.8900'
+    todays_date = '2016-08-17'
+    standard = 'Std: 1080'
+    frames_per_second = 'FR: 23.98PsF'
+    part = 'Part: 1 of 1'
+    total_runtime = 'TRT: 114:17'
+
     channel_one_text = 'Latin American Spanish Left Total'
     channel_two_text = 'Latin American Spanish Right Total'
     channel_three_text = 'English Left Total'
@@ -106,7 +116,7 @@ def main():
 
     canvas.saveState()
 
-    canvas.translate(.25 * inch, 7.375 * inch)
+    canvas.translate(.25 * inch, 7.54 * inch)
 
     image = Image(os.path.dirname(os.path.realpath(__file__)) + '/2g_logo.png')
     image.drawHeight = .5 * inch * image.drawHeight / image.drawWidth
@@ -135,7 +145,7 @@ def main():
     # 5P Labels
     canvas.saveState()
 
-    canvas.translate(.25 * inch, 5.90625 * inch)
+    canvas.translate(0 * inch, 6.25 * inch)
 
     image = Image(os.path.dirname(os.path.realpath(__file__)) + '/5P_vertical.png')
     image.drawHeight = .75 * inch
@@ -156,7 +166,9 @@ def main():
     canvas.rotate(90)
 
     draw_side_binding(canvas)
-    draw_section_five(canvas, client, title, version, language, aspect_ratio, textless)
+    draw_section_five(canvas, client, title, version, language, aspect_ratio, textless, channel_pairs, company_name,
+                      address_one, address_two, phone_number, todays_date, standard, frames_per_second, part,
+                      total_runtime)
 
     canvas.restoreState()
     canvas.saveState()
@@ -247,13 +259,13 @@ def draw_section_one(canvas, client, title, version, language, aspect_ratio, tex
 
 def draw_side_binding(canvas):
     canvas.setFont("Helvetica", 12)
-    canvas.drawString(0, 2.2 * inch, '2G018653')
+    canvas.drawString(0, 2.35 * inch, '2G018653')
 
     image = Image(os.path.dirname(os.path.realpath(__file__)) + '/2g_logo.png')
     image.drawHeight = .70 * inch * image.drawHeight / image.drawWidth
     image.drawWidth = .70 * inch
 
-    image.drawOn(canvas, 0, 1.4 * inch)
+    image.drawOn(canvas, 0, 1.55 * inch)
 
     paragraph_style = ParagraphStyle('paraStyle')
     paragraph_style.fontSize = 6
@@ -269,7 +281,7 @@ def draw_side_binding(canvas):
     part = 'Part: 1 of 1'
     total_runtime = 'TRT: 114:17'
 
-    current_y = 1.2
+    current_y = 1.4
 
     for text in (company_name, address_one, address_two, phone_number, todays_date, standard, frames_per_second,
                  part, total_runtime):
@@ -280,26 +292,28 @@ def draw_side_binding(canvas):
         current_y -= .1
 
 
-def draw_section_five(canvas, client, title, version, language, aspect_ratio, textless):
+def draw_section_five(canvas, client, title, version, language, aspect_ratio, textless, channel_pairs, company_name,
+                      address_one, address_two, phone_number, todays_date, standard, frames_per_second, part,
+                      total_runtime):
     client_paragraph_style = ParagraphStyle('clientStyle')
     client_paragraph_style.fontSize = 8
     client_paragraph_style.leading = 10
 
     client_paragraph = Paragraph(client, client_paragraph_style)
-    client_paragraph.wrap(2.0 * inch, 0.6 * inch)
-    client_paragraph.drawOn(canvas, 1.3125 * inch, 2.2 * inch)
+    client_paragraph.wrap(2.0 * inch, 0.4 * inch)
+    client_paragraph.drawOn(canvas, 1.3 * inch, 2.3 * inch)
 
     title_paragraph_style = ParagraphStyle('titleStyle')
-    title_paragraph_style.fontSize = 10
-    title_paragraph_style.leading = 12
+    title_paragraph_style.fontSize = 9
+    title_paragraph_style.leading = 10
 
     title_paragraph = Paragraph(title, title_paragraph_style)
     title_paragraph.wrap(2.0 * inch, 1.0 * inch)
-    title_paragraph.drawOn(canvas, 1.3125 * inch, 2.0 * inch)
+    title_paragraph.drawOn(canvas, 1.3 * inch, 2.1 * inch)
 
     paragraph_style = ParagraphStyle('detailStyle')
-    paragraph_style.fontSize = 6
-    paragraph_style.leading = 8
+    paragraph_style.fontSize = 5
+    paragraph_style.leading = 7
 
     current_height = 1.95 * inch
 
@@ -310,6 +324,49 @@ def draw_section_five(canvas, client, title, version, language, aspect_ratio, te
         current_height -= paragraph.height
 
         paragraph.drawOn(canvas, 1.3125 * inch, current_height)
+
+    channel_paragraph_style = ParagraphStyle('channelStyle')
+    channel_paragraph_style.fontSize = 5
+    channel_paragraph_style.leading = 7
+
+    current_height_one = 0
+    current_height_two = 0
+
+    for iterator, channel_pair in enumerate(channel_pairs):
+        paragraph1 = Paragraph('CH{0:02d}: {1}'.format(iterator + 1, channel_pair[0]), channel_paragraph_style)
+        width1, height1 = paragraph1.wrap(1.4 * inch, 50)
+
+        paragraph2 = Paragraph('CH{0:02d}: {1}'.format(iterator + 7, channel_pair[1]), channel_paragraph_style)
+        width2, height2 = paragraph2.wrap(1.4 * inch, 50)
+
+        current_height_one += height1
+        current_height_two += height2
+
+        paragraph1.drawOn(canvas, 1.3 * inch, 1.5 * inch - current_height_one)
+        paragraph2.drawOn(canvas, 2.8 * inch, 1.5 * inch - current_height_two)
+
+    canvas.setFont("Helvetica", 12)
+    canvas.drawString(4.3 * inch, 2.35 * inch, '2G018653')
+
+    image = Image(os.path.dirname(os.path.realpath(__file__)) + '/2g_logo.png')
+    image.drawHeight = .70 * inch * image.drawHeight / image.drawWidth
+    image.drawWidth = .70 * inch
+
+    image.drawOn(canvas, 4.3 * inch, 1.55 * inch)
+
+    right_paragraph_style = ParagraphStyle('rightSideStyle')
+    right_paragraph_style.fontSize = 6
+    right_paragraph_style.leading = 8
+
+    current_y = 1.4
+
+    for text in (company_name, address_one, address_two, phone_number, todays_date, standard, frames_per_second,
+                 part, total_runtime):
+        paragraph = Paragraph(text, right_paragraph_style)
+        paragraph.wrap(.9375 * inch, .5 * inch)
+        paragraph.drawOn(canvas, 4.3 * inch, current_y * inch)
+
+        current_y -= .1
 
 
 def draw_section_six(canvas, client, title, version, language, aspect_ratio, textless):
