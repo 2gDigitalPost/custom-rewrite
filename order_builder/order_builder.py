@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import widgets.html_widgets
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.widget import ButtonNewWdg
@@ -113,13 +115,25 @@ class OrderBuilderWdg(BaseRefreshWdg):
         po_number = self.order_sobject.get_value('po_number') or 'None'
         description = self.order_sobject.get('description')
 
+        due_date = self.order_sobject.get('due_date')
+
+        if due_date:
+            due_date_datetime_object = datetime.strptime(due_date, '%Y-%m-%d %H:%M:%S')
+            due_date_string = due_date_datetime_object.strftime('%A, %b %d, %Y')
+        else:
+            due_date_string = 'Due Date not specified'
+
         order_name_div = DivWdg()
         order_name_div.add_style('text-decoration', 'underline')
         order_name_div.add_style('font-size', '24px')
-        order_name_div.add('Order: ' + order_name)
+        order_name_div.add(order_name)
 
         order_code_div = DivWdg()
         order_code_div.add('Code: ' + order_code)
+
+        order_due_date_div = DivWdg()
+        order_due_date_div.add('Due Date: ' + due_date_string)
+        order_due_date_div.add_style('font-weight', 'bold')
 
         client_name_div = DivWdg()
 
@@ -225,6 +239,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         # Add the divs to the outer_div for display
         order_div.add(order_name_div)
         order_div.add(order_code_div)
+        order_div.add(order_due_date_div)
         order_div.add(client_name_div)
         order_div.add(po_number_div)
         order_div.add(description_div)
