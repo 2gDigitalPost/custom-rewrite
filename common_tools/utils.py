@@ -31,6 +31,21 @@ def get_order_sobject_from_task_sobject(task_sobject):
     return get_order_sobject_from_component_sobject(component_sobject)
 
 
+def get_task_sobjects_from_component_sobject(component_sobject):
+    """
+    Given a twog/component sobject, get a list of all the sthpw/task sobjects attached to it.
+
+    :param component_sobject: twog/component
+    :return: List of sthpw/task sobjects
+    """
+
+    task_search = Search('sthpw/task')
+    task_search.add_filter('search_code', component_sobject.get_code())
+    tasks = task_search.get_sobjects()
+
+    return tasks
+
+
 def get_task_data_sobject_from_task_code(task_code):
     """
     Given a task code, find the task_data sobject associated with it
