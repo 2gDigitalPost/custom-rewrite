@@ -11,7 +11,7 @@ import order_builder_utils as obu
 
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
     get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order,\
-    get_file_in_package_status, get_file_in_package_sobjects_by_package_code
+    get_file_in_package_status, get_file_in_package_sobjects_by_package_code, get_order_priority_relative_to_all_orders
 
 
 def get_task_data_div(task_code):
@@ -122,6 +122,10 @@ class OrderBuilderWdg(BaseRefreshWdg):
             due_date_string = due_date_datetime_object.strftime('%A, %b %d, %Y')
         else:
             due_date_string = 'Due Date not specified'
+
+        order_priority = get_order_priority_relative_to_all_orders(self.order_sobject)
+        order_priority_div = DivWdg()
+        order_priority_div.add('Priority: {0}'.format(order_priority))
 
         order_name_div = DivWdg()
         order_name_div.add_style('text-decoration', 'underline')
@@ -240,6 +244,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(order_name_div)
         order_div.add(order_code_div)
         order_div.add(order_due_date_div)
+        order_div.add(order_priority_div)
         order_div.add(client_name_div)
         order_div.add(po_number_div)
         order_div.add(description_div)
@@ -286,9 +291,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
         status_div.add('Status: ')
         status_div.add(status_span)
 
-        priority_div = DivWdg()
-        priority_div.add('Priority: ' + str(task.get('priority')))
-
         assigned_div = DivWdg()
         assigned_div.add_style('font-style', 'italic')
         assigned = task.get('assigned')
@@ -328,7 +330,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         task_div.add(process_div)
         task_div.add(status_div)
-        task_div.add(priority_div)
         task_div.add(assigned_div)
         task_div.add(department_div)
         task_div.add(task_data_div)
@@ -367,9 +368,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_description_div.add_style('font-style', 'italic')
             component_description_div.add(component.get('description'))
 
-            component_priority_div = DivWdg()
-            component_priority_div.add(component.get('priority'))
-
             component_pipeline_div = DivWdg()
             component_pipeline_name = obu.get_sobject_name_by_code('sthpw/pipeline', component.get('pipeline_code'))
 
@@ -394,7 +392,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(component_name_div)
             component_div.add(component_title_div)
             component_div.add(component_description_div)
-            component_div.add(component_priority_div)
             component_div.add(component_pipeline_div)
             component_div.add(component_language_div)
 
@@ -520,9 +517,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
             package_description_div.add_style('font-style', 'italic')
             package_description_div.add(package.get('description'))
 
-            package_priority_div = DivWdg()
-            package_priority_div.add('Priority: {0}'.format(package.get('priority')))
-
             package_platform_div = DivWdg()
             platform_code = package.get('platform_code')
 
@@ -568,7 +562,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             package_div.add(package_name_div)
             package_div.add(package_description_div)
-            package_div.add(package_priority_div)
             package_div.add(package_due_date_div)
             package_div.add(package_delivery_task_div)
             package_div.add(package_platform_div)

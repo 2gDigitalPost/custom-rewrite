@@ -31,6 +31,14 @@ def get_order_sobject_from_task_sobject(task_sobject):
     return get_order_sobject_from_component_sobject(component_sobject)
 
 
+def get_order_priority_relative_to_all_orders(order_sobject):
+    higher_priority_order_search = Search('twog/order')
+    higher_priority_order_search.add_filter('priority', order_sobject.get('priority'), op='<')
+    higher_priority_orders = higher_priority_order_search.get_sobjects()
+
+    return len(higher_priority_orders) + 1
+
+
 def get_task_sobjects_from_component_sobject(component_sobject):
     """
     Given a twog/component sobject, get a list of all the sthpw/task sobjects attached to it.
