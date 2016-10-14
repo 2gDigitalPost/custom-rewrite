@@ -63,19 +63,18 @@ def get_title_select_wdg(width=300):
     return title_select_wdg
 
 
-def get_title_collection_select_wdg(width=300):
-    title_collection_select_wdg = SelectWdg('title_collection_code')
-    title_collection_select_wdg.set_id('title_collection_code')
-    title_collection_select_wdg.add_style('width', '{0}px'.format(width))
-    title_collection_select_wdg.add_empty_option()
+def get_season_select_wdg(width=300):
+    season_select_wdg = SelectWdg('season_code')
+    season_select_wdg.set_id('season_code')
+    season_select_wdg.add_style('width', '{0}px'.format(width))
 
-    title_collection_search = Search('twog/title_collection')
-    title_collections = title_collection_search.get_sobjects()
+    season_search = Search('twog/season')
+    seasons = season_search.get_sobjects()
 
-    for title_collection in title_collections:
-        title_collection_select_wdg.append_option(title_collection.get_value('name'), title_collection.get_code())
+    for season in seasons:
+        season_select_wdg.append_option(season.get_value('name'), season.get_code())
 
-    return title_collection_select_wdg
+    return season_select_wdg
 
 
 def get_pipeline_select_wdg(search_type, width=300):
@@ -273,7 +272,7 @@ catch(err) {
         return behavior
 
 
-class InsertComponentByTitleCollectionWdg(BaseRefreshWdg):
+class InsertComponentBySeasonWdg(BaseRefreshWdg):
     def init(self):
         self.order_sobject = self.get_sobject_from_kwargs()
         self.parent_widget_title = self.kwargs.get('parent_widget_title')
@@ -282,13 +281,13 @@ class InsertComponentByTitleCollectionWdg(BaseRefreshWdg):
 
     def get_display(self):
         outer_div = DivWdg()
-        outer_div.set_id('insert-component-in-order-by-title-collection')
+        outer_div.set_id('insert-component-in-order-by-season')
 
         outer_div.add(widgets.html_widgets.get_label_widget('Name'))
         outer_div.add(widgets.input_widgets.get_text_input_wdg('new_component_name', 400))
 
-        outer_div.add(widgets.html_widgets.get_label_widget('Title Collection'))
-        outer_div.add(get_title_collection_select_wdg(400))
+        outer_div.add(widgets.html_widgets.get_label_widget('Season'))
+        outer_div.add(get_season_select_wdg(400))
 
         outer_div.add(get_languages_checkboxes())
 
@@ -314,35 +313,29 @@ try {
 
     // Get the server object
     var server = TacticServerStub.get();
-    var containing_element = bvr.src_el.getParent("#insert-component-in-order-by-title-collection");
+    var containing_element = bvr.src_el.getParent("#insert-component-in-order-by-season");
     var new_component_values = spt.api.get_input_values(containing_element, null, false);
 
     // Get the form values
     var order_code = '%s';
-    // var name = new_component_values.new_component_name;
     var pipeline_code = new_component_values.pipeline_code;
     var instructions_code = new_component_values.instructions_select;
-    var title_collection_code = new_component_values.title_collection_code;
+    var season_code = new_component_values.season_code;
 
-    console.log(title_collection_code);
-
-    var title_in_title_collection_sobjects = server.eval("@SOBJECT(twog/title_in_title_collection['title_collection_code', '" + title_collection_code + "'])");
-    console.log(title_in_title_collection_sobjects);
+    var title_in_season_sobjects = server.eval("@SOBJECT(twog/title['season_code', '" + season_code + "'])");
 
     var languages = server.eval("@SOBJECT(twog/language)");
 
     for (var i = 0; i < languages.length; i++) {
         var language_code = languages[i].code;
-
         var language_checkbox_value = new_component_values[language_code];
 
         if (language_checkbox_value == "on") {
             var language_name = languages[i].name;
 
-            for (var j = 0; j < title_in_title_collection_sobjects.length; j++) {
-                var title_code = title_in_title_collection_sobjects[j].title_code;
-
-                var title_name = server.eval("@GET(twog/title['code', '" + title_code + "'].name)")[0];
+            for (var j = 0; j < title_in_season_sobjects.length; j++) {
+                var title_code = title_in_season_sobjects[j].code;
+                var title_name = title_in_season_sobjects[j].name;
 
                 var new_component = {
                     'name': title_name + ' - ' + language_name,

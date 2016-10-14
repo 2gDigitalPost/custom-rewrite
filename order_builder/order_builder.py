@@ -181,16 +181,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
         )
         add_component_by_language_button.add_style('display', 'inline-block')
 
-        add_component_by_title_collection_button = ButtonNewWdg(title='Add Component By Title Collection',
-                                                                icon='INSERT_MULTI')
-        add_component_by_title_collection_button.add_behavior(
+        add_component_by_season_button = ButtonNewWdg(title='Add Component By Season', icon='INSERT_MULTI')
+        add_component_by_season_button.add_behavior(
             obu.get_load_popup_widget_with_reload_behavior(
-                'Insert Components by Title Collection', 'widgets.InsertComponentByTitleCollectionWdg',
+                'Insert Components by Title Collection', 'widgets.InsertComponentBySeasonWdg',
                 self.order_sobject.get_search_key(), 'Order Builder', 'order_builder.OrderBuilderWdg',
                 self.order_sobject.get_search_key()
             )
         )
-        add_component_by_title_collection_button.add_style('display', 'inline-block')
+        add_component_by_season_button.add_style('display', 'inline-block')
 
         add_packages_button = ButtonNewWdg(title='Add Package', icon='INSERT')
         add_packages_button.add_behavior(
@@ -250,7 +249,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(description_div)
         order_div.add(add_component_button)
         order_div.add(add_component_by_language_button)
-        order_div.add(add_component_by_title_collection_button)
+        order_div.add(add_component_by_season_button)
         order_div.add(add_packages_button)
         order_div.add(add_packages_by_platform)
         order_div.add(add_file_to_order_button)
