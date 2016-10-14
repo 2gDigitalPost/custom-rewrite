@@ -218,6 +218,29 @@ catch(err) {
 
         return behavior
 
+    def get_checked_row_behavior(self, row_code):
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+var server = TacticServerStub.get();
+var element_evaluation_code = '%s';
+var code = '%s';
+
+var search_key = server.build_search_key('twog/element_evaluation_line', code, 'twog');
+
+server.update(search_key, {'checked': true});
+
+// Refresh the widget
+var element_eval_lines_div = document.getElementById('element_eval_lines_div');
+
+spt.api.load_panel(element_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
+                   {'element_evaluation_code': element_evaluation_code});
+''' % (self.element_evaluation_code, row_code)
+        }
+
+        return behavior
+
     def set_header_rows(self, table):
         table.add_row()
         table.add_header("Timecode In")
@@ -307,6 +330,17 @@ catch(err) {
 
         return span_wdg
 
+    def get_row_checked_button(self, row_code):
+        span_wdg = SpanWdg()
+
+        checked_row_button = ButtonNewWdg(title='Checked Row', icon='CHECK')
+        checked_row_button.add_style('display', 'inline-block')
+        checked_row_button.add_behavior(self.get_checked_row_behavior(row_code))
+
+        span_wdg.add(checked_row_button)
+
+        return span_wdg
+
     def get_display(self):
         table = Table()
         table.set_id('element_eval_lines_table')
@@ -366,6 +400,9 @@ catch(err) {
                 table.add_cell(
                     self.get_remove_row_button(line.get_code())
                 )
+
+                if not line.get_value('checked'):
+                    table.add_cell(self.get_row_checked_button(line.get_code()))
         else:
             table.add_cell("No Element Evaluation lines exist yet. Add one?")
 
