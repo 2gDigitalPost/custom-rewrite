@@ -11,7 +11,8 @@ import order_builder_utils as obu
 
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
     get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order,\
-    get_file_in_package_status, get_file_in_package_sobjects_by_package_code, get_order_priority_relative_to_all_orders
+    get_file_in_package_status, get_file_in_package_sobjects_by_package_code,\
+    get_order_priority_relative_to_all_orders, get_sobject_by_code, get_sobject_name_by_code
 
 
 def get_task_data_div(task_code):
@@ -110,7 +111,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         # Show some information for the order at the top.
         order_name = self.order_sobject.get('name')
         order_code = self.order_sobject.get_code()
-        division_name = obu.get_division_name_from_code(self.order_sobject.get('division_code'))
+        division_name = get_sobject_name_by_code('twog/division', self.order_sobject.get('division_code'))
         client_name = obu.get_client_name_from_division_code(self.order_sobject.get('division_code'))
         po_number = self.order_sobject.get_value('po_number') or 'None'
         description = self.order_sobject.get('description')
@@ -356,7 +357,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             component_title_div = DivWdg()
             component_title_div.add_style('text-decoration', 'underline')
-            component_title = obu.get_sobject_name_by_code('twog/title', component.get('title_code'))
+            component_title = get_sobject_name_by_code('twog/title', component.get('title_code'))
 
             if component_title:
                 component_title_div.add('Title: {0}'.format(component_title))
@@ -368,7 +369,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_description_div.add(component.get('description'))
 
             component_pipeline_div = DivWdg()
-            component_pipeline_name = obu.get_sobject_name_by_code('sthpw/pipeline', component.get('pipeline_code'))
+            component_pipeline_name = get_sobject_name_by_code('sthpw/pipeline', component.get('pipeline_code'))
 
             if component_pipeline_name:
                 component_pipeline_div.add('Pipeline: <i>{0}</i>'.format(component_pipeline_name))
@@ -376,7 +377,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
                 component_pipeline_div.add('<i>No Pipeline Assigned</i>')
 
             component_language_div = DivWdg()
-            component_language = obu.get_sobject_name_by_code('twog/language', component.get_value('language_code'))
+            component_language = get_sobject_name_by_code('twog/language', component.get_value('language_code'))
 
             if component_language:
                 component_language_div.add('Language: <i>{0}</i>'.format(component_language))
@@ -520,7 +521,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             platform_code = package.get('platform_code')
 
             if platform_code:
-                platform = obu.get_platform(platform_code)
+                platform = get_sobject_by_code('twog/platform', platform_code)
 
                 if platform:
                     package_platform_div.add('Platform: {0}'.format(platform.get('name')))

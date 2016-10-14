@@ -2,6 +2,42 @@ from pyasm.search import Search
 from pyasm.widget import SelectWdg
 
 
+def get_sobject_by_code(search_type, sobject_code):
+    """
+    Given a search type and an sobject code, return the sobject associated with the code.
+
+    :param search_type: Search type ('twog/order' for example)
+    :param sobject_code: sobject unique code
+    :return: sobject
+    """
+
+    search = Search(search_type)
+    search.add_code_filter(sobject_code)
+    search_result = search.get_sobject()
+
+    if search_result:
+        return search_result
+    else:
+        return None
+
+
+def get_sobject_name_by_code(search_type, sobject_code):
+    """
+    Given a search type and an sobject code, return the sobject's name.
+
+    :param search_type: Search type ('twog/order' for example)
+    :param sobject_code: sobject unique code
+    :return: String (sobject name)
+    """
+
+    search_result = get_sobject_by_code(search_type, sobject_code)
+
+    if search_result:
+        return search_result.get('name')
+    else:
+        return None
+
+
 def get_order_sobject_from_component_sobject(component_sobject):
     """
     Given a twog/component sobject, get the order that it is assigned to.

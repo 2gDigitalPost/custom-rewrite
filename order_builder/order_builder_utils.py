@@ -163,40 +163,6 @@ def get_packages_from_order(order_code):
     return packages_search.get_sobjects()
 
 
-def get_client_name_from_code(client_code):
-    """
-    Get the client's name, using their code to search
-
-    :param client_code: A unique client code
-    :return: The client's name
-    """
-    client_search = Search('twog/client')
-    client_search.add_code_filter(client_code)
-    client = client_search.get_sobject()
-
-    if client:
-        return client.get('name')
-    else:
-        return None
-
-
-def get_division_name_from_code(division_code):
-    """
-    Get the client division's name, using their code to search
-
-    :param division_code: A unique division code
-    :return: The division's name
-    """
-    division_search = Search('twog/division')
-    division_search.add_code_filter(division_code)
-    division = division_search.get_sobject()
-
-    if division:
-        return division.get('name')
-    else:
-        return None
-
-
 def get_client_name_from_division_code(division_code):
     """
     Get the name of the client that owns the division.
@@ -217,24 +183,6 @@ def get_client_name_from_division_code(division_code):
             return client.get('name')
 
     return None
-
-
-def get_sobject_name_by_code(search_type, sobject_code):
-    search = Search(search_type)
-    search.add_code_filter(sobject_code)
-    search_result = search.get_sobject()
-
-    if search_result:
-        return search_result.get_value('name')
-    else:
-        return None
-
-
-def get_platform(platform_code):
-    platform_search = Search('twog/platform')
-    platform_search.add_code_filter(platform_code)
-
-    return platform_search.get_sobject()
 
 
 def get_date_calendar_wdg():
