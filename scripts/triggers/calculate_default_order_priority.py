@@ -33,7 +33,7 @@ def main(server=None, input_data=None):
 
         if len(orders_due_day_of) > 1:
             priorities = [order_due_day_of.get('priority') for order_due_day_of in orders_due_day_of]
-            priority = sum([float(priority) for priority in priorities]) / float(len(priorities))
+            priority = sum([float(priority) for priority in priorities]) / float(len(priorities) - 1)
 
         else:
             order_due_day_before_list = server.eval(
