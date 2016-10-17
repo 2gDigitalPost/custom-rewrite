@@ -550,6 +550,19 @@ def get_delivery_task_for_package(package_code):
     return None
 
 
+def get_platform_connection_by_package_sobject(package_sobject):
+    order_search = Search('twog/order')
+    order_search.add_code_filter(package_sobject.get('order_code'))
+    order_sobject = order_search.get_sobject()
+
+    platform_connection_search = Search('twog/platform_connection')
+    platform_connection_search.add_filter('platform_code', package_sobject.get('platform_code'))
+    platform_connection_search.add_filter('division_code', order_sobject.get('division_code'))
+    platform_connection = platform_connection_search.get_sobject()
+
+    return platform_connection
+
+
 def get_order_builder_url_on_click(url):
     """
     Gets the behavior that the button uses on click.

@@ -12,7 +12,8 @@ import order_builder_utils as obu
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
     get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order,\
     get_file_in_package_status, get_file_in_package_sobjects_by_package_code,\
-    get_order_priority_relative_to_all_orders, get_sobject_by_code, get_sobject_name_by_code
+    get_order_priority_relative_to_all_orders, get_sobject_by_code, get_sobject_name_by_code, \
+    get_platform_connection_by_package_sobject
 
 
 def get_task_data_div(task_code):
@@ -518,6 +519,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             package_description_div.add(package.get('description'))
 
             package_platform_div = DivWdg()
+            connection_status_div = DivWdg()
             platform_code = package.get('platform_code')
 
             if platform_code:
@@ -525,6 +527,24 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
                 if platform:
                     package_platform_div.add('Platform: {0}'.format(platform.get('name')))
+
+                    platform_connection = get_platform_connection_by_package_sobject(package)
+
+                    if platform_connection:
+                        platform_connection_status = platform_connection.get('connection_status')
+
+                        connection_status_text_span = SpanWdg()
+                        connection_status_text_span.add(platform_connection_status.title())
+
+                        if platform_connection_status == 'disconnected':
+                            connection_status_text_span.add_style('color', 'red')
+                        elif platform_connection_status == 'testing':
+                            connection_status_text_span.add_style('color', '#afb332')
+                        elif platform_connection_status == 'connected':
+                            connection_status_text_span.add_style('color', 'green')
+
+                        connection_status_div.add('Connection Status: ')
+                        connection_status_div.add(connection_status_text_span)
 
             package_due_date_div = DivWdg()
 
@@ -565,6 +585,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             package_div.add(package_due_date_div)
             package_div.add(package_delivery_task_div)
             package_div.add(package_platform_div)
+            package_div.add(connection_status_div)
 
             files_in_package_sobjects = get_file_in_package_sobjects_by_package_code(package.get_code())
             files_in_package_list = get_files_for_package(package.get_code())
