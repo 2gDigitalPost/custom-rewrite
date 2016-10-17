@@ -89,7 +89,7 @@ try {
     var new_package = {
         'name': name,
         'order_code': order_code,
-        'platform_code': platform_code.value,
+        'platform_code': platform_code,
         'due_date': due_date
     }
 
