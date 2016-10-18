@@ -340,11 +340,32 @@ catch(err) {
     return behavior
 
 
-def get_load_popup_widget_behavior(widget_title, widget_name, search_key):
-    behavior = {
-        'css_class': 'clickme',
-        'type': 'click_up',
-        'cbjs_action': '''
+def get_load_popup_widget_behavior(widget_title, widget_name, search_key, width=None, height=None):
+
+    if width and height:
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+try {
+    var widget_title = '%s';
+    var widget_name = '%s';
+    var search_key = '%s';
+    var width='%s' + 'px';
+    var height='%s' + 'px';
+
+    spt.api.load_popup(widget_title, widget_name, {'search_key': search_key}, {'width': width, 'height': height});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % (widget_title, widget_name, search_key, str(width), str(height))
+        }
+    else:
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
 try {
     var widget_title = '%s';
     var widget_name = '%s';
@@ -356,7 +377,7 @@ catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
 }''' % (widget_title, widget_name, search_key)
-    }
+        }
 
     return behavior
 
