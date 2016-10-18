@@ -483,6 +483,24 @@ def get_task_estimated_hours_from_instructions_document(instructions_document, t
         return None
 
 
+def get_task_estimated_hours_from_task_code(task_code):
+    task_search = Search('sthpw/task')
+    task_search.add_code_filter(task_code)
+    task = task_search.get_sobject()
+
+    component = task.get_parent()
+
+    instructions_code = component.get('instructions_code')
+
+    if instructions_code:
+        instructions_sobject = get_instructions_sobject_from_instructions_code(instructions_code)
+
+        if instructions_sobject:
+            return get_task_estimated_hours_from_instructions_document(instructions_sobject, task.get('process'))
+
+    return None
+
+
 def get_client_division_sobject_from_order_sobject(order_sobject):
     """
     Given an order sobject, get the division code associated with it. If there isn't one, return None
