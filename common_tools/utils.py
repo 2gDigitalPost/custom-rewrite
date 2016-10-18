@@ -75,6 +75,22 @@ def get_order_priority_relative_to_all_orders(order_sobject):
     return len(higher_priority_orders) + 1
 
 
+
+def get_task_sobjects_from_component_code(component_code):
+    """
+    Given a twog/component unique code, get a list of all the sthpw/task sobjects attached to it
+
+    :param component_code: twog/component code
+    :return: List of sthpw/task sobjects
+    """
+
+    task_search = Search('sthpw/task')
+    task_search.add_filter('search_code', component_code)
+    tasks = task_search.get_sobjects()
+
+    return tasks
+
+
 def get_task_sobjects_from_component_sobject(component_sobject):
     """
     Given a twog/component sobject, get a list of all the sthpw/task sobjects attached to it.
@@ -83,11 +99,7 @@ def get_task_sobjects_from_component_sobject(component_sobject):
     :return: List of sthpw/task sobjects
     """
 
-    task_search = Search('sthpw/task')
-    task_search.add_filter('search_code', component_sobject.get_code())
-    tasks = task_search.get_sobjects()
-
-    return tasks
+    return get_task_sobjects_from_component_code(component_sobject.get_code())
 
 
 def get_task_data_sobject_from_task_code(task_code):
@@ -499,6 +511,25 @@ def get_task_estimated_hours_from_task_code(task_code):
             return get_task_estimated_hours_from_instructions_document(instructions_sobject, task.get('process'))
 
     return None
+
+
+def get_component_estimated_hours_from_component_code(component_code):
+    tasks = get_task_sobjects_from_component_code(component_code)
+
+    estimated_hours_sum = 0
+
+    for task in tasks:
+        task_data = get_task_data_sobject_from_task_code(task.get_code())
+
+        if task_data.get('estimated_hours'):
+            task_estimated_hours = float(task_data.get('estimated_hours'))
+
+            estimated_hours_sum += task_estimated_hours
+
+    if estimated_hours_sum == 0:
+        return None
+    else:
+        return estimated_hours_sum
 
 
 def get_client_division_sobject_from_order_sobject(order_sobject):

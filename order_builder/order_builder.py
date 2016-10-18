@@ -13,7 +13,7 @@ from common_tools.utils import get_task_data_in_files, get_task_data_out_files, 
     get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order,\
     get_file_in_package_status, get_file_in_package_sobjects_by_package_code,\
     get_order_priority_relative_to_all_orders, get_sobject_by_code, get_sobject_name_by_code, \
-    get_platform_connection_by_package_sobject
+    get_platform_connection_by_package_sobject, get_component_estimated_hours_from_component_code
 
 
 def get_task_data_div(task_code):
@@ -392,6 +392,12 @@ class OrderBuilderWdg(BaseRefreshWdg):
             else:
                 component_language_div.add('<i>No language selected</i>')
 
+            component_estimated_hours_div = DivWdg()
+            estimated_remaining_hours = get_component_estimated_hours_from_component_code(component.get_code())
+
+            if estimated_remaining_hours:
+                component_estimated_hours_div.add('Estimated Hours: {0}'.format(estimated_remaining_hours))
+
             component_div = DivWdg()
             component_div.add_style('background-color', '#d9edcf')
             component_div.add_style('padding', '10px')
@@ -402,6 +408,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(component_description_div)
             component_div.add(component_pipeline_div)
             component_div.add(component_language_div)
+            component_div.add(component_estimated_hours_div)
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
             instructions_button.add_behavior(
