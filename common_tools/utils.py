@@ -449,7 +449,10 @@ def get_task_instructions_text_from_instructions_code(instructions_code, task_na
     for line in instructions_text.split('\n'):
         if line:
             if line[0:3] == '###':
-                if task_name == line[4:]:
+                name = line.split('|')[0].strip()
+                name = name[4:]
+
+                if task_name == name:
                     task_instructions_text += line[4:] + '\n'
                     instruction_text_in_task = True
                 else:
@@ -461,6 +464,23 @@ def get_task_instructions_text_from_instructions_code(instructions_code, task_na
         task_instructions_text = 'Sorry, no instructions are available for this task.'
 
     return task_instructions_text
+
+
+def get_task_estimated_hours_from_instructions_document(instructions_document, task_name):
+
+    instructions_text = instructions_document.get('instructions_text')
+
+    for line in instructions_text.split('\n'):
+        if line:
+            if line[0:3] == '###':
+                name, hours = line.split('|')
+                name = name.strip()[4:]
+                hours = hours.strip()
+
+                if name == task_name:
+                    return float(hours)
+    else:
+        return None
 
 
 def get_client_division_sobject_from_order_sobject(order_sobject):

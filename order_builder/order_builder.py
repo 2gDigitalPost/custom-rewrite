@@ -13,8 +13,43 @@ from common_tools.utils import get_task_data_in_files, get_task_data_out_files, 
     get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order,\
     get_file_in_package_status, get_file_in_package_sobjects_by_package_code,\
     get_order_priority_relative_to_all_orders, get_sobject_by_code, get_sobject_name_by_code, \
-    get_platform_connection_by_package_sobject
+    get_platform_connection_by_package_sobject, get_instructions_sobject_from_instructions_code, \
+    get_task_estimated_hours_from_instructions_document
 
+
+def get_estimated_hours_div(task_sobject):
+    outer_div = DivWdg()
+
+    parent_component = task_sobject.get_parent()
+    instructions_code = parent_component.get('instructions_code')
+
+    instructions = get_instructions_sobject_from_instructions_code(instructions_code)
+    estimated_hours = get_task_estimated_hours_from_instructions_document(instructions, task_sobject.get('process'))
+
+    if estimated_hours:
+        outer_div.add('Hours: {0}'.format(estimated_hours))
+    else:
+        outer_div.add('No estimated time available')
+
+    return outer_div
+
+'''
+    for line in instructions.split('\n'):
+        print(line)
+        if line:
+            if line[0:3] == '###':
+                print(line)
+                if len(line.split('|')) > 1:
+                    hours = float(line.split('|')[-1])
+                    outer_div.add('Hours: {0}'.format(hours))
+
+                    return outer_div
+    else:
+        outer_div.add('No hours available')
+
+
+        return outer_div
+'''
 
 def get_task_data_div(task_code):
     outer_div = DivWdg()
@@ -310,6 +345,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
         else:
             department_div.add('No department assigned')
 
+        estimated_hours_div = get_estimated_hours_div(task)
+
         task_data_div = get_task_data_div(task.get_code())
 
         instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
@@ -333,6 +370,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         task_div.add(status_div)
         task_div.add(assigned_div)
         task_div.add(department_div)
+        task_div.add(estimated_hours_div)
         task_div.add(task_data_div)
         task_div.add(instructions_button)
         task_div.add(inspect_button)
