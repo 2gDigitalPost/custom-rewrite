@@ -161,6 +161,18 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         div_wdg.add(HtmlElement.h4('<u>Status</u>'))
         div_wdg.add(get_task_status_select_wdg(self.task_sobject))
 
+        div_wdg.add(HtmlElement.h4('<u>Estimated Hours: {0}</u>'.format(self.task_data.get('estimated_hours'))))
+
+        change_estimated_hours_button = ButtonNewWdg(title='Change Estimated Hours', icon='TIME')
+        change_estimated_hours_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Change Estimated Hours', 'widgets.ChangeEstimatedHoursForTaskWdg', self.task_sobject.get_search_key(),
+                'Task', 'widgets.TaskInspectWdg', self.task_sobject.get_search_key()
+            )
+        )
+        change_estimated_hours_button.add_style('display', 'inline-block')
+        div_wdg.add(change_estimated_hours_button)
+
         div_wdg.add(HtmlElement.h4('<u>Input Files</u>'))
         div_wdg.add(get_in_files_list(self.task_data.get_code()))
 

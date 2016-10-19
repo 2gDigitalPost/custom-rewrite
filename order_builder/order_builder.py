@@ -10,10 +10,10 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 import order_builder_utils as obu
 
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
-    get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order,\
-    get_file_in_package_status, get_file_in_package_sobjects_by_package_code,\
+    get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order, \
+    get_file_in_package_status, get_file_in_package_sobjects_by_package_code, \
     get_order_priority_relative_to_all_orders, get_sobject_by_code, get_sobject_name_by_code, \
-    get_platform_connection_by_package_sobject, get_component_estimated_total_hours_from_component_code,\
+    get_platform_connection_by_package_sobject, get_component_estimated_total_hours_from_component_code, \
     get_component_estimated_remaining_hours_from_component_code, get_order_estimated_total_hours_from_order_code
 
 
