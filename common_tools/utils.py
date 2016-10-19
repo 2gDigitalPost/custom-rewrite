@@ -75,6 +75,20 @@ def get_order_priority_relative_to_all_orders(order_sobject):
     return len(higher_priority_orders) + 1
 
 
+def get_component_sobjects_from_order_code(order_code):
+    """
+    Given a twog/order unique code, get a list of all the twog/component sobjects attached to it
+
+    :param order_code: twog/order code
+    :return: List of twog/component sobjects (possibly empty)
+    """
+
+    component_search = Search('twog/component')
+    component_search.add_filter('order_code', order_code)
+    components = component_search.get_sobjects()
+
+    return components
+
 
 def get_task_sobjects_from_component_code(component_code):
     """
@@ -513,7 +527,14 @@ def get_task_estimated_hours_from_task_code(task_code):
     return None
 
 
-def get_component_estimated_hours_from_component_code(component_code):
+def get_component_estimated_total_hours_from_component_code(component_code):
+    """
+    Given a twog/component code, sum up all the estimated hours from its tasks.
+
+    :param component_code: twog/component code
+    :return: int or None
+    """
+
     tasks = get_task_sobjects_from_component_code(component_code)
 
     estimated_hours_sum = 0
@@ -530,6 +551,60 @@ def get_component_estimated_hours_from_component_code(component_code):
         return None
     else:
         return estimated_hours_sum
+
+
+def get_component_estimated_remaining_hours_from_component_code(component_code):
+    """
+    Same function as get_component_estimated_total_hours_from_component_code, but only takes into account tasks that
+    are not marked as 'Complete'.
+
+    :param component_code: twog/component code
+    :return: int or None
+    """
+
+    tasks = get_task_sobjects_from_component_code(component_code)
+
+    estimated_hours_sum = 0
+
+    tasks = [task for task in tasks if task.get('status') != 'Complete']
+
+    for task in tasks:
+        task_data = get_task_data_sobject_from_task_code(task.get_code())
+
+        if task_data.get('estimated_hours'):
+            task_estimated_hours = float(task_data.get('estimated_hours'))
+
+            estimated_hours_sum += task_estimated_hours
+
+    if estimated_hours_sum == 0:
+        return None
+    else:
+        return estimated_hours_sum
+
+
+def get_order_estimated_total_hours_from_order_code(order_code):
+    """
+    Given a twog/order code, get the estimated total hours to complete the order. This is done by getting the estimated
+    total hours for each of the components, and getting the highest one (because components can be completed in
+    parallel).
+
+    :param order_code: twog/order code
+    :return: int or None
+    """
+    components = get_component_sobjects_from_order_code(order_code)
+
+    estimated_total_hours = 0
+
+    for component in components:
+        component_estimated_hours = get_component_estimated_total_hours_from_component_code(component.get_code())
+
+        if component_estimated_hours and component_estimated_hours > estimated_total_hours:
+            estimated_total_hours = component_estimated_hours
+
+    if estimated_total_hours == 0:
+        return None
+    else:
+        return estimated_total_hours
 
 
 def get_client_division_sobject_from_order_sobject(order_sobject):

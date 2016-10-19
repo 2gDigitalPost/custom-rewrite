@@ -61,7 +61,8 @@ var instructions_text = '';
 for (var i = 0; i < sorted_department_instructions_sobjects.length; i++) {
     var department_instructions_sobject = sorted_department_instructions_sobjects[i];
 
-    instructions_text += '### ' + department_instructions_sobject['name'] + '\\n\\n';
+    instructions_text += '### ' + department_instructions_sobject['name'] + ' | ' + department_instructions_sobject['estimated_hours'] + '\\n\\n';
+    console.log(instructions_text);
     instructions_text += department_instructions_sobject['instructions_text'] + '\\n\\n';
 }
 

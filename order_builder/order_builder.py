@@ -13,7 +13,8 @@ from common_tools.utils import get_task_data_in_files, get_task_data_out_files, 
     get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order,\
     get_file_in_package_status, get_file_in_package_sobjects_by_package_code,\
     get_order_priority_relative_to_all_orders, get_sobject_by_code, get_sobject_name_by_code, \
-    get_platform_connection_by_package_sobject, get_component_estimated_hours_from_component_code
+    get_platform_connection_by_package_sobject, get_component_estimated_total_hours_from_component_code,\
+    get_component_estimated_remaining_hours_from_component_code, get_order_estimated_total_hours_from_order_code
 
 
 def get_task_data_div(task_code):
@@ -171,6 +172,12 @@ class OrderBuilderWdg(BaseRefreshWdg):
         else:
             description_div.add('No description available')
 
+        estimated_total_hours_div = DivWdg()
+        estimated_total_hours = get_order_estimated_total_hours_from_order_code(order_code)
+
+        if estimated_total_hours:
+            estimated_total_hours_div.add('Estimated Total Hours: {0}'.format(estimated_total_hours))
+
         add_component_button = ButtonNewWdg(title='Add Component', icon='INSERT')
         add_component_button.add_behavior(
             obu.get_load_popup_widget_with_reload_behavior(
@@ -256,6 +263,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(client_name_div)
         order_div.add(po_number_div)
         order_div.add(description_div)
+        order_div.add(estimated_total_hours_div)
         order_div.add(add_component_button)
         order_div.add(add_component_by_language_button)
         order_div.add(add_component_by_season_button)
@@ -392,11 +400,19 @@ class OrderBuilderWdg(BaseRefreshWdg):
             else:
                 component_language_div.add('<i>No language selected</i>')
 
-            component_estimated_hours_div = DivWdg()
-            estimated_remaining_hours = get_component_estimated_hours_from_component_code(component.get_code())
+            component_estimated_total_hours_div = DivWdg()
+            estimated_total_hours = get_component_estimated_total_hours_from_component_code(component.get_code())
+
+            if estimated_total_hours:
+                component_estimated_total_hours_div.add('Estimated Total Hours: {0}'.format(estimated_total_hours))
+
+            component_estimated_remaining_hours_div = DivWdg()
+            estimated_remaining_hours = get_component_estimated_remaining_hours_from_component_code(
+                component.get_code())
 
             if estimated_remaining_hours:
-                component_estimated_hours_div.add('Estimated Hours: {0}'.format(estimated_remaining_hours))
+                component_estimated_remaining_hours_div.add('Estimated Remaining Hours: {0}'.format(
+                    estimated_remaining_hours))
 
             component_div = DivWdg()
             component_div.add_style('background-color', '#d9edcf')
@@ -408,7 +424,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(component_description_div)
             component_div.add(component_pipeline_div)
             component_div.add(component_language_div)
-            component_div.add(component_estimated_hours_div)
+            component_div.add(component_estimated_total_hours_div)
+            component_div.add(component_estimated_remaining_hours_div)
 
             instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
             instructions_button.add_behavior(
