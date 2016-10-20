@@ -89,7 +89,8 @@ try {
     server.update_multiple(lines);
 
     // Insert a blank line
-    server.insert('twog/element_evaluation_line', {'element_evaluation_code': element_evaluation_code});
+    server.insert('twog/element_evaluation_line', {'element_evaluation_code': element_evaluation_code,
+                                                   'checked': true});
 
     // Refresh the widget
     var element_eval_lines_div = document.getElementById('element_eval_lines_div');
@@ -171,7 +172,8 @@ try {
     // Insert multiple blank lines. Unfortunately, as far as I know, insert_multiple does not work, and each line
     // must be inserted individually
     for (var x = 0; x < number_of_lines; x++) {
-        server.insert('twog/element_evaluation_line', {'element_evaluation_code': element_evaluation_code})
+        server.insert('twog/element_evaluation_line', {'element_evaluation_code': element_evaluation_code,
+                                                       'checked': true});
     }
 
     // Refresh the widget
@@ -223,13 +225,60 @@ catch(err) {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
-var server = TacticServerStub.get();
+function getTableRowsWithAttribute(table, attribute)
+{
+  var matchingElements = [];
+  var allElements = table.getElementsByTagName('tr');
+  for (var i = 0, n = allElements.length; i < n; i++)
+  {
+    if (allElements[i].getAttribute(attribute) !== null)
+    {
+      // Element exists with attribute. Add to array.
+      matchingElements.push(allElements[i]);
+    }
+  }
+  return matchingElements;
+}
+
 var element_evaluation_code = '%s';
-var code = '%s';
 
-var search_key = server.build_search_key('twog/element_evaluation_line', code, 'twog');
+var element_eval_lines_table = document.getElementById('element_eval_lines_table');
+var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
 
-server.update(search_key, {'checked': true});
+var server = TacticServerStub.get();
+
+// Get a dictionary of all the line items, indexed by search key. This is to send all the lines to the database
+// at once and avoid multiple insert queries (ends up being really slow).
+var lines = {};
+
+for (var i = 0; i < table_rows.length; i++) {
+    var line_data = {};
+
+    line_data['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
+    line_data['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
+    line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
+    line_data['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
+    line_data['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
+    line_data['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
+    line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
+    line_data['scale'] = document.getElementById("scale-" + String(i)).value;
+    line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
+    line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
+
+    var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
+                                             'twog');
+
+    lines[search_key] = line_data;
+}
+
+// Update all the lines at once
+server.update_multiple(lines);
+
+var line_code = '%s';
+
+var checked_line_search_key = server.build_search_key('twog/element_evaluation_line', line_code, 'twog');
+
+server.update(checked_line_search_key, {'checked': true});
 
 // Refresh the widget
 var element_eval_lines_div = document.getElementById('element_eval_lines_div');

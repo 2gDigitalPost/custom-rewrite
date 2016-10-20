@@ -630,6 +630,9 @@ try {
         line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
         line_data['element_evaluation_code'] = code;
 
+        // All copied lines are not checked by default, to force operators to check off the lines on new reports
+        line_data['checked'] = false;
+
         server.insert('twog/element_evaluation_line', line_data);
     }
 
