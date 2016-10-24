@@ -140,11 +140,10 @@
 
                 console.log(order_priorities);
 
-/*
                 $.ajax({
-                    url: '/instructions_template',
+                    url: '/orders/priorities',
                     contentType: 'application/json',
-                    data: JSON.stringify(data_to_submit),
+                    data: JSON.stringify(order_priorities),
                     type: 'POST',
                     success: function(response) {
                         console.log(response);
@@ -153,7 +152,7 @@
                     error: function (error) {
                         console.log(error);
                     }
-                });*/
+                });
             });
         });
     </script>

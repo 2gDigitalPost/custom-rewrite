@@ -120,6 +120,19 @@ class OrderPriorities(Resource):
 
         return {'orders': order_sobjects, 'count': len(order_sobjects), 'priority_levels': priority_levels}
 
+    def post(self):
+        json_data = request.get_json()
+
+        update_data = {}
+
+        for order_code, priority in json_data.iteritems():
+            order_search_key = server.build_search_key('twog/order', order_code, project_code='twog')
+            update_data[order_search_key] = {'priority': float(priority)}
+
+        server.update_multiple(update_data)
+
+        return {'status': 200}
+
 
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
