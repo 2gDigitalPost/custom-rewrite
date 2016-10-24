@@ -41,6 +41,11 @@ def files_select():
     return render_template('files_select.html')
 
 
+@app.route('/orders/reprioritizer')
+def order_reprioritizer():
+    return render_template('order_reprioritizer.html')
+
+
 class DepartmentInstructions(Resource):
     def get(self):
         department_instructions = server.eval('@SOBJECT(twog/department_instructions)')
@@ -90,9 +95,36 @@ class InstructionsTemplate(Resource):
         print(args)
 
 
+class OrderPriorities(Resource):
+    def get(self):
+        order_sobjects = server.eval("@SOBJECT(twog/order['@ORDER_BY', 'priority asc'])")
+
+        priority_levels = {}
+        previous_priority = 0
+
+        for iterator, order_sobject in enumerate(order_sobjects):
+            current_priority = order_sobject.get('priority')
+
+            if current_priority != previous_priority:
+                priority_levels[iterator] = current_priority
+                previous_priority = current_priority
+            else:
+                priority_levels[iterator] = None
+
+        for priority_level, priority_decimal in priority_levels.iteritems():
+            if priority_decimal is None:
+                previous_priority = priority_levels[priority_level - 1]
+                next_priority = priority_levels[priority_level + 1]
+
+                priority_levels[priority_level] = (previous_priority + next_priority) / 2.0
+
+        return {'orders': order_sobjects, 'count': len(order_sobjects), 'priority_levels': priority_levels}
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
+api.add_resource(OrderPriorities, '/orders/priorities')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
