@@ -113,8 +113,14 @@ class OrderPriorities(Resource):
 
         for priority_level, priority_decimal in priority_levels.iteritems():
             if priority_decimal is None:
-                previous_priority = priority_levels[priority_level - 1]
-                next_priority = priority_levels[priority_level + 1]
+                previous_priority = priority_levels.get(priority_level - 1)
+                next_priority = priority_levels.get(priority_level + 1)
+
+                if previous_priority is None:
+                    previous_priority = 0.0
+
+                if next_priority is None:
+                    next_priority = 600000.0
 
                 priority_levels[priority_level] = (previous_priority + next_priority) / 2.0
 
