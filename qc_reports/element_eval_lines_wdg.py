@@ -5,7 +5,7 @@ from tactic.ui.common import BaseRefreshWdg
 from pyasm.prod.biz import ProdSetting
 from pyasm.search import Search
 from pyasm.web import DivWdg, SpanWdg, Table
-from pyasm.widget import SelectWdg
+from pyasm.widget import HiddenWdg, SelectWdg
 
 from utils import get_text_input_wdg
 
@@ -38,49 +38,48 @@ class ElementEvalLinesWdg(BaseRefreshWdg):
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
-function getTableRowsWithAttribute(table, attribute)
-{
-  var matchingElements = [];
-  var allElements = table.getElementsByTagName('tr');
-  for (var i = 0, n = allElements.length; i < n; i++)
-  {
-    if (allElements[i].getAttribute(attribute) !== null)
-    {
-      // Element exists with attribute. Add to array.
-      matchingElements.push(allElements[i]);
-    }
-  }
-  return matchingElements;
-}
-
 try {
-    var element_evaluation_code = '%s';
+    // Return an object containing the element evaluation's values
+    var top = bvr.src_el.getParent("#element_eval_panel");
+    var report_values = spt.api.get_input_values(top, null, false);
 
-    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
-    var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
+    var element_evaluation_code = '%s';
 
     var server = TacticServerStub.get();
 
+    var number_of_lines = 0;
+
+    while (true)
+    {
+        if (report_values.hasOwnProperty("timecode-in-" + String(number_of_lines))) {
+            number_of_lines++;
+        }
+        else {
+            break;
+        }
+    }
+
     // Get a dictionary of all the line items, indexed by search key. This is to send all the lines to the database
     // at once and avoid multiple insert queries (ends up being really slow).
-    var lines = {};
+    lines = {};
 
-    for (var i = 0; i < table_rows.length; i++) {
+    for (var i = 0; i < number_of_lines; i++) {
         var line_data = {};
 
-        line_data['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
-        line_data['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
-        line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
-        line_data['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
-        line_data['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
-        line_data['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
-        line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
-        line_data['scale'] = document.getElementById("scale-" + String(i)).value;
-        line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
+        line_data['timecode_in'] = report_values["timecode-in-" + String(i)];
+        line_data['field_in'] = report_values["field-in-" + String(i)];
+        line_data['description'] = report_values["description-" + String(i)];
+        line_data['in_safe'] = report_values["in-safe-" + String(i)];
+        line_data['timecode_out'] = report_values["timecode-out-" + String(i)];
+        line_data['field_out'] = report_values["field-out-" + String(i)];
+        line_data['type_code'] = report_values["type-code-" + String(i)];
+        line_data['scale'] = report_values["scale-" + String(i)];
+        line_data['sector_or_channel'] = report_values["sector-or-channel-" + String(i)];
+        line_data['in_source'] = report_values["in-source-" + String(i)];
 
-        var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
-                                                 'twog');
+        line_data_code = report_values["element-eval-line-code-" + String(i)];
+
+        var search_key = server.build_search_key('twog/element_evaluation_line', line_data_code, 'twog');
 
         lines[search_key] = line_data;
     }
@@ -93,9 +92,7 @@ try {
                                                    'checked': true});
 
     // Refresh the widget
-    var element_eval_lines_div = document.getElementById('element_eval_lines_div');
-
-    spt.api.load_panel(element_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
+    spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.ElementEvalLinesWdg',
                        {'element_evaluation_code': element_evaluation_code});
 }
 catch(err) {
@@ -112,56 +109,55 @@ catch(err) {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
-function getTableRowsWithAttribute(table, attribute)
-{
-  var matchingElements = [];
-  var allElements = table.getElementsByTagName('tr');
-  for (var i = 0, n = allElements.length; i < n; i++)
-  {
-    if (allElements[i].getAttribute(attribute) !== null)
-    {
-      // Element exists with attribute. Add to array.
-      matchingElements.push(allElements[i]);
-    }
-  }
-  return matchingElements;
-}
-
 try {
-    var element_evaluation_code = '%s';
+    // Return an object containing the element evaluation's values
+    var top = bvr.src_el.getParent("#element_eval_panel");
+    var report_values = spt.api.get_input_values(top, null, false);
 
-    var element_eval_lines_table = document.getElementById('element_eval_lines_table');
-    var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
+    var element_evaluation_code = '%s';
 
     var server = TacticServerStub.get();
 
-    var number_of_lines = Number(prompt('Enter the amount of lines you want to add.'));
+    var number_of_lines_to_insert = Number(prompt('Enter the amount of lines you want to add.'));
 
-    if (isNaN(number_of_lines)) {
+    if (isNaN(number_of_lines_to_insert)) {
         alert("Your entry was invalid, please enter only a number");
         return;
     }
 
+    var number_of_lines = 0;
+
+    while (true)
+    {
+        if (report_values.hasOwnProperty("timecode-in-" + String(number_of_lines))) {
+            number_of_lines++;
+        }
+        else {
+            break;
+        }
+    }
+
     // Get a dictionary of all the line items, indexed by search key. This is to send all the lines to the database
     // at once and avoid multiple insert queries (ends up being really slow).
-    var lines = {};
+    lines = {};
 
-    for (var i = 0; i < table_rows.length; i++) {
+    for (var i = 0; i < number_of_lines; i++) {
         var line_data = {};
 
-        line_data['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
-        line_data['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
-        line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
-        line_data['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
-        line_data['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
-        line_data['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
-        line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
-        line_data['scale'] = document.getElementById("scale-" + String(i)).value;
-        line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-        line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
+        line_data['timecode_in'] = report_values["timecode-in-" + String(i)];
+        line_data['field_in'] = report_values["field-in-" + String(i)];
+        line_data['description'] = report_values["description-" + String(i)];
+        line_data['in_safe'] = report_values["in-safe-" + String(i)];
+        line_data['timecode_out'] = report_values["timecode-out-" + String(i)];
+        line_data['field_out'] = report_values["field-out-" + String(i)];
+        line_data['type_code'] = report_values["type-code-" + String(i)];
+        line_data['scale'] = report_values["scale-" + String(i)];
+        line_data['sector_or_channel'] = report_values["sector-or-channel-" + String(i)];
+        line_data['in_source'] = report_values["in-source-" + String(i)];
 
-        var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
-                                                 'twog');
+        line_data_code = report_values["element-eval-line-code-" + String(i)];
+
+        var search_key = server.build_search_key('twog/element_evaluation_line', line_data_code, 'twog');
 
         lines[search_key] = line_data;
     }
@@ -171,15 +167,13 @@ try {
 
     // Insert multiple blank lines. Unfortunately, as far as I know, insert_multiple does not work, and each line
     // must be inserted individually
-    for (var x = 0; x < number_of_lines; x++) {
+    for (var x = 0; x < number_of_lines_to_insert; x++) {
         server.insert('twog/element_evaluation_line', {'element_evaluation_code': element_evaluation_code,
                                                        'checked': true});
     }
 
     // Refresh the widget
-    var element_eval_lines_div = document.getElementById('element_eval_lines_div');
-
-    spt.api.load_panel(element_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
+    spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.ElementEvalLinesWdg',
                        {'element_evaluation_code': element_evaluation_code});
 }
 catch(err) {
@@ -205,9 +199,7 @@ try {
         server.retire_sobject(server.build_search_key('twog/element_evaluation_line', code, 'twog'));
 
         // Refresh the widget
-        var element_eval_lines_div = document.getElementById('element_eval_lines_div');
-
-        spt.api.load_panel(element_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
+        spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.ElementEvalLinesWdg',
                            {'element_evaluation_code': element_evaluation_code});
     }
 }
@@ -225,48 +217,47 @@ catch(err) {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
-function getTableRowsWithAttribute(table, attribute)
-{
-  var matchingElements = [];
-  var allElements = table.getElementsByTagName('tr');
-  for (var i = 0, n = allElements.length; i < n; i++)
-  {
-    if (allElements[i].getAttribute(attribute) !== null)
-    {
-      // Element exists with attribute. Add to array.
-      matchingElements.push(allElements[i]);
-    }
-  }
-  return matchingElements;
-}
+// Return an object containing the element evaluation's values
+var top = bvr.src_el.getParent("#element_eval_panel");
+var report_values = spt.api.get_input_values(top, null, false);
 
 var element_evaluation_code = '%s';
 
-var element_eval_lines_table = document.getElementById('element_eval_lines_table');
-var table_rows = getTableRowsWithAttribute(element_eval_lines_table, 'code');
-
 var server = TacticServerStub.get();
+
+var number_of_lines = 0;
+
+while (true)
+{
+    if (report_values.hasOwnProperty("timecode-in-" + String(number_of_lines))) {
+        number_of_lines++;
+    }
+    else {
+        break;
+    }
+}
 
 // Get a dictionary of all the line items, indexed by search key. This is to send all the lines to the database
 // at once and avoid multiple insert queries (ends up being really slow).
-var lines = {};
+lines = {};
 
-for (var i = 0; i < table_rows.length; i++) {
+for (var i = 0; i < number_of_lines; i++) {
     var line_data = {};
 
-    line_data['timecode_in'] = document.getElementsByName("timecode-in-" + String(i))[0].value;
-    line_data['field_in'] = document.getElementsByName("field-in-" + String(i))[0].value;
-    line_data['description'] = document.getElementsByName("description-" + String(i))[0].value;
-    line_data['in_safe'] = document.getElementById("in-safe-" + String(i)).value;
-    line_data['timecode_out'] = document.getElementsByName("timecode-out-" + String(i))[0].value;
-    line_data['field_out'] = document.getElementsByName("field-out-" + String(i))[0].value;
-    line_data['type_code'] = document.getElementById("type-code-" + String(i)).value;
-    line_data['scale'] = document.getElementById("scale-" + String(i)).value;
-    line_data['sector_or_channel'] = document.getElementsByName("sector-or-channel-" + String(i))[0].value;
-    line_data['in_source'] = document.getElementById("in-source-" + String(i)).value;
+    line_data['timecode_in'] = report_values["timecode-in-" + String(i)];
+    line_data['field_in'] = report_values["field-in-" + String(i)];
+    line_data['description'] = report_values["description-" + String(i)];
+    line_data['in_safe'] = report_values["in-safe-" + String(i)];
+    line_data['timecode_out'] = report_values["timecode-out-" + String(i)];
+    line_data['field_out'] = report_values["field-out-" + String(i)];
+    line_data['type_code'] = report_values["type-code-" + String(i)];
+    line_data['scale'] = report_values["scale-" + String(i)];
+    line_data['sector_or_channel'] = report_values["sector-or-channel-" + String(i)];
+    line_data['in_source'] = report_values["in-source-" + String(i)];
 
-    var search_key = server.build_search_key('twog/element_evaluation_line', table_rows[i].getAttribute('code'),
-                                             'twog');
+    line_data_code = report_values["element-eval-line-code-" + String(i)];
+
+    var search_key = server.build_search_key('twog/element_evaluation_line', line_data_code, 'twog');
 
     lines[search_key] = line_data;
 }
@@ -281,9 +272,7 @@ var checked_line_search_key = server.build_search_key('twog/element_evaluation_l
 server.update(checked_line_search_key, {'checked': true});
 
 // Refresh the widget
-var element_eval_lines_div = document.getElementById('element_eval_lines_div');
-
-spt.api.load_panel(element_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
+spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.ElementEvalLinesWdg',
                    {'element_evaluation_code': element_evaluation_code});
 ''' % (self.element_evaluation_code, row_code)
         }
@@ -408,8 +397,7 @@ spt.api.load_panel(element_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
                                  ('From Approved Master', 'from_approved_master')]
 
             for iterator, line in enumerate(self.lines):
-                current_row = table.add_row()
-                current_row.add_attr('code', line.get_code())
+                table.add_row()
 
                 table.add_cell(
                     get_text_input_wdg('timecode-in-{0}'.format(iterator), line.get_value('timecode_in'), 150,
@@ -445,6 +433,9 @@ spt.api.load_panel(element_eval_lines_div, 'qc_reports.ElementEvalLinesWdg',
                 table.add_cell(
                     self.get_select_wdg('in-source-{0}'.format(iterator), in_source_options,
                                         line.get_value('in_source'))
+                )
+                table.add_cell(
+                    HiddenWdg('element-eval-line-code-{0}'.format(iterator), line.get_code())
                 )
                 table.add_cell(
                     self.get_remove_row_button(line.get_code())
