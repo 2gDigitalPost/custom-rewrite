@@ -7,7 +7,7 @@ from pyasm.search import Search
 from pyasm.web import DivWdg, SpanWdg, Table
 from pyasm.widget import HiddenWdg, SelectWdg
 
-from utils import get_text_input_wdg
+from utils import get_text_input_wdg, get_add_colons_for_time_behavior
 
 
 class ElementEvalLinesWdg(BaseRefreshWdg):
@@ -279,6 +279,24 @@ spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.
 
         return behavior
 
+    @staticmethod
+    def get_text_input_for_element_eval_line_wdg(name, data, is_checked, width=200, timecode=False):
+        textbox_wdg = TextInputWdg()
+        textbox_wdg.set_id(name)
+        textbox_wdg.set_name(name)
+        textbox_wdg.add_style('width', '{0}px'.format(width))
+
+        if not is_checked:
+            textbox_wdg.add_style('font-weight', 'bold')
+
+        if timecode:
+            textbox_wdg.add_behavior(get_add_colons_for_time_behavior())
+
+        if data:
+            textbox_wdg.set_value(data)
+
+        return textbox_wdg
+
     def set_header_rows(self, table):
         table.add_row()
         table.add_header("Timecode In")
@@ -295,26 +313,13 @@ spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.
             time_out_label = "Timecode Out"
 
         table.add_header(time_out_label)
-        table.add_header("&nbsp;F")
         table.add_header("Code")
         table.add_header("Scale")
         table.add_header("Sector/Ch")
         table.add_header("In Source")
 
     @staticmethod
-    def get_text_input_wdg_for_element_eval_lines(name, width=200, line_data=None):
-        textbox_wdg = TextInputWdg()
-        textbox_wdg.set_id(name)
-        textbox_wdg.set_name(name)
-        textbox_wdg.add_style('width', '{0}px'.format(width))
-
-        if line_data:
-            textbox_wdg.set_value(line_data)
-
-        return textbox_wdg
-
-    @staticmethod
-    def get_select_wdg(name, options, saved_value=None):
+    def get_select_wdg(name, options, is_checked, saved_value=None):
         select_wdg = SelectWdg(name)
         select_wdg.set_id(name)
         select_wdg.add_empty_option()
@@ -324,6 +329,9 @@ spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.
             value = option_set[1]
 
             select_wdg.append_option(label, value)
+
+        if not is_checked:
+            select_wdg.add_style('font-weight', 'bold')
 
         if saved_value:
             select_wdg.set_value(saved_value)
@@ -400,39 +408,45 @@ spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.
                 table.add_row()
 
                 table.add_cell(
-                    get_text_input_wdg('timecode-in-{0}'.format(iterator), line.get_value('timecode_in'), 150,
-                                       timecode=True)
+                    self.get_text_input_for_element_eval_line_wdg('timecode-in-{0}'.format(iterator),
+                                                                  line.get_value('timecode_in'),
+                                                                  line.get_value('checked'), 150, timecode=True)
                 )
                 table.add_cell(
-                    get_text_input_wdg('field-in-{0}'.format(iterator), line.get_value('field_in'), 30)
+                    self.get_text_input_for_element_eval_line_wdg('field-in-{0}'.format(iterator),
+                                                                  line.get_value('field_in'), line.get_value('checked'),
+                                                                  50)
                 )
                 table.add_cell(
-                    get_text_input_wdg('description-{0}'.format(iterator), line.get_value('description'), 400)
+                    self.get_text_input_for_element_eval_line_wdg('description-{0}'.format(iterator),
+                                                                  line.get_value('description'),
+                                                                  line.get_value('checked'), 400)
                 )
                 table.add_cell(
-                    self.get_select_wdg('in-safe-{0}'.format(iterator), in_safe_options, line.get_value('in_safe'))
+                    self.get_select_wdg('in-safe-{0}'.format(iterator), in_safe_options, line.get_value('checked'),
+                                        line.get_value('in_safe'))
                 )
                 table.add_cell(
-                    get_text_input_wdg('timecode-out-{0}'.format(iterator), line.get_value('timecode_out'), 150,
-                                       timecode=True)
-                )
-                table.add_cell(
-                    get_text_input_wdg('field-out-{0}'.format(iterator), line.get_value('field_out'), 30)
+                    self.get_text_input_for_element_eval_line_wdg('timecode-out-{0}'.format(iterator),
+                                                                  line.get_value('timecode_out'),
+                                                                  line.get_value('checked'), 150, timecode=True)
                 )
                 table.add_cell(
                     self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options,
-                                        line.get_value('type_code'))
+                                        line.get_value('checked'), line.get_value('type_code'))
                 )
                 table.add_cell(
-                    self.get_select_wdg('scale-{0}'.format(iterator), scale_select_options, line.get_value('scale'))
+                    self.get_select_wdg('scale-{0}'.format(iterator), scale_select_options,
+                                        line.get_value('checked'), line.get_value('scale'))
                 )
                 table.add_cell(
-                    get_text_input_wdg('sector-or-channel-{0}'.format(iterator), line.get_value('sector_or_channel'),
-                                       150)
+                    self.get_text_input_for_element_eval_line_wdg('sector-or-channel-{0}'.format(iterator),
+                                                                  line.get_value('sector_or_channel'),
+                                                                  line.get_value('checked'), 150)
                 )
                 table.add_cell(
                     self.get_select_wdg('in-source-{0}'.format(iterator), in_source_options,
-                                        line.get_value('in_source'))
+                                        line.get_value('checked'), line.get_value('in_source'))
                 )
                 table.add_cell(
                     HiddenWdg('element-eval-line-code-{0}'.format(iterator), line.get_code())
