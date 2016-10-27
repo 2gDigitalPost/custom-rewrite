@@ -449,6 +449,9 @@ spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.
                                         line.get_value('checked'), line.get_value('in_source'))
                 )
                 table.add_cell(
+                    HiddenWdg('checked-{0}'.format(iterator), line.get_value('checked'))
+                )
+                table.add_cell(
                     HiddenWdg('element-eval-line-code-{0}'.format(iterator), line.get_code())
                 )
                 table.add_cell(

@@ -1,6 +1,3 @@
-from datetime import datetime
-
-
 def main(server=None, trigger_input=None):
     """
     On the insert|twog/contact event, insert the contact's "name" field based on the first_name and last_name fields.

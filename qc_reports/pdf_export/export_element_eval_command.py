@@ -19,6 +19,13 @@ def get_paragraph(text, style_sheet_type='BodyText'):
     return Paragraph(text, style_sheet[style_sheet_type])
 
 
+def calculate_duration(timecode_in, timecode_out):
+    hours_in, minutes_in, seconds_in, frames_in = timecode_in.split(':')
+    hours_out, minutes_out, seconds_out, frames_out = timecode_out.split(':')
+
+
+
+
 def get_title_table(element_eval_sobject):
     title_table_data = [
         [
@@ -117,7 +124,7 @@ def get_element_eval_lines_table(element_eval_sobject):
     if not element_eval_lines:
         return None
 
-    element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'F', 'Code',
+    element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'Duration', 'Code',
                                       'Scale', 'Sector/Ch', 'In Source']]
 
     lines_with_values = []
@@ -146,17 +153,18 @@ def get_element_eval_lines_table(element_eval_sobject):
             in_safe = ''
 
         timecode_out = line.get('timecode_out')
-        field_out = line.get('field_out')
         type_code = line.get('type_code').capitalize()
         scale = line.get('scale').upper()
         sector_or_channel = line.get('sector_or_channel')
         in_source = translate_in_source(line.get('in_source'))
 
-        if any([timecode_in, field_in, description, in_safe, timecode_out, field_out, type_code, scale,
+        if any([timecode_in, field_in, description, in_safe, timecode_out, type_code, scale,
                 sector_or_channel, in_source]):
             line_data = []
 
-            for attribute in [timecode_in, field_in, description, in_safe, timecode_out, field_out, type_code, scale,
+            duration = calculate_duration(timecode_in, timecode_out)
+
+            for attribute in [timecode_in, field_in, description, in_safe, timecode_out, 'asdf', type_code, scale,
                               sector_or_channel, in_source]:
                 paragraph_style = ParagraphStyle(attribute)
                 paragraph_style.fontSize = 7
@@ -171,9 +179,9 @@ def get_element_eval_lines_table(element_eval_sobject):
             element_eval_lines_table_data.append(line_data)
 
     element_eval_lines_table = Table(element_eval_lines_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5,
-                                     colWidths=[(.7 * inch), (.19 * inch), (inch * 3.5), (.4 * inch), (.82 * inch),
-                                                (.19 * inch), (.3 * inch), (.3 * inch), (.55 * inch),
-                                                (.75 * inch)],
+                                     colWidths=[(.7 * inch), (.14 * inch), (inch * 3.1), (.4 * inch), (.80 * inch),
+                                                (.5 * inch),
+                                                (.3 * inch), (.3 * inch), (.55 * inch), (.75 * inch)],
                                      repeatRows=1)
 
     element_eval_lines_table.setStyle([('BOX', (0, 0), (-1, -1), 0.2, colors.black),

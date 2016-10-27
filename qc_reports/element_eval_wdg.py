@@ -312,7 +312,6 @@ function get_report_values() {
 
     // Operator row values
     var date = report_values.date;
-    var operator = report_values.operator;
     var style = report_values.style_select;
     var bay = report_values.bay_select;
     var machine_code = report_values.machine_select;
@@ -367,8 +366,7 @@ function get_report_values() {
         'name': name,
         'client_code': client_code,
         'status': status,
-        'date': date,
-        'operator': operator,
+        'date': new Date().toUTCString(),
         'style': style,
         'bay': bay,
         'machine_code': machine_code,
@@ -483,6 +481,228 @@ try {
 
         // All copied lines are not checked by default, to force operators to check off the lines on new reports
         line_data['checked'] = false;
+
+        server.insert('twog/element_evaluation_line', line_data);
+    }
+
+    // Finally, get the search key for the new report, and use it to reload the page
+    var search_key = server.build_search_key('twog/element_evaluation', code, 'twog');
+
+    spt.api.load_panel(bvr.src_el.getParent('#element_eval_panel'), 'qc_reports.ElementEvalWdg', {'search_key': search_key});
+
+    spt.app_busy.hide();
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
+            '''
+        }
+
+        return behavior
+
+    @staticmethod
+    def get_save_as_new_version_behavior():
+        behavior = {
+            'css_class': 'clickme',
+            'type': 'click_up',
+            'cbjs_action': '''
+function get_report_values() {
+    // Return an object containing the element evaluation's values
+    var top = bvr.src_el.getParent("#element_eval_panel");
+    var report_values = spt.api.get_input_values(top, null, false);
+
+    // Regular expression to find if the name has _V{digit} at the end of the name. If so, increment the version by one,
+    // if not, add _V2 to the name when saving the new report
+    var regex = /_V\d$/gm;
+
+    // Name of the report
+    var name = report_values.name_data;
+
+    var match = regex.exec(name);
+
+    if (match) {
+        var version_digit = Number(name[name.length - 1]) + 1;
+        name = name.slice(0, -1) + String(version_digit);
+    }
+    else {
+        name = name + "_V2";
+    }
+
+    // Client row values
+    var client_code = report_values.client_select;
+    var status = report_values.status_select;
+
+    // Operator row values
+    var style = report_values.style_select;
+    var bay = report_values.bay_select;
+    var machine_code = report_values.machine_select;
+
+    // Title section values
+    var title_data = report_values.title_data;
+    var format = report_values.format_select;
+    var season = report_values.season;
+    var standard = report_values.standard_select;
+    var episode = report_values.episode;
+    var frame_rate_code = report_values.frame_rate_select;
+    var version = report_values.version;
+    var po_number = report_values.po_number;
+    var file_name = report_values.file_name;
+
+    // Program Format values
+    var roll_up_blank = report_values.roll_up_blank;
+    var bars_tone = report_values.bars_tone;
+    var black_silence_1 = report_values.black_silence_1;
+    var slate_silence = report_values.slate_silence;
+    var black_silence_2 = report_values.black_silence_2;
+    var start_of_program = report_values.start_of_program;
+    var end_of_program = report_values.end_of_program;
+
+    // Video Measurements values
+    var active_video_begins = report_values.active_video_begins;
+    var active_video_ends = report_values.active_video_ends;
+    var horizontal_blanking = report_values.horizontal_blanking;
+    var luminance_peak = report_values.luminance_peak;
+    var chroma_peak = report_values.chroma_peak;
+    var head_logo = report_values.head_logo;
+    var tail_logo = report_values.tail_logo;
+
+    // Element Profile values
+    var total_runtime = report_values.total_runtime;
+    var language_code = report_values.language_select;
+    var tv_feature_trailer = report_values.tv_feature_trailer;
+    var cc_subtitles = report_values.cc_subtitles;
+    var video_aspect_ratio = report_values.video_aspect_ratio_select;
+    var vitc = report_values.vitc;
+    var textless_tail = report_values.textless_tail;
+    var source_barcode = report_values.source_barcode;
+    var notices = report_values.notices;
+    var element_qc_barcode = report_values.element_qc_barcode;
+    var label = report_values.label;
+    var record_date = report_values.record_date;
+
+    // General comments
+    var general_comments = report_values.general_comments;
+
+    var qc_report_object = {
+        'name': name,
+        'client_code': client_code,
+        'status': status,
+        'date': new Date().toUTCString(),
+        'style': style,
+        'bay': bay,
+        'machine_code': machine_code,
+        'title': title_data,
+        'format': format,
+        'season': season,
+        'standard': standard,
+        'episode': episode,
+        'frame_rate_code': frame_rate_code,
+        'version': version,
+        'po_number': po_number,
+        'file_name': file_name,
+        'roll_up_blank': roll_up_blank,
+        'bars_tone': bars_tone,
+        'black_silence_1': black_silence_1,
+        'slate_silence': slate_silence,
+        'black_silence_2': black_silence_2,
+        'start_of_program': start_of_program,
+        'end_of_program': end_of_program,
+        'active_video_begins': active_video_begins,
+        'active_video_ends': active_video_ends,
+        'horizontal_blanking': horizontal_blanking,
+        'luminance_peak': luminance_peak,
+        'chroma_peak': chroma_peak,
+        'head_logo': head_logo,
+        'tail_logo': tail_logo,
+        'total_runtime': total_runtime,
+        'language_code': language_code,
+        'tv_feature_trailer': tv_feature_trailer,
+        'cc_subtitles': cc_subtitles,
+        'video_aspect_ratio': video_aspect_ratio,
+        'vitc': vitc,
+        'textless_tail': textless_tail,
+        'source_barcode': source_barcode,
+        'notices': notices,
+        'element_qc_barcode': element_qc_barcode,
+        'label': label,
+        'record_date': record_date,
+        'general_comments': general_comments
+    };
+
+    return qc_report_object;
+}
+
+try {
+    // Return an object containing the element evaluation's values
+    var top = bvr.src_el.getParent("#element_eval_panel");
+    var report_values = spt.api.get_input_values(top, null, false);
+
+    var server = TacticServerStub.get();
+
+    spt.app_busy.show("Saving a new Report...");
+
+    var qc_report_object = get_report_values();
+
+    // Save the new Element Evaluation, and get the code that it saved as
+    var inserted_element_evaluation = server.insert('twog/element_evaluation', qc_report_object);
+    var code = inserted_element_evaluation['code'];
+
+    // Using the code gained from the new report, save the audio and element eval lines
+    var number_of_lines = 0;
+
+    while (true) {
+        if (report_values.hasOwnProperty("channel-" + String(number_of_lines))) {
+            number_of_lines++;
+        }
+        else {
+            break;
+        }
+    }
+
+    for (var i = 0; i < number_of_lines; i++) {
+        var channel = report_values["channel-" + String(i)];
+        var content = report_values["content-" + String(i)];
+        var tone = report_values["tone-" + String(i)];
+        var peak = report_values["peak-" + String(i)];
+
+        // Insert the line
+        // TODO: Insert all lines at once rather than one at a time
+        server.insert('twog/audio_evaluation_line', {'element_evaluation_code': code,
+                                                     'channel': channel,
+                                                     'content': content,
+                                                     'tone': tone,
+                                                     'peak': peak});
+    }
+
+    number_of_lines = 0;
+
+    while (true) {
+        if (report_values.hasOwnProperty("timecode-in-" + String(number_of_lines))) {
+            number_of_lines++;
+        }
+        else {
+            break;
+        }
+    }
+
+    for (var i = 0; i < number_of_lines; i++) {
+        var line_data = {};
+
+        line_data['timecode_in'] = report_values["timecode-in-" + String(i)];
+        line_data['field_in'] = report_values["field-in-" + String(i)];
+        line_data['description'] = report_values["description-" + String(i)];
+        line_data['in_safe'] = report_values["in-safe-" + String(i)];
+        line_data['timecode_out'] = report_values["timecode-out-" + String(i)];
+        line_data['field_out'] = report_values["field-out-" + String(i)];
+        line_data['type_code'] = report_values["type-code-" + String(i)];
+        line_data['scale'] = report_values["scale-" + String(i)];
+        line_data['sector_or_channel'] = report_values["sector-or-channel-" + String(i)];
+        line_data['in_source'] = report_values["in-source-" + String(i)];
+        line_data['element_evaluation_code'] = code;
+
+        // All copied lines are checked by default, as opposed to the regular 'save as'
+        line_data['checked'] = report_values["checked-" + String(i)];
 
         server.insert('twog/element_evaluation_line', line_data);
     }
@@ -1018,6 +1238,18 @@ window.open(file_path);
 
         return section_span
 
+    def get_save_as_new_version_button(self):
+        section_span = SpanWdg()
+        section_span.add_style('display', 'inline-block')
+
+        save_as_new_version_button = ButtonNewWdg(title='Save As New Version', icon='INSERT')
+        save_as_new_version_button.add_class('save_as_new_version_button')
+        save_as_new_version_button.add_behavior(self.get_save_as_new_version_behavior())
+
+        section_span.add(save_as_new_version_button)
+
+        return section_span
+
     def get_export_to_pdf_button(self):
         section_span = SpanWdg()
         section_span.add_style('display', 'inline-block')
@@ -1030,10 +1262,18 @@ window.open(file_path);
 
         return section_span
 
+    def add_button_row_to_main_wdg(self, main_wdg):
+        main_wdg.add(self.get_save_button())
+        main_wdg.add(self.get_export_to_pdf_button())
+        main_wdg.add(self.get_save_as_new_button())
+        main_wdg.add(self.get_save_as_new_version_button())
+
     def get_display(self):
         # This will be the main <div> that everything else goes into
         main_wdg = DivWdg()
         main_wdg.set_id('element_eval_panel')
+
+        self.add_button_row_to_main_wdg(main_wdg)
 
         main_wdg.add(self.get_name_section())
 
@@ -1056,8 +1296,7 @@ window.open(file_path);
         main_wdg.add(self.get_general_comments_section())
 
         main_wdg.add(ElementEvalLinesWdg(element_evaluation_code=self.element_eval_sobject.get_code()))
-        main_wdg.add(self.get_save_button())
-        main_wdg.add(self.get_export_to_pdf_button())
-        main_wdg.add(self.get_save_as_new_button())
+
+        self.add_button_row_to_main_wdg(main_wdg)
 
         return main_wdg
