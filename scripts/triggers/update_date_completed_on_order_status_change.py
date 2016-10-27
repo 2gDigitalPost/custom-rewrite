@@ -13,7 +13,7 @@ def main(server=None, trigger_input=None):
     if not trigger_input:
         return
 
-    # Get the package sobject.
+    # Get the order sobject.
     order_sobject = trigger_input.get('sobject')
 
     # Only perform the update if the status has been changed to 'complete'
