@@ -124,7 +124,7 @@ def get_element_eval_lines_table(element_eval_sobject):
     if not element_eval_lines:
         return None
 
-    element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'Duration', 'Code',
+    element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'Code',
                                       'Scale', 'Sector/Ch', 'In Source']]
 
     lines_with_values = []
@@ -162,9 +162,9 @@ def get_element_eval_lines_table(element_eval_sobject):
                 sector_or_channel, in_source]):
             line_data = []
 
-            duration = calculate_duration(timecode_in, timecode_out)
+            # duration = calculate_duration(timecode_in, timecode_out)
 
-            for attribute in [timecode_in, field_in, description, in_safe, timecode_out, 'asdf', type_code, scale,
+            for attribute in [timecode_in, field_in, description, in_safe, timecode_out, type_code, scale,
                               sector_or_channel, in_source]:
                 paragraph_style = ParagraphStyle(attribute)
                 paragraph_style.fontSize = 7
@@ -179,8 +179,7 @@ def get_element_eval_lines_table(element_eval_sobject):
             element_eval_lines_table_data.append(line_data)
 
     element_eval_lines_table = Table(element_eval_lines_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5,
-                                     colWidths=[(.7 * inch), (.14 * inch), (inch * 3.1), (.4 * inch), (.80 * inch),
-                                                (.5 * inch),
+                                     colWidths=[(.7 * inch), (.14 * inch), (inch * 3.6), (.4 * inch), (.80 * inch),
                                                 (.3 * inch), (.3 * inch), (.55 * inch), (.75 * inch)],
                                      repeatRows=1)
 
