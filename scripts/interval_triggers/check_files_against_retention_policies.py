@@ -91,7 +91,6 @@ def main(server=None, input=None):
 
                     if most_recent_completion_date:
                         number_of_days_passed = (datetime.today() - most_recent_completion_date).days
-                        print(number_of_days_passed)
 
                         file_classification = division_file.get('classification')
 

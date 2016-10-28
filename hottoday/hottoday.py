@@ -8,7 +8,7 @@ from tactic.ui.widget import ButtonNewWdg
 from tactic_client_lib import TacticServerStub
 
 from common_tools.utils import get_order_sobject_from_task_sobject
-from order_builder.order_builder_utils import get_load_popup_widget_behavior
+from order_builder.order_builder_utils import get_load_popup_widget_behavior, get_add_notes_behavior
 
 
 def abbreviate_text(string, max_len):
@@ -67,6 +67,23 @@ var thead = document.getElementById('thead-section');
 thead.style.padding = "0px " + getScrollbarWidth() + "px 0px 0px";
             '''
             }
+
+
+def get_order_builder_launch_behavior(order_search_key):
+    behavior = {'css_class': 'clickme', 'type': 'click_up', 'cbjs_action': '''
+try {
+    var order_search_key = '%s';
+
+    spt.tab.add_new('order_' + order_search_key, 'Order Builder', 'order_builder.OrderBuilderWdg',
+                    {'search_key': order_search_key});
+}
+catch(err){
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}
+''' % order_search_key
+                }
+    return behavior
 
 
 class HotTodayWdg(BaseRefreshWdg):
@@ -149,7 +166,6 @@ class HotTodayWdg(BaseRefreshWdg):
             group_cell.add_style('border', '1px solid #E0E0E0')
             group_cell.add_style('width', '{0}%'.format(76.0 / len(groups)))
 
-
     @staticmethod
     def set_extra_info_row(info_text, color, table):
         extra_info_row = table.add_row()
@@ -186,8 +202,12 @@ class HotTodayWdg(BaseRefreshWdg):
 
         division_row = order_table.add_row()
 
+        division_search = Search('twog/division')
+        division_search.add_code_filter(division_code)
+        division = division_search.get_sobject()
+
         # TODO: Find the division image
-        division_data = '<b>Division:</b> {0}'.format(division_code)
+        division_data = '<b>Division:</b> {0}'.format(division.get('name'))
 
         order_table.add_cell(data=division_data, row=division_row)
 
@@ -195,10 +215,21 @@ class HotTodayWdg(BaseRefreshWdg):
         due_date_data = '<b>Due:</b> {0}'.format(due_date)
         order_table.add_cell(data=due_date_data, row=date_row)
 
+        # Add the buttons for the Order
+        button_row = order_table.add_row()
+
+        order_builder_button = ButtonNewWdg(title='Order Builder', icon='WORK')
+        order_builder_button.add_behavior(get_order_builder_launch_behavior(order.get('__search_key__')))
+
+        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+        note_button.add_behavior(get_add_notes_behavior(order.get('__search_key__')))
+        note_button.add_style('display', 'inline-block')
+
+        order_table.add_cell(data=order_builder_button, row=button_row)
+        order_table.add_cell(data=note_button, row=button_row)
 
         current_row = table.add_row()
         current_row.add_style('width', '100%')
-        current_row.add_style('height', 'auto')
         current_row.add_style('vertical-align', 'top')
 
         order_cell_background_color = '#D7D7D7'
@@ -229,7 +260,7 @@ class HotTodayWdg(BaseRefreshWdg):
                     current_task_row.add_style('border-top-left-radius', '10px')
                     current_task_row.add_style('border-bottom-left-radius', '10px')
 
-                    inspect_button = ButtonNewWdg(title='Task Inspect', icon='INFORMATION')
+                    inspect_button = ButtonNewWdg(title='Task Inspect', icon='WORK')
                     inspect_button.add_behavior(get_load_popup_widget_behavior('Task Inspect',
                                                                                'widgets.TaskInspectWdg',
                                                                                task.get_search_key(),
