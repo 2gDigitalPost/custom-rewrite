@@ -120,7 +120,6 @@ class HotTodayWdg(BaseRefreshWdg):
 
     @staticmethod
     def get_header_groups(tasks):
-        group_order = ['MR', 'Vault', 'Onboarding', 'Compression', 'Audio', 'Localization', 'QC', 'Edel']
         header_groups = []
 
         for task in tasks:
@@ -132,10 +131,23 @@ class HotTodayWdg(BaseRefreshWdg):
                 if group not in header_groups:
                     header_groups.append(group)
 
-        # TODO: Refactor the line below, surely a cleaner way to get the groups in order
-        header_groups = [group for group in group_order if group in header_groups]
-
         return header_groups
+
+    @staticmethod
+    def sort_header_groups(header_groups):
+        """
+        Given a list of header groups, return a sorted set of those groups
+
+        :param header_groups: List of header groups
+        :return: Set (sorted)
+        """
+        group_order = ['MR', 'Vault', 'Onboarding', 'Compression', 'Audio', 'Localization', 'QC', 'Edel']
+
+        header_groups_set = set(header_groups)
+
+        sorted_header_groups_set = [group for group in group_order if group in header_groups_set]
+
+        return sorted_header_groups_set
 
     @staticmethod
     def set_header(table, groups):
@@ -371,7 +383,7 @@ class HotTodayWdg(BaseRefreshWdg):
         package_codes_string = ','.join(package_codes)
 
         tasks_in_package_search = Search('sthpw/task')
-        tasks_in_package_search.add_filter('search_type', 'twog/component?project=twog')
+        tasks_in_package_search.add_filter('search_type', 'twog/package?project=twog')
         tasks_in_package_search.add_filter('status', 'Complete', op='!=')
         tasks_in_package_search.add_where('\"search_code\" in ({0})'.format(package_codes_string))
 
@@ -418,6 +430,9 @@ class HotTodayWdg(BaseRefreshWdg):
         header_groups = self.get_header_groups(component_tasks)
         header_groups.extend(self.get_header_groups(package_tasks))
 
+        # Get the header groups as a sorted set
+        header_groups = self.sort_header_groups(header_groups)
+
         self.set_header(table, header_groups)
 
         hotlist_body = table.add_tbody()
@@ -431,6 +446,23 @@ class HotTodayWdg(BaseRefreshWdg):
         dictionary_of_tasks = {}
 
         for task in component_tasks:
+            order_sobject = get_order_sobject_from_task_sobject(task)
+            order_code = order_sobject.get_code()
+
+            process_name = task.get('process')
+
+            if len(process_name.split(':')) > 1:
+                task_header = process_name.split(':')[0]
+
+            if order_code not in dictionary_of_tasks.keys():
+                dictionary_of_tasks[order_code] = {task_header: None}
+
+            if not dictionary_of_tasks[order_code].get(task_header):
+                dictionary_of_tasks[order_code][task_header] = [task]
+            else:
+                dictionary_of_tasks[order_code][task_header].append(task)
+
+        for task in package_tasks:
             order_sobject = get_order_sobject_from_task_sobject(task)
             order_code = order_sobject.get_code()
 

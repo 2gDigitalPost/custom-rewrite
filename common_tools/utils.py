@@ -527,6 +527,40 @@ def get_task_estimated_hours_from_task_code(task_code):
     return None
 
 
+def get_task_estimated_hours_from_package_task_code(task_code):
+    """
+    From a sthpw/task sobject, assumed to be attached to a twog/package, get the estimated hours for the task.
+    This is taken from the twog/platform_connection sobject related to the package.
+
+    :param task_code: sthpw/task code (must be for a twog/package)
+    :return: Float
+    """
+
+    # Get the task sobject
+    task = get_sobject_by_code('sthpw/task', task_code)
+
+    # Get the package sobject
+    package = task.get_parent()
+
+    # Get the platform code, used for the platform_connection search
+    platform_code = package.get('platform_code')
+
+    # Get the division code, also for the platform_connection search
+    division = get_client_division_sobject_from_order_code(package.get('order_code'))
+    division_code = division.get_code()
+
+    # Search for the platform_connection
+    platform_connection_search = Search('twog/platform_connection')
+    platform_connection_search.add_filter('platform_code', platform_code)
+    platform_connection_search.add_filter('division_code', division_code)
+    platform_connection = platform_connection_search.get_sobject()
+
+    # Get the estimated hours, and convert to a float
+    estimated_hours = float(platform_connection.get('estimated_hours'))
+
+    return estimated_hours
+
+
 def get_component_estimated_total_hours_from_component_code(component_code):
     """
     Given a twog/component code, sum up all the estimated hours from its tasks.
@@ -609,7 +643,7 @@ def get_order_estimated_total_hours_from_order_code(order_code):
 
 def get_client_division_sobject_from_order_sobject(order_sobject):
     """
-    Given an order sobject, get the division code associated with it. If there isn't one, return None
+    Given an order sobject, get the division sobject associated with it. If there isn't one, return None
 
     :param order_sobject: twog/order sobject
     :return: twog/division sobject or None
@@ -623,6 +657,18 @@ def get_client_division_sobject_from_order_sobject(order_sobject):
         return division_sobject
     else:
         return None
+
+
+def get_client_division_sobject_from_order_code(order_code):
+    """
+    Given an order code, get the division sobject associated with it. If there isn't one, return None
+
+    :param order_code: twog/order code
+    :return: twog/division sobject or None
+    """
+    order_sobject = get_sobject_by_code('twog/order', order_code)
+
+    return get_client_division_sobject_from_order_sobject(order_sobject)
 
 
 def get_client_division_sobject_for_task_sobject(task):
@@ -688,7 +734,7 @@ def get_delivery_task_for_package(package_code):
     package_tasks = package_sobject.get_all_children('sthpw/task')
 
     for package_task in package_tasks:
-        if package_task.get('process').lower() == 'deliver':
+        if package_task.get('process').lower() == 'edel: deliver':
             return package_task
 
     return None
