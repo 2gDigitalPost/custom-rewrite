@@ -10,6 +10,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
 from reportlab.platypus.flowables import HRFlowable
 
+from common_tools.utils import get_sobject_by_code
 from pdf_export_utils import get_name_from_code, get_top_table, NumberedCanvas
 
 
@@ -19,11 +20,42 @@ def get_paragraph(text, style_sheet_type='BodyText'):
     return Paragraph(text, style_sheet[style_sheet_type])
 
 
-def calculate_duration(timecode_in, timecode_out):
+def seconds_to_frames(seconds, frame_rate):
+    return seconds * frame_rate
+
+
+def frames_to_seconds(frames, frame_rate):
+    return frames / frame_rate
+
+
+def calculate_duration(timecode_in, timecode_out, frame_rate):
     hours_in, minutes_in, seconds_in, frames_in = timecode_in.split(':')
     hours_out, minutes_out, seconds_out, frames_out = timecode_out.split(':')
 
+    print(frames_out)
 
+    frames_in = int(frames_in)
+    frames_out = int(frames_out)
+    seconds_in = int(seconds_in)
+    seconds_out = int(seconds_out)
+
+    seconds_in += int(hours_in) * 60 * 60
+    seconds_in += int(minutes_in) * 60
+
+    seconds_out += int(hours_out) * 60 * 60
+    seconds_out += int(minutes_out) * 60
+
+    frames_in += seconds_to_frames(seconds_in, frame_rate)
+    frames_out += seconds_to_frames(seconds_out, frame_rate)
+
+    print(frames_in)
+    print(frames_out)
+
+    duration_in_frames = frames_out - frames_in
+
+    duration_in_seconds = frames_to_seconds(duration_in_frames, frame_rate)
+
+    
 
 
 def get_title_table(element_eval_sobject):
@@ -124,7 +156,7 @@ def get_element_eval_lines_table(element_eval_sobject):
     if not element_eval_lines:
         return None
 
-    element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'Code',
+    element_eval_lines_table_data = [['Timecode In', 'F', 'Description', 'In Safe', 'Timecode Out', 'Duration', 'Code',
                                       'Scale', 'Sector/Ch', 'In Source']]
 
     lines_with_values = []
@@ -162,9 +194,19 @@ def get_element_eval_lines_table(element_eval_sobject):
                 sector_or_channel, in_source]):
             line_data = []
 
-            # duration = calculate_duration(timecode_in, timecode_out)
+            frame_rate_code = element_eval_sobject.get('frame_rate_code')
+            frame_rate_sobject = get_sobject_by_code('twog/frame_rate', frame_rate_code)
+            approximate_frame_rate = int(frame_rate_sobject.get('approximate_frames'))
 
-            for attribute in [timecode_in, field_in, description, in_safe, timecode_out, type_code, scale,
+            print(timecode_in)
+            print(timecode_out)
+
+            if timecode_in and timecode_out:
+                duration = str(calculate_duration(timecode_in, timecode_out, approximate_frame_rate))
+            else:
+                duration = ''
+
+            for attribute in [timecode_in, field_in, description, in_safe, timecode_out, duration, type_code, scale,
                               sector_or_channel, in_source]:
                 paragraph_style = ParagraphStyle(attribute)
                 paragraph_style.fontSize = 7
@@ -180,6 +222,7 @@ def get_element_eval_lines_table(element_eval_sobject):
 
     element_eval_lines_table = Table(element_eval_lines_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5,
                                      colWidths=[(.7 * inch), (.14 * inch), (inch * 3.6), (.4 * inch), (.80 * inch),
+                                                (.4 * inch),
                                                 (.3 * inch), (.3 * inch), (.55 * inch), (.75 * inch)],
                                      repeatRows=1)
 
