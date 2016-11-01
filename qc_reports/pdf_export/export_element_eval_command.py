@@ -20,19 +20,9 @@ def get_paragraph(text, style_sheet_type='BodyText'):
     return Paragraph(text, style_sheet[style_sheet_type])
 
 
-def seconds_to_frames(seconds, frame_rate):
-    return seconds * frame_rate
-
-
-def frames_to_seconds(frames, frame_rate):
-    return frames / frame_rate
-
-
 def calculate_duration(timecode_in, timecode_out, frame_rate):
     hours_in, minutes_in, seconds_in, frames_in = timecode_in.split(':')
     hours_out, minutes_out, seconds_out, frames_out = timecode_out.split(':')
-
-    print(frames_out)
 
     frames_in = int(frames_in)
     frames_out = int(frames_out)
@@ -45,17 +35,18 @@ def calculate_duration(timecode_in, timecode_out, frame_rate):
     seconds_out += int(hours_out) * 60 * 60
     seconds_out += int(minutes_out) * 60
 
-    frames_in += seconds_to_frames(seconds_in, frame_rate)
-    frames_out += seconds_to_frames(seconds_out, frame_rate)
-
-    print(frames_in)
-    print(frames_out)
+    frames_in += seconds_in * frame_rate
+    frames_out += seconds_out * frame_rate
 
     duration_in_frames = frames_out - frames_in
 
-    duration_in_seconds = frames_to_seconds(duration_in_frames, frame_rate)
+    seconds, frames = divmod(duration_in_frames, frame_rate)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
 
-    
+    duration_string = '{0:02d}:{1:02d}:{2:02d}:{3:02d}'.format(hours, minutes, seconds, frames)
+
+    return duration_string
 
 
 def get_title_table(element_eval_sobject):
@@ -198,11 +189,8 @@ def get_element_eval_lines_table(element_eval_sobject):
             frame_rate_sobject = get_sobject_by_code('twog/frame_rate', frame_rate_code)
             approximate_frame_rate = int(frame_rate_sobject.get('approximate_frames'))
 
-            print(timecode_in)
-            print(timecode_out)
-
             if timecode_in and timecode_out:
-                duration = str(calculate_duration(timecode_in, timecode_out, approximate_frame_rate))
+                duration = calculate_duration(timecode_in, timecode_out, approximate_frame_rate)
             else:
                 duration = ''
 
@@ -221,9 +209,8 @@ def get_element_eval_lines_table(element_eval_sobject):
             element_eval_lines_table_data.append(line_data)
 
     element_eval_lines_table = Table(element_eval_lines_table_data, hAlign='LEFT', spaceBefore=5, spaceAfter=5,
-                                     colWidths=[(.7 * inch), (.14 * inch), (inch * 3.6), (.4 * inch), (.80 * inch),
-                                                (.4 * inch),
-                                                (.3 * inch), (.3 * inch), (.55 * inch), (.75 * inch)],
+                                     colWidths=[(.7 * inch), (.14 * inch), (inch * 3.1), (.4 * inch), (.80 * inch),
+                                                (.6 * inch), (.4 * inch), (.3 * inch), (.55 * inch), (.75 * inch)],
                                      repeatRows=1)
 
     element_eval_lines_table.setStyle([('BOX', (0, 0), (-1, -1), 0.2, colors.black),
