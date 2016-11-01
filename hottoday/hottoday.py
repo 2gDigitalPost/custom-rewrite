@@ -493,7 +493,6 @@ class HotTodayWdg(BaseRefreshWdg):
         # Put the table in a DivWdg, makes it fit better with the Tactic side bar
         hotlist_div = DivWdg()
         hotlist_div.add_attr('id', 'hotlist_div')
-        hotlist_div.add_style('height', '900px')
         hotlist_div.add_attr('overflow', 'hidden')
 
         hotlist_div.add(table)
