@@ -1,4 +1,5 @@
 import os
+import re
 from ConfigParser import SafeConfigParser
 
 from pyasm.command import Command
@@ -11,6 +12,7 @@ from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
 from reportlab.platypus.flowables import HRFlowable
 
 from common_tools.utils import get_sobject_by_code
+from qc_reports.utils import calculate_duration
 from pdf_export_utils import get_name_from_code, get_top_table, NumberedCanvas
 
 
@@ -18,35 +20,6 @@ def get_paragraph(text, style_sheet_type='BodyText'):
     style_sheet = getSampleStyleSheet()
 
     return Paragraph(text, style_sheet[style_sheet_type])
-
-
-def calculate_duration(timecode_in, timecode_out, frame_rate):
-    hours_in, minutes_in, seconds_in, frames_in = timecode_in.split(':')
-    hours_out, minutes_out, seconds_out, frames_out = timecode_out.split(':')
-
-    frames_in = int(frames_in)
-    frames_out = int(frames_out)
-    seconds_in = int(seconds_in)
-    seconds_out = int(seconds_out)
-
-    seconds_in += int(hours_in) * 60 * 60
-    seconds_in += int(minutes_in) * 60
-
-    seconds_out += int(hours_out) * 60 * 60
-    seconds_out += int(minutes_out) * 60
-
-    frames_in += seconds_in * frame_rate
-    frames_out += seconds_out * frame_rate
-
-    duration_in_frames = frames_out - frames_in
-
-    seconds, frames = divmod(duration_in_frames, frame_rate)
-    minutes, seconds = divmod(seconds, 60)
-    hours, minutes = divmod(minutes, 60)
-
-    duration_string = '{0:02d}:{1:02d}:{2:02d}:{3:02d}'.format(hours, minutes, seconds, frames)
-
-    return duration_string
 
 
 def get_title_table(element_eval_sobject):
@@ -190,7 +163,12 @@ def get_element_eval_lines_table(element_eval_sobject):
             approximate_frame_rate = int(frame_rate_sobject.get('approximate_frames'))
 
             if timecode_in and timecode_out:
-                duration = calculate_duration(timecode_in, timecode_out, approximate_frame_rate)
+                regex = re.compile('^\d{2}:\d{2}:\d{2}:\d{2}$')
+
+                if regex.match(timecode_in) and regex.match(timecode_out):
+                    duration = calculate_duration(timecode_in, timecode_out, approximate_frame_rate)
+                else:
+                    duration = ''
             else:
                 duration = ''
 

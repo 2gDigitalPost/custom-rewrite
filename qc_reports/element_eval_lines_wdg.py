@@ -1,13 +1,15 @@
+import re
+
 from tactic.ui.input import TextInputWdg
 from tactic.ui.widget import ButtonNewWdg
 from tactic.ui.common import BaseRefreshWdg
 
-from pyasm.prod.biz import ProdSetting
 from pyasm.search import Search
 from pyasm.web import DivWdg, SpanWdg, Table
 from pyasm.widget import HiddenWdg, SelectWdg
 
-from utils import get_text_input_wdg, get_add_colons_for_time_behavior
+from common_tools.utils import get_sobject_by_code
+from qc_reports.utils import calculate_duration, get_add_colons_for_time_behavior
 
 
 class ElementEvalLinesWdg(BaseRefreshWdg):
@@ -30,6 +32,15 @@ class ElementEvalLinesWdg(BaseRefreshWdg):
 
             self.lines = sorted(lines_with_values, key=lambda x: x.get_value('timecode_in'))
             self.lines.extend(lines_without_values)
+
+            # Get the parent element_evaluation's frame rate sobject, used for calculating duration
+            element_evaluation_sobject = get_sobject_by_code('twog/element_evaluation', self.element_evaluation_code)
+            frame_rate_code= element_evaluation_sobject.get('frame_rate_code')
+
+            if frame_rate_code:
+                self.frame_rate = get_sobject_by_code('twog/frame_rate', frame_rate_code)
+            else:
+                self.frame_rate = None
         else:
             self.lines = []
 
@@ -303,16 +314,8 @@ spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.
         table.add_header("&nbsp;F")
         table.add_header("Description")
         table.add_header("In Safe")
-
-        # Some clients want "Duration" instead
-        duration_clients = ProdSetting.get_seq_by_key('qc_report_duration_clients')
-
-        if self.kwargs.get('client_code') in duration_clients:
-            time_out_label = "Duration"
-        else:
-            time_out_label = "Timecode Out"
-
-        table.add_header(time_out_label)
+        table.add_header("Timecode Out")
+        table.add_header("Duration")
         table.add_header("Code")
         table.add_header("Scale")
         table.add_header("Sector/Ch")
@@ -387,6 +390,27 @@ spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.
 
         return span_wdg
 
+    def get_duration_wdg(self, timecode_in, timecode_out):
+        span_wdg = SpanWdg()
+
+        if timecode_in and timecode_out:
+            if self.frame_rate:
+                regex = re.compile('^\d{2}:\d{2}:\d{2}:\d{2}$')
+
+                if regex.match(timecode_in) and regex.match(timecode_out):
+                    duration = calculate_duration(timecode_in, timecode_out,
+                                                  int(self.frame_rate.get('approximate_frames')))
+
+                    span_wdg.add(duration)
+                else:
+                    span_wdg.add('N/A')
+            else:
+                span_wdg.add('No frame rate selected')
+        else:
+            span_wdg.add('N/A')
+
+        return span_wdg
+
     def get_display(self):
         table = Table()
         table.set_id('element_eval_lines_table')
@@ -430,6 +454,9 @@ spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.
                     self.get_text_input_for_element_eval_line_wdg('timecode-out-{0}'.format(iterator),
                                                                   line.get_value('timecode_out'),
                                                                   line.get_value('checked'), 150, timecode=True)
+                )
+                table.add_cell(
+                    self.get_duration_wdg(line.get_value('timecode_in'), line.get_value('timecode_out'))
                 )
                 table.add_cell(
                     self.get_select_wdg('type-code-{0}'.format(iterator), type_code_options,
