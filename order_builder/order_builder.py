@@ -246,6 +246,16 @@ class OrderBuilderWdg(BaseRefreshWdg):
         )
         create_file_for_order_button.add_style('display', 'inline-block')
 
+        link_components_to_packages_button = ButtonNewWdg(title='Link Components to Packages', icon='ARROW_RIGHT')
+        link_components_to_packages_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Link Components to Packages', 'widgets.LinkComponentsToPackagesWdg',
+                self.order_sobject.get_search_key(), 'Order Builder', 'order_builder.OrderBuilderWdg',
+                self.order_sobject.get_search_key()
+            )
+        )
+        link_components_to_packages_button.add_style('display', 'inline-block')
+
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
         note_button.add_style('display', 'inline-block')
@@ -271,6 +281,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(add_packages_by_platform)
         order_div.add(add_file_to_order_button)
         order_div.add(create_file_for_order_button)
+        order_div.add(link_components_to_packages_button)
         order_div.add(note_button)
         order_div.add(copy_url_button)
 
