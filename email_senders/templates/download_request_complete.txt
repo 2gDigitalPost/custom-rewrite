@@ -1,0 +1,16 @@
+Your download request has been completed.
+
+Name: ${name}
+Task Code: ${task_code}
+Description: ${description}
+
+This e-mail message, including any attachments, is intended only for the use of the
+individual or entity to which it is addressed and may contain information that is privileged
+and/or confidential. If you are not the intended recipient or the employee or agent
+responsible for delivering the communication to the intended recipient, please notify us
+immediately and then delete this message from your system. You are hereby notified that any use,
+dissemination, distribution and/or reproduction of this message and/or any attachments by unintended
+recipients is unauthorized and may be unlawful. Furthermore, although we have taken precautions to
+minimize the risk of transmitting software viruses, we advise you to perform your own
+virus checks on any attachment to this message. We do not accept liability for any loss
+or damage caused by software viruses.
