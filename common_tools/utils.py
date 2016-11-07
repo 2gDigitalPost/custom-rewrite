@@ -90,6 +90,21 @@ def get_component_sobjects_from_order_code(order_code):
     return components
 
 
+def get_package_sobjects_from_order_code(order_code):
+    """
+    Given a twog/order unique code, get a list of all the twog/package sobjects attached to it
+
+    :param order_code: twog/order code
+    :return: List of twog/package sobjects (possibly empty)
+    """
+
+    packages_search = Search('twog/package')
+    packages_search.add_filter('order_code', order_code)
+    packages = packages_search.get_sobjects()
+
+    return packages
+
+
 def get_task_sobjects_from_component_code(component_code):
     """
     Given a twog/component unique code, get a list of all the sthpw/task sobjects attached to it
