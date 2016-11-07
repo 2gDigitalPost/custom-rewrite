@@ -155,39 +155,6 @@ for (var i = 0; i < component_package_keys.length; i++) {
     }
 }
 
-/*
-var equipment = server.eval("@SOBJECT(twog/equipment)");
-
-for (var i = 0; i < equipment.length; i++) {
-    var equipment_code = equipment[i].code;
-
-    var file_checkbox_value = values[equipment_code];
-
-    var existing_entry = server.eval("@SOBJECT(twog/equipment_in_task_data['equipment_code', '" +
-                                     equipment_code + "']['task_data_code',  '" + task_data_code + "'])");
-
-    if (file_checkbox_value == "on") {
-        // Only insert a new entry if one does not already exist.
-        if (existing_entry.length == 0) {
-            var new_entry = {
-                'task_data_code': task_data_code,
-                'equipment_code': equipment_code
-            }
-
-            server.insert('twog/equipment_in_task_data', new_entry);
-        }
-    }
-    else {
-        // If a box is unchecked, remove any entries in the database that exist (in other words, if a box was checked
-        // but is now unchecked, the user meant to remove the connection)
-        if (existing_entry.length > 0)
-        {
-            server.delete_sobject(existing_entry[0].__search_key__);
-        }
-    }
-}
-*/
-
 spt.app_busy.hide();
 spt.popup.close(spt.popup.get_popup(bvr.src_el));
 
