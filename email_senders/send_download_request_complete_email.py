@@ -1,4 +1,6 @@
+import os
 import smtplib
+
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -11,14 +13,20 @@ def main(name, task_code, description, recipient, sender='TacticDebug@2gdigital.
         recipient = 'tyler.standridge@2gdigital.com'
 
         message = MIMEMultipart('alternative')
-        message['Subject'] = 'Download Request Complete'
+        message['Subject'] = 'Download Request Complete: {0}'.format(name)
         message['From'] = sender
         message['To'] = recipient
 
         smtp_server = smtplib.SMTP(smtp_server_name)
 
-        plain_text_template = Template(filename='templates/download_request_complete.txt')
-        html_template = Template(filename='templates/download_request_complete.html')
+        directory_path = os.path.dirname(os.path.realpath(__file__))
+        templates_path = os.path.join(directory_path, 'templates/')
+
+        plain_text_file = os.path.join(templates_path, 'download_request_complete.txt')
+        html_file = os.path.join(templates_path, 'download_request_complete.html')
+
+        plain_text_template = Template(filename=plain_text_file)
+        html_template = Template(filename=html_file)
 
         kwargs = {
             'name': name,

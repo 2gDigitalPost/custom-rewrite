@@ -4,10 +4,14 @@ from datetime import date
 from pyasm.search import Search
 
 from formatted_emailer import email_sender
+from email_senders import send_download_request_complete_email
 
 
 def main(server=None, trigger_input=None):
     """
+    Upon a Download Task being marked as 'Complete', send an email to the person who put in the request, notifying
+    them that their request is finished.
+
     :param server: the TacticServerStub object
     :param trigger_input: a dict with data like like search_key, search_type, sobject, and update_data
     :return: None
@@ -28,9 +32,7 @@ def main(server=None, trigger_input=None):
         if task.get('status') != 'Complete':
             return
 
-        todays_date = date.today()
-
-        # The title code should always be the last word in the process.
+        # The name of the task follows the 'Download Request: ' part
         download_task_name = task.get('process').split(': ')[-1]
 
         # Get the login id of the person who put in this request
@@ -46,19 +48,9 @@ def main(server=None, trigger_input=None):
             # Email the user who put in the request
             email_address = user.get('email')
 
-            email_template = '/opt/spt/custom/formatted_emailer/templates/generic_internal_message.html'
-
-            context_data = {
-                'to_email': email_address,
-                'subject': 'Download Task "{0}" is complete'.format(download_task_name),
-                'message': 'The download is now complete for task: {0}'.format(download_task_name),
-                'from_email': 'TacticDebug@2gdigital.com',
-                'from_name': 'Tactic',
-            }
-
-            email_file_name = 'past_due_title_notification_{0}.html'.format(todays_date)
-            email_sender.send_email(template=email_template, email_data=context_data,
-                                    email_file_name=email_file_name, server=server)
+            # Call the function to send the email, using the download task's data
+            send_download_request_complete_email.main(download_task_name, task.get('code'), task.get('description'),
+                                                      email_address)
 
     except AttributeError as e:
         traceback.print_exc()
