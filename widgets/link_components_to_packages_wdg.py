@@ -1,10 +1,8 @@
 from tactic.ui.common import BaseRefreshWdg
-from tactic.ui.widget import ButtonNewWdg
 
-from pyasm.web import DivWdg, HtmlElement, Table
+from pyasm.search import Search
+from pyasm.web import DivWdg, Table
 from pyasm.widget import CheckboxWdg, SubmitWdg
-
-import order_builder.order_builder_utils as obu
 
 from common_tools import get_component_sobjects_from_order_code, get_package_sobjects_from_order_code
 
@@ -15,6 +13,46 @@ class LinkComponentsToPackagesWdg(BaseRefreshWdg):
         self.parent_widget_title = self.kwargs.get('parent_widget_title')
         self.parent_widget_name = self.kwargs.get('parent_widget_name')
         self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
+
+    @staticmethod
+    def get_existing_entries(components, packages):
+        """
+        Given a list of components and a list of packages, search the database for all entries that link the two lists.
+
+        :param components: List of twog/component sobjects
+        :param packages: List of twog/package sobjects
+        :return: List of twog/component_files_to_package sobjects
+        """
+        component_codes = ','.join(["'{0}'".format(component.get_code()) for component in components])
+        package_codes = ','.join(["'{0}'".format(package.get_code()) for package in packages])
+
+        existing_component_package_links_search = Search('twog/component_files_to_package')
+        existing_component_package_links_search.add_where('\"component_code\" in ({0})'.format(component_codes))
+        existing_component_package_links_search.add_where('\"package_code\" in ({0})'.format(package_codes))
+        existing_component_package_links = existing_component_package_links_search.get_sobjects()
+
+        return existing_component_package_links
+
+    @staticmethod
+    def component_package_link_exists(component, package, component_package_links):
+        """
+        Given a component sobject, package sobject, and a list of component_files_to_package sobjects, search the list
+        of component_files_to_package sobjects to see if the component and package is in that list. Return True if it
+        is, and False otherwise
+
+        :param component: twog/component sobject
+        :param package: twog/package sobject
+        :param component_package_links: List of twog/component_files_to_package sobjects
+        :return: Boolean
+        """
+        for component_package_link in component_package_links:
+            component_code = component_package_link.get('component_code')
+            package_code = component_package_link.get('package_code')
+
+            if component_code == component.get_code() and package_code == package.get_code():
+                return True
+
+        return False
 
     def get_display(self):
         outer_div = DivWdg()
@@ -30,6 +68,8 @@ class LinkComponentsToPackagesWdg(BaseRefreshWdg):
         components = get_component_sobjects_from_order_code(order_code)
         packages = get_package_sobjects_from_order_code(order_code)
 
+        existing_component_package_links = self.get_existing_entries(components, packages)
+
         package_row = table.add_row()
         table.add_cell(row=package_row)
 
@@ -44,6 +84,9 @@ class LinkComponentsToPackagesWdg(BaseRefreshWdg):
 
             for package in packages:
                 checkbox = CheckboxWdg(name='{0}_{1}'.format(component.get_code(), package.get_code()))
+
+                if self.component_package_link_exists(component, package, existing_component_package_links):
+                    checkbox.set_checked()
 
                 checkbox_cell = table.add_cell(checkbox)
                 checkbox_cell.add_style('text-align', 'center')
