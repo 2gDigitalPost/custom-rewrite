@@ -1,9 +1,7 @@
 import traceback
-from datetime import date
 
 from pyasm.search import Search
 
-from formatted_emailer import email_sender
 from email_senders import send_download_request_complete_email
 
 
