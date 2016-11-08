@@ -22,8 +22,9 @@ class InstructionsWdg(BaseRefreshWdg):
 
         for line in instructions.split('\n'):
             if line:
-                if line[0:3] == '###':
-                    formatted_line = '<h4>{0}</h4>'.format(line[4:])
+                if line.startswith('!@#|'):
+                    name = line.split('|')[1].strip()
+                    formatted_line = '<h4>{0}</h4>'.format(name)
                 else:
                     formatted_line = '<p>{0}</p>'.format(line)
 

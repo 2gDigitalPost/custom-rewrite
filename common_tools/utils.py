@@ -219,6 +219,14 @@ def get_task_data_out_files(task_data_code):
         return []
 
 
+def get_component_sobject_from_task_data_code(task_data_code):
+    task_data = get_sobject_by_code('twog/task_data', task_data_code)
+    task = get_sobject_by_code('sthpw/task', task_data.get_code())
+    component = task.get_parent()
+
+    return component
+
+
 def get_files_for_order(order_code):
     """
     Given the code for an order, get all the files that are associated with it in a list.
@@ -489,12 +497,11 @@ def get_task_instructions_text_from_instructions_code(instructions_code, task_na
 
     for line in instructions_text.split('\n'):
         if line:
-            if line[0:3] == '###':
-                name = line.split('|')[0].strip()
-                name = name[4:]
+            if line.startswith('!@#|'):
+                name = line.split('|')[1].strip()
 
                 if task_name == name:
-                    task_instructions_text += line[4:] + '\n'
+                    task_instructions_text += name + '\n'
                     instruction_text_in_task = True
                 else:
                     instruction_text_in_task = False
@@ -513,10 +520,9 @@ def get_task_estimated_hours_from_instructions_document(instructions_document, t
 
     for line in instructions_text.split('\n'):
         if line:
-            if line[0:3] == '###':
-                name, hours = line.split('|')
-                name = name.strip()[4:]
-                hours = hours.strip()
+            if line[0:3] == '!@#|':
+                _, name, department, hours = line.split('|')
+                name = name.strip()
 
                 if name == task_name:
                     return float(hours)

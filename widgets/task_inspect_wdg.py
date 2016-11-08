@@ -95,8 +95,9 @@ class TaskInspectWdg(BaseRefreshWdg):
 
         for line in instructions.split('\n'):
             if line:
-                if line[0:3] == '###':
-                    formatted_line = '<h4>{0}</h4>'.format(line[4:])
+                if line[0:4] == '!@#|':
+                    task_name = line.split('|')[1]
+                    formatted_line = '<h4>{0}</h4>'.format(task_name)
                 else:
                     formatted_line = '<p>{0}</p>'.format(line)
 
