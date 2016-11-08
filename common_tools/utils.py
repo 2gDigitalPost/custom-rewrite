@@ -768,6 +768,22 @@ def get_platform_connection_by_package_sobject(package_sobject):
     return platform_connection
 
 
+def get_component_status_label_and_color(component_status):
+    """
+
+    :param component_status:
+    :return:
+    """
+
+    component_status_dictionary = {
+        'in_progress': ('In Progress', '#1D8B98'),
+        'on_hold': ('On Hold', '#FF0000'),
+        'complete': ('Complete', '#A3D991')
+    }
+
+    return component_status_dictionary.get(component_status, (None, None))
+
+
 def get_order_builder_url_on_click(url):
     """
     Gets the behavior that the button uses on click.

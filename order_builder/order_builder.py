@@ -14,7 +14,8 @@ from common_tools.utils import get_task_data_in_files, get_task_data_out_files, 
     get_file_in_package_status, get_file_in_package_sobjects_by_package_code, \
     get_order_priority_relative_to_all_orders, get_sobject_by_code, get_sobject_name_by_code, \
     get_platform_connection_by_package_sobject, get_component_estimated_total_hours_from_component_code, \
-    get_component_estimated_remaining_hours_from_component_code, get_order_estimated_total_hours_from_order_code
+    get_component_estimated_remaining_hours_from_component_code, get_order_estimated_total_hours_from_order_code,\
+    get_component_status_label_and_color
 
 
 def get_task_data_div(task_code):
@@ -411,6 +412,31 @@ class OrderBuilderWdg(BaseRefreshWdg):
             else:
                 component_language_div.add('<i>No language selected</i>')
 
+            # Set up a div for the component's status, if one exists (it should).
+            component_status_div = DivWdg()
+            component_status = component.get('status')
+
+            if component_status:
+                # Get the label and color for the component status by looking it up in a dictionary.
+                # If the status is not found, None will be returned instead
+                component_status_label, component_status_color = get_component_status_label_and_color(component_status)
+
+                if component_status_label and component_status_color:
+                    # Put the label in a span, so it can be assigned a color
+                    component_status_span = SpanWdg()
+                    component_status_span.add(component_status_label)
+                    component_status_span.add_style('color', component_status_color)
+
+                    # Add "Status:" along with the colored span to the div
+                    component_status_div.add('Status: ')
+                    component_status_div.add(component_status_span)
+                else:
+                    # Status was not found, present it as it is in the database
+                    component_status_div.add('Status: {0}'.format(component_status))
+            else:
+                # There should never be a case where a status is not set on a component, but it could happen
+                component_status_div.add('<i>Status not set</i>')
+
             component_estimated_total_hours_div = DivWdg()
             estimated_total_hours = get_component_estimated_total_hours_from_component_code(component.get_code())
 
@@ -435,6 +461,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(component_description_div)
             component_div.add(component_pipeline_div)
             component_div.add(component_language_div)
+            component_div.add(component_status_div)
             component_div.add(component_estimated_total_hours_div)
             component_div.add(component_estimated_remaining_hours_div)
 
