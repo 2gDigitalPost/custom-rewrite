@@ -11,6 +11,8 @@ from common_tools import get_task_data_sobject_from_task_code, get_task_data_equ
 
 from widgets.input_widgets import get_task_status_select_wdg
 
+from markdown2 import Markdown
+
 
 def get_page_header(string):
     """
