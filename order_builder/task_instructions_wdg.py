@@ -15,7 +15,7 @@ class TaskInstructionsWdg(BaseRefreshWdg):
 
         for line in instructions.split('\n'):
             if line:
-                if line.startswith('!@#|'):
+                if line.startswith('!@|'):
                     name = line.split('|')[1].strip()
                     formatted_line = '<h4>{0}</h4>'.format(name)
                 else:

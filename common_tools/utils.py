@@ -497,7 +497,7 @@ def get_task_instructions_text_from_instructions_code(instructions_code, task_na
 
     for line in instructions_text.split('\n'):
         if line:
-            if line.startswith('!@#|'):
+            if line.startswith('!@|'):
                 name = line.split('|')[1].strip()
 
                 if task_name == name:
@@ -520,7 +520,7 @@ def get_task_estimated_hours_from_instructions_document(instructions_document, t
 
     for line in instructions_text.split('\n'):
         if line:
-            if line[0:3] == '!@#|':
+            if line.startswith('!@|'):
                 _, name, department, hours = line.split('|')
                 name = name.strip()
 

@@ -15,8 +15,8 @@ class ComponentInstructionsWdg(BaseRefreshWdg):
 
         for line in instructions.split('\n'):
             if line:
-                if line[0:4] == '!@#|':
-                    formatted_line = '<h4>{0}</h4>'.format(line[4:])
+                if line.startswith('!@|'):
+                    formatted_line = '<h4>{0}</h4>'.format(line[3:])
                 else:
                     formatted_line = '<p>{0}</p>'.format(line)
 
