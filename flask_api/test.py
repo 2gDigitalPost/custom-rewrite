@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, redirect, flash, url_for
 from flask_restful import reqparse, Resource, Api
 
 import os, sys, inspect
@@ -9,6 +9,7 @@ config = ConfigParser.ConfigParser()
 config.read('config.ini')
 
 sys.path.append(config.get('tacticpath', 'path'))
+sys.path.append(config.get('tacticpath', 'pyasm'))
 
 from tactic_client_lib import TacticServerStub
 
@@ -17,19 +18,88 @@ sys.path.append('/opt/spt/custom')
 app = Flask(__name__)
 api = Api(app)
 
+SECRET_KEY = "yeah, not actually a secret"
+DEBUG = True
+
+app.secret_key = SECRET_KEY
+
 
 # Get credentials from config file
-user = config.get('credentials', 'user')
-password = config.get('credentials', 'password')
+# user = config.get('credentials', 'user')
+# password = config.get('credentials', 'password')
 project = config.get('credentials', 'project')
 
 # Just get the dev server URL for now
 url = config.get('server', 'dev')
 
-# Get a server object to perform queries
-server = TacticServerStub(server=url, project=project, user=user, password=password)
-
 parser = reqparse.RequestParser()
+
+
+from flask_login import LoginManager, current_user, login_required, login_user, logout_user, UserMixin
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField
+from wtforms.validators import DataRequired
+
+
+class EmailPasswordForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+
+
+class User(UserMixin):
+    def __init__(self, name, id, active=True):
+        self.name = name
+        self.id = id
+        self.active = active
+
+    def is_active(self):
+        return self.active
+
+
+ALL_USERS = {}
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    form = EmailPasswordForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+
+        server = TacticServerStub(server=url, project=project, user=username, password=password)
+        ticket = server.get_ticket(username, password)
+
+        ALL_USERS[ticket] = username
+
+        user = User(username, ticket)
+        login_user(user, remember=False)
+
+        return redirect('/orders/reprioritizer')
+    return render_template("login.html", form=form)
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("Logged out.")
+    return redirect(url_for("index"))
+
+
+@login_manager.user_loader
+def user_loader(user_id):
+    try:
+        username = ALL_USERS[user_id]
+    except KeyError:
+        return None
+
+    user = User(username, user_id)
+
+    return user
+
 
 @app.route('/instructions_template_builder')
 def hello():
@@ -42,12 +112,15 @@ def files_select():
 
 
 @app.route('/orders/reprioritizer')
+@login_required
 def order_reprioritizer():
     return render_template('order_reprioritizer.html')
 
 
 class DepartmentInstructions(Resource):
     def get(self):
+        server = TacticServerStub(server=url, project=project, ticket=current_user.id)
+
         department_instructions = server.eval('@SOBJECT(twog/department_instructions)')
 
         return {'department_instructions_list': department_instructions}
@@ -55,12 +128,15 @@ class DepartmentInstructions(Resource):
 
 class NewInstructionsTemplate(Resource):
     def get(self):
+        server = TacticServerStub(server=url, project=project, ticket=current_user.id)
 
         department_instructions = server.eval('@SOBJECT(twog/department_instructions)')
 
         return {'department_instructions_list': department_instructions}
 
     def post(self):
+        server = TacticServerStub(server=url, project=project, ticket=current_user.id)
+
         json_data = request.get_json()
 
         print(json_data)
@@ -80,6 +156,8 @@ class NewInstructionsTemplate(Resource):
 
 class InstructionsTemplate(Resource):
     def get(self, instructions_template_id):
+        server = TacticServerStub(server=url, project=project, ticket=current_user.id)
+
         instructions_template_sobject = server.eval('@SOBJECT(twog/instructions_template["code", "{0}"])'.format(instructions_template_id))
         department_instructions_in_template_sobjects = server.eval('@SOBJECT(twog/department_instructions_in_template["instructions_template_code", "{0}"])'.format(instructions_template_id))
         department_instructions_sobjects_in_template = server.eval('@SOBJECT(twog/department_instructions["code", "in", "{0}"])'.format('|'.join([department_instructions_in_template_sobject.get('department_instructions_code') for department_instructions_in_template_sobject in department_instructions_in_template_sobjects])))
@@ -97,6 +175,8 @@ class InstructionsTemplate(Resource):
 
 class OrderPriorities(Resource):
     def get(self):
+        server = TacticServerStub(server=url, project=project, ticket=current_user.id)
+
         order_sobjects = server.eval("@SOBJECT(twog/order['@ORDER_BY', 'priority asc'])")
 
         priority_levels = {}
@@ -127,6 +207,8 @@ class OrderPriorities(Resource):
         return {'orders': order_sobjects, 'count': len(order_sobjects), 'priority_levels': priority_levels}
 
     def post(self):
+        server = TacticServerStub(server=url, project=project, ticket=current_user.id)
+
         json_data = request.get_json()
 
         update_data = {}
@@ -146,5 +228,7 @@ api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructi
 api.add_resource(OrderPriorities, '/orders/priorities')
 
 if __name__ == '__main__':
+    global ALL_USERS
+
     app.run(debug=True, host='0.0.0.0')
 
