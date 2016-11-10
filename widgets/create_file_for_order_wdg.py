@@ -41,7 +41,8 @@ var division_code = '%s';
 var kwargs = {
     'file_path': file_path,
     'classification': classification,
-    'division_code': division_code
+    'division_code': division_code,
+    'san_status': 'exists'
 }
 
 // Save the new file sobject, and get the code that it saved as

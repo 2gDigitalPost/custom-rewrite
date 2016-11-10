@@ -69,7 +69,8 @@ var kwargs = {
     'file_path': file_path,
     'classification': classification,
     'original_file': original_file_code,
-    'division_code': division_code
+    'division_code': division_code,
+    'san_status': 'exists'
 }
 
 // Save the new file sobject, and get the code that it saved as
