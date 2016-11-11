@@ -324,6 +324,31 @@ def get_file_sobjects_from_file_in_package_sobjects(file_in_package_sobjects):
         return []
 
 
+def get_task_sobjects_from_file_in_package_sobjects(file_in_package_sobjects):
+    """
+    Given a list of twog/file_in_package sobjects, return a list of containing the sthpw/task sobjects associated with
+    those entries.
+
+    :param file_in_package_sobjects: List of twog/file_in_package sobjects
+    :return: List of sthpw/task sobjects
+    """
+
+    if len(file_in_package_sobjects) > 0:
+        files_in_package_string = ','.join(
+            ["'{0}'".format(file_in_package.get_code()) for file_in_package in file_in_package_sobjects]
+        )
+
+        print(files_in_package_string)
+
+        task_search = Search('sthpw/task')
+        task_search.add_where('\"search_code\" in ({0})'.format(files_in_package_string))
+        tasks = task_search.get_sobjects()
+
+        return tasks
+    else:
+        return []
+
+
 def get_files_for_package(package_code):
     """
     Given the code for a package, get all the files that are associated with it in a list
