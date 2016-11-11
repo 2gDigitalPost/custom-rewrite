@@ -53,7 +53,7 @@ class MoveInputFileToOutputWdg(BaseRefreshWdg):
             'cbjs_action': '''
 // Get the server object
 var server = TacticServerStub.get();
-var containing_element = bvr.src_el.getParent("#move_input_files_to_output");
+var containing_element = bvr.src_el.getParent("#move_input_file_to_output");
 var values = spt.api.get_input_values(containing_element, null, false);
 
 // Get the form values
