@@ -9,6 +9,17 @@ from common_tools.utils import get_file_in_package_sobjects_by_package_code,\
     get_file_sobjects_from_file_in_package_sobjects
 
 
+def get_page_header(string):
+    """
+    Given a string, return a DivWdg containing the string in an H1 tag
+
+    :param string: String
+    :return: HtmlElement.label
+    """
+
+    return HtmlElement.h2(string)
+
+
 class PackageInspectWdg(BaseRefreshWdg):
     def init(self):
         self.package_sobject = self.get_sobject_from_kwargs()
@@ -69,6 +80,9 @@ class PackageInspectWdg(BaseRefreshWdg):
     def get_display(self):
         outer_div = DivWdg()
         outer_div.set_id('package_inspect_{0}'.format(self.package_sobject.get_code()))
+
+        outer_div.add(get_page_header(self.package_sobject.get('name')))
+        outer_div.add(HtmlElement.h4('Code: {0}'.format(self.package_sobject.get_code())))
 
         task_sobject = self.package_sobject.get_all_children('sthpw/task')[0]
 

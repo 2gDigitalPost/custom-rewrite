@@ -227,6 +227,25 @@ def get_component_sobject_from_task_data_code(task_data_code):
     return component
 
 
+def get_delivery_task_for_package(package_sobject):
+    """
+    Given a twog/package sobject, search for an attached task named 'Edel: Deliver'. This is the step that determines
+    the status of the file delivery. Packages can have one or many tasks, but each one should have at least this task.
+
+    :param package_sobject: twog/package sobject
+    :return: sthpw/task sobject or None
+    """
+    task_search = Search('sthpw/task')
+    task_search.add_filter('search_code', package_sobject.get_code())
+    tasks = task_search.get_sobjects()
+
+    for task in tasks:
+        if task.get('process').lower() == 'edel: deliver':
+            return task
+
+    return None
+
+
 def get_files_for_order(order_code):
     """
     Given the code for an order, get all the files that are associated with it in a list.
@@ -739,26 +758,6 @@ def get_deliverable_files_in_order(order_sobject):
         return deliverable_files
     else:
         return []
-
-
-def get_delivery_task_for_package(package_code):
-    """
-
-    :param package_code:
-    :return:
-    """
-
-    package_search = Search('twog/package')
-    package_search.add_code_filter(package_code)
-    package_sobject = package_search.get_sobject()
-
-    package_tasks = package_sobject.get_all_children('sthpw/task')
-
-    for package_task in package_tasks:
-        if package_task.get('process').lower() == 'edel: deliver':
-            return package_task
-
-    return None
 
 
 def get_platform_connection_by_package_sobject(package_sobject):

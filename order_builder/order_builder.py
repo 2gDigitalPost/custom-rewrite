@@ -621,7 +621,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
                 package_due_date_div.add('Due: {0}'.format(package.get('due_date')))
 
             package_delivery_task_div = DivWdg()
-            package_delivery_task = get_delivery_task_for_package(package.get_code())
+            package_delivery_task = get_delivery_task_for_package(package)
 
             if package_delivery_task:
                 package_delivery_task_div.add('Delivery Status: {0}'.format(package_delivery_task.get('status')))
