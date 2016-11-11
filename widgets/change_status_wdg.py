@@ -102,7 +102,7 @@ var package_code = '%s';
 
 // Get the server object
 var server = TacticServerStub.get();
-var containing_element = bvr.src_el.getParent("#status_select_" + package_code);
+var containing_element = bvr.src_el.getParent("#multiple_status_edit_" + package_code);
 var values = spt.api.get_input_values(containing_element, null, false);
 
 var task_status = values["file_status_select"];
@@ -177,7 +177,7 @@ spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_
 
     def get_display(self):
         outer_div = DivWdg()
-        outer_div.set_id('status_edit_{0}'.format(self.package_sobject.get_code()))
+        outer_div.set_id('multiple_status_edit_{0}'.format(self.package_sobject.get_code()))
 
         outer_div.add(self.get_files_checkboxes())
         outer_div.add(get_file_in_package_status_select())
