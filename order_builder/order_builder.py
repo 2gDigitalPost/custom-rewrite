@@ -561,7 +561,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             if tasks:
                 task_list = DivWdg()
 
-                for task in tasks:
+                for task in sorted(tasks, key=lambda x: x.get_code()):
                     task_div = DivWdg()
                     task_div.add(self.get_task_div(task))
                     task_list.add(task_div)
