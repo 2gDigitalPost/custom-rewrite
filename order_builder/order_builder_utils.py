@@ -408,3 +408,35 @@ catch(err) {
     }
 
     return behavior
+
+
+def get_load_new_tab_behavior(tab_id, widget_title, widget_name, search_key):
+    """
+    Load a new tab in Tactic with the specified widget.
+
+    :param tab_id: An identifier for Tactic to reload the tab
+    :param widget_title: Name of the tab (as appears on the tab)
+    :param widget_name: Name of the widget to load (its name in the source code)
+    :param search_key: Unique search key of the item the widget needs
+    :return: Javascript behavior
+    """
+
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    var tab_id = '%s';
+    var widget_title = '%s';
+    var widget_name = '%s';
+    var search_key = '%s';
+
+    spt.tab.add_new(tab_id, widget_title, widget_name, {'search_key': search_key});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % (tab_id, widget_title, widget_name, search_key)
+    }
+
+    return behavior

@@ -4,7 +4,7 @@ import widgets.html_widgets
 from tactic.ui.common import BaseRefreshWdg
 from tactic.ui.widget import ButtonNewWdg
 
-from pyasm.search import Search
+from pyasm.search import Search, SearchKey
 from pyasm.web import DivWdg, HtmlElement, SpanWdg
 
 import order_builder_utils as obu
@@ -481,6 +481,20 @@ class OrderBuilderWdg(BaseRefreshWdg):
             )
             change_instructions_button.add_style('display', 'inline-block')
 
+            # Get the instructions search key for the Edit Instructions widget
+            instructions_document_search_key = SearchKey.build_search_key('twog/instructions',
+                                                                          component.get('instructions_code'),
+                                                                          project_code='twog')
+
+            edit_instructions_button = ButtonNewWdg(title='Edit Instructions', icon='EDIT')
+            edit_instructions_button.add_behavior(
+                obu.get_load_new_tab_behavior(
+                    'edit_instructions_{0}'.format(instructions_document_search_key), 'Edit Instructions',
+                    'widgets.EditInstructionsWdg', instructions_document_search_key
+                )
+            )
+            edit_instructions_button.add_style('display', 'inline-block')
+
             add_instructions_from_template_button = ButtonNewWdg(title='Add Instructions From Template', icon='EDIT')
             add_instructions_from_template_button.add_behavior(
                 obu.get_load_popup_widget_with_reload_behavior(
@@ -526,6 +540,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(instructions_button)
+            button_row_div.add(edit_instructions_button)
             button_row_div.add(change_instructions_button)
             button_row_div.add(add_instructions_from_template_button)
             button_row_div.add(change_title_button)
