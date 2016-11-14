@@ -173,6 +173,15 @@ class InstructionsTemplate(Resource):
         print(args)
 
 
+class AllTitles(Resource):
+    def get(self):
+        server = TacticServerStub(server=url, project=project, ticket=current_user.id)
+
+        title_sobjects = server.eval("@SOBJECT(twog/title)")
+
+        return {'titles': title_sobjects}
+
+
 class OrderPriorities(Resource):
     def get(self):
         server = TacticServerStub(server=url, project=project, ticket=current_user.id)
@@ -225,6 +234,7 @@ class OrderPriorities(Resource):
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
+api.add_resource(AllTitles, '/titles')
 api.add_resource(OrderPriorities, '/orders/priorities')
 
 if __name__ == '__main__':
