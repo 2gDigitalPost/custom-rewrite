@@ -15,16 +15,18 @@ class TestComponent extends Component {
 
   getItemsAsync(searchValue, cb) {
     // let url = `https://api.github.com/search/repositories?q=${searchValue}&language=javascript`
-    let url = `/titles`;
+
+    let ticket_div = document.getElementById('ticket');
+    let ticket = ticket_div.dataset.ticket;
+
+    let url = `/titles/` + ticket;
 
     fetch(url).then( (response) => {
-      console.log(response);
       return response.json();
     }).then((results) => {
-      console.log(results);
-      if(results.items != undefined){
-        let items = results.items.map( (res, i) => { return { id: i, value: res.full_name } })
-        this.setState({ repos: items })
+      if(results.titles != undefined){
+        let items = results.titles.map( (res, i) => { return { id: i, value: res.name } });
+        this.setState({ repos: items });
         cb(searchValue)
       }
     });

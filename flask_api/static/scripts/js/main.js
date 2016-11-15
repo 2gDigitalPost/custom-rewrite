@@ -21317,16 +21317,18 @@ var TestComponent = function (_Component) {
       var _this2 = this;
 
       // let url = `https://api.github.com/search/repositories?q=${searchValue}&language=javascript`
-      var url = '/titles';
+
+      var ticket_div = document.getElementById('ticket');
+      var ticket = ticket_div.dataset.ticket;
+
+      var url = '/titles/' + ticket;
 
       fetch(url).then(function (response) {
-        console.log(response);
         return response.json();
       }).then(function (results) {
-        console.log(results);
-        if (results.items != undefined) {
-          var items = results.items.map(function (res, i) {
-            return { id: i, value: res.full_name };
+        if (results.titles != undefined) {
+          var items = results.titles.map(function (res, i) {
+            return { id: i, value: res.name };
           });
           _this2.setState({ repos: items });
           cb(searchValue);

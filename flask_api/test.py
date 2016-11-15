@@ -121,7 +121,7 @@ def order_reprioritizer():
 
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', ticket=session['ticket'])
 
 
 class DepartmentInstructions(Resource):
@@ -179,11 +179,20 @@ class InstructionsTemplate(Resource):
 
         print(args)
 
-
+"""
 class AllTitles(Resource):
     def get(self):
         # server = TacticServerStub(server=url, project=project, ticket=current_user.id)
         server = TacticServerStub(server=url, project=project, ticket=session['ticket'])
+
+        title_sobjects = server.eval("@SOBJECT(twog/title)")
+
+        return jsonify({'titles': title_sobjects})
+"""
+
+class AllTitles(Resource):
+    def get(self, ticket):
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         title_sobjects = server.eval("@SOBJECT(twog/title)")
 
@@ -242,7 +251,7 @@ class OrderPriorities(Resource):
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
-api.add_resource(AllTitles, '/titles')
+api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
 
 if __name__ == '__main__':
