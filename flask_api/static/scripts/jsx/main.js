@@ -1,53 +1,68 @@
-var DynamicSearch = React.createClass({
+import Search from 'react-search'
+import ReactDOM from 'react-dom'
+import React, { Component, PropTypes } from 'react'
+ 
+class TestComponent extends Component {
+ 
+  HiItems(items) {
+    console.log(items)
+  }
 
-  // sets initial state
-  getInitialState: function(){
-    return { searchString: '' };
-  },
+  constructor (props) {
+    super(props)
+    this.state = { repos: [] }
+  }
 
-  // sets state, triggers render method
-  handleChange: function(event){
-    // grab value form input box
-    this.setState({searchString:event.target.value});
-    console.log("scope updated!");
-  },
+  getItemsAsync(searchValue, cb) {
+    // let url = `https://api.github.com/search/repositories?q=${searchValue}&language=javascript`
+    let url = `/titles`;
 
-  render: function() {
+    fetch(url).then( (response) => {
+      console.log(response);
+      return response.json();
+    }).then((results) => {
+      console.log(results);
+      if(results.items != undefined){
+        let items = results.items.map( (res, i) => { return { id: i, value: res.full_name } })
+        this.setState({ repos: items })
+        cb(searchValue)
+      }
+    });
+  }
 
-    var countries = this.props.items;
-    var searchString = this.state.searchString.trim().toLowerCase();
-
-    // filter countries list by value from input box
-    if(searchString.length > 0){
-      countries = countries.filter(function(country){
-        return country.name.toLowerCase().match( searchString );
-      });
-    }
-
+  render () {
     return (
       <div>
-        <input type="text" value={this.state.searchString} onChange={this.handleChange} placeholder="Search!" />
-        <ul>
-          { countries.map(function(country){ return <li>{country.name} </li> }) }
-        </ul>
+        <Search items={this.state.repos}
+                multiple={true}
+                getItemsAsync={this.getItemsAsync.bind(this)}
+                onItemsChanged={this.HiItems.bind(this)} />
       </div>
     )
   }
-
-});
-
-// list of countries, defined with JavaScript object literals
-var countries = [
-  {"name": "Sweden"}, {"name": "China"}, {"name": "Peru"}, {"name": "Czech Republic"},
-  {"name": "Bolivia"}, {"name": "Latvia"}, {"name": "Samoa"}, {"name": "Armenia"},
-  {"name": "Greenland"}, {"name": "Cuba"}, {"name": "Western Sahara"}, {"name": "Ethiopia"},
-  {"name": "Malaysia"}, {"name": "Argentina"}, {"name": "Uganda"}, {"name": "Chile"},
-  {"name": "Aruba"}, {"name": "Japan"}, {"name": "Trinidad and Tobago"}, {"name": "Italy"},
-  {"name": "Cambodia"}, {"name": "Iceland"}, {"name": "Dominican Republic"}, {"name": "Turkey"},
-  {"name": "Spain"}, {"name": "Poland"}, {"name": "Haiti"}
-];
-
-ReactDOM.render(
-  <DynamicSearch items={ countries } />,
-  document.getElementById('main')
-);
+  /*
+  render () {
+    let items = [
+      { id: 0, value: 'ruby' },
+      { id: 1, value: 'javascript' },
+      { id: 2, value: 'lua' },
+      { id: 3, value: 'go' },
+      { id: 4, value: 'julia' }
+    ];
+ 
+    return (
+      <div>
+        <Search items={items} />
+ 
+        <Search items={items}
+                placeholder='Pick your language'
+                maxSelected={3}
+                multiple={true}
+                onItemsChanged={this.HiItems.bind(this)} />
+      </div>
+    )
+  }
+  */
+}
+ 
+ReactDOM.render( <TestComponent />, document.getElementById('root'));

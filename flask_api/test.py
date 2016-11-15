@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, redirect, flash, url_for
+from flask import Flask, jsonify, render_template, request, redirect, flash, url_for, session
 from flask_restful import reqparse, Resource, Api
 
 import os, sys, inspect
@@ -71,6 +71,8 @@ def login():
 
         server = TacticServerStub(server=url, project=project, user=username, password=password)
         ticket = server.get_ticket(username, password)
+
+        session['ticket'] = ticket
 
         ALL_USERS[ticket] = username
 
@@ -180,11 +182,12 @@ class InstructionsTemplate(Resource):
 
 class AllTitles(Resource):
     def get(self):
-        server = TacticServerStub(server=url, project=project, ticket=current_user.id)
+        # server = TacticServerStub(server=url, project=project, ticket=current_user.id)
+        server = TacticServerStub(server=url, project=project, ticket=session['ticket'])
 
         title_sobjects = server.eval("@SOBJECT(twog/title)")
 
-        return {'titles': title_sobjects}
+        return jsonify({'titles': title_sobjects})
 
 
 class OrderPriorities(Resource):
