@@ -40,5 +40,41 @@ class TestComponent extends Component {
     )
   }
 }
+
+function ClientOptions(props) {
+  return <option>{props.name}</option>
+}
+
+class ClientSelect extends React.Component {
+
+  render() {
+    var clients = [
+      {
+        "name": "sony",
+        "divisions": [
+            "Sony Division 1",
+            "Sony Division 2"
+        ]
+      },
+      {
+        "name": "fox",
+        "divisions": [
+            "Fox Division 1",
+            "Fox Division 2"
+        ]
+      }
+    ];
+
+    return (
+      <div>
+        <select>
+          {clients.map(ClientOptions)}
+        </select>
+      </div>
+    )
+  }
+}
+
+ReactDOM.render(<ClientSelect />, document.getElementById('client_select'));
  
 ReactDOM.render( <TestComponent />, document.getElementById('root'));

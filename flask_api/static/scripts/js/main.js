@@ -21349,6 +21349,51 @@ var TestComponent = function (_Component) {
   return TestComponent;
 }(_react.Component);
 
+function ClientOptions(props) {
+  return _react2.default.createElement(
+    'option',
+    null,
+    props.name
+  );
+}
+
+var ClientSelect = function (_React$Component) {
+  _inherits(ClientSelect, _React$Component);
+
+  function ClientSelect() {
+    _classCallCheck(this, ClientSelect);
+
+    return _possibleConstructorReturn(this, (ClientSelect.__proto__ || Object.getPrototypeOf(ClientSelect)).apply(this, arguments));
+  }
+
+  _createClass(ClientSelect, [{
+    key: 'render',
+    value: function render() {
+      var clients = [{
+        "name": "sony",
+        "divisions": ["Sony Division 1", "Sony Division 2"]
+      }, {
+        "name": "fox",
+        "divisions": ["Fox Division 1", "Fox Division 2"]
+      }];
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'select',
+          null,
+          clients.map(ClientOptions)
+        )
+      );
+    }
+  }]);
+
+  return ClientSelect;
+}(_react2.default.Component);
+
+_reactDom2.default.render(_react2.default.createElement(ClientSelect, null), document.getElementById('client_select'));
+
 _reactDom2.default.render(_react2.default.createElement(TestComponent, null), document.getElementById('root'));
 
 },{"react":172,"react-dom":3,"react-search":4}]},{},[173])
