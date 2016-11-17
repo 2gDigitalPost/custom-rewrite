@@ -101,6 +101,15 @@ class PackageInspectWdg(BaseRefreshWdg):
         outer_div.add(HtmlElement.h4('<u>Files</u>'))
         outer_div.add(self.get_files_list())
 
+        outer_div.add(HtmlElement.h4('<u>Instructions</u>'))
+
+        instructions = self.package_sobject.get('delivery_instructions')
+
+        if not instructions:
+            instructions = 'Sorry, instructions have not been added yet.'
+
+            outer_div.add(instructions.encode('utf-8'))
+
         outer_div.add(self.get_buttons_row())
 
         return outer_div
