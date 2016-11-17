@@ -1,5 +1,3 @@
-import widgets.html_widgets
-import widgets.input_widgets
 from tactic.ui.common import BaseRefreshWdg
 
 from pyasm.search import Search
@@ -7,6 +5,9 @@ from pyasm.web import DivWdg, Table
 from pyasm.widget import CheckboxWdg, SubmitWdg
 
 import order_builder_utils as obu
+
+from widgets.html_widgets import get_label_widget
+from widgets.input_widgets import get_pipeline_select_wdg, get_text_input_wdg
 
 
 def get_platforms_checkboxes():
@@ -43,12 +44,15 @@ class InsertPackageInOrderWdg(BaseRefreshWdg):
         outer_div = DivWdg()
         outer_div.set_id('insert-package-in-order')
 
-        outer_div.add(widgets.html_widgets.get_label_widget('Name'))
-        outer_div.add(widgets.input_widgets.get_text_input_wdg('new_package_name', 400))
+        outer_div.add(get_label_widget('Name'))
+        outer_div.add(get_text_input_wdg('new_package_name', 400))
 
         self.get_platform_select_widget(outer_div)
 
-        outer_div.add(widgets.html_widgets.get_label_widget('Due Date'))
+        outer_div.add(get_label_widget('Pipeline'))
+        outer_div.add(get_pipeline_select_wdg('twog/package'))
+
+        outer_div.add(get_label_widget('Due Date'))
         outer_div.add(obu.get_date_calendar_wdg())
 
         submit_button = SubmitWdg('Submit')
@@ -63,7 +67,7 @@ class InsertPackageInOrderWdg(BaseRefreshWdg):
         platform_select_wdg = obu.get_select_widget_from_search_type('twog/platform', 'platform_code', 'name', 'code')
         platform_select_wdg.set_id('platform_code')
 
-        outer_div.add(widgets.html_widgets.get_label_widget('Platform'))
+        outer_div.add(get_label_widget('Platform'))
         outer_div.add(platform_select_wdg)
 
     def get_submit_button_behavior(self):
@@ -125,12 +129,12 @@ class InsertPackageByPlatformWdg(BaseRefreshWdg):
         outer_div = DivWdg()
         outer_div.set_id('insert-package-in-order')
 
-        outer_div.add(widgets.html_widgets.get_label_widget('Name'))
-        outer_div.add(widgets.input_widgets.get_text_input_wdg('new_package_name', 400))
+        outer_div.add(get_label_widget('Name'))
+        outer_div.add(get_text_input_wdg('new_package_name', 400))
 
         outer_div.add(get_platforms_checkboxes())
 
-        outer_div.add(widgets.html_widgets.get_label_widget('Due Date'))
+        outer_div.add(get_label_widget('Due Date'))
         outer_div.add(obu.get_date_calendar_wdg())
 
         submit_button = SubmitWdg('Submit')

@@ -1,4 +1,5 @@
 from pyasm.biz import Pipeline
+from pyasm.search import Search
 from pyasm.web import Table
 from pyasm.widget import CheckboxWdg, SelectWdg, MultiSelectWdg
 
@@ -108,6 +109,29 @@ def get_file_classification_select_wdg(width=200):
     classification_select_wdg.append_option('Deliverable', 'deliverable')
 
     return classification_select_wdg
+
+
+def get_pipeline_select_wdg(search_type, width=300):
+    """
+    Given a search type, return a select widget with the pipelines available for that search type
+
+    :param search_type: Search type as a string
+    :param width: Width of the widget in pixels
+    :return: SelectWdg
+    """
+    pipeline_select_wdg = SelectWdg('pipeline_code')
+    pipeline_select_wdg.set_id('pipeline_code')
+    pipeline_select_wdg.add_style('width', '{0}px'.format(width))
+    pipeline_select_wdg.add_empty_option()
+
+    pipeline_search = Search('sthpw/pipeline')
+    pipeline_search.add_filter('search_type', search_type)
+    pipelines = pipeline_search.get_sobjects()
+
+    for pipeline in pipelines:
+        pipeline_select_wdg.append_option(pipeline.get_value('name'), pipeline.get_code())
+
+    return pipeline_select_wdg
 
 
 def get_text_input_wdg(name, width=200):

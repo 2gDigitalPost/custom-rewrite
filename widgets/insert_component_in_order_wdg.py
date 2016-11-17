@@ -7,6 +7,7 @@ from pyasm.web import DivWdg, Table
 from pyasm.widget import CheckboxWdg, SelectWdg, SubmitWdg
 
 from common_tools.utils import get_instructions_select_wdg
+from widgets.input_widgets import get_pipeline_select_wdg
 
 
 def get_language_select_wdg():
@@ -75,29 +76,6 @@ def get_season_select_wdg(width=300):
         season_select_wdg.append_option(season.get_value('name'), season.get_code())
 
     return season_select_wdg
-
-
-def get_pipeline_select_wdg(search_type, width=300):
-    """
-    Given a search type, return a select widget with the pipelines available for that search type
-
-    :param search_type: Search type as a string
-    :param width: Width of the widget in pixels
-    :return: SelectWdg
-    """
-    pipeline_select_wdg = SelectWdg('pipeline_code')
-    pipeline_select_wdg.set_id('pipeline_code')
-    pipeline_select_wdg.add_style('width', '{0}px'.format(width))
-    pipeline_select_wdg.add_empty_option()
-
-    pipeline_search = Search('sthpw/pipeline')
-    pipeline_search.add_filter('search_type', search_type)
-    pipelines = pipeline_search.get_sobjects()
-
-    for pipeline in pipelines:
-        pipeline_select_wdg.append_option(pipeline.get_value('name'), pipeline.get_code())
-
-    return pipeline_select_wdg
 
 
 class InsertComponentInOrderWdg(BaseRefreshWdg):
