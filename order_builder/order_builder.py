@@ -368,6 +368,80 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         return task_div
 
+    def get_package_task_div(self, task):
+        """
+            Take a task object and set up the Div to display it.
+
+            :param task: sthpw/task object
+            :return: DivWdg
+            """
+
+        task_div = DivWdg()
+        task_div.add_style('display', 'inline-block')
+        task_div.add_style('background-color', '#F2F2F2')
+        task_div.add_style('padding-left', '10px')
+        task_div.add_style('padding-top', '10px')
+        task_div.add_style('border-radius', '10px')
+        task_div.add_style('width', '90%')
+
+        process_div = DivWdg()
+        process_div.add_style('font-weight', 'bold')
+        process_div.add(task.get('process'))
+
+        status_div = DivWdg()
+        status_span = SpanWdg()
+        status = task.get('status')
+        status_span.add(status)
+
+        if status in obu.TASK_COLORS.keys():
+            status_span.add_style('color', obu.TASK_COLORS.get(status))
+
+        status_div.add('Status: ')
+        status_div.add(status_span)
+
+        assigned_div = DivWdg()
+        assigned_div.add_style('font-style', 'italic')
+        assigned = task.get('assigned')
+
+        if assigned:
+            assigned_div.add('Assigned to: ' + assigned)
+        else:
+            assigned_div.add('Not yet assigned')
+
+        department_div = DivWdg()
+        department_div.add_style('font-style', 'italic')
+        department = obu.get_assigned_group_from_task(task)
+
+        if department:
+            department_div.add('Department: ' + department)
+        else:
+            department_div.add('No department assigned')
+
+        task_data_div = get_task_data_div(task.get_code())
+
+        instructions_button = ButtonNewWdg(title='Instructions', icon='CONTENTS')
+        instructions_button.add_behavior(obu.load_task_instructions_behavior(task.get_search_key()))
+        instructions_button.add_style('display', 'inline-block')
+
+        inspect_button = ButtonNewWdg(title='Inspect', icon='WORK')
+        inspect_button.add_behavior(obu.load_task_inspect_widget(task.get_search_key()))
+        inspect_button.add_style('display', 'inline-block')
+
+        note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
+        note_button.add_behavior(obu.get_add_notes_behavior(task.get_search_key()))
+        note_button.add_style('display', 'inline-block')
+
+        task_div.add(process_div)
+        task_div.add(status_div)
+        task_div.add(assigned_div)
+        task_div.add(department_div)
+        task_div.add(task_data_div)
+        task_div.add(instructions_button)
+        task_div.add(inspect_button)
+        task_div.add(note_button)
+
+        return task_div
+
     def setup_html_list_for_components_in_order(self, width=600):
         components_list = HtmlElement.ul()
         components_list.add_style('list-style-type', 'none')
@@ -576,7 +650,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         return components_list
 
-    def setup_html_list_for_packages_in_orders(self):
+    def setup_html_list_for_packages_in_orders(self, width=600):
         """
         Add the packages that go into the order to an HTML style unordered list
 
@@ -650,9 +724,13 @@ class OrderBuilderWdg(BaseRefreshWdg):
             )
             add_deliverable_file_to_package_button.add_style('display', 'inline-block')
 
-            inspect_package_button = ButtonNewWdg(title='Inspect', icon='WORK')
-            inspect_package_button.add_behavior(obu.load_package_inspect_widget(package.get_search_key()))
-            inspect_package_button.add_style('display', 'inline-block')
+            add_tasks_from_pipeline_wdg = ButtonNewWdg(title='Add Tasks from Pipeline', icon='INSERT_MULTI')
+            add_tasks_from_pipeline_wdg.add_behavior(get_load_assign_tasks_wdg(package.get_search_key()))
+            add_tasks_from_pipeline_wdg.add_style('display', 'inline-block')
+
+            # inspect_package_button = ButtonNewWdg(title='Inspect', icon='WORK')
+            # inspect_package_button.add_behavior(obu.load_package_inspect_widget(package.get_search_key()))
+            # inspect_package_button.add_style('display', 'inline-block')
 
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(obu.get_add_notes_behavior(package.get_search_key()))
@@ -661,7 +739,8 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(add_deliverable_file_to_package_button)
-            button_row_div.add(inspect_package_button)
+            button_row_div.add(add_tasks_from_pipeline_wdg)
+            # button_row_div.add(inspect_package_button)
             button_row_div.add(note_button)
 
             package_div.add(package_name_div)
@@ -692,8 +771,29 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             package_div.add(button_row_div)
 
+            tasks = package.get_all_children('sthpw/task')
+
+            package_task_div = DivWdg()
+            package_task_div.add_style('width', '{0}px'.format(width - 10))
+            package_task_div.add_style('margin-left', '10px')
+
+            # If there are tasks associated with the component, add them as a sub-list below it
+            if tasks:
+                task_list = DivWdg()
+
+                for task in sorted(tasks, key=lambda x: x.get_code()):
+                    task_div = DivWdg()
+                    task_div.add(self.get_package_task_div(task))
+                    task_list.add(task_div)
+
+                package_task_div.add(task_list)
+
+            package_outer_div = DivWdg()
+            package_outer_div.add(package_div)
+            package_outer_div.add(package_task_div)
+
             package_list_div = DivWdg()
-            package_list_div.add(package_div)
+            package_list_div.add(package_outer_div)
 
             packages_list.add(package_list_div)
 
@@ -852,20 +952,20 @@ catch(err) {
 
         order_div.add(self.setup_order_information())
 
-        components_div_width = 500
+        div_width = 500
 
         components_div = DivWdg()
         components_div.add_style('display', 'inline-block')
-        components_div.add_style('width', '{0}px'.format(components_div_width))
+        components_div.add_style('width', '{0}px'.format(div_width))
         components_div.add_style('float', 'left')
-        components_div.add(self.setup_html_list_for_components_in_order(components_div_width))
+        components_div.add(self.setup_html_list_for_components_in_order(div_width))
         order_div.add(components_div)
 
         packages_div = DivWdg()
         packages_div.add_style('display', 'inline-block')
-        packages_div.add_style('width', '500px')
+        packages_div.add_style('width', '{0}px'.format(div_width))
         packages_div.add_style('float', 'left')
-        packages_div.add(self.setup_html_list_for_packages_in_orders())
+        packages_div.add(self.setup_html_list_for_packages_in_orders(div_width))
         order_div.add(packages_div)
 
         files_div = DivWdg()
