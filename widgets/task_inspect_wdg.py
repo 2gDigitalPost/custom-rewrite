@@ -140,10 +140,17 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
     def get_buttons_row(self):
         outer_div = DivWdg()
 
+        download_attached_files_button =  ButtonNewWdg(title='Download Attached Files', icon='DOWNLOAD')
+        download_attached_files_button.add_behavior(obu.get_download_attached_files_behavior(
+            self.task_sobject.get_search_key()
+        ))
+        download_attached_files_button.add_style('display', 'inline-block')
+
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(self.task_sobject.get_search_key()))
         note_button.add_style('display', 'inline-block')
 
+        outer_div.add(download_attached_files_button)
         outer_div.add(note_button)
 
         return outer_div

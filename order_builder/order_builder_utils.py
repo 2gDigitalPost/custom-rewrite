@@ -280,6 +280,23 @@ catch(err) {
     return behavior
 
 
+def get_download_attached_files_behavior(search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    spt.api.load_popup('Add Note', 'tactic.ui.widget.SObjectCheckinHistoryWdg', {'search_key': '%s'});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % search_key
+    }
+
+    return behavior
+
+
 def load_task_instructions_behavior(task_search_key):
     behavior = {
         'css_class': 'clickme',
