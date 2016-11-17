@@ -10,7 +10,7 @@ from common_tools.utils import get_instructions_select_wdg
 
 
 def get_language_select_wdg():
-    language_select_wdg = SelectWdg('language_select')
+    language_select_wdg = SelectWdg('language_code')
     language_select_wdg.set_id('language_code')
     language_select_wdg.add_style('display', 'inline-block')
     language_select_wdg.add_empty_option()
