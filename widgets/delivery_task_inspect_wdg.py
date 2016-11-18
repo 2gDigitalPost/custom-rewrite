@@ -6,74 +6,14 @@ from pyasm.widget import SubmitWdg
 
 import order_builder.order_builder_utils as obu
 
-from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
-    get_task_data_out_files, get_task_instructions_text_from_instructions_code, get_order_sobject_from_component_sobject
+from common_tools import get_task_data_sobject_from_task_code, get_task_instructions_text_from_instructions_code,\
+    get_order_sobject_from_component_sobject
 
 from widgets.html_widgets import get_page_header
 from widgets.input_widgets import get_task_status_select_wdg
 
 
-def get_in_files_list(task_data_code):
-    in_files_list = get_task_data_in_files(task_data_code)
-
-    div_wdg = DivWdg()
-
-    if in_files_list:
-        in_files_unordered_html_list = HtmlElement.ul()
-
-        for file_path in sorted([in_file.get('file_path') for in_file in in_files_list]):
-            file_li = HtmlElement.li()
-            file_li.add(file_path)
-            in_files_unordered_html_list.add(file_li)
-
-        div_wdg.add(in_files_unordered_html_list)
-    else:
-        div_wdg.add('No input files exist for this task')
-
-    return div_wdg
-
-
-def get_out_files_list(task_data_code):
-    out_files_list = get_task_data_out_files(task_data_code)
-
-    div_wdg = DivWdg()
-
-    if out_files_list:
-        out_files_unordered_html_list = HtmlElement.ul()
-
-        for file_path in sorted([out_file.get('file_path') for out_file in out_files_list]):
-            file_li = HtmlElement.li()
-            file_li.add(file_path)
-            out_files_unordered_html_list.add(file_li)
-
-        div_wdg.add(out_files_unordered_html_list)
-    else:
-        div_wdg.add('No output files exist for this task')
-
-    return div_wdg
-
-
-def get_equipment_list(task_data_code):
-    equipment_sobjects_list = get_task_data_equipment(task_data_code)
-
-    div_wdg = DivWdg()
-
-    if equipment_sobjects_list:
-        equipment_unordered_html_list = HtmlElement.ul()
-
-        for name in [equipment_sobject.get('name') for equipment_sobject in equipment_sobjects_list]:
-            equipment_li = HtmlElement.li()
-            equipment_li.add(name)
-            equipment_unordered_html_list.add(equipment_li)
-
-        div_wdg.add(equipment_unordered_html_list)
-    else:
-        div_wdg.add('No equipment is assigned to this task')
-
-    return div_wdg
-
-
-class TaskInspectWdg(BaseRefreshWdg):
+class DeliveryTaskInspectWdg(BaseRefreshWdg):
     def init(self):
         self.task_sobject = self.get_sobject_from_kwargs()
         self.task_data = get_task_data_sobject_from_task_code(self.task_sobject.get_code())
@@ -149,7 +89,7 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
 
         div_wdg.add(get_page_header(self.task_sobject.get('process')))
         div_wdg.add(HtmlElement.h4('Code: {0}'.format(self.task_sobject.get_code())))
-        div_wdg.add(HtmlElement.h4('Component: {0} ({1})'.format(self.parent_component.get('name'),
+        div_wdg.add(HtmlElement.h4('Package: {0} ({1})'.format(self.parent_component.get('name'),
                                                                  self.parent_component.get_code())))
 
         # Get the order that contains the parent component and display its information
@@ -171,9 +111,6 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         change_estimated_hours_button.add_style('display', 'inline-block')
         div_wdg.add(change_estimated_hours_button)
 
-        div_wdg.add(HtmlElement.h4('<u>Input Files</u>'))
-        div_wdg.add(get_in_files_list(self.task_data.get_code()))
-
         add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
         add_input_file_button.add_behavior(
             obu.get_load_popup_widget_behavior('Add Input Files from Order',
@@ -193,9 +130,6 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         create_input_file_button.add_style('display', 'inline-block')
         div_wdg.add(create_input_file_button)
 
-        div_wdg.add(HtmlElement.h4('<u>Output Files</u>'))
-        div_wdg.add(get_out_files_list(self.task_data.get_code()))
-
         move_input_file_to_output_button = ButtonNewWdg(title='Move Input File to Output', icon='RIGHT')
         move_input_file_to_output_button.add_behavior(
             obu.get_load_popup_widget_with_reload_behavior(
@@ -205,9 +139,6 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         )
         move_input_file_to_output_button.add_style('display', 'inline-block')
         div_wdg.add(move_input_file_to_output_button)
-
-        div_wdg.add(HtmlElement.h4('<u>Equipment</u>'))
-        div_wdg.add(get_equipment_list(self.task_data.get_code()))
 
         add_equipment_button = ButtonNewWdg(title='Add Equipment', icon='INSERT_MULTI')
         add_equipment_button.add_behavior(
