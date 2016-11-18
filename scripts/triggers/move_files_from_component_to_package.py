@@ -1,7 +1,7 @@
 from pyasm.search import Search
 
-from common_tools.utils import get_task_sobjects_from_component_code, get_task_data_sobject_from_task_code,\
-    get_task_data_in_files, get_task_data_out_files
+from common_tools.utils import get_sobject_by_code, get_task_sobjects_from_component_code,\
+    get_task_data_sobject_from_task_code, get_task_data_in_files, get_task_data_out_files
 
 
 def main(server=None, input_data=None):
@@ -49,22 +49,25 @@ def main(server=None, input_data=None):
 
     # Iterate through the entries in twog/component_files_to_package (If there aren't any then this script does nothing)
     for component_files_to_package_entry in component_files_to_package_entries:
-        package_code = component_files_to_package_entry.get('package_code')
-
         for deliverable_file in deliverable_files:
             deliverable_file_code = deliverable_file.get_code()
 
-            existing_entry_search = Search('twog/file_in_package')
-            existing_entry_search.add_filter('package_code', package_code)
+            package = get_sobject_by_code('twog/package', component_files_to_package_entry.get('package_code'))
+            first_task_in_package = package.get_all_children('sthpw/task')[0]
+            first_task_data = get_task_data_sobject_from_task_code(first_task_in_package.get_code())
+            first_task_data_code = first_task_data.get_code()
+
+            existing_entry_search = Search('twog/task_data_in_file')
+            existing_entry_search.add_filter('task_data_code', first_task_data_code)
             existing_entry_search.add_filter('file_code', deliverable_file_code)
             existing_entry = existing_entry_search.get_sobject()
 
             if not existing_entry:
                 # Set up the data dictionary
-                data = {'package_code': package_code, 'file_code': deliverable_file_code}
+                data = {'task_data_code': first_task_data_code, 'file_code': deliverable_file_code}
 
-                # Finally, insert the new twog/file_in_package object
-                server.insert('twog/file_in_package', data)
+                # Finally, insert the new twog/task_data_in_file object
+                server.insert('twog/task_data_in_file', data)
 
 
 if __name__ == '__main__':

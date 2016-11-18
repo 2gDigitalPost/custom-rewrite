@@ -19,23 +19,27 @@ def main(server=None, trigger_input=None):
     if not (task_sobject and task_sobject.get('search_type') == u'twog/component?project=twog'):
         return
 
-    # Only send the notification if the task is being marked as completed.
-    if task_sobject.get('status') != 'Complete':
-        return
-
     component_search_code = task_sobject.get('search_code')
 
     component_search = Search('twog/component')
     component_search.add_code_filter(component_search_code)
     component = component_search.get_sobject()
 
-    tasks = get_task_sobjects_from_component_sobject(component)
+    task_status = task_sobject.get('status')
 
-    for task in tasks:
-        if task.get('status') != 'Complete':
-            return
-    else:
-        server.update(component.get_search_key(), {'status': 'complete'})
+    # If the task is marked as complete, check if the component needs to be set to complete as well (only happens if
+    # all other tasks on that component are marked as complete)
+    if task_status.lower() == 'complete':
+        tasks = get_task_sobjects_from_component_sobject(component)
+
+        for task in tasks:
+            if task.get('status') != 'Complete':
+                return
+        else:
+            server.update(component.get_search_key(), {'status': 'complete'})
+    elif task_status.lower() == 'in progress':
+        if component.get('status').lower() != 'in_progress':
+            server.update(component.get_search_key(), {'status': 'in_progress'})
 
 
 if __name__ == '__main__':
