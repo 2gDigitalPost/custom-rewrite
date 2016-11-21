@@ -131,6 +131,32 @@ def get_task_sobjects_from_component_sobject(component_sobject):
     return get_task_sobjects_from_component_code(component_sobject.get_code())
 
 
+def get_task_sobjects_from_package_code(package_code):
+    """
+    Given a twog/package unique code, get a list of all the sthpw/task sobjects attached to it
+
+    :param package_code: twog/package code
+    :return: List of sthpw/task sobjects
+    """
+
+    task_search = Search('sthpw/task')
+    task_search.add_filter('search_code', package_code)
+    tasks = task_search.get_sobjects()
+
+    return tasks
+
+
+def get_task_sobjects_from_package_sobject(package_sobject):
+    """
+    Given a twog/package sobject, get a list of all the sthpw/task sobjects attached to it.
+
+    :param package_sobject: twog/package
+    :return: List of sthpw/task sobjects
+    """
+
+    return get_task_sobjects_from_package_code(package_sobject.get_code())
+
+
 def get_task_data_sobject_from_task_code(task_code):
     """
     Given a task code, find the task_data sobject associated with it
@@ -812,6 +838,31 @@ def get_component_status_label_and_color(component_status):
     }
 
     return component_status_dictionary.get(component_status, (None, None))
+
+
+def get_all_tasks_from_order_sobject(order_sobject):
+    """
+    Given a twog/order sobject, get all the sthpw/task sobjects attached to it (through the components and packages).
+
+    :param order_sobject: twog/order sobject
+    :return: List of sthpw/task sobjects
+    """
+
+    # Get a list of the components and tasks attached to the order
+    components = get_component_sobjects_from_order_code(order_sobject.get_code())
+    packages = get_package_sobjects_from_order_code(order_sobject.get_code())
+
+    tasks = []
+
+    # Add each component task to the list
+    for component in components:
+        tasks.extend(get_task_sobjects_from_component_sobject(component))
+
+    # Add each package task to the list
+    for package in packages:
+        tasks.extend(get_task_sobjects_from_package_sobject(package))
+
+    return tasks
 
 
 def get_order_builder_url_on_click(url):
