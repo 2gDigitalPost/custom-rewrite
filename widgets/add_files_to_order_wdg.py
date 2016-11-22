@@ -1,9 +1,9 @@
 from tactic.ui.common import BaseRefreshWdg
 
-from pyasm.search import Search
 from pyasm.web import DivWdg
 from pyasm.widget import SubmitWdg
 
+from common_tools.utils import get_sobject_by_code
 from widgets.input_widgets import get_files_checkboxes_for_division
 
 
@@ -14,7 +14,7 @@ class AddFilesToOrderWdg(BaseRefreshWdg):
         self.parent_widget_name = self.kwargs.get('parent_widget_name')
         self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
 
-    def get_submit_button_behavior(self):
+    def get_submit_button_behavior(self, division_code):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -28,8 +28,9 @@ var values = spt.api.get_input_values(containing_element, null, false);
 
 // Get the form values
 var order_code = '%s';
+var division_code = '%s';
 
-var files = server.eval("@SOBJECT(twog/file)");
+var files = server.eval("@SOBJECT(twog/file['division_code', '" + division_code + "'])");
 
 for (var i = 0; i < files.length; i++) {
     var file_code = files[i].code;
@@ -68,7 +69,7 @@ var parent_widget_name = '%s';
 var parent_widget_search_key = '%s';
 
 spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_widget_search_key});
-            ''' % (self.order_sobject.get_code(), self.parent_widget_title, self.parent_widget_name,
+            ''' % (self.order_sobject.get_code(), division_code, self.parent_widget_title, self.parent_widget_name,
                    self.parent_widget_search_key)
         }
 
@@ -78,18 +79,19 @@ spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_
         outer_div = DivWdg()
         outer_div.set_id('add_files_to_order')
 
-        division_search = Search('twog/division')
-        division_search.add_code_filter(self.order_sobject.get('division_code'))
-        division_sobject = division_search.get_sobject()
+        division_sobject = get_sobject_by_code('twog/division', self.order_sobject.get('division_code'))
 
         if division_sobject:
-            outer_div.add(get_files_checkboxes_for_division(division_sobject.get_code(), self.order_sobject.get_code()))
+            division_code = division_sobject.get_code()
+
+            outer_div.add(get_files_checkboxes_for_division(division_code, self.order_sobject.get_code()))
+
+            submit_button = SubmitWdg('Submit')
+            submit_button.add_behavior(self.get_submit_button_behavior(division_code))
+
+            outer_div.add(submit_button)
         else:
             outer_div.add('<div>You cannot add files to an Order until a Client Division has been selected.</div>')
 
-        submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior())
-
-        outer_div.add(submit_button)
 
         return outer_div
