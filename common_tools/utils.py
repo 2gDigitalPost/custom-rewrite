@@ -308,7 +308,6 @@ def get_files_for_division(division_code):
 
     file_search = Search('twog/file')
     file_search.add_filter('division_code', division_code)
-    file_search.add_filter('classification', 'source')
     files = file_search.get_sobjects()
 
     return files

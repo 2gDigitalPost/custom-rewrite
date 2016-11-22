@@ -30,19 +30,26 @@ var values = spt.api.get_input_values(containing_element, null, false);
 var order_code = '%s';
 var division_code = '%s';
 
+// Get a list of all the files belonging to the division
 var files = server.eval("@SOBJECT(twog/file['division_code', '" + division_code + "'])");
+
+// Get all the existing entries in the twog/file_in_order table for this order
+var existing_entries = server.eval("@SOBJECT(twog/file_in_order['order_code', '" + order_code + "'])");
+
+// Get a list of all the existing file codes
+var existing_entry_file_codes = [];
+for (var y = 0; y < existing_entries.length; y++) {
+    existing_entry_file_codes.push(existing_entries[y].file_code);
+}
 
 for (var i = 0; i < files.length; i++) {
     var file_code = files[i].code;
 
     var file_checkbox_value = values[file_code];
 
-    var existing_entry = server.eval("@SOBJECT(twog/file_in_order['file_code', '" + file_code +
-                                     "']['order_code',  '" + order_code + "'])");
-
     if (file_checkbox_value == "on") {
         // Only insert a new entry if one does not already exist.
-        if (existing_entry.length == 0) {
+        if (existing_entry_file_codes.indexOf(file_code) == -1) {
             var new_entry = {
                 'order_code': order_code,
                 'file_code': file_code
@@ -54,9 +61,12 @@ for (var i = 0; i < files.length; i++) {
     else {
         // If a box is unchecked, remove any entries in the database that exist (in other words, if a box was checked
         // but is now unchecked, the user meant to remove the connection)
-        if (existing_entry.length > 0)
-        {
-            server.delete_sobject(existing_entry[0].__search_key__);
+        if (existing_entry_file_codes.indexOf(file_code) > -1) {
+            for (var j = 0; j < existing_entries.length; j++) {
+                if (existing_entries[j].file_code == file_code) {
+                    server.delete_sobject(existing_entries[j].__search_key__);
+                }
+            }
         }
     }
 }
