@@ -727,6 +727,14 @@ class OrderBuilderWdg(BaseRefreshWdg):
             else:
                 package_instructions_div.add('Instructions have not been set.')
 
+            package_pipeline_div = DivWdg()
+            package_pipeline_name = get_sobject_name_by_code('sthpw/pipeline', package.get('pipeline_code'))
+
+            if package_pipeline_name:
+                package_pipeline_div.add('Pipeline: <i>{0}</i>'.format(package_pipeline_name))
+            else:
+                package_pipeline_div.add('<i>No Pipeline Assigned</i>')
+
             # add_deliverable_file_to_package_button = ButtonNewWdg(title='Add Deliverable File', icon='ADD')
             # add_deliverable_file_to_package_button.add_behavior(
                 # obu.get_load_popup_widget_with_reload_behavior(
@@ -735,6 +743,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
                 # )
             # )
             # add_deliverable_file_to_package_button.add_style('display', 'inline-block')
+
+            change_pipeline_button = ButtonNewWdg(title='Change Pipeline', icon='PIPELINE')
+            change_pipeline_button.add_behavior(
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Change Pipeline', 'widgets.AssignPipelineWdg', package.get_search_key(),
+                    'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+                )
+            )
+            change_pipeline_button.add_style('display', 'inline-block')
 
             change_instructions_button = ButtonNewWdg(title='Change Instructions', icon='DOCUMENTATION')
             change_instructions_button.add_behavior(
@@ -759,6 +776,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
+            button_row_div.add(change_pipeline_button)
             button_row_div.add(change_instructions_button)
             # button_row_div.add(add_deliverable_file_to_package_button)
             button_row_div.add(add_tasks_from_pipeline_wdg)
@@ -767,6 +785,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             package_div.add(package_name_div)
             package_div.add(package_description_div)
+            package_div.add(package_pipeline_div)
             package_div.add(package_instructions_div)
             package_div.add(package_due_date_div)
             package_div.add(package_delivery_task_div)

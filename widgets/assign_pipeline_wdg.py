@@ -4,18 +4,17 @@ from pyasm.search import Search
 from pyasm.web import DivWdg
 from pyasm.widget import SelectWdg, SubmitWdg
 
-from order_builder.order_builder_utils import get_widget_header
 from widgets.html_widgets import get_label_widget
 
 
-def get_pipeline_select_wdg(pipeline_code):
+def get_pipeline_select_wdg(pipeline_code, search_type):
     pipeline_sel = SelectWdg('pipeline_select')
     pipeline_sel.set_id('pipeline_select')
     pipeline_sel.add_style('width', '135px')
     pipeline_sel.add_empty_option()
 
     pipeline_search = Search('sthpw/pipeline')
-    pipeline_search.add_filter('search_type', 'twog/component')
+    pipeline_search.add_filter('search_type', search_type)
     pipelines = pipeline_search.get_sobjects()
 
     for pipeline in pipelines:
@@ -29,30 +28,34 @@ def get_pipeline_select_wdg(pipeline_code):
 
 class AssignPipelineWdg(BaseRefreshWdg):
     def init(self):
-        self.component_sobject = self.get_sobject_from_kwargs()
+        self.sobject = self.get_sobject_from_kwargs()
+
         self.parent_widget_title = self.kwargs.get('parent_widget_title')
         self.parent_widget_name = self.kwargs.get('parent_widget_name')
         self.parent_widget_search_key = self.kwargs.get('parent_widget_search_key')
 
-    def get_submit_button_behavior(self):
+    def get_submit_button_behavior(self, search_type):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
             'cbjs_action': '''
 try {
+    spt.app_busy.show('Saving...');
+
     // Get the server object
     var server = TacticServerStub.get();
     var containing_element = bvr.src_el.getParent("#assign-pipeline-wdg");
     var values = spt.api.get_input_values(containing_element, null, false);
 
     // Get the form values
-    var component_code = '%s';
+    var sobject_code = '%s';
+    var search_type = '%s';
     var pipeline_code = values.pipeline_select;
 
-    // Build a search key using the component's code
-    var search_key = server.build_search_key('twog/component', component_code, 'twog');
+    // Build a search key using the sobject's code
+    var search_key = server.build_search_key(search_type, sobject_code, 'twog');
 
-    // Set up the kwargs to update the component data
+    // Set up the kwargs to update the sobject's data
     var kwargs = {
         'pipeline_code': pipeline_code,
     }
@@ -63,6 +66,7 @@ try {
     spt.app_busy.hide();
     spt.popup.close(spt.popup.get_popup(bvr.src_el));
 
+    // Reload the parent widget
     var parent_widget_title = '%s';
     var parent_widget_name = '%s';
     var parent_widget_search_key = '%s';
@@ -72,7 +76,7 @@ try {
 catch(err) {
     spt.app_busy.hide();
     spt.alert(spt.exception.handler(err));
-}''' % (self.component_sobject.get_code(), self.parent_widget_title, self.parent_widget_name,
+}''' % (self.sobject.get_code(), search_type, self.parent_widget_title, self.parent_widget_name,
         self.parent_widget_search_key)
         }
 
@@ -82,20 +86,17 @@ catch(err) {
         outer_div = DivWdg()
         outer_div.add_class('assign-pipeline-wdg')
 
-        page_label = 'Assign Pipeline'
-        outer_div.add(get_widget_header(page_label))
-
         outer_div.add(get_label_widget('Pipeline'))
 
-        if self.component_sobject:
-            pipeline_code = self.component_sobject.get_value('pipeline_code')
-        else:
-            pipeline_code = None
+        pipeline_code = self.sobject.get_value('pipeline_code')
 
-        outer_div.add(get_pipeline_select_wdg(pipeline_code))
+        # 'get_search_type' returns the full search type ('twog/component?project=twog'). Only need the first part.
+        search_type = self.sobject.get_search_type().split('?')[0]
+
+        outer_div.add(get_pipeline_select_wdg(pipeline_code, search_type))
 
         submit_button = SubmitWdg('Submit')
-        submit_button.add_behavior(self.get_submit_button_behavior())
+        submit_button.add_behavior(self.get_submit_button_behavior(search_type))
 
         outer_div.add(submit_button)
 
