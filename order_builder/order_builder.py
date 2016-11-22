@@ -715,14 +715,35 @@ class OrderBuilderWdg(BaseRefreshWdg):
             if package_delivery_task:
                 package_delivery_task_div.add('Delivery Status: {0}'.format(package_delivery_task.get('status')))
 
-            add_deliverable_file_to_package_button = ButtonNewWdg(title='Add Deliverable File', icon='ADD')
-            add_deliverable_file_to_package_button.add_behavior(
+            package_instructions_div = DivWdg()
+            package_instructions_code = package.get('package_instructions_code')
+
+            if package_instructions_code:
+                package_instructions = get_sobject_by_code('twog/package_instructions', package_instructions_code)
+
+                package_instructions_name = package_instructions.get('name')
+
+                package_instructions_div.add('Instructions: {0}'.format(package_instructions_name))
+            else:
+                package_instructions_div.add('Instructions have not been set.')
+
+            # add_deliverable_file_to_package_button = ButtonNewWdg(title='Add Deliverable File', icon='ADD')
+            # add_deliverable_file_to_package_button.add_behavior(
+                # obu.get_load_popup_widget_with_reload_behavior(
+                    # 'Add Deliverable Files', 'widgets.AddDeliverableFilesToPackageWdg', package.get_search_key(),
+                    # 'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+                # )
+            # )
+            # add_deliverable_file_to_package_button.add_style('display', 'inline-block')
+
+            change_instructions_button = ButtonNewWdg(title='Change Instructions', icon='DOCUMENTATION')
+            change_instructions_button.add_behavior(
                 obu.get_load_popup_widget_with_reload_behavior(
-                    'Add Deliverable Files', 'widgets.AddDeliverableFilesToPackageWdg', package.get_search_key(),
+                    'Change Instructions', 'widgets.ChangePackageInstructionsWdg', package.get_search_key(),
                     'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
                 )
             )
-            add_deliverable_file_to_package_button.add_style('display', 'inline-block')
+            change_instructions_button.add_style('display', 'inline-block')
 
             add_tasks_from_pipeline_wdg = ButtonNewWdg(title='Add Tasks from Pipeline', icon='INSERT_MULTI')
             add_tasks_from_pipeline_wdg.add_behavior(get_load_assign_tasks_wdg(package.get_search_key()))
@@ -738,13 +759,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
             button_row_div = SpanWdg()
             button_row_div.add_style('display', 'inline-block')
-            button_row_div.add(add_deliverable_file_to_package_button)
+            button_row_div.add(change_instructions_button)
+            # button_row_div.add(add_deliverable_file_to_package_button)
             button_row_div.add(add_tasks_from_pipeline_wdg)
             # button_row_div.add(inspect_package_button)
             button_row_div.add(note_button)
 
             package_div.add(package_name_div)
             package_div.add(package_description_div)
+            package_div.add(package_instructions_div)
             package_div.add(package_due_date_div)
             package_div.add(package_delivery_task_div)
             package_div.add(package_platform_div)

@@ -762,6 +762,20 @@ def get_client_division_sobject_from_order_code(order_code):
     return get_client_division_sobject_from_order_sobject(order_sobject)
 
 
+def get_client_division_sobject_for_package_sobject(package_sobject):
+    """
+    Given a twog/package sobject, get the division sobject associated with it (through the parent twog/order sobject).
+
+    :param package_sobject: twog/package sobject
+    :return: twog/division sobject
+    """
+
+    order = get_sobject_by_code('twog/order', package_sobject.get('order_code'))
+    division = get_sobject_by_code('twog/division', order.get('division_code'))
+
+    return division
+
+
 def get_client_division_sobject_for_task_sobject(task):
     """
     Given a task sobject, travel up the chain of Component and Order to get the Division the order is assigned
