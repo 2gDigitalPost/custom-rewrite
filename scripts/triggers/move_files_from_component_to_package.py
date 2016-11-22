@@ -53,21 +53,27 @@ def main(server=None, input_data=None):
             deliverable_file_code = deliverable_file.get_code()
 
             package = get_sobject_by_code('twog/package', component_files_to_package_entry.get('package_code'))
-            first_task_in_package = package.get_all_children('sthpw/task')[0]
-            first_task_data = get_task_data_sobject_from_task_code(first_task_in_package.get_code())
-            first_task_data_code = first_task_data.get_code()
 
-            existing_entry_search = Search('twog/task_data_in_file')
-            existing_entry_search.add_filter('task_data_code', first_task_data_code)
-            existing_entry_search.add_filter('file_code', deliverable_file_code)
-            existing_entry = existing_entry_search.get_sobject()
+            # Get a list of all the tasks attached to a package (might be empty)
+            package_tasks = package.get_all_children('sthpw/task')
 
-            if not existing_entry:
-                # Set up the data dictionary
-                data = {'task_data_code': first_task_data_code, 'file_code': deliverable_file_code}
+            # If no tasks are attached to the package, no need to do anything
+            if package_tasks:
+                first_task_in_package = package.get_all_children('sthpw/task')[0]
+                first_task_data = get_task_data_sobject_from_task_code(first_task_in_package.get_code())
+                first_task_data_code = first_task_data.get_code()
 
-                # Finally, insert the new twog/task_data_in_file object
-                server.insert('twog/task_data_in_file', data)
+                existing_entry_search = Search('twog/task_data_in_file')
+                existing_entry_search.add_filter('task_data_code', first_task_data_code)
+                existing_entry_search.add_filter('file_code', deliverable_file_code)
+                existing_entry = existing_entry_search.get_sobject()
+
+                if not existing_entry:
+                    # Set up the data dictionary
+                    data = {'task_data_code': first_task_data_code, 'file_code': deliverable_file_code}
+
+                    # Finally, insert the new twog/task_data_in_file object
+                    server.insert('twog/task_data_in_file', data)
 
 
 if __name__ == '__main__':
