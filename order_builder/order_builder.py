@@ -735,15 +735,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
             else:
                 package_pipeline_div.add('<i>No Pipeline Assigned</i>')
 
-            # add_deliverable_file_to_package_button = ButtonNewWdg(title='Add Deliverable File', icon='ADD')
-            # add_deliverable_file_to_package_button.add_behavior(
-                # obu.get_load_popup_widget_with_reload_behavior(
-                    # 'Add Deliverable Files', 'widgets.AddDeliverableFilesToPackageWdg', package.get_search_key(),
-                    # 'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
-                # )
-            # )
-            # add_deliverable_file_to_package_button.add_style('display', 'inline-block')
-
             change_pipeline_button = ButtonNewWdg(title='Change Pipeline', icon='PIPELINE')
             change_pipeline_button.add_behavior(
                 obu.get_load_popup_widget_with_reload_behavior(
@@ -766,10 +757,6 @@ class OrderBuilderWdg(BaseRefreshWdg):
             add_tasks_from_pipeline_wdg.add_behavior(get_load_assign_tasks_wdg(package.get_search_key()))
             add_tasks_from_pipeline_wdg.add_style('display', 'inline-block')
 
-            # inspect_package_button = ButtonNewWdg(title='Inspect', icon='WORK')
-            # inspect_package_button.add_behavior(obu.load_package_inspect_widget(package.get_search_key()))
-            # inspect_package_button.add_style('display', 'inline-block')
-
             note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
             note_button.add_behavior(obu.get_add_notes_behavior(package.get_search_key()))
             note_button.add_style('display', 'inline-block')
@@ -778,9 +765,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div.add_style('display', 'inline-block')
             button_row_div.add(change_pipeline_button)
             button_row_div.add(change_instructions_button)
-            # button_row_div.add(add_deliverable_file_to_package_button)
             button_row_div.add(add_tasks_from_pipeline_wdg)
-            # button_row_div.add(inspect_package_button)
             button_row_div.add(note_button)
 
             package_div.add(package_name_div)
