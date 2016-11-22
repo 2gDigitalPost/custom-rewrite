@@ -19,9 +19,9 @@ class AddInputFilesToTaskWdg(BaseRefreshWdg):
 
         order_search = Search('twog/order')
         order_search.add_code_filter(component.get('order_code'))
-        order = order_search.get_sobject()
+        self.order = order_search.get_sobject()
 
-        self.order_files = get_files_for_order(order.get_code())
+        self.order_files = get_files_for_order(self.order.get_code())
         self.selected_files = get_task_data_in_files(self.task_data.get_code())
 
     def get_files_checkbox_for_task(self):
@@ -45,8 +45,7 @@ class AddInputFilesToTaskWdg(BaseRefreshWdg):
 
         return files_checkbox_table
 
-    @staticmethod
-    def get_submit_button_behavior(task_data_code, task_search_key):
+    def get_submit_button_behavior(self, task_data_code, task_search_key):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -60,11 +59,12 @@ var values = spt.api.get_input_values(containing_element, null, false);
 
 // Get the form values
 var task_data_code = '%s';
+var order_code = '%s';
 
-var files = server.eval("@SOBJECT(twog/file)");
+var file_in_order_entries = server.eval("@SOBJECT(twog/file_in_order['order_code', '" + order_code + "'])");
 
-for (var i = 0; i < files.length; i++) {
-    var file_code = files[i].code;
+for (var i = 0; i < file_in_order_entries.length; i++) {
+    var file_code = file_in_order_entries[i].file_code;
 
     var file_checkbox_value = values[file_code];
 
@@ -98,7 +98,7 @@ spt.popup.close(spt.popup.get_popup(bvr.src_el));
 var task_search_key = '%s';
 
 spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_key});
-            ''' % (task_data_code, task_search_key)
+            ''' % (task_data_code, self.order.get_code(), task_search_key)
         }
 
         return behavior
