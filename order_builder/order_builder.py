@@ -308,6 +308,9 @@ class OrderBuilderWdg(BaseRefreshWdg):
         process_div.add_style('font-weight', 'bold')
         process_div.add(task.get('process'))
 
+        code_div = DivWdg()
+        code_div.add('Code: {0}'.format(task.get_code()))
+
         status_div = DivWdg()
         status_span = SpanWdg()
         status = task.get('status')
@@ -357,6 +360,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         note_button.add_style('display', 'inline-block')
 
         task_div.add(process_div)
+        task_div.add(code_div)
         task_div.add(status_div)
         task_div.add(assigned_div)
         task_div.add(department_div)
@@ -387,6 +391,9 @@ class OrderBuilderWdg(BaseRefreshWdg):
         process_div = DivWdg()
         process_div.add_style('font-weight', 'bold')
         process_div.add(task.get('process'))
+
+        code_div = DivWdg()
+        code_div.add('Code: {0}'.format(task.get_code()))
 
         status_div = DivWdg()
         status_span = SpanWdg()
@@ -432,6 +439,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         note_button.add_style('display', 'inline-block')
 
         task_div.add(process_div)
+        task_div.add(code_div)
         task_div.add(status_div)
         task_div.add(assigned_div)
         task_div.add(department_div)
@@ -457,8 +465,10 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_name_div.add_style('font-weight', 'bold')
             component_name_div.add(component.get('name'))
 
+            component_code_div = DivWdg()
+            component_code_div.add('Code: {0}'.format(component.get_code()))
+
             component_title_div = DivWdg()
-            component_title_div.add_style('text-decoration', 'underline')
             component_title = get_sobject_name_by_code('twog/title', component.get('title_code'))
 
             if component_title:
@@ -531,6 +541,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add_style('border-radius', '10px')
 
             component_div.add(component_name_div)
+            component_div.add(component_code_div)
             component_div.add(component_title_div)
             component_div.add(component_description_div)
             component_div.add(component_pipeline_div)
@@ -672,6 +683,9 @@ class OrderBuilderWdg(BaseRefreshWdg):
             package_name_div.add_style('font-weight', 'bold')
             package_name_div.add(package.get('name'))
 
+            package_code_div = DivWdg()
+            package_code_div.add('Code: {0}'.format(package.get_code()))
+
             package_description_div = DivWdg()
             package_description_div.add_style('font-style', 'italic')
             package_description_div.add(package.get('description'))
@@ -769,6 +783,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             button_row_div.add(note_button)
 
             package_div.add(package_name_div)
+            package_div.add(package_code_div)
             package_div.add(package_description_div)
             package_div.add(package_pipeline_div)
             package_div.add(package_instructions_div)
