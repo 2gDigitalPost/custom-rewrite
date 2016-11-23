@@ -593,10 +593,13 @@ def get_task_estimated_hours_from_instructions_document(instructions_document, t
                 _, name, department, hours = line.split('|')
                 name = name.strip()
 
-                if name == task_name:
+                print(name)
+                print(task_name)
+
+                if name.lower() == task_name.lower().strip():
                     return float(hours)
     else:
-        return None
+        return 0
 
 
 def get_task_estimated_hours_from_task_code(task_code):
@@ -614,7 +617,7 @@ def get_task_estimated_hours_from_task_code(task_code):
         if instructions_sobject:
             return get_task_estimated_hours_from_instructions_document(instructions_sobject, task.get('process'))
 
-    return None
+    return 0
 
 
 def get_task_estimated_hours_from_package_task_code(task_code):
