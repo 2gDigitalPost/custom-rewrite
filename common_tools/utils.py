@@ -363,8 +363,6 @@ def get_task_sobjects_from_file_in_package_sobjects(file_in_package_sobjects):
             ["'{0}'".format(file_in_package.get_code()) for file_in_package in file_in_package_sobjects]
         )
 
-        print(files_in_package_string)
-
         task_search = Search('sthpw/task')
         task_search.add_where('\"search_code\" in ({0})'.format(files_in_package_string))
         tasks = task_search.get_sobjects()
@@ -592,9 +590,6 @@ def get_task_estimated_hours_from_instructions_document(instructions_document, t
             if line.startswith('!@|'):
                 _, name, department, hours = line.split('|')
                 name = name.strip()
-
-                print(name)
-                print(task_name)
 
                 if name.lower() == task_name.lower().strip():
                     return float(hours)
