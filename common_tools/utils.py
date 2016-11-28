@@ -510,22 +510,6 @@ def get_component_instructions_text_from_task_sobject(task):
     return get_instructions_text_for_instructions_template_code(component_sobject.get('instructions_template_code'))
 
 
-def get_instructions_sobject_from_instructions_code(instructions_code):
-    """
-    Given an instructions code, return the sobject that it refers to. If an instructions sobject is not found,
-    return None
-
-    :param instructions_code: instructions unique code
-    :return: twog/instructions sobject or None
-    """
-
-    instructions_search = Search('twog/instructions')
-    instructions_search.add_code_filter(instructions_code)
-    instructions = instructions_search.get_sobject()
-
-    return instructions or None
-
-
 def get_instructions_text_from_instructions_code(instructions_code):
     """
     Given an instructions code, search for the instructions sobject, and return its text.
@@ -534,7 +518,7 @@ def get_instructions_text_from_instructions_code(instructions_code):
     :return: String
     """
 
-    instructions = get_instructions_sobject_from_instructions_code(instructions_code)
+    instructions = get_sobject_by_code('twog/instructions', instructions_code)
 
     if instructions:
         return instructions.get('instructions_text')
@@ -556,7 +540,7 @@ def get_task_instructions_text_from_instructions_code(instructions_code, task_na
     if package:
         instructions = get_sobject_by_code('twog/package_instructions', instructions_code)
     else:
-        instructions = get_instructions_sobject_from_instructions_code(instructions_code)
+        instructions = get_sobject_by_code('twog/instructions', instructions_code)
 
     if instructions:
         instructions_text = instructions.get('instructions_text')
@@ -611,7 +595,7 @@ def get_task_estimated_hours_from_task_code(task_code):
     instructions_code = component.get('instructions_code')
 
     if instructions_code:
-        instructions_sobject = get_instructions_sobject_from_instructions_code(instructions_code)
+        instructions_sobject = get_sobject_by_code('twog/instructions', instructions_code)
 
         if instructions_sobject:
             return get_task_estimated_hours_from_instructions_document(instructions_sobject, task.get('process'))
