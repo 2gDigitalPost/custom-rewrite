@@ -309,8 +309,11 @@ class ExportElementEvalCommand(Command):
         address_table = Table(address_table_data)
 
         approved_rejected_status = element_eval_sobject.get('status')
+        # Get the numeric code in the Element Evaluation code (the code with ELEMENT_EVALUATION replaced with the '#'
+        # sign
+        element_evaluation_numeric_code = element_eval_sobject.get_code().replace('ELEMENT_EVALUATION', '#')
         approved_rejected_table_data = [
-            [get_paragraph('{0}'.format(element_eval_sobject.get_code()), 'Italic')],
+            [get_paragraph('{0}'.format(element_evaluation_numeric_code), 'Italic')],
             [],
             [],
             [],
