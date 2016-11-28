@@ -488,6 +488,15 @@ class OrderBuilderWdg(BaseRefreshWdg):
             else:
                 component_pipeline_div.add('<i>No Pipeline Assigned</i>')
 
+            component_instructions_div = DivWdg()
+            component_instructions_name = get_sobject_name_by_code('twog/instructions',
+                                                                   component.get('instructions_code'))
+
+            if component_instructions_name:
+                component_instructions_div.add('Instructions: <i>{0}</i>'.format(component_instructions_name))
+            else:
+                component_instructions_div.add('<i>No Instrutions assigned</i>')
+
             component_language_div = DivWdg()
             component_language = get_sobject_name_by_code('twog/language', component.get_value('language_code'))
 
@@ -545,6 +554,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
             component_div.add(component_title_div)
             component_div.add(component_description_div)
             component_div.add(component_pipeline_div)
+            component_div.add(component_instructions_div)
             component_div.add(component_language_div)
             component_div.add(component_status_div)
             component_div.add(component_estimated_total_hours_div)
