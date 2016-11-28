@@ -232,7 +232,10 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         elif self.parent_component.get_search_type() == u'twog/package?project=twog':
             div_wdg.add(HtmlElement.h4('<u>Instructions</u>'))
 
-            instructions = self.parent_component.get('delivery_instructions')
+            package_instructions_code = self.parent_component.get('package_instructions_code')
+            instructions = get_task_instructions_text_from_instructions_code(package_instructions_code,
+                                                                             self.task_sobject.get('process'),
+                                                                             package=True)
 
             if not instructions:
                 instructions = 'Sorry, instructions have not been added yet.'

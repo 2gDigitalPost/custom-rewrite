@@ -542,17 +542,21 @@ def get_instructions_text_from_instructions_code(instructions_code):
         return 'Sorry, no instructions are available yet.'
 
 
-def get_task_instructions_text_from_instructions_code(instructions_code, task_name):
+def get_task_instructions_text_from_instructions_code(instructions_code, task_name, package=False):
     """
     Given an instructions code and a task name, get the task's instruction text from the instructions document.
     If none exists, return a string in its place.
 
     :param instructions_code: instructions unique code
     :param task_name: Task name (process)
+    :param package: Boolean (True if instructions are for a twog/package, False if for a twog/component)
     :return: String
     """
 
-    instructions = get_instructions_sobject_from_instructions_code(instructions_code)
+    if package:
+        instructions = get_sobject_by_code('twog/package_instructions', instructions_code)
+    else:
+        instructions = get_instructions_sobject_from_instructions_code(instructions_code)
 
     if instructions:
         instructions_text = instructions.get('instructions_text')
