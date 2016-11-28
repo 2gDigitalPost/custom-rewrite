@@ -310,7 +310,12 @@ class ExportElementEvalCommand(Command):
 
         approved_rejected_status = element_eval_sobject.get('status')
         approved_rejected_table_data = [
-            [get_paragraph('Status: <strong>{0}</strong>'.format(approved_rejected_status))]]
+            [get_paragraph('{0}'.format(element_eval_sobject.get_code()), 'Italic')],
+            [],
+            [],
+            [],
+            [get_paragraph('Status: <strong>{0}</strong>'.format(approved_rejected_status))]
+        ]
 
         approved_rejected_table = Table(approved_rejected_table_data)
 
