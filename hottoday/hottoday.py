@@ -312,7 +312,7 @@ class HotTodayWdg(BaseRefreshWdg):
         priority_row.add_style('background-color', '#DCE3EE')
 
     @staticmethod
-    def get_components_list(order_list):
+    def get_component_or_package_list(order_list, search_type):
         order_codes = []
 
         for order in order_list:
@@ -323,29 +323,10 @@ class HotTodayWdg(BaseRefreshWdg):
 
         order_codes_string = ','.join(order_codes)
 
-        components_search = Search('twog/component')
-        components_search.add_where('\"order_code\" in ({0})'.format(order_codes_string))
+        search = Search(search_type)
+        search.add_where('\"order_code\" in ({0})'.format(order_codes_string))
 
-        components = components_search.get_sobjects()
-
-        return components
-
-    @staticmethod
-    def get_packages_list(order_list):
-        order_codes = []
-
-        for order in order_list:
-            order_codes.append("'{0}'".format(order.get('code')))
-
-        if not order_codes:
-            return []
-
-        order_codes_string = ','.join(order_codes)
-
-        package_search = Search('twog/package')
-        package_search.add_where('\"order_code\" in ({0})'.format(order_codes_string))
-
-        packages = package_search.get_sobjects()
+        packages = search.get_sobjects()
 
         return packages
 
@@ -400,8 +381,10 @@ class HotTodayWdg(BaseRefreshWdg):
             order for order in orders_due_today_or_earlier_list if order.get('status') != 'complete'
         ]
 
-        components_list = self.get_components_list(orders_due_today_or_earlier_not_complete_list)
-        packages_list = self.get_packages_list(orders_due_today_or_earlier_not_complete_list)
+        components_list = self.get_component_or_package_list(orders_due_today_or_earlier_not_complete_list,
+                                                             'twog/component')
+        packages_list = self.get_component_or_package_list(orders_due_today_or_earlier_not_complete_list,
+                                                           'twog/package')
 
         component_tasks = self.get_tasks_for_search_type(components_list, 'twog/component?project=twog')
         package_tasks = self.get_tasks_for_search_type(packages_list, 'twog/package?project=twog')
