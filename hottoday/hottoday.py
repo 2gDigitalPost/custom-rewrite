@@ -386,11 +386,10 @@ class HotTodayWdg(BaseRefreshWdg):
         packages_list = self.get_component_or_package_list(orders_due_today_or_earlier_not_complete_list,
                                                            'twog/package')
 
-        component_tasks = self.get_tasks_for_search_type(components_list, 'twog/component?project=twog')
-        package_tasks = self.get_tasks_for_search_type(packages_list, 'twog/package?project=twog')
+        task_list = self.get_tasks_for_search_type(components_list, 'twog/component?project=twog')
+        task_list.extend(self.get_tasks_for_search_type(packages_list, 'twog/package?project=twog'))
 
-        header_groups = self.get_header_groups(component_tasks)
-        header_groups.extend(self.get_header_groups(package_tasks))
+        header_groups = self.get_header_groups(task_list)
 
         # Get the header groups as a sorted set
         header_groups = self.sort_header_groups(header_groups)
@@ -407,24 +406,7 @@ class HotTodayWdg(BaseRefreshWdg):
 
         dictionary_of_tasks = {}
 
-        for task in component_tasks:
-            order_sobject = get_order_sobject_from_task_sobject(task)
-            order_code = order_sobject.get_code()
-
-            process_name = task.get('process')
-
-            if len(process_name.split(':')) > 1:
-                task_header = process_name.split(':')[0]
-
-            if order_code not in dictionary_of_tasks.keys():
-                dictionary_of_tasks[order_code] = {task_header: None}
-
-            if not dictionary_of_tasks[order_code].get(task_header):
-                dictionary_of_tasks[order_code][task_header] = [task]
-            else:
-                dictionary_of_tasks[order_code][task_header].append(task)
-
-        for task in package_tasks:
+        for task in task_list:
             order_sobject = get_order_sobject_from_task_sobject(task)
             order_code = order_sobject.get_code()
 
