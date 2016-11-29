@@ -350,44 +350,23 @@ class HotTodayWdg(BaseRefreshWdg):
         return packages
 
     @staticmethod
-    def get_component_tasks(component_list):
-        component_codes = []
+    def get_tasks_for_search_type(sobject_list, search_type):
+        codes = []
 
-        for component in component_list:
-            component_codes.append("'{0}'".format(component.get('code')))
+        for sobject in sobject_list:
+            codes.append("'{0}'".format(sobject.get_code()))
 
-        if not component_codes:
+        if not codes:
             return []
 
-        component_codes_string = ','.join(component_codes)
+        codes_string = ','.join(codes)
 
-        tasks_in_component_search = Search('sthpw/task')
-        tasks_in_component_search.add_filter('search_type', 'twog/component?project=twog')
-        tasks_in_component_search.add_filter('status', 'Complete', op='!=')
-        tasks_in_component_search.add_where('\"search_code\" in ({0})'.format(component_codes_string))
+        tasks_search = Search('sthpw/task')
+        tasks_search.add_filter('search_type', search_type)
+        tasks_search.add_filter('status', 'Complete', op='!=')
+        tasks_search.add_where('\"search_code\" in ({0})'.format(codes_string))
 
-        tasks = tasks_in_component_search.get_sobjects()
-
-        return tasks
-
-    @staticmethod
-    def get_package_tasks(package_list):
-        package_codes = []
-
-        for package in package_list:
-            package_codes.append("'{0}'".format(package.get_code()))
-
-        if not package_codes:
-            return []
-
-        package_codes_string = ','.join(package_codes)
-
-        tasks_in_package_search = Search('sthpw/task')
-        tasks_in_package_search.add_filter('search_type', 'twog/package?project=twog')
-        tasks_in_package_search.add_filter('status', 'Complete', op='!=')
-        tasks_in_package_search.add_where('\"search_code\" in ({0})'.format(package_codes_string))
-
-        tasks = tasks_in_package_search.get_sobjects()
+        tasks = tasks_search.get_sobjects()
 
         return tasks
 
@@ -424,8 +403,8 @@ class HotTodayWdg(BaseRefreshWdg):
         components_list = self.get_components_list(orders_due_today_or_earlier_not_complete_list)
         packages_list = self.get_packages_list(orders_due_today_or_earlier_not_complete_list)
 
-        component_tasks = self.get_component_tasks(components_list)
-        package_tasks = self.get_package_tasks(packages_list)
+        component_tasks = self.get_tasks_for_search_type(components_list, 'twog/component?project=twog')
+        package_tasks = self.get_tasks_for_search_type(packages_list, 'twog/package?project=twog')
 
         header_groups = self.get_header_groups(component_tasks)
         header_groups.extend(self.get_header_groups(package_tasks))
