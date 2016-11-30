@@ -124,6 +124,11 @@ def index():
     return render_template('index.html', ticket=session['ticket'])
 
 
+@app.route('/titles/add')
+def title_adder():
+    return render_template('title_adder.html')
+
+
 class DepartmentInstructions(Resource):
     def get(self):
         server = TacticServerStub(server=url, project=project, ticket=current_user.id)
@@ -248,11 +253,30 @@ class OrderPriorities(Resource):
         return {'status': 200}
 
 
+class TitleAdder(Resource):
+    def post(self, ticket):
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        json_data = request.get_json()
+
+        imdb_id = json_data.get('imdb_id')
+
+        existing_title = server.eval("@SOBJECT(twog/title['imdb_id', '{0}'])".format(imdb_id))
+
+        if existing_title:
+            pass
+        else:
+            server.insert('twog/title', json_data)
+
+        return {'status': 200}
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
+api.add_resource(TitleAdder, '/api/v1/titles/add')
 
 if __name__ == '__main__':
     global ALL_USERS
