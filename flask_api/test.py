@@ -9,7 +9,6 @@ config = ConfigParser.ConfigParser()
 config.read('config.ini')
 
 sys.path.append(config.get('tacticpath', 'path'))
-sys.path.append(config.get('tacticpath', 'pyasm'))
 
 from tactic_client_lib import TacticServerStub
 
