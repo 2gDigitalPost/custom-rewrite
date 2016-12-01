@@ -78,7 +78,7 @@ def login():
         user = User(username, ticket)
         login_user(user, remember=False)
 
-        return redirect('/orders/reprioritizer')
+        return redirect('/')
     return render_template("login.html", form=form)
 
 
@@ -113,19 +113,33 @@ def files_select():
 
 
 @app.route('/orders/reprioritizer')
-@login_required
 def order_reprioritizer():
-    return render_template('order_reprioritizer.html')
+    ticket = session.get('ticket')
+
+    if ticket:
+        return render_template('order_reprioritizer.html')
+    else:
+        return redirect('/login')
 
 
-@app.route('/index')
+@app.route('/')
 def index():
-    return render_template('index.html', ticket=session['ticket'])
+    ticket = session.get('ticket')
+
+    if ticket:
+        return render_template('index.html', ticket=session['ticket'])
+    else:
+        return redirect('/login')
 
 
 @app.route('/titles/add')
 def title_adder():
-    return render_template('title_adder.html')
+    ticket = session.get('ticket')
+
+    if ticket:
+        return render_template('title_adder.html', ticket=ticket)
+    else:
+        return redirect('/login')
 
 
 class DepartmentInstructions(Resource):
@@ -183,16 +197,6 @@ class InstructionsTemplate(Resource):
 
         print(args)
 
-"""
-class AllTitles(Resource):
-    def get(self):
-        # server = TacticServerStub(server=url, project=project, ticket=current_user.id)
-        server = TacticServerStub(server=url, project=project, ticket=session['ticket'])
-
-        title_sobjects = server.eval("@SOBJECT(twog/title)")
-
-        return jsonify({'titles': title_sobjects})
-"""
 
 class AllTitles(Resource):
     def get(self, ticket):
@@ -253,12 +257,18 @@ class OrderPriorities(Resource):
 
 
 class TitleAdder(Resource):
-    def post(self, ticket):
+    def post(self):
+        ticket = session.get('ticket')
+
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         json_data = request.get_json()
 
+        print(json_data)
+
         imdb_id = json_data.get('imdb_id')
+
+        print(imdb_id)
 
         existing_title = server.eval("@SOBJECT(twog/title['imdb_id', '{0}'])".format(imdb_id))
 

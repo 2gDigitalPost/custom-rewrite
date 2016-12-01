@@ -88,7 +88,7 @@ var app = new Vue({
       data_to_submit['director'] = title_to_submit.Director;
       data_to_submit['genre'] = title_to_submit.Genre;
       data_to_submit['language'] = title_to_submit.Language;
-      data_to_submit['metascore'] = title_to_submit.Metascore;
+      data_to_submit['metascore'] = parseInt(title_to_submit.Metascore);
       data_to_submit['plot'] = title_to_submit.Plot;
       data_to_submit['poster'] = title_to_submit.Poster;
       data_to_submit['rated'] = title_to_submit.Rated;
@@ -98,23 +98,14 @@ var app = new Vue({
       data_to_submit['writer'] = title_to_submit.Writer;
       data_to_submit['year'] = title_to_submit.Year;
       data_to_submit['imdb_id'] = title_to_submit.imdbID;
-      data_to_submit['imdb_rating'] = title_to_submit.imdbRating;
-      data_to_submit['imdb_votes'] = title_to_submit.imdbVotes;
+      data_to_submit['imdb_rating'] = parseFloat(title_to_submit.imdbRating.replace(/,/g, ''));
+      data_to_submit['imdb_votes'] = parseInt(title_to_submit.imdbVotes);
 
       var xhr = new XMLHttpRequest();
-      var self = this;
 
       xhr.open('POST', '/api/v1/titles/add');
-
-      /*xhr.onload = function () {
-        self.movies = JSON.parse(xhr.responseText).Search;
-        console.log(self.movies);
-      }*/
-      xhr.send();
-
-      console.log(xhr.responseText);
-
-      console.log(data_to_submit);
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xhr.send(JSON.stringify(data_to_submit));
     }
   }
 })

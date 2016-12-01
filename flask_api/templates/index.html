@@ -1,10 +1,9 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html>
   <head lang="en">
     <meta charset="UTF-8">
     <title>Flask React</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- styles -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
   </head>
@@ -12,9 +11,16 @@
   <div id="ticket" data-ticket="{{ticket}}"></div>
   <div id="client_select"></div>
 <div id="root"></div>
-    <!-- scripts -->
     <script src="{{ url_for('static', filename='bower_components/react/react.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bower_components/react/react-dom.min.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts/js/main.js') }}"></script>
   </body>
-</html>
+</html>-->
+
+{% extends "base.html" %}
+{% block title %}Tactic{% endblock %}
+{% block content %}
+
+<h1>Welcome to Tactic</h1>
+
+{% endblock %}
