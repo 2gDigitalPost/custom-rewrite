@@ -8,7 +8,7 @@ import order_builder.order_builder_utils as obu
 
 from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
     get_task_data_out_files, get_task_instructions_text_from_instructions_code,\
-    get_order_sobject_from_component_sobject, get_order_sobject_from_task_sobject
+    get_order_sobject_from_component_sobject
 
 from widgets.html_widgets import get_page_header
 from widgets.input_widgets import get_task_status_select_wdg
@@ -90,6 +90,74 @@ def get_equipment_list(task_data_code):
         div_wdg.add(equipment_unordered_html_list)
     else:
         div_wdg.add('No equipment is assigned to this task')
+
+    return div_wdg
+
+
+def get_previous_tasks_div(task_sobject):
+    div_wdg = DivWdg()
+
+    div_wdg.add(HtmlElement.h4('Previous Tasks'))
+
+    pipeline_code = task_sobject.get_parent().get('pipeline_code')
+
+    pipeline_xml = obu.get_pipeline_xml(pipeline_code)
+
+    previous_task_processes = obu.get_previous_task_processes_from_xml(pipeline_xml, task_sobject.get('process'))
+
+    if previous_task_processes:
+        for process in previous_task_processes:
+            div_wdg.add(process)
+
+            previous_task_sobject = obu.get_task_sobject_from_xml_and_process(pipeline_xml, process,
+                                                                              task_sobject.get('search_code'))
+
+            if previous_task_sobject:
+                task_load_button = ButtonNewWdg(title='Load Order', icon='WORK')
+                task_load_button.add_behavior(
+                    obu.get_load_new_tab_behavior(
+                        'task_{0}'.format(previous_task_sobject.get_code()), process, 'widgets.TaskInspectWdg',
+                        previous_task_sobject.get_search_key()
+                    )
+                )
+                task_load_button.add_style('display', 'inline-block')
+                div_wdg.add(task_load_button)
+    else:
+        div_wdg.add('None')
+
+    return div_wdg
+
+
+def get_next_tasks_div(task_sobject):
+    div_wdg = DivWdg()
+
+    div_wdg.add(HtmlElement.h4('Next Tasks'))
+
+    pipeline_code = task_sobject.get_parent().get('pipeline_code')
+
+    pipeline_xml = obu.get_pipeline_xml(pipeline_code)
+
+    next_task_processes = obu.get_next_tasks_processes_from_xml(pipeline_xml, task_sobject.get('process'))
+
+    if next_task_processes:
+        for process in next_task_processes:
+            div_wdg.add(process)
+
+            next_task_sobject = obu.get_task_sobject_from_xml_and_process(pipeline_xml, process,
+                                                                          task_sobject.get('search_code'))
+
+            if next_task_sobject:
+                task_load_button = ButtonNewWdg(title='Load Order', icon='WORK')
+                task_load_button.add_behavior(
+                    obu.get_load_new_tab_behavior(
+                        'task_{0}'.format(next_task_sobject.get_code()), process, 'widgets.TaskInspectWdg',
+                        next_task_sobject.get_search_key()
+                    )
+                )
+                task_load_button.add_style('display', 'inline-block')
+                div_wdg.add(task_load_button)
+    else:
+        div_wdg.add('None')
 
     return div_wdg
 
@@ -186,6 +254,9 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         )
         load_order_builder_button.add_style('display', 'inline-block')
         div_wdg.add(load_order_builder_button)
+
+        div_wdg.add(get_previous_tasks_div(self.task_sobject))
+        div_wdg.add(get_next_tasks_div(self.task_sobject))
 
         div_wdg.add(HtmlElement.h4('<u>Status</u>'))
         div_wdg.add(get_task_status_select_wdg(self.task_sobject))

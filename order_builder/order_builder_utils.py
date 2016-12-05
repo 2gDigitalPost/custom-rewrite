@@ -109,7 +109,7 @@ def get_assigned_group_from_xml(xml, process):
         return None
 
 
-def get_next_tasks_codes_from_xml(xml, process):
+def get_next_tasks_processes_from_xml(xml, process):
     xml_tree = ElementTree.fromstring(xml)
 
     connected_processes = []
@@ -117,6 +117,37 @@ def get_next_tasks_codes_from_xml(xml, process):
     for connect_xml in xml_tree.iter('connect'):
         if connect_xml.attrib.get('from') == process:
             connected_processes.append(connect_xml.attrib.get('to'))
+
+    return connected_processes
+
+
+def get_previous_task_processes_from_xml(xml, process):
+    xml_tree = ElementTree.fromstring(xml)
+
+    connected_processes = []
+
+    for connect_xml in xml_tree.iter('connect'):
+        if connect_xml.attrib.get('to') == process:
+            connected_processes.append(connect_xml.attrib.get('from'))
+
+    return connected_processes
+
+
+def get_task_sobject_from_xml_and_process(xml, process, search_code):
+    xml_tree = ElementTree.fromstring(xml)
+
+    print(xml_tree)
+
+    for process_xml in xml_tree.iter('process'):
+        if process_xml.attrib.get('name') == process:
+            task_search = Search('sthpw/task')
+            task_search.add_filter('search_code', search_code)
+            task_search.add_filter('process', process)
+            task_sobject = task_search.get_sobject()
+
+            return task_sobject
+    else:
+        return None
 
 
 def get_assigned_group_from_task(task):
