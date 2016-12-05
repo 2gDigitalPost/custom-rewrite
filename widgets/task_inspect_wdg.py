@@ -7,10 +7,31 @@ from pyasm.widget import SubmitWdg
 import order_builder.order_builder_utils as obu
 
 from common_tools import get_task_data_sobject_from_task_code, get_task_data_equipment, get_task_data_in_files,\
-    get_task_data_out_files, get_task_instructions_text_from_instructions_code, get_order_sobject_from_component_sobject
+    get_task_data_out_files, get_task_instructions_text_from_instructions_code,\
+    get_order_sobject_from_component_sobject, get_order_sobject_from_task_sobject
 
 from widgets.html_widgets import get_page_header
 from widgets.input_widgets import get_task_status_select_wdg
+
+
+def load_order_builder_wdg(order_search_key):
+    behavior = {
+        'css_class': 'clickme',
+        'type': 'click_up',
+        'cbjs_action': '''
+try {
+    var task_search_key = '%s';
+
+    spt.tab.add_new('task_inspect_' + task_search_key, 'Task', 'widgets.TaskInspectWdg',
+                    {'search_key': task_search_key});
+}
+catch(err) {
+    spt.app_busy.hide();
+    spt.alert(spt.exception.handler(err));
+}''' % order_search_key
+    }
+
+    return behavior
 
 
 def get_in_files_list(task_data_code):
@@ -156,8 +177,24 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         order_sobject = get_order_sobject_from_component_sobject(self.parent_component)
         div_wdg.add(HtmlElement.h4('Order: {0} ({1})'.format(order_sobject.get('name'), order_sobject.get_code())))
 
+        load_order_builder_button = ButtonNewWdg(title='Load Order', icon='WORK')
+        load_order_builder_button.add_behavior(
+            obu.get_load_new_tab_behavior(
+                'order_{0}'.format(order_sobject.get_code()), 'Order Builder', 'order_builder.OrderBuilderWdg',
+                order_sobject.get_search_key()
+            )
+        )
+        load_order_builder_button.add_style('display', 'inline-block')
+        div_wdg.add(load_order_builder_button)
+
         div_wdg.add(HtmlElement.h4('<u>Status</u>'))
         div_wdg.add(get_task_status_select_wdg(self.task_sobject))
+
+        submit_button = SubmitWdg('Submit Changes')
+        submit_button.add_behavior(self.submit_button_behavior())
+        submit_button.add_style('display', 'block')
+
+        div_wdg.add(submit_button)
 
         div_wdg.add(HtmlElement.h4('<u>Estimated Hours: {0}</u>'.format(self.task_data.get('estimated_hours'))))
 
@@ -243,11 +280,5 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
             div_wdg.add(self.parse_instruction_text(instructions.encode('utf-8')))
 
         div_wdg.add(self.get_buttons_row())
-
-        submit_button = SubmitWdg('Submit Changes')
-        submit_button.add_behavior(self.submit_button_behavior())
-        submit_button.add_style('display', 'block')
-
-        div_wdg.add(submit_button)
 
         return div_wdg
