@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Add Department Instructions to Tactic{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/markdown_editor.css') }}">
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<h1>Add Department Instructions to Tactic</h1>
+
+{% raw %}
+<div id="app">
+    <div>
+        <label for="name">Name</label>
+        <input v-model="name">
+        <label for="full_name">Full Name</label>
+        <input v-model="full_name">
+        <select v-model="department">
+            <option>Compression</option>
+            <option>Edel</option>
+            <option>QC</option>
+        </select>
+        <label for="estimated_hours">Estimated Hours</label>
+        <input v-model="estimated_hours">
+
+
+        <button v-on:click="submitMessage">Submit</button>
+
+        <ul>
+            <li
+            is="movie-item"
+            v-for="item in movies"
+            v-bind:movie="item"
+            v-on:remove="selected_id = item.imdbID"
+            ></li>
+        </ul>
+    </div>
+</div>
+
+        <div id="editor">
+            <textarea :value="input" @input="update"></textarea>
+            <div v-html="compiledMarkdown"></div>
+        </div>
+
+{% endraw %}
+
+<script src="{{ url_for('static', filename='js/department_instructions_adder.js') }}"></script>
+
+{% endblock %}

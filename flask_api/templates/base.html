@@ -3,12 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
+
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/lodash@4.16.0"></script>
+    <script src="https://unpkg.com/marked@0.3.6"></script>
+
+    {% block stylesheets %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    {% endblock %}
 </head>
 <body>
     <ul>
         <li><a href="/orders/reprioritizer">Order Reprioritizer</a></li>
         <li><a href="/titles/add">Title Adder</a></li>
+        <li><a href="#">Instructions Document Editor</a></li>
+        <li><a href="#">Instructions Template Editor</a></li>
+        <li><a href="/instructions/department/add">Add Department Instructions</a></li>
     </ul>
 
     <div id="ticket" data-ticket="{{ticket}}"></div>

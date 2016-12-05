@@ -142,6 +142,16 @@ def title_adder():
         return redirect('/login')
 
 
+@app.route('/instructions/department/add')
+def department_instructions_adder():
+    ticket = session.get('ticket')
+
+    if ticket:
+        return render_template('add_department_instructions.html', ticket=ticket)
+    else:
+        return redirect('/login')
+
+
 class DepartmentInstructions(Resource):
     def get(self):
         server = TacticServerStub(server=url, project=project, ticket=current_user.id)
@@ -264,11 +274,7 @@ class TitleAdder(Resource):
 
         json_data = request.get_json()
 
-        print(json_data)
-
         imdb_id = json_data.get('imdb_id')
-
-        print(imdb_id)
 
         existing_title = server.eval("@SOBJECT(twog/title['imdb_id', '{0}'])".format(imdb_id))
 
