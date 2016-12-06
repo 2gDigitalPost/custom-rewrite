@@ -92,7 +92,7 @@ def get_files_checkboxes_for_division(division_code, order_code):
     return get_files_checkbox_from_file_list(files_in_division, files_in_order)
 
 
-def get_file_classification_select_wdg(width=200):
+def get_file_classification_select_wdg(width=200, selected=None):
     """
     Get a SelectWdg with the three options available for a file's classification (source, intermediate, and
     deliverable).
@@ -107,6 +107,9 @@ def get_file_classification_select_wdg(width=200):
     classification_select_wdg.append_option('Source', 'source')
     classification_select_wdg.append_option('Intermediate', 'intermediate')
     classification_select_wdg.append_option('Deliverable', 'deliverable')
+
+    if selected:
+        classification_select_wdg.set_value(selected)
 
     return classification_select_wdg
 
@@ -134,11 +137,14 @@ def get_pipeline_select_wdg(search_type, width=300):
     return pipeline_select_wdg
 
 
-def get_text_input_wdg(name, width=200):
+def get_text_input_wdg(name, width=200, pretext=None):
     textbox_wdg = TextInputWdg()
     textbox_wdg.set_id(name)
     textbox_wdg.set_name(name)
     textbox_wdg.add_style('width', '{0}px'.format(width))
+
+    if pretext:
+        textbox_wdg.set_value(pretext)
 
     return textbox_wdg
 

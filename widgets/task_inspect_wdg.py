@@ -35,7 +35,7 @@ catch(err) {
     return behavior
 
 
-def get_in_files_list(task_data_code):
+def get_in_files_list(task_data_code, task_sobject_search_key):
     in_files_list = get_task_data_in_files(task_data_code)
 
     div_wdg = DivWdg()
@@ -43,9 +43,21 @@ def get_in_files_list(task_data_code):
     if in_files_list:
         in_files_unordered_html_list = HtmlElement.ul()
 
-        for file_path in sorted([in_file.get('file_path') for in_file in in_files_list]):
+        for in_file in in_files_list:
             file_li = HtmlElement.li()
-            file_li.add(file_path)
+            file_li.add(in_file.get('file_path'))
+
+            file_edit_button = ButtonNewWdg(title='Edit File', icon='EDIT')
+            file_edit_button.add_behavior(
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Edit File', 'widgets.EditFileWdg', in_file.get_search_key(),
+                    'Task', 'widgets.TaskInspectWdg', task_sobject_search_key
+                )
+            )
+            file_edit_button.add_style('display', 'inline-block')
+
+            file_li.add(file_edit_button)
+
             in_files_unordered_html_list.add(file_li)
 
         div_wdg.add(in_files_unordered_html_list)
@@ -55,7 +67,7 @@ def get_in_files_list(task_data_code):
     return div_wdg
 
 
-def get_out_files_list(task_data_code):
+def get_out_files_list(task_data_code, task_sobject_search_key):
     out_files_list = get_task_data_out_files(task_data_code)
 
     div_wdg = DivWdg()
@@ -63,9 +75,21 @@ def get_out_files_list(task_data_code):
     if out_files_list:
         out_files_unordered_html_list = HtmlElement.ul()
 
-        for file_path in sorted([out_file.get('file_path') for out_file in out_files_list]):
+        for out_file in out_files_list:
             file_li = HtmlElement.li()
-            file_li.add(file_path)
+            file_li.add(out_file.get('file_path'))
+
+            file_edit_button = ButtonNewWdg(title='Edit File', icon='EDIT')
+            file_edit_button.add_behavior(
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Edit File', 'widgets.EditFileWdg', out_file.get_search_key(),
+                    'Task', 'widgets.TaskInspectWdg', task_sobject_search_key
+                )
+            )
+            file_edit_button.add_style('display', 'inline-block')
+
+            file_li.add(file_edit_button)
+
             out_files_unordered_html_list.add(file_li)
 
         div_wdg.add(out_files_unordered_html_list)
@@ -281,7 +305,7 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         div_wdg.add(change_estimated_hours_button)
 
         div_wdg.add(HtmlElement.h4('<u>Input Files</u>'))
-        div_wdg.add(get_in_files_list(self.task_data.get_code()))
+        div_wdg.add(get_in_files_list(self.task_data.get_code(), self.task_sobject.get_search_key()))
 
         add_input_file_button = ButtonNewWdg(title='Add Input Files', icon='INSERT_MULTI')
         add_input_file_button.add_behavior(
@@ -303,7 +327,7 @@ spt.api.load_tab('Task', 'widgets.TaskInspectWdg', {'search_key': task_search_ke
         div_wdg.add(create_input_file_button)
 
         div_wdg.add(HtmlElement.h4('<u>Output Files</u>'))
-        div_wdg.add(get_out_files_list(self.task_data.get_code()))
+        div_wdg.add(get_out_files_list(self.task_data.get_code(), self.task_sobject.get_search_key()))
 
         move_input_file_to_output_button = ButtonNewWdg(title='Move Input File to Output', icon='RIGHT')
         move_input_file_to_output_button.add_behavior(
