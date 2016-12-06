@@ -3,6 +3,7 @@ from tactic.ui.common import BaseRefreshWdg
 from pyasm.web import DivWdg
 from pyasm.widget import SubmitWdg
 
+from html_widgets import get_label_widget
 from input_widgets import get_text_input_wdg, get_file_classification_select_wdg
 
 
@@ -30,18 +31,23 @@ var server = TacticServerStub.get();
 var containing_element = bvr.src_el.getParent("#edit_file_" + file_code);
 var values = spt.api.get_input_values(containing_element, null, false);
 
+// Get the form values
 var file_path = values["file_path_input"];
 var classification = values["file_classification_select"];
 
+// Set up the kwargs dictionary to submit to the server
 var kwargs = {
     'file_path': file_path,
     'classification': classification
 }
 
+// Get the search key for the server.update method
 var file_search_key = server.build_search_key('twog/file', file_code, 'twog');
 
+// Send the data
 server.update(file_search_key, kwargs);
 
+// Refresh the page
 spt.app_busy.hide();
 spt.popup.close(spt.popup.get_popup(bvr.src_el));
 
@@ -59,9 +65,15 @@ spt.api.load_tab(parent_widget_title, parent_widget_name, {'search_key': parent_
         div_wdg = DivWdg()
         div_wdg.set_id('edit_file_{0}'.format(self.file_sobject.get_code()))
 
+        # Add a text section for File Path
+        div_wdg.add(get_label_widget('File Path'))
         div_wdg.add(get_text_input_wdg('file_path_input', pretext=self.file_sobject.get('file_path')))
+
+        # Add a Select widget for Classification
+        div_wdg.add(get_label_widget('Classification'))
         div_wdg.add(get_file_classification_select_wdg(selected=self.file_sobject.get('classification')))
 
+        # Add the submit button
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.submit_button_behavior())
         submit_button.add_style('display', 'block')

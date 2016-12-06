@@ -45,7 +45,7 @@ def get_in_files_list(task_data_code, task_sobject_search_key):
 
         for in_file in in_files_list:
             file_li = HtmlElement.li()
-            file_li.add(in_file.get('file_path'))
+            file_li.add('{0} ({1})'.format(in_file.get('file_path'), in_file.get('classification').title()))
 
             file_edit_button = ButtonNewWdg(title='Edit File', icon='EDIT')
             file_edit_button.add_behavior(
@@ -77,7 +77,7 @@ def get_out_files_list(task_data_code, task_sobject_search_key):
 
         for out_file in out_files_list:
             file_li = HtmlElement.li()
-            file_li.add(out_file.get('file_path'))
+            file_li.add('{0} ({1})'.format(out_file.get('file_path'), out_file.get('classification').title()))
 
             file_edit_button = ButtonNewWdg(title='Edit File', icon='EDIT')
             file_edit_button.add_behavior(

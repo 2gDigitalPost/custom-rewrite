@@ -95,9 +95,10 @@ def get_files_checkboxes_for_division(division_code, order_code):
 def get_file_classification_select_wdg(width=200, selected=None):
     """
     Get a SelectWdg with the three options available for a file's classification (source, intermediate, and
-    deliverable).
+    deliverable). If 'selected' argument is passed, set the SelectWdg's value to that.
 
     :param width: Width of the widget in pixels (optional)
+    :param selected: String ('source', 'intermediate', 'deliverable', or None)
     :return: SelectWdg
     """
     classification_select_wdg = SelectWdg('file_classification_select')
