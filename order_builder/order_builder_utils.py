@@ -77,18 +77,6 @@ def get_select_widget_from_search_type(search_type, label, label_column, value_c
     return search_wdg
 
 
-def get_pipeline_xml(pipeline_code):
-    pipeline_search = Search('sthpw/pipeline')
-    pipeline_search.add_filter('code', pipeline_code)
-
-    pipeline_search_result = pipeline_search.get_sobject()
-
-    if pipeline_search_result:
-        return pipeline_search_result.get_value('pipeline')
-    else:
-        return None
-
-
 def task_is_assigned_to_group(xml, process, group):
     xml_tree = ElementTree.fromstring(xml)
 
@@ -105,47 +93,6 @@ def get_assigned_group_from_xml(xml, process):
     for process_xml in xml_tree.iter('process'):
         if process_xml.attrib.get('name') == process:
             return process_xml.attrib.get('assigned_login_group')
-    else:
-        return None
-
-
-def get_next_tasks_processes_from_xml(xml, process):
-    xml_tree = ElementTree.fromstring(xml)
-
-    connected_processes = []
-
-    for connect_xml in xml_tree.iter('connect'):
-        if connect_xml.attrib.get('from') == process:
-            connected_processes.append(connect_xml.attrib.get('to'))
-
-    return connected_processes
-
-
-def get_previous_task_processes_from_xml(xml, process):
-    xml_tree = ElementTree.fromstring(xml)
-
-    connected_processes = []
-
-    for connect_xml in xml_tree.iter('connect'):
-        if connect_xml.attrib.get('to') == process:
-            connected_processes.append(connect_xml.attrib.get('from'))
-
-    return connected_processes
-
-
-def get_task_sobject_from_xml_and_process(xml, process, search_code):
-    xml_tree = ElementTree.fromstring(xml)
-
-    print(xml_tree)
-
-    for process_xml in xml_tree.iter('process'):
-        if process_xml.attrib.get('name') == process:
-            task_search = Search('sthpw/task')
-            task_search.add_filter('search_code', search_code)
-            task_search.add_filter('process', process)
-            task_sobject = task_search.get_sobject()
-
-            return task_sobject
     else:
         return None
 

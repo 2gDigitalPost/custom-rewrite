@@ -1,6 +1,8 @@
 from pyasm.search import Search
 from pyasm.widget import SelectWdg
 
+from xml.etree import ElementTree
+
 
 def get_sobject_by_code(search_type, sobject_code):
     """
@@ -36,6 +38,59 @@ def get_sobject_name_by_code(search_type, sobject_code):
         return search_result.get('name')
     else:
         return None
+
+
+def get_pipeline_xml(pipeline_code):
+    pipeline_search = Search('sthpw/pipeline')
+    pipeline_search.add_filter('code', pipeline_code)
+
+    pipeline_search_result = pipeline_search.get_sobject()
+
+    if pipeline_search_result:
+        return pipeline_search_result.get_value('pipeline')
+    else:
+        return None
+
+
+def get_task_sobject_from_xml_and_process(xml, process, search_code):
+    xml_tree = ElementTree.fromstring(xml)
+
+    print(xml_tree)
+
+    for process_xml in xml_tree.iter('process'):
+        if process_xml.attrib.get('name') == process:
+            task_search = Search('sthpw/task')
+            task_search.add_filter('search_code', search_code)
+            task_search.add_filter('process', process)
+            task_sobject = task_search.get_sobject()
+
+            return task_sobject
+    else:
+        return None
+
+
+def get_next_tasks_processes_from_xml(xml, process):
+    xml_tree = ElementTree.fromstring(xml)
+
+    connected_processes = []
+
+    for connect_xml in xml_tree.iter('connect'):
+        if connect_xml.attrib.get('from') == process:
+            connected_processes.append(connect_xml.attrib.get('to'))
+
+    return connected_processes
+
+
+def get_previous_task_processes_from_xml(xml, process):
+    xml_tree = ElementTree.fromstring(xml)
+
+    connected_processes = []
+
+    for connect_xml in xml_tree.iter('connect'):
+        if connect_xml.attrib.get('to') == process:
+            connected_processes.append(connect_xml.attrib.get('from'))
+
+    return connected_processes
 
 
 def get_order_sobject_from_component_sobject(component_sobject):
