@@ -6,6 +6,8 @@ from pyasm.widget import SelectWdg, TextAreaWdg
 from tactic.ui.widget import CalendarInputWdg
 from tactic_client_lib import tactic_server_stub
 
+from common_tools.utils import get_pipeline_xml
+
 
 TASK_COLORS = {
     "Assignment":      "#ffc500",
