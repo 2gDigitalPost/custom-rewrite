@@ -245,6 +245,42 @@ def get_task_data_out_files(task_data_code):
         return []
 
 
+def get_potential_origin_files(task_data_code):
+    in_files_search = Search('twog/task_data_in_file')
+    in_files_search.add_filter('task_data_code', task_data_code)
+    in_files = in_files_search.get_sobjects()
+
+    out_files_search = Search('twog/task_data_out_file')
+    out_files_search.add_filter('task_data_code', task_data_code)
+    out_files = out_files_search.get_sobjects()
+
+    in_files_string = ''
+    out_files_string = ''
+
+    if len(in_files) > 0:
+        in_files_string = ','.join(["'{0}'".format(in_file.get('file_code')) for in_file in in_files])
+
+    if len(out_files) > 0:
+        out_files_string = ','.join(["'{0}'".format(out_file.get('file_code')) for out_file in out_files])
+
+    if in_files_string and out_files_string:
+        files_string = in_files_string + ',' + out_files_string
+    elif in_files_string:
+        files_string = in_files_string
+    elif out_files_string:
+        files_string = out_files_string
+    else:
+        return []
+
+    files_search = Search('twog/file')
+    files_search.add_where('\"code\" in ({0})'.format(files_string))
+    files_search.add_filter('classification', 'deliverable', op='!=')
+
+    files = files_search.get_sobjects()
+
+    return files
+
+
 def get_component_sobject_from_task_data_code(task_data_code):
     task_data = get_sobject_by_code('twog/task_data', task_data_code)
     task = get_sobject_by_code('sthpw/task', task_data.get_code())
