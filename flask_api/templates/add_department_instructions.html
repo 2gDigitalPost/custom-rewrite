@@ -11,12 +11,12 @@
 <h1>Add Department Instructions to Tactic</h1>
 
 {% raw %}
-<div id="app">
-    <div>
+<div id="markdown_editor">
+    <div id="editor">
         <label for="name">Name</label>
         <input v-model="name">
-        <label for="full_name">Full Name</label>
-        <input v-model="full_name">
+        <label for="descriptive_name">Descriptive Name</label>
+        <input v-model="descriptive_name">
         <select v-model="department">
             <option>Compression</option>
             <option>Edel</option>
@@ -26,7 +26,7 @@
         <input v-model="estimated_hours">
 
 
-        <button v-on:click="submitMessage">Submit</button>
+        <button v-on:click="submitToTactic">Submit</button>
 
         <ul>
             <li
@@ -36,12 +36,14 @@
             v-on:remove="selected_id = item.imdbID"
             ></li>
         </ul>
+
+        <textarea :value="input" @input="update"></textarea>
+        <div v-html="compiledMarkdown"></div>
     </div>
 </div>
 
-        <div id="editor">
-            <textarea :value="input" @input="update"></textarea>
-            <div v-html="compiledMarkdown"></div>
+        <div>
+
         </div>
 
 {% endraw %}

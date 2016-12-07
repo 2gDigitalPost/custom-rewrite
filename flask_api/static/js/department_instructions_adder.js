@@ -108,9 +108,13 @@ var app = new Vue({
 });
 
 var markdown_editor = new Vue({
-  el: '#editor',
+  el: '#markdown_editor',
   data: {
-    input: '# hello'
+    input: '# hello',
+    name: '',
+    descriptive_name: '',
+    department: '',
+    estimated_hours: ''
   },
   computed: {
     compiledMarkdown: function () {
@@ -120,6 +124,21 @@ var markdown_editor = new Vue({
   methods: {
     update: _.debounce(function (e) {
       this.input = e.target.value
-    }, 300)
+    }, 300),
+    submitToTactic: function() {
+      var data_to_submit = {};
+
+      data_to_submit['name'] = this.department + ': ' + this.name;
+      data_to_submit['descriptive_name'] = this.descriptive_name;
+      // data_to_submit['department'] = this.department;
+      data_to_submit['estimated_hours'] = this.estimated_hours;
+      data_to_submit['instructions_text'] = this.input;
+
+      var xhr = new XMLHttpRequest();
+
+      xhr.open('POST', '/api/v1/instructions/department/add');
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF=8");
+      xhr.send(JSON.stringify(data_to_submit));
+    }
   }
 });

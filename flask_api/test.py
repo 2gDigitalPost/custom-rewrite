@@ -286,12 +286,26 @@ class TitleAdder(Resource):
         return {'status': 200}
 
 
+class DepartmentInstructionsAdder(Resource):
+    def post(self):
+        ticket = session.get('ticket')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        json_data = request.get_json()
+
+        server.insert('twog/department_instructions', json_data)
+
+        return {'status': 200}
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
+api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
 
 if __name__ == '__main__':
     global ALL_USERS
