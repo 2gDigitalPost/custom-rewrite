@@ -12,40 +12,42 @@
 
 {% raw %}
 <div id="markdown_editor">
-    <div id="editor">
+    <div>
         <label for="name">Name</label>
         <input v-model="name">
+    </div>
+    <div>
         <label for="descriptive_name">Descriptive Name</label>
         <input v-model="descriptive_name">
+    </div>
+    <div>
+        <label for="department">Department</label>
         <select v-model="department">
             <option>Compression</option>
             <option>Edel</option>
             <option>QC</option>
         </select>
+    </div>
+    <div>
         <label for="estimated_hours">Estimated Hours</label>
         <input v-model="estimated_hours">
+    </div>
 
-
-        <button v-on:click="submitToTactic">Submit</button>
-
-        <ul>
-            <li
-            is="movie-item"
-            v-for="item in movies"
-            v-bind:movie="item"
-            v-on:remove="selected_id = item.imdbID"
-            ></li>
-        </ul>
-
+    <ul>
+        <li
+        is="movie-item"
+        v-for="item in movies"
+        v-bind:movie="item"
+        v-on:remove="selected_id = item.imdbID"
+        ></li>
+    </ul>
+    <div id="editor">
         <textarea :value="input" @input="update"></textarea>
         <div v-html="compiledMarkdown"></div>
     </div>
+
+    <button v-on:click="submitToTactic">Submit</button>
 </div>
-
-        <div>
-
-        </div>
-
 {% endraw %}
 
 <script src="{{ url_for('static', filename='js/department_instructions_adder.js') }}"></script>
