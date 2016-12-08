@@ -127,12 +127,19 @@ class OrderBuilderWdg(BaseRefreshWdg):
         description = self.order_sobject.get('description')
 
         due_date = self.order_sobject.get('due_date')
+        expected_completion_date = self.order_sobject.get('expected_completion_date')
 
         if due_date:
             due_date_datetime_object = datetime.strptime(due_date, '%Y-%m-%d %H:%M:%S')
-            due_date_string = due_date_datetime_object.strftime('%A, %b %d, %Y')
+            due_date_string = due_date_datetime_object.strftime('%A, %b %d, %Y at %H:%M %p')
         else:
             due_date_string = 'Due Date not specified'
+
+        if expected_completion_date:
+            expected_completion_datetime_object = datetime.strptime(expected_completion_date, '%Y-%m-%d %H:%M:%S')
+            expected_completion_string = expected_completion_datetime_object.strftime('%A, %b %d, %Y at %H:%M %p')
+        else:
+            expected_completion_string = 'Not specified'
 
         order_priority = get_order_priority_relative_to_all_orders(self.order_sobject)
         order_priority_div = DivWdg()
@@ -149,6 +156,10 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_due_date_div = DivWdg()
         order_due_date_div.add('Due Date: ' + due_date_string)
         order_due_date_div.add_style('font-weight', 'bold')
+
+        order_expected_completion_date_div = DivWdg()
+        order_expected_completion_date_div.add('Expected Completion Date: ' + expected_completion_string)
+        order_expected_completion_date_div.add_style('font-weight', 'bold')
 
         client_name_div = DivWdg()
 
@@ -270,6 +281,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(order_name_div)
         order_div.add(order_code_div)
         order_div.add(order_due_date_div)
+        order_div.add(order_expected_completion_date_div)
         order_div.add(order_priority_div)
         order_div.add(client_name_div)
         order_div.add(po_number_div)
