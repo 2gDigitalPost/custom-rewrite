@@ -16,4 +16,4 @@ class DateTimeTimezoneWdg(DateYearTimeWdg):
         current_time = timestamp - timedelta(hours=timezone_hours)
 
         # Return the result, formatted as a string
-        return current_time.strftime("%b %d - %H:%M")
+        return current_time.strftime("%b %d, %Y - %I:%M %p")
