@@ -2,7 +2,7 @@ from tactic_client_lib import TacticServerStub
 
 from pyasm.search import Search
 
-from datetime import datetime, timedelta
+from common_tools.time_utils import datetime_string_to_timezone_aware_string_tactic_formatted
 
 
 def main(server=None, input_data=None):
@@ -14,48 +14,52 @@ def main(server=None, input_data=None):
 
     input_sobject = input_data.get('sobject')
 
-    search_key = server.build_search_key('twog/order', input_sobject.get('code'), project_code='twog')
+    # Get the expected completion date. This is what determines priority
+    # due_date = input_sobject.get('due_date')
+    expected_completion_date = input_sobject.get('expected_completion_date')
 
-    order_search = Search('twog/order')
-    order_search.get_by_search_key(search_key)
-    order_sobject = order_search.get_sobject()
+    if input_sobject and expected_completion_date:
+        timezone_converted_completion_date = datetime_string_to_timezone_aware_string_tactic_formatted(expected_completion_date)
 
-    due_date = input_sobject.get('due_date')
+        # Search for orders due at the same time. Note that because this trigger runs after the insertion, the search
+        # will find the new order, unless a filter is added to exclude it
+        orders_completed_at_same_time_search = Search('twog/order')
+        orders_completed_at_same_time_search.add_filter('expected_completion_date', timezone_converted_completion_date)
+        orders_completed_at_same_time_search.add_filter('code', input_sobject.get('code'), op='!=')
+        orders_completed_at_same_time = orders_completed_at_same_time_search.get_sobjects()
 
-    if order_sobject and due_date:
-        due_date_datetime_object = datetime.strptime(due_date, '%Y-%m-%d %H:%M:%S')
-        due_date_string = due_date_datetime_object.strftime('%Y-%m-%d')
-        due_date_day_after_string = (due_date_datetime_object + timedelta(days=1)).strftime('%Y-%m-%d')
+        if orders_completed_at_same_time:
+            # Get any order from the list, shouldn't matter which one since they are all the same priority level
+            order_completed_at_same_time = orders_completed_at_same_time[0]
+            priority = float(order_completed_at_same_time.get('priority'))
 
-        orders_due_day_of_search = Search('twog/order')
-        orders_due_day_of_search.add_filter('due_date', due_date_string)
-        orders_due_day_of = orders_due_day_of_search.get_sobjects()
-
-        if len(orders_due_day_of) > 1:
-            priorities = [order_due_day_of.get('priority') for order_due_day_of in orders_due_day_of]
-            priority = sum([float(priority) for priority in priorities]) / float(len(priorities) - 1)
-
+            # Assign the priority of the other order to this one
+            server.update(input_sobject.get('__search_key__'), {'priority': priority})
         else:
-            order_due_day_before_list = server.eval(
-                "@SOBJECT(twog/order['due_date', 'is before', '{0}']['@ORDER_BY', 'due_date desc']['@LIMIT', '2'])".format(due_date_string))
-            order_due_day_after_list = server.eval(
-                "@SOBJECT(twog/order['due_date', 'is after', '{0}']['@ORDER_BY', 'due_date asc']['@LIMIT', '1'])".format(due_date_day_after_string))
+            # Need to get the orders that come immediately before and after this one's time.
+            # Get the order before
+            orders_before = server.eval('@SOBJECT(twog/order["expected_completion_date", "is before", "{0}"]["@ORDER_BY", "expected_completion_date"])'.format(timezone_converted_completion_date))
 
-            if len(order_due_day_before_list) > 1:
-                order_due_day_before = order_due_day_before_list[1]
-                priority_lower_bound = float(order_due_day_before.get('priority'))
+            if len(orders_before) > 1:
+                order_before = orders_before[-2]
+                previous_priority = order_before.get('priority')
             else:
-                priority_lower_bound = 0.0
+                previous_priority = 0.0
 
-            if order_due_day_after_list:
-                order_due_day_after = order_due_day_after_list[0]
-                priority_upper_bound = float(order_due_day_after.get('priority'))
+            # Get the order after
+            orders_after = server.eval(
+                '@SOBJECT(twog/order["expected_completion_date", "is after", "{0}"]["@ORDER_BY", "expected_completion_date"]["@LIMIT", "2"])'.format(
+                    timezone_converted_completion_date))
+
+            if len(orders_after) > 1:
+                order_after = orders_after[-1]
+                next_priority = order_after.get('priority')
             else:
-                priority_upper_bound = 600000.0
+                next_priority = 600000.0
 
-            priority = (priority_lower_bound + priority_upper_bound) / 2.0
+            priority = (previous_priority + next_priority) / 2.0
 
-        server.update(search_key, {'priority': priority})
+            server.update(input_sobject.get('__search_key__'), {'priority': priority})
 
 
 if __name__ == '__main__':
