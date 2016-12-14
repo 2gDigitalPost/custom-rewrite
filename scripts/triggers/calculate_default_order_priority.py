@@ -15,7 +15,6 @@ def main(server=None, input_data=None):
     input_sobject = input_data.get('sobject')
 
     # Get the expected completion date. This is what determines priority
-    # due_date = input_sobject.get('due_date')
     expected_completion_date = input_sobject.get('expected_completion_date')
 
     if input_sobject and expected_completion_date:

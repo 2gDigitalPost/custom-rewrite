@@ -22,6 +22,7 @@ def datetime_string_to_timezone_aware_string(datetime_string):
     # Return the result, formatted as a string
     return current_time.strftime("%b %d, %Y - %I:%M %p")
 
+
 def datetime_string_to_timezone_aware_string_tactic_formatted(datetime_string):
     """
     Works the same as datetime_string_to_timezone_aware_string, but returns the string in the same format that TACTIC
