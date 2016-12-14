@@ -9,6 +9,7 @@ from pyasm.web import DivWdg, HtmlElement, SpanWdg
 
 import order_builder_utils as obu
 
+from common_tools.time_utils import datetime_string_to_timezone_aware_string
 from common_tools.utils import get_task_data_in_files, get_task_data_out_files, get_task_data_equipment, \
     get_files_for_package, get_delivery_task_for_package, get_order_builder_url_on_click, get_files_for_order, \
     get_file_in_package_status, get_file_in_package_sobjects_by_package_code, \
@@ -136,8 +137,9 @@ class OrderBuilderWdg(BaseRefreshWdg):
             due_date_string = 'Due Date not specified'
 
         if expected_completion_date:
-            expected_completion_datetime_object = datetime.strptime(expected_completion_date, '%Y-%m-%d %H:%M:%S')
-            expected_completion_string = expected_completion_datetime_object.strftime('%A, %b %d, %Y at %H:%M %p')
+            expected_completion_string = datetime_string_to_timezone_aware_string(expected_completion_date)
+            # expected_completion_datetime_object = datetime.strptime(expected_completion_date, '%Y-%m-%d %H:%M:%S')
+            # expected_completion_string = expected_completion_datetime_object.strftime('%A, %b %d, %Y at %H:%M %p')
         else:
             expected_completion_string = 'Not specified'
 
@@ -268,6 +270,16 @@ class OrderBuilderWdg(BaseRefreshWdg):
         )
         link_components_to_packages_button.add_style('display', 'inline-block')
 
+        change_expected_completion_date_button = ButtonNewWdg(title='Change Expected Completion Date', icon='CALENDAR')
+        change_expected_completion_date_button.add_behavior(
+            obu.get_load_popup_widget_with_reload_behavior(
+                'Change Expected Completion Date', 'widgets.ChangeOrderExpectedCompletionDate',
+                self.order_sobject.get_search_key(), 'Order Builder', 'order_builder.OrderBuilderWdg',
+                self.order_sobject.get_search_key()
+            )
+        )
+        change_expected_completion_date_button.add_style('display', 'inline-block')
+
         note_button = ButtonNewWdg(title='Add Note', icon='NOTE')
         note_button.add_behavior(obu.get_add_notes_behavior(self.order_sobject.get_search_key()))
         note_button.add_style('display', 'inline-block')
@@ -295,6 +307,7 @@ class OrderBuilderWdg(BaseRefreshWdg):
         order_div.add(add_file_to_order_button)
         order_div.add(create_file_for_order_button)
         order_div.add(link_components_to_packages_button)
+        order_div.add(change_expected_completion_date_button)
         order_div.add(note_button)
         order_div.add(copy_url_button)
 
