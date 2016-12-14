@@ -16,7 +16,7 @@ from common_tools.utils import get_task_data_in_files, get_task_data_out_files, 
     get_order_priority_relative_to_all_orders, get_sobject_by_code, get_sobject_name_by_code, \
     get_platform_connection_by_package_sobject, get_component_estimated_total_hours_from_component_code, \
     get_component_estimated_remaining_hours_from_component_code, get_order_estimated_total_hours_from_order_code,\
-    get_component_status_label_and_color
+    get_component_status_label_and_color, get_component_sobjects_from_order_code
 
 
 def get_task_data_div(task_code):
@@ -696,6 +696,49 @@ class OrderBuilderWdg(BaseRefreshWdg):
 
         return components_list
 
+    def setup_html_list_for_file_flows_in_order(self, width=600):
+        file_flows_list = HtmlElement.ul()
+        file_flows_list.add_style('list-style-type', 'none')
+        file_flows_list.add_style('margin-left', '10px')
+        file_flows_list.add_style('padding-left', '0px')
+
+        component_sobjects = get_component_sobjects_from_order_code(self.order_sobject.get_code())
+
+        component_sobjects_string = ','.join(
+            ["'{0}'".format(component.get_code()) for component in component_sobjects]
+        )
+
+        file_flow_search = Search('twog/file_flow')
+        file_flow_search.add_where('\"component_code\" in ({0})'.format(component_sobjects_string))
+        file_flows = file_flow_search.get_sobjects()
+
+        for file_flow in file_flows:
+            file_flow_div = DivWdg()
+            file_flow_div.add_style('background-color', '#d9edf7')
+            file_flow_div.add_style('padding', '10px')
+            file_flow_div.add_style('border-radius', '10px')
+
+            file_flow_div.add(file_flow.get('name'))
+            file_flow_div.add_style('display', 'block')
+
+            change_component_button = ButtonNewWdg(title='Change Component', icon='PIPELINE')
+            change_component_button.add_behavior(
+                obu.get_load_popup_widget_with_reload_behavior(
+                    'Change Component', 'widgets.ChangeComponentForFileFlowWdg', file_flow.get_search_key(),
+                    'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+                )
+            )
+            change_component_button.add_style('display', 'inline-block')
+
+            file_flow_div.add(change_component_button)
+
+            li = HtmlElement.li()
+
+            li.add(file_flow_div)
+            file_flows_list.add(li)
+
+        return file_flows_list
+
     def setup_html_list_for_packages_in_orders(self, width=600):
         """
         Add the packages that go into the order to an HTML style unordered list
@@ -1037,6 +1080,13 @@ catch(err) {
         components_div.add_style('float', 'left')
         components_div.add(self.setup_html_list_for_components_in_order(div_width))
         order_div.add(components_div)
+
+        file_flows_div = DivWdg()
+        file_flows_div.add_style('display', 'inline-block')
+        file_flows_div.add_style('width', '300px')
+        file_flows_div.add_style('float', 'left')
+        file_flows_div.add(self.setup_html_list_for_file_flows_in_order(div_width))
+        order_div.add(file_flows_div)
 
         packages_div = DivWdg()
         packages_div.add_style('display', 'inline-block')
