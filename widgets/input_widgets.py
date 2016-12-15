@@ -3,8 +3,25 @@ from pyasm.search import Search
 from pyasm.web import Table
 from pyasm.widget import CheckboxWdg, SelectWdg, MultiSelectWdg
 
-from common_tools.utils import get_files_for_order, get_files_for_division
 from tactic.ui.input import TextInputWdg
+from tactic.ui.widget import CalendarInputWdg
+
+from common_tools.utils import get_files_for_order, get_files_for_division
+
+
+def get_datetime_calendar_wdg():
+    """
+    Get a CalendarInputWdg that displays the time.
+
+    :return: CalendarInputWdg
+    """
+    date_calendar_wdg = CalendarInputWdg("datetime_calendar")
+    date_calendar_wdg.set_option('show_activator', 'true')
+    date_calendar_wdg.set_option('show_time', 'true')
+    date_calendar_wdg.set_option('width', '300px')
+    date_calendar_wdg.set_option('id', 'datetime_calendar')
+
+    return date_calendar_wdg
 
 
 def get_file_select_wdg_from_file_list(files, width=400):
