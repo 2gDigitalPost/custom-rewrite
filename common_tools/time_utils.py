@@ -10,6 +10,9 @@ def datetime_string_to_timezone_aware_string(datetime_string):
     :return: String
     """
 
+    if not datetime_string:
+        return ''
+
     # Get the timestamp as a datetime object instead of a string
     timestamp = datetime.strptime(datetime_string, '%Y-%m-%d %H:%M:%S')
 
@@ -31,6 +34,9 @@ def datetime_string_to_timezone_aware_string_tactic_formatted(datetime_string):
     :param datetime_string: String (in format YEAR-MONTH-DAY HOUR:MINUTE:SECOND
     :return: String
     """
+
+    if not datetime_string:
+        return ''
 
     # Get the timestamp as a datetime object instead of a string
     timestamp = datetime.strptime(datetime_string, '%Y-%m-%d %H:%M:%S')
