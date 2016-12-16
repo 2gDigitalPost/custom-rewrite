@@ -33,7 +33,7 @@ class HandleDepartmentRequestTaskStatusUpdate(Trigger):
         if task_process == 'request' and task_status == 'complete':
             # Check if the department request has its 'Response' column filled out. If not, raise an error
             if not department_request_sobject.get('response'):
-                raise TacticException("Before marking the request as 'Complete', you must fill out the 'Response'"
+                raise TacticException("Before marking the request as 'Complete', you must fill out the 'Response' "
                                       "column.")
 
             # Mark the twog/department_request status as needing approval
