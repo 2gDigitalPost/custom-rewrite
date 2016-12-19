@@ -112,6 +112,16 @@ def files_select():
     return render_template('files_select.html')
 
 
+@app.route('/orders/create')
+def order_creator():
+    ticket = session.get('ticket')
+
+    if ticket:
+        return render_template('order_creator.html')
+    else:
+        return redirect('/login')
+
+
 @app.route('/orders/reprioritizer')
 def order_reprioritizer():
     ticket = session.get('ticket')
@@ -210,6 +220,26 @@ class InstructionsTemplate(Resource):
         print(args)
 
 
+class Clients(Resource):
+    def get(self):
+        ticket = session.get('ticket')
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        client_sobjects = server.eval("@SOBJECT(twog/client)")
+
+        return jsonify({'clients': client_sobjects})
+
+
+class Divisions(Resource):
+    def get(self, client_code):
+        ticket = session.get('ticket')
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        division_sobjects = server.eval("@SOBJECT(twog/division['client_code', '{0}'])".format(client_code))
+
+        return jsonify({'divisions': division_sobjects})
+
+
 class AllTitles(Resource):
     def get(self, ticket):
         server = TacticServerStub(server=url, project=project, ticket=ticket)
@@ -270,6 +300,20 @@ class OrderPriorities(Resource):
         return {'status': 200}
 
 
+class Orders(Resource):
+    def post(self):
+        ticket = session.get('ticket')
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        json_data = request.get_json()
+
+        print(json_data)
+
+        return {'status': 200}
+
+        server.insert('twog/order', json_data)
+
+
 class TitleAdder(Resource):
     def post(self):
         ticket = session.get('ticket')
@@ -306,8 +350,11 @@ class DepartmentInstructionsAdder(Resource):
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
+api.add_resource(Clients, '/api/v1/clients')
+api.add_resource(Divisions, '/api/v1/divisions/<string:client_code>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
+api.add_resource(Orders, '/api/v1/orders/add')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
 
