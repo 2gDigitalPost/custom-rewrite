@@ -122,6 +122,35 @@ def order_creator():
         return redirect('/login')
 
 
+@app.route('/orders/<order_code>/add_component_by_title')
+def order_add_component_by_title(order_code):
+    ticket = session.get('ticket')
+
+    if ticket:
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        order_sobject = server.eval("@SOBJECT(twog/order['code', '{0}'])".format(order_code))[0]
+
+        return render_template('order_add_component_by_title.html', name=order_sobject.get('name'),
+                               code=order_sobject.get('code'))
+    else:
+        return redirect('/login')
+
+
+@app.route('/orders/edit/<order_code>/components')
+def order_component_editor(order_code):
+    ticket = session.get('ticket')
+
+    if ticket:
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        order_sobject = server.eval("@SOBJECT(twog/order['code', '{0}'])".format(order_code))[0]
+
+        return render_template('order_component_editor.html', name=order_sobject.get('name'))
+    else:
+        return redirect('/login')
+
+
 @app.route('/orders/reprioritizer')
 def order_reprioritizer():
     ticket = session.get('ticket')
@@ -307,11 +336,20 @@ class Orders(Resource):
 
         json_data = request.get_json()
 
-        print(json_data)
+        inserted_order = server.insert('twog/order', json_data)
 
-        return {'status': 200}
+        return {'status': 200, 'order_code': inserted_order.get('code')}
 
-        server.insert('twog/order', json_data)
+
+class Title(Resource):
+    def get(self, name):
+        ticket = session.get('ticket')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        found_titles = server.eval("@SOBJECT(twog/title['name', '{0}'])".format(name))
+
+        return {'status': 200, 'titles': found_titles}
 
 
 class TitleAdder(Resource):
@@ -356,6 +394,7 @@ api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
 api.add_resource(Orders, '/api/v1/orders/add')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
+api.add_resource(Title, '/api/v1/title/name/<string:name>')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
 
 if __name__ == '__main__':

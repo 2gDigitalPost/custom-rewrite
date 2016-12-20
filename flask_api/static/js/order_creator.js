@@ -22,11 +22,11 @@ var order_creator = new Vue({
             var data_to_send = {};
 
             data_to_send['name'] = this.name;
-            data_to_send['client'] = this.client;
-            data_to_send['division'] = this.division;
+            data_to_send['division_code'] = this.division;
             data_to_send['due_date'] = this.due_date;
             data_to_send['expected_completion_date'] = this.expected_completion_date;
             data_to_send['po_number'] = this.po_number;
+            data_to_send['status'] = 'pending';
 
             $.ajax({
                 url: '/api/v1/orders/add',
@@ -36,7 +36,7 @@ var order_creator = new Vue({
                 dataType: 'json',
                 async: false,
                 success: function(message) {
-                    alert(message);
+                    window.location.replace("/orders/" + message['order_code'] + "/add_component_by_title");
                 }
             });
         }

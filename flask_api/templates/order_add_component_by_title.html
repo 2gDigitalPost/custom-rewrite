@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}Add an Order to Tactic{% endblock %}
+{% block content %}
+<h1>Adding Components by Title to Order: {{ name }} ({{ code }})</h1>
+
+{% raw %}
+<div id="add-component-by-title">
+    <div>
+        <h3>Are you adding a Movie, Episode or a Series?</h3>
+        <select v-model="title_type">
+            <option>Movie</option>
+            <option>Episode</option>
+            <option>Series</option>
+        </select>
+    </div>
+
+    <template v-if="title_type !== ''">
+        <div>
+            <h4>Enter the name of the {{ title_type }} you are searching for.</h4>
+            <input v-model="title_search_name">
+            <button v-on:click="searchForTitle">Search Tactic</button>
+        </div>
+    </template>
+
+    <template v-if="tactic_title_search_results.length > 0">
+        <div>
+            <p>{{ tactic_title_search_results.length }} results found.</p>
+        </div>
+        <div>
+            <ul>
+                <li
+                    is="title-item"
+                    v-for="title in tactic_title_search_results"
+                    v-bind:title="title"
+                    v-on:title-selected="selected_title_code = title.code"
+                ></li>
+            </ul>
+        </div>
+    </template>
+    <template v-else-if="tactic_title_searched">
+        <div>
+            <p>
+                No search results were found. Either the name was entered incorrectly, or this Title does not yet
+                exist in Tactic's database.
+            </p>
+            <p>
+                You can try searching again, or you can add the Title to Tactic's database. To do the latter, select
+                whether you want to search OMDb (a free IMDb search service), or enter the title yourself.
+            </p>
+        </div>
+        <div>
+            <input type="radio" id="search_omdb" value="Search OMDb" v-model="search_omdb_or_manual_entry">
+            <label for="search_omdb">Search OMDb</label>
+            <br>
+            <input type="radio" id="manual_entry" value="Enter Manually" v-model="search_omdb_or_manual_entry">
+            <label for="two">Enter Manually</label>
+            <br>
+        </div>
+
+        <template v-if="search_omdb_or_manual_entry === 'Enter Manually'">
+            <div>
+                <p>Sorry, this is not yet implemented.</p>
+            </div>
+        </template>
+        <template v-else-if="search_omdb_or_manual_entry === 'Search OMDb'">
+            <div>
+                <p>
+                    Click the button below to begin the search. If you know the Year of the Title you're searching for,
+                    you can enter that to narrow your results.
+                </p>
+                <label for="omdb_search_year">Year</label>
+                <select v-model="omdb_search_year">
+                    <option v-for="option in year_options">
+                        {{ option }}
+                    </option>
+                </select>
+                <br/>
+                <button v-on:click="searchOMDbForTitle">Search OMDb</button>
+            </div>
+
+            <template v-if="omdb_found_titles.length > 0">
+                <div style="width: 40%; float: left;">
+                    <div>
+                        <p>{{ omdb_found_titles.length }} titles found.</p>
+                    </div>
+
+                    <div>
+                        <ul>
+                            <li
+                                is="omdb-title-item"
+                                v-for="title in omdb_found_titles"
+                                v-bind:title="title"
+                                v-on:omdb-title-selected="omdb_selected_id = title.imdbID"
+                            ></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="width: 60%; margin-left: 30px;">
+                    <h3 v-if="omdb_selected_id !== ''">Add this title to Tactic?</h3>
+
+                    <template v-if="omdb_selected_title !== ''">
+                        <h4>{{ omdb_selected_title.Title }} ({{ omdb_selected_title.Year }})</h4>
+                        <img v-bind:src="omdb_selected_title.Poster"/>
+                        <h5>Runtime: {{ omdb_selected_title.Runtime }}</h5>
+                        <h6>Released: {{ omdb_selected_title.Released }}</h6>
+                        <h6>Rated: {{ omdb_selected_title.Rated }}</h6>
+                        <p>Plot: {{ omdb_selected_title.Plot }}</p>
+                        <button v-on:click="addTitleToTactic">Submit</button>
+                    </template>
+                </div>
+            </template>
+            <template v-else-if="omdb_searched">
+                <div>
+                    <p>
+                        No titles matching that name were found in OMDb. Either it does not exist, or the name was
+                        entered incorrectly.
+                    </p>
+                    <p>
+                        If you cannot find the title in OMDb, you will have to enter it manually. Click the button
+                        above to switch to manual entry.
+                    </p>
+                </div>
+            </template>
+        </template>
+    </template>
+
+
+
+    <template v-if="selected_title_code !== ''">
+        <div>
+            <h4>Selected Title: {{ selected_title_code }}</h4>
+            <p>Is this ok?</p>
+        </div>
+    </template>
+
+
+</div>
+
+{% endraw %}
+
+<script src="{{ url_for('static', filename='js/order_add_component_by_title.js') }}"></script>
+
+{% endblock %}
