@@ -702,40 +702,42 @@ class OrderBuilderWdg(BaseRefreshWdg):
         file_flows_list.add_style('margin-left', '10px')
         file_flows_list.add_style('padding-left', '0px')
 
-        component_sobjects = get_component_sobjects_from_order_code(self.order_sobject.get_code())
+        component_sobjects = get_component_sobjects_from_order_code(self.order_sobject.get_code())\
 
-        component_sobjects_string = ','.join(
-            ["'{0}'".format(component.get_code()) for component in component_sobjects]
-        )
-
-        file_flow_search = Search('twog/file_flow')
-        file_flow_search.add_where('\"component_code\" in ({0})'.format(component_sobjects_string))
-        file_flows = file_flow_search.get_sobjects()
-
-        for file_flow in file_flows:
-            file_flow_div = DivWdg()
-            file_flow_div.add_style('background-color', '#d9edf7')
-            file_flow_div.add_style('padding', '10px')
-            file_flow_div.add_style('border-radius', '10px')
-
-            file_flow_div.add(file_flow.get('name'))
-            file_flow_div.add_style('display', 'block')
-
-            change_component_button = ButtonNewWdg(title='Change Component', icon='PIPELINE')
-            change_component_button.add_behavior(
-                obu.get_load_popup_widget_with_reload_behavior(
-                    'Change Component', 'widgets.ChangeComponentForFileFlowWdg', file_flow.get_search_key(),
-                    'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
-                )
+        # Only do the searching and rendering if components exist for the Order
+        if component_sobjects:
+            component_sobjects_string = ','.join(
+                ["'{0}'".format(component.get_code()) for component in component_sobjects]
             )
-            change_component_button.add_style('display', 'inline-block')
 
-            file_flow_div.add(change_component_button)
+            file_flow_search = Search('twog/file_flow')
+            file_flow_search.add_where('\"component_code\" in ({0})'.format(component_sobjects_string))
+            file_flows = file_flow_search.get_sobjects()
 
-            li = HtmlElement.li()
+            for file_flow in file_flows:
+                file_flow_div = DivWdg()
+                file_flow_div.add_style('background-color', '#d9edf7')
+                file_flow_div.add_style('padding', '10px')
+                file_flow_div.add_style('border-radius', '10px')
 
-            li.add(file_flow_div)
-            file_flows_list.add(li)
+                file_flow_div.add(file_flow.get('name'))
+                file_flow_div.add_style('display', 'block')
+
+                change_component_button = ButtonNewWdg(title='Change Component', icon='PIPELINE')
+                change_component_button.add_behavior(
+                    obu.get_load_popup_widget_with_reload_behavior(
+                        'Change Component', 'widgets.ChangeComponentForFileFlowWdg', file_flow.get_search_key(),
+                        'Order Builder', 'order_builder.OrderBuilderWdg', self.order_sobject.get_search_key()
+                    )
+                )
+                change_component_button.add_style('display', 'inline-block')
+
+                file_flow_div.add(change_component_button)
+
+                li = HtmlElement.li()
+
+                li.add(file_flow_div)
+                file_flows_list.add(li)
 
         return file_flows_list
 
