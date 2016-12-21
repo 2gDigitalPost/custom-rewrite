@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, redirect, flash, url_for, session
+from flask import Flask, flash, jsonify, render_template, request, redirect, flash, url_for, session
 from flask_restful import reqparse, Resource, Api
 
 import os, sys, inspect
@@ -176,7 +176,7 @@ def title_adder():
     ticket = session.get('ticket')
 
     if ticket:
-        return render_template('title_adder.html', ticket=ticket)
+        return render_template('add_title_to_tactic.html', ticket=ticket)
     else:
         return redirect('/login')
 
@@ -347,7 +347,7 @@ class Title(Resource):
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        found_titles = server.eval("@SOBJECT(twog/title['name', '{0}'])".format(name))
+        found_titles = server.eval("@SOBJECT(twog/title['name', 'EQ', '{0}'])".format(name))
 
         return {'status': 200, 'titles': found_titles}
 
@@ -360,16 +360,22 @@ class TitleAdder(Resource):
 
         json_data = request.get_json()
 
-        imdb_id = json_data.get('imdb_id')
+        # Some data can have None set as the value. This does not work when inserting to the database, so remove
+        # these keys/values
+        cleaned_json_data = {key: value for key, value in json_data.iteritems() if value != None}
 
+        imdb_id = json_data.get('imdb_id')
         existing_title = server.eval("@SOBJECT(twog/title['imdb_id', '{0}'])".format(imdb_id))
 
         if existing_title:
-            pass
-        else:
-            server.insert('twog/title', json_data)
+            # HTTP status 409: Conflict
+            return {'status': 409}
 
-        return {'status': 200}
+        inserted_title = server.insert('twog/title', cleaned_json_data)
+
+        flash('Title added successfully: {0}'.format(inserted_title.get('code')))
+
+        return {'status': 200, 'inserted_title': inserted_title}
 
 
 class DepartmentInstructionsAdder(Resource):
@@ -401,4 +407,3 @@ if __name__ == '__main__':
     global ALL_USERS
 
     app.run(debug=True, host='0.0.0.0')
-

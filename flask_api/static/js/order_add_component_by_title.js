@@ -32,6 +32,8 @@ var add_component_by_title = new Vue({
     data: {
         title_type: '',
         title_search_name: '',
+        season_number: '',
+        episode_number: '',
         tactic_title_searched: false,
         tactic_title_search_results: [],
         title_not_in_tactic_results: false,
@@ -55,36 +57,10 @@ var add_component_by_title = new Vue({
                 }
             }.bind(this));
         },
-        searchOMDbForTitle: function() {
-            var omdbURL;
+        searchForEpisode: function() {
 
-            if (this.title_type.toLowerCase() === 'movie') {
-                omdbURL = 'http://www.omdbapi.com/?s=' + this.title_search_name + '&type=' + this.title_type;
-            }
-            else if (this.title_type.toLowerCase() === 'episode') {
-                omdbURL = 'http://www.omdbapi.com/?s=' + this.title_search_name + '&type=' + this.title_type;
-            }
-
-            if (this.omdb_search_year !== '') {
-                omdbURL += '&y=' + this.omdb_search_year;
-            }
-
-            $.get(omdbURL, function(response) {
-                this.omdb_searched = true;
-                this.omdb_found_titles = [];
-
-                // The json object returned from OMDb always returns a "Response" string, set to either "True" or
-                // "False".
-                if (response.Response.toLowerCase() === 'true') {
-                    var found_titles = response.Search;
-
-                    for (var i = 0; i < found_titles.length; i++) {
-                        Vue.set(this.omdb_found_titles, i, {name: found_titles[i].Title, year: found_titles[i].Year, imdbID: found_titles[i].imdbID});
-                    }
-                }
-            }.bind(this));
         },
-        addTitleToTactic: function() {
+        searchForSeason: function() {
 
         },
         submit: function() {
@@ -120,6 +96,13 @@ var add_component_by_title = new Vue({
                     self.omdb_selected_title = response;
                 }
             });
+        },
+        title_not_in_tactic_results: function() {
+            // If the user declares that the Title is not in Tactic, unselect any of the search results the user may
+            // have clicked on
+            var self = this;
+
+            this.selected_title_code = '';
         }
     }
 });
