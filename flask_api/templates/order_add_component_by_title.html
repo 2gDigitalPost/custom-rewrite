@@ -36,8 +36,12 @@
                 ></li>
             </ul>
         </div>
+        <div>
+            <input type="checkbox" id="title_not_in_tactic_results_checkbox" v-model="title_not_in_tactic_results">
+            <label for="title_not_in_tactic_results_checkbox">The Title I need is not listed. {{ title_not_in_tactic_results }}</label>
+        </div>
     </template>
-    <template v-else-if="tactic_title_searched">
+    <template v-else-if="tactic_title_searched && tactic_title_search_results.length === 0">
         <div>
             <p>
                 No search results were found. Either the name was entered incorrectly, or this Title does not yet
@@ -48,6 +52,9 @@
                 whether you want to search OMDb (a free IMDb search service), or enter the title yourself.
             </p>
         </div>
+    </template>
+
+    <template v-if="(tactic_title_searched && tactic_title_search_results.length === 0) || title_not_in_tactic_results">
         <div>
             <input type="radio" id="search_omdb" value="Search OMDb" v-model="search_omdb_or_manual_entry">
             <label for="search_omdb">Search OMDb</label>

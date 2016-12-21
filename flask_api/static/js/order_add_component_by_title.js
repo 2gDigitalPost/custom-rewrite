@@ -34,6 +34,7 @@ var add_component_by_title = new Vue({
         title_search_name: '',
         tactic_title_searched: false,
         tactic_title_search_results: [],
+        title_not_in_tactic_results: false,
         selected_title_code: '',
         search_omdb_or_manual_entry: '',
         omdb_search_year: '',
