@@ -19,6 +19,12 @@
 
     <template v-if="search_omdb_or_manual_entry === 'Enter Manually'">
         <div>
+            <h3>Are you adding a Movie, Episode or a Season?</h3>
+            <select v-model="title_type">
+                <option>Movie</option>
+                <option>Episode</option>
+                <option>Season</option>
+            </select>
             <p>Sorry, this is not yet implemented.</p>
         </div>
     </template>

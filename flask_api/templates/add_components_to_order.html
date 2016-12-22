@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Add Components to Order: {{ order_name }} {{ order_code }}{% endblock %}
+{% block stylesheets %}{{ super() }}{% endblock %}
+{% block content %}
+<h1>Adding Components to Order</h1>
+
+{% raw %}
+
+
+
+{% endraw %}
+
+<script src="{{ url_for('static', filename='js/add_components_to_order.js') }}"></script>
+
+{% endblock %}

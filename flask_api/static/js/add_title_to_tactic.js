@@ -57,7 +57,7 @@ var add_component_by_title = new Vue({
             var omdbURL = 'http://www.omdbapi.com/?t=' + this.title_search_name + '&Season=' + this.season_number + '&Episode=' + this.episode_number;
 
             $.get(omdbURL, function(response) {
-
+                console.log(response);
             }.bind(this));
 
         },
@@ -71,7 +71,8 @@ var add_component_by_title = new Vue({
                 omdbURL = 'http://www.omdbapi.com/?s=' + this.title_search_name + '&type=' + this.title_type;
             }
             else if (this.title_type.toLowerCase() === 'episode') {
-                omdbURL = 'http://www.omdbapi.com/?s=' + this.title_search_name + '&type=' + this.title_type;
+                // omdbURL = 'http://www.omdbapi.com/?s=' + this.title_search_name + '&type=' + this.title_type;
+                omdbURL = 'http://www.omdbapi.com/t=' + this.title_search_name + '&Season=' + this.season_number + '&Episode=' + this.episode_number;
             }
 
             if (this.omdb_search_year !== '') {
@@ -81,6 +82,8 @@ var add_component_by_title = new Vue({
             $.get(omdbURL, function(response) {
                 this.omdb_searched = true;
                 this.omdb_found_titles = [];
+
+                console.log(response);
 
                 // The json object returned from OMDb always returns a "Response" string, set to either "True" or
                 // "False".

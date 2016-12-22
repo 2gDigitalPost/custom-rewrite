@@ -122,6 +122,21 @@ def order_creator():
         return redirect('/login')
 
 
+@app.route('/orders/<order_code>/add_components')
+def add_components_to_order(order_code):
+    ticket = session.get('ticket')
+
+    if ticket:
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        order_sobject = server.eval("@SOBJECT(twog/order['code', '{0}'])".format(order_code))[0]
+
+        return render_template('add_components_to_order.html', order_name=order_sobject.get('name'),
+                               order_code=order_sobject.get('code'))
+    else:
+        return redirect('/login')
+
+
 @app.route('/orders/<order_code>/add_component_by_title')
 def order_add_component_by_title(order_code):
     ticket = session.get('ticket')
