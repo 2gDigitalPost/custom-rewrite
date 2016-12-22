@@ -27,7 +27,7 @@ Vue.component('omdb-title-item', {
     '
 });
 
-var add_component_by_title = new Vue({
+var add_title_to_tactic = new Vue({
     el: '#add-title-to-tactic',
     data: {
         title_type: '',
@@ -40,7 +40,9 @@ var add_component_by_title = new Vue({
         omdb_searched: false,
         omdb_found_titles: [],
         omdb_selected_id: '',
-        omdb_selected_title: ''
+        omdb_selected_title: '',
+        new_title_name: '',
+        year_released: ''
     },
     methods: {
         searchForTitle: function() {
@@ -103,8 +105,28 @@ var add_component_by_title = new Vue({
 
         },
         addTitleToTactic: function() {
+            var data_to_submit = {};
+
+            data_to_submit['name'] = this.new_title_name;
+            data_to_submit['year'] = this.year_released;
+            data_to_submit['type'] = this.title_type.toLowerCase();
+
+            $.ajax({
+                url: '/api/v1/titles/add',
+                type: 'POST',
+                data: JSON.stringify(data_to_submit),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                async: false,
+                success: function(message) {
+                    if (message.status == 200) {
+                        location.reload();
+                    }
+                }
+            });
+        },
+        addTitleToTacticFromOMDb: function() {
             var title_to_submit = this.omdb_selected_title;
-            console.log(title_to_submit);
             var data_to_submit = {};
 
             data_to_submit['actors'] = title_to_submit.Actors;

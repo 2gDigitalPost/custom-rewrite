@@ -19,13 +19,26 @@
 
     <template v-if="search_omdb_or_manual_entry === 'Enter Manually'">
         <div>
-            <h3>Are you adding a Movie, Episode or a Season?</h3>
+            <h3>Are you adding a Movie, Trailer, Episode or a Season?</h3>
             <select v-model="title_type">
                 <option>Movie</option>
+                <option>Trailer</option>
                 <option>Episode</option>
                 <option>Season</option>
             </select>
-            <p>Sorry, this is not yet implemented.</p>
+        </div>
+
+        <div v-if="title_type !== ''">
+            <h3>What is the name?</h3>
+            <input v-model="new_title_name">
+        </div>
+
+        <div v-if="new_title_name !== ''">
+            <h3>Enter the year, if you know it.</h3>
+            <p>Entering a year is not required, but it is highly recommended.</p>
+            <input v-model="year_released">
+            <br/>
+            <button v-on:click="addTitleToTactic">Add Title to Tactic</button>
         </div>
     </template>
     <template v-else-if="search_omdb_or_manual_entry === 'Search OMDb'">
@@ -111,7 +124,7 @@
                     <h6>Released: {{ omdb_selected_title.Released }}</h6>
                     <h6>Rated: {{ omdb_selected_title.Rated }}</h6>
                     <p>Plot: {{ omdb_selected_title.Plot }}</p>
-                    <button v-on:click="addTitleToTactic">Add Title to Tactic</button>
+                    <button v-on:click="addTitleToTacticFromOMDb">Add Title to Tactic</button>
                 </template>
             </div>
         </template>
