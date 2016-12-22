@@ -18,6 +18,9 @@ var order_creator = new Vue({
                 }
             }.bind(this));
         },
+        datePicker: function() {
+            $('#datetimepicker1').datetimepicker();
+        },
         submit: function() {
             var data_to_send = {};
 
@@ -43,6 +46,7 @@ var order_creator = new Vue({
     },
     beforeMount: function() {
         this.loadClients();
+        this.datePicker();
     },
     watch: {
         client: function(val) {
