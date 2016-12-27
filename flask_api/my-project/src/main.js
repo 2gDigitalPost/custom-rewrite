@@ -1,7 +1,18 @@
-import Vue from 'vue'
-import App from './App.vue'
+var Vue = require("vue");
 
-new Vue({
-  el: '#app',
-  render: h => h(App)
-})
+var vm = new Vue({
+  el: "#app",
+  components: {
+    "demo": require("./App.vue")
+  },
+  data: function() {
+    return {
+      result1: null,
+      result2: null,
+      result3: null,
+      result4: null,
+      startDatetime: moment(),
+      endDatetime: null
+    };
+  }
+});

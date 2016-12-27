@@ -206,6 +206,16 @@ def department_instructions_adder():
         return redirect('/login')
 
 
+@app.route('/webpacktest')
+def webpacktest():
+    ticket = session.get('ticket')
+
+    if ticket:
+        return render_template('webpacktest.html', ticket=ticket)
+    else:
+        return redirect('/login')
+
+
 class DepartmentInstructions(Resource):
     def get(self):
         ticket = session.get('ticket')
