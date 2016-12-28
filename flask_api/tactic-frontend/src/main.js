@@ -4,6 +4,7 @@ import Vue from 'vue'
 import auth from './auth'
 import App from './App'
 import VueRouter from 'vue-router'
+import AboutPage from './components/AboutPage/index.vue'
 import LoginForm from './components/LoginForm/index.vue'
 import OrderEntryForm from './components/OrderEntryForm/index.vue'
 
@@ -12,6 +13,7 @@ Vue.use(VueRouter)
 const routes = [
   { path: '/order_entry', component: OrderEntryForm, beforeEnter: requireAuth },
   { path: '/login', component: LoginForm },
+  { path: '/about', component: AboutPage },
   { path: '/logout',
     beforeEnter (to, from, next) {
       auth.logout()

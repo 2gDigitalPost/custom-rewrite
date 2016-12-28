@@ -10,6 +10,9 @@
       <li>
         <router-link to="/order_entry">Enter a new Order</router-link>
       </li>
+      <li>
+        <router-link to="/about">About</router-link>
+      </li>
     </ul>
     <router-view class="view"></router-view>
   </div>
