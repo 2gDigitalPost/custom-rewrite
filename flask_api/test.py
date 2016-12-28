@@ -1,4 +1,5 @@
-from flask import Flask, flash, jsonify, render_template, request, redirect, flash, url_for, session
+from flask import Flask, flash, jsonify, render_template, request, redirect, flash, url_for, session, abort
+from flask_cors import CORS, cross_origin
 from flask_restful import reqparse, Resource, Api
 
 import os, sys, inspect
@@ -15,6 +16,7 @@ from tactic_client_lib import TacticServerStub
 sys.path.append('/opt/spt/custom')
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 
 SECRET_KEY = "yeah, not actually a secret"
@@ -59,6 +61,24 @@ ALL_USERS = {}
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+@app.route("/api/v1/login", methods=["POST"])
+def api_login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+
+    if username is None or password is None:
+        # Missing arguments
+        abort(400)
+
+    server = TacticServerStub(server=url, project=project, user=username, password=password)
+    ticket = server.get_ticket(username, password)
+
+    session['ticket'] = ticket
+
+    return jsonify({ 'ticket': ticket })
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
