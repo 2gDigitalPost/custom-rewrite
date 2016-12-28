@@ -1,5 +1,10 @@
-<form v-on:submit.prevent="onSubmit">
-    <input type="text" v-model="username" placeholder="Username" />
-    <input type="password" v-model="password" placeholder="Password" />
-    <button type="submit">Login</button>
-</form>
+<div>
+    <p v-if="$route.query.redirect">
+      You need to login first.
+    </p>
+    <form v-on:submit.prevent="getToken">
+        <input type="text" v-model="username" placeholder="Username" />
+        <input type="password" v-model="password" placeholder="Password" />
+        <button type="submit">Login</button>
+    </form>
+</div>

@@ -1,20 +1,34 @@
 <template>
   <div id="app">
     <img src="./assets/logo.png">
-    <hello></hello>
-    <login-form></login-form>
+
+    <ul>
+      <li>
+        <router-link v-if="loggedIn" to="/logout">Log Out</router-link>
+        <router-link v-if="!loggedIn" to="/login">Log In</router-link>
+      </li>
+      <li>
+        <router-link to="/order_entry">Enter a new Order</router-link>
+      </li>
+    </ul>
+    <router-view class="view"></router-view>
   </div>
 </template>
 
 <script>
-import Hello from './components/Hello'
-import LoginForm from './components/LoginForm'
+import auth from './auth'
 
 export default {
   name: 'app',
-  components: {
-    Hello,
-    LoginForm
+  data () {
+    return {
+      loggedIn: auth.loggedIn()
+    }
+  },
+  created () {
+    auth.onChange = loggedIn => {
+      this.loggedIn = loggedIn
+    }
   }
 }
 </script>
