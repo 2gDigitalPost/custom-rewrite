@@ -312,7 +312,12 @@ class Clients(Resource):
 
 class Divisions(Resource):
     def get(self, client_code):
-        ticket = session.get('ticket')
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         division_sobjects = server.eval("@SOBJECT(twog/division['client_code', '{0}'])".format(client_code))

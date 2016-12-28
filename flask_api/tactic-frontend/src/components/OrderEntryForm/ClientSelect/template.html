@@ -1,0 +1,11 @@
+<div>
+    <select v-model="selected_client">
+        <option v-for="option in client_options" v-bind:value="option.value">
+            {{ option.text }}
+        </option>
+    </select>
+
+    <div v-if="selected_client !== ''">
+        <division-select :client="selected_client"></division-select>
+    </div>
+</div>
