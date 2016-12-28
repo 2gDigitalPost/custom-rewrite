@@ -6,11 +6,11 @@
         <div class="card">
             <div class="row">
                 <span>Due Date：</span>
-                <date-picker :date="due_date" :option="option" :limit="limit"></date-picker>
+                <date-picker :date="due_date" :option="option"></date-picker>
             </div>
             <div class="row">
                 <span>Expected Completion Date：</span>
-                <date-picker :date="expected_completion_date" :option="option" :limit="limit"></date-picker>
+                <date-picker :date="expected_completion_date" :option="option"></date-picker>
             </div>
         </div>
     </div>

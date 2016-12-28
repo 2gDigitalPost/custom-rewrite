@@ -1,20 +1,38 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Tactic</a>
+        </div>
 
-    <ul>
-      <li>
-        <router-link v-if="loggedIn" to="/logout">Log Out</router-link>
-        <router-link v-if="!loggedIn" to="/login">Log In</router-link>
-      </li>
-      <li>
-        <router-link to="/order_entry">Enter a new Order</router-link>
-      </li>
-      <li>
-        <router-link to="/about">About</router-link>
-      </li>
-    </ul>
-    <router-view class="view"></router-view>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li>
+              <router-link v-if="loggedIn" to="/logout">Log Out</router-link>
+              <router-link v-if="!loggedIn" to="/login">Log In</router-link>
+            </li>
+            <li>
+              <router-link to="/order_entry">Enter a new Order</router-link>
+            </li>
+            <li>
+              <router-link to="/about">About</router-link>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+    <div class="container">
+      <router-view class="view"></router-view>
+    </div>
   </div>
 </template>
 
@@ -36,13 +54,5 @@ export default {
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style src='../node_modules/bootstrap/dist/css/bootstrap.css'>
 </style>
