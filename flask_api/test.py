@@ -296,7 +296,13 @@ class InstructionsTemplate(Resource):
 
 class Clients(Resource):
     def get(self):
-        ticket = session.get('ticket')
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        # ticket = session.get('ticket')
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         client_sobjects = server.eval("@SOBJECT(twog/client)")

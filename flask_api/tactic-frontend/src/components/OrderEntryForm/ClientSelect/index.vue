@@ -11,6 +11,8 @@
 <style>
 </style>
 <script>
+  /* globals localStorage */
+
   import axios from 'axios'
 
   export default {
@@ -23,17 +25,25 @@
     },
     methods: {
       loadClients: function () {
-        /* $.get('/api/v1/clients', function (response) {
-          for (var i = 0; i < response.clients.length; i++) {
-            this.client_options.push({text: response.clients[i].name, value: response.clients[i].code})
+        var self = this
+
+        axios.get('http://localhost:5000/api/v1/clients', {
+          params: {
+            token: localStorage.tactic_token
           }
-        }.bind(this)) */
-        /* axios.get('http://localhost:5000/api/v1/clients', function (response) {
+        })
+        .then(function (response) {
           console.log(response)
+
+          let clientData = response.data.clients
+
+          for (let i = 0; i < clientData.length; i++) {
+            self.client_options.push({text: clientData[i].name, value: clientData[i].code})
+          }
         })
         .catch(function (error) {
           console.log(error)
-        }) */
+        })
       }
     },
     beforeMount: function () {
