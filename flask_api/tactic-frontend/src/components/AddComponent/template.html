@@ -1,0 +1,18 @@
+<div>
+    <h4>Is the title a movie, trailer, or episode?</h4>
+
+    <select v-model="title_type">
+        <option>Movie</option>
+        <option>Trailer</option>
+        <option>Episode</option>
+    </select>
+
+    <span v-if="title_type !== null">
+        <h4>
+            Select the title below (type to search). If the title is not listed, you
+            will have to add it to Tactic's Database
+        </h4>
+
+        <multiselect :selected="selected_title" :options="searchable_titles" track-by="code" label="name"></multiselect>
+    </span>
+</div>

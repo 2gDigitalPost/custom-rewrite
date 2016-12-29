@@ -21,6 +21,9 @@
               <router-link v-if="!loggedIn" to="/login">Log In</router-link>
             </li>
             <li>
+              <router-link to="/orders">Orders</router-link>
+            </li>
+            <li>
               <router-link to="/order_entry">Enter a new Order</router-link>
             </li>
             <li>

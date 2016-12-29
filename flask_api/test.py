@@ -386,6 +386,19 @@ class OrderPriorities(Resource):
 
 
 class Orders(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        order_sobjects = server.eval("@SOBJECT(twog/order)")
+
+        return jsonify({'orders': order_sobjects})
+
     def post(self):
         ticket = session.get('ticket')
         server = TacticServerStub(server=url, project=project, ticket=ticket)
@@ -406,6 +419,21 @@ class Title(Resource):
         found_titles = server.eval("@SOBJECT(twog/title['name', 'EQ', '{0}'])".format(name))
 
         return {'status': 200, 'titles': found_titles}
+
+
+class Titles(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        title_sobjects = server.eval("@SOBJECT(twog/title)")
+
+        return jsonify({'titles': title_sobjects})
 
 
 class TitleAdder(Resource):
@@ -454,9 +482,10 @@ api.add_resource(Clients, '/api/v1/clients')
 api.add_resource(Divisions, '/api/v1/divisions/<string:client_code>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
-api.add_resource(Orders, '/api/v1/orders/add')
+api.add_resource(Orders, '/api/v1/orders/')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
 api.add_resource(Title, '/api/v1/title/name/<string:name>')
+api.add_resource(Titles, '/api/v1/titles')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
 
 if __name__ == '__main__':
