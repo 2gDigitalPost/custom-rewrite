@@ -1,16 +1,28 @@
 <div>
-    <h2>Enter a Title</h2>
+    <h1>New Title</h1>
 
     <h4>Enter the name</h4>
 
-    <input type="text" v-model="title_name" placeholder="Name" />
-    <br/>
+    <form v-on:submit.prevent="addTitleToTactic">
+        <input type="text" v-model="title_name" placeholder="Name" />
+        <br/>
 
-    <h4>Is this a Movie, Trailer, or Episode?</h4>
+        <h4>Is this a Movie, Trailer, or Episode?</h4>
 
-    <select v-model="title_type">
-        <option>Movie</option>
-        <option>Trailer</option>
-        <option>Episode</option>
-    </select>
+        <select v-model="title_type">
+            <option>Movie</option>
+            <option>Trailer</option>
+            <option>Episode</option>
+        </select>
+
+        <h4>Select the year, if you know it</h4>
+        <select v-model="year">
+            <option v-for="option in year_options">
+                {{ option }}
+            </option>
+        </select>
+        <br/>
+
+        <button type="submit">Submit</button>
+    </form>
 </div>

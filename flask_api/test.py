@@ -435,6 +435,36 @@ class Titles(Resource):
 
         return jsonify({'titles': title_sobjects})
 
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        json_data = request.get_json()
+
+        print(json_data)
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Some data can have None set as the value. This does not work when inserting to the database, so remove
+        # these keys/values
+        cleaned_json_data = {key: value for key, value in json_data.iteritems() if value != None}
+
+        imdb_id = json_data.get('imdb_id')
+
+        if imdb_id:
+            existing_title = server.eval("@SOBJECT(twog/title['imdb_id', '{0}'])".format(imdb_id))
+
+            if existing_title:
+                # HTTP status 409: Conflict
+                return {'status': 409}
+
+        inserted_title = server.insert('twog/title', cleaned_json_data)
+
+        return {'status': 200, 'inserted_title': inserted_title}
+
 
 class TitleAdder(Resource):
     def post(self):
