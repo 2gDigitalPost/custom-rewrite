@@ -7,6 +7,7 @@ import VueRouter from 'vue-router'
 import AboutPage from './components/AboutPage/index.vue'
 import AddComponent from './components/AddComponent/index.vue'
 import AddTitleFromIMDb from './components/AddTitleFromIMDb/index.vue'
+import AddTitleManually from './components/AddTitleManually/index.vue'
 import LoginForm from './components/LoginForm/index.vue'
 import OrderEntryForm from './components/OrderEntryForm/index.vue'
 import OrderList from './components/OrderList/index.vue'
@@ -18,6 +19,7 @@ const routes = [
   { path: '/orders', component: OrderList, beforeEnter: requireAuth },
   { path: '/orders/add_component', component: AddComponent, beforeEnter: requireAuth },
   { path: '/titles/add/imdb', component: AddTitleFromIMDb, beforeEnter: requireAuth },
+  { path: '/titles/add/manual', component: AddTitleManually, beforeEnter: requireAuth },
   { path: '/login', component: LoginForm },
   { path: '/about', component: AboutPage },
   { path: '/logout',
