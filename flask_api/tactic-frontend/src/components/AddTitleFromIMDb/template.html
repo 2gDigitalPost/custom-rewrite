@@ -1,0 +1,22 @@
+<div>
+    <form v-on:submit.prevent="searchOMDb">
+        <h4>Select a type to search for</h4>
+
+        <select v-model="title_type">
+            <option>Movie</option>
+            <option>Trailer</option>
+            <option>Episode</option>
+        </select>
+
+        <h4>Enter the name</h4>
+
+        <input type="text" v-model="title_search_name" placeholder="Name" />
+        <br/>
+
+        <button type="submit">Search</button>
+
+        <div v-if="search_results.length > 0">
+            <h4>{{ search_results.length }} results found</h4>
+        </div>
+    </form>
+</div>
