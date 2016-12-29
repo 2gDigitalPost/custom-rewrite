@@ -1,5 +1,7 @@
 /* globals localStorage */
 
+import bus from '../../../bus'
+
 import axios from 'axios'
 
 export default {
@@ -25,7 +27,6 @@ export default {
         }
       })
       .then(function (response) {
-        console.log(response)
         let divisionData = response.data.divisions
 
         for (let i = 0; i < divisionData.length; i++) {
@@ -40,6 +41,9 @@ export default {
   watch: {
     client: function () {
       this.loadDivisions()
+    },
+    selected_division: function () {
+      bus.$emit('division-selected', this.selected_division)
     }
   },
   beforeMount: function () {

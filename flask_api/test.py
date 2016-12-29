@@ -400,12 +400,23 @@ class Orders(Resource):
         return jsonify({'orders': order_sobjects})
 
     def post(self):
-        ticket = session.get('ticket')
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         json_data = request.get_json()
 
-        inserted_order = server.insert('twog/order', json_data)
+        # Some data can have None set as the value. This does not work when inserting to the database, so remove
+        # these keys/values
+        cleaned_json_data = {key: value for key, value in json_data.iteritems() if value != None}
+
+        print(cleaned_json_data)
+
+        inserted_order = server.insert('twog/order', cleaned_json_data)
 
         return {'status': 200, 'order_code': inserted_order.get('code')}
 
@@ -510,7 +521,7 @@ api.add_resource(Clients, '/api/v1/clients')
 api.add_resource(Divisions, '/api/v1/divisions/<string:client_code>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
-api.add_resource(Orders, '/api/v1/orders/')
+api.add_resource(Orders, '/api/v1/orders')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
 api.add_resource(Title, '/api/v1/title/name/<string:name>')
 api.add_resource(Titles, '/api/v1/titles')

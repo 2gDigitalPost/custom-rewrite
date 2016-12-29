@@ -1,0 +1,17 @@
+<div>
+    <form v-on:submit.prevent="addOrderToTactic">
+        <input type="text" v-model="order_name" placeholder="Order Name" />
+        <client-select></client-select>
+        <div class="card">
+            <div class="row">
+                <span>Due Date：</span>
+                <date-picker :date="due_date" :option="option"></date-picker>
+            </div>
+            <div class="row">
+                <span>Expected Completion Date：</span>
+                <date-picker :date="expected_completion_date" :option="option"></date-picker>
+            </div>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+</div>
