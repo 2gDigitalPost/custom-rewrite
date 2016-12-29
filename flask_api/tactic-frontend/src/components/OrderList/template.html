@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="order in orders">
+            <tr v-for="order in orders" v-on:click="openOrderLink(order.code)">
                 <td>{{ order.name }}</td>
                 <td>{{ order.code }}</td>
                 <td>{{ order.division_code }}</td>

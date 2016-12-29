@@ -96,7 +96,6 @@ export default {
     divisionSelected: function (division) {
       var self = this
       self.selected_division = division
-      console.log(division)
     }
   },
   created() {

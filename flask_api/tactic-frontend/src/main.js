@@ -10,6 +10,7 @@ import AddComponent from './components/AddComponent/index.vue'
 import AddTitleFromIMDb from './components/AddTitleFromIMDb/index.vue'
 import AddTitleManually from './components/AddTitleManually/index.vue'
 import LoginForm from './components/LoginForm/index.vue'
+import OrderDetail from './components/OrderDetail/index.vue'
 import OrderEntryForm from './components/OrderEntryForm/index.vue'
 import OrderList from './components/OrderList/index.vue'
 
@@ -20,6 +21,7 @@ const routes = [
   { path: '/about', component: AboutPage },
   { path: '/order_entry', component: OrderEntryForm, beforeEnter: requireAuth },
   { path: '/orders', component: OrderList, beforeEnter: requireAuth },
+  { path: '/orders/:code', component: OrderDetail, beforeEnter: requireAuth },
   { path: '/orders/add_component', component: AddComponent, beforeEnter: requireAuth },
   { path: '/titles/add/imdb', component: AddTitleFromIMDb, beforeEnter: requireAuth },
   { path: '/titles/add/manual', component: AddTitleManually, beforeEnter: requireAuth },

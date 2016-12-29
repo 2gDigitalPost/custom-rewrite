@@ -13,7 +13,7 @@ export default {
     loadOrders: function () {
       var self = this
 
-      axios.get('http://localhost:5000/api/v1/orders/', {
+      axios.get('http://localhost:5000/api/v1/orders', {
         params: {
           token: localStorage.tactic_token
         }
@@ -29,6 +29,11 @@ export default {
       .catch(function (error) {
         console.log(error)
       })
+    },
+    openOrderLink: function(orderCode) {
+      let orderDetailURL = '/orders/' + orderCode
+
+      this.$router.push(orderDetailURL)
     }
   },
   beforeMount: function () {
