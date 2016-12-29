@@ -41,8 +41,6 @@ export default {
         }
       })
       .then(function (response) {
-        console.log(response)
-
         if (response.data) {
           if (response.data.status === 200) {
             self.$router.go(self.$router.currentRoute)

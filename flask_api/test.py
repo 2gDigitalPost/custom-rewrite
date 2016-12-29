@@ -444,8 +444,6 @@ class Titles(Resource):
 
         json_data = request.get_json()
 
-        print(json_data)
-
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         # Some data can have None set as the value. This does not work when inserting to the database, so remove

@@ -15,18 +15,16 @@
     },
     methods: {
       getToken: function () {
+        let self = this
+
         axios.post('http://localhost:5000/api/v1/login', {
           username: this.username,
           password: this.password
         })
         .then(function (response) {
-          console.log(response.data.ticket)
-
           localStorage.setItem('tactic_token', response.data.ticket)
 
-          console.log(localStorage.getItem('tactic_token'))
-
-          this.$route.router.replace(this.$route.query.redirect || '/')
+          self.$router.replace(self.$route.query.redirect || '/')
         })
         .catch(function (error) {
           console.log(error)
