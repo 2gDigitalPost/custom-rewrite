@@ -198,12 +198,7 @@ def order_reprioritizer():
 
 @app.route('/')
 def index():
-    ticket = session.get('ticket')
-
-    if ticket:
-        return render_template('index.html', ticket=session['ticket'])
-    else:
-        return redirect('/login')
+    return render_template('index.html')
 
 
 @app.route('/titles/add')
