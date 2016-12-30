@@ -20,7 +20,6 @@ export default {
       })
       .then(function (response) {
         let ordersData = response.data.orders
-        console.log(ordersData)
 
         for (let i = 0; i < ordersData.length; i++) {
           self.orders.push(ordersData[i])

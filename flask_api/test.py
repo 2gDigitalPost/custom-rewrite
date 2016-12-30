@@ -385,6 +385,33 @@ class OrderPriorities(Resource):
         return {'status': 200}
 
 
+class FullOrder(Resource):
+    """
+    Given an order's unique code, return all the details possible on that order. This includes the twog/order sobject,
+    all twog/component sobjects, and all twog/package sobjects.
+    """
+
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the order sobject (there should be only one, but it still returns in a list)
+        order_sobject = server.eval("@SOBJECT(twog/order['code', '{0}'])".format(code))[0]
+
+        # Get all the components associated with the order
+        component_sobjects = server.eval("@SOBJECT(twog/component['order_code', '{0}'])".format(code))
+
+        # Get all the packages associated with the order
+        package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
+
+        return jsonify({'order': order_sobject, 'components': component_sobjects, 'packages': package_sobjects})
+
+
 class Orders(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -522,6 +549,7 @@ api.add_resource(Divisions, '/api/v1/divisions/<string:client_code>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
 api.add_resource(Orders, '/api/v1/orders')
+api.add_resource(FullOrder, '/api/v1/orders/<string:code>/full')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
 api.add_resource(Title, '/api/v1/title/name/<string:name>')
 api.add_resource(Titles, '/api/v1/titles')
