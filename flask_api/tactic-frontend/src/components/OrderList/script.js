@@ -13,7 +13,7 @@ export default {
     loadOrders: function () {
       var self = this
 
-      axios.get('http://localhost:5000/api/v1/orders', {
+      axios.get('http://0.0.0.0:5000/api/v1/orders', {
         params: {
           token: localStorage.tactic_token
         }

@@ -21,7 +21,7 @@ export default {
     loadTitles: function () {
       var self = this
 
-      axios.get('http://localhost:5000/api/v1/titles', {
+      axios.get('http://0.0.0.0:5000/api/v1/titles', {
         params: {
           token: localStorage.tactic_token
         }

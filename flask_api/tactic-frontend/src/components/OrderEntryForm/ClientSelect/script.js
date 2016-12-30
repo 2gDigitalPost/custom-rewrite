@@ -18,7 +18,7 @@ export default {
     loadClients: function () {
       var self = this
 
-      axios.get('http://localhost:5000/api/v1/clients', {
+      axios.get('http://0.0.0.0:5000/api/v1/clients', {
         params: {
           token: localStorage.tactic_token
         }

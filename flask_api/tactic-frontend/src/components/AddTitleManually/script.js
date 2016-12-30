@@ -27,7 +27,7 @@ export default {
     addTitleToTactic: function() {
       var self = this
 
-      axios.post('http://localhost:5000/api/v1/titles', 
+      axios.post('http://0.0.0.0:5000/api/v1/titles', 
         JSON.stringify({
           'name': self.title_name,
           'type': self.title_type.toLowerCase(),
