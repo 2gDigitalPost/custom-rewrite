@@ -1,13 +1,11 @@
 from tactic.ui.common import BaseRefreshWdg
 
-from pyasm.search import Search
-from pyasm.web import DivWdg, HtmlElement, SpanWdg
-from pyasm.widget import SubmitWdg, TextAreaWdg
+from pyasm.web import DivWdg
+from pyasm.widget import SubmitWdg
 
 from order_builder.order_builder_utils import get_text_area_input_wdg
 
 from widgets.html_widgets import get_label_widget
-from widgets.input_widgets import get_text_input_wdg, get_datetime_calendar_wdg
 
 
 class DepartmentRequestResponseWdg(BaseRefreshWdg):
@@ -25,16 +23,18 @@ class DepartmentRequestResponseWdg(BaseRefreshWdg):
         outer_div.add(get_label_widget('Response'))
         outer_div.add(get_text_area_input_wdg('response', 800, [('display', 'block')]))
 
+        print(self.department_request_sobject.get('response'))
+
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.submit_button_behavior(self.department_request_sobject.get_search_key(),
-                                                               self.department_request_sobject.get('response')))
+                                                               self.department_request_sobject.get_code()))
         outer_div.add(submit_button)
 
         return outer_div
 
 
     @staticmethod
-    def submit_button_behavior(department_request_search_key, current_response_text):
+    def submit_button_behavior(department_request_search_key, code):
         behavior = {
             'css_class': 'clickme',
             'type': 'click_up',
@@ -48,10 +48,12 @@ var submit_form = function(values) {
     var login = env.user;
 
     var department_request_search_key = '%s';
+    var code = '%s';
 
     // Get the values needed to submit the form
     var response = values.response;
-    var current_response_text = '%s';
+    var current_response_text = server.eval("@GET(twog/department_request['code', '" + code + "'].response)");
+
     var new_response_text;
 
     if (current_response_text !== '') {
@@ -61,8 +63,6 @@ var submit_form = function(values) {
         new_response_text = login + ' @ ' + new Date().toLocaleString() + ': ' + response;
     }
 
-    console.log(new_response_text);
-
     var department_request_data = {
         'response': new_response_text
     }
@@ -71,7 +71,7 @@ var submit_form = function(values) {
 
     // Refresh the view
     spt.app_busy.hide();
-    spt.popup.close();
+    spt.popup.close("department_request_response");
 }
 
 // Get the server object
@@ -84,7 +84,7 @@ var values = spt.api.get_input_values(containing_element, null, false);
 console.log(values);
 
 submit_form(values);
-''' % (department_request_search_key, current_response_text)
+''' % (department_request_search_key, code)
         }
 
         return behavior

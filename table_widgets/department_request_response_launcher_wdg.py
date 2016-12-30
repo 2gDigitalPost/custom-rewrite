@@ -13,8 +13,8 @@ class DepartmentRequestResponseLauncherWdg(BaseTableElementWdg):
 try {
     var department_request_search_key = '%s';
 
-    spt.panel.load_popup('department_request' + department_request_search_key,
-                    'widgets.DepartmentRequestResponseWdg', {'search_key': department_request_search_key});
+    spt.panel.load_popup('department_request_response', 'widgets.DepartmentRequestResponseWdg',
+                         {'search_key': department_request_search_key});
 }
 catch(err){
     spt.app_busy.hide();
