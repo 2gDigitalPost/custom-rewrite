@@ -7,7 +7,11 @@ export default {
   data () {
     return {
       order_code: this.$route.params.code,
-      titles: []
+      order_sobject: null,
+      order_name: null,
+      components: [],
+      packages: [],
+      add_title_link: null
     }
   },
   methods: {
@@ -24,7 +28,12 @@ export default {
         let componentsData = response.data.components
         let packagesData = response.data.packages
 
+        self.order_sobject = orderData
+        self.order_name = orderData['name']
+        self.add_title_link = '/orders/' + self.order_code + '/titles/add'
+
         console.log(orderData)
+        console.log(self.order_sobject)
         console.log(componentsData)
         console.log(packagesData)
       })

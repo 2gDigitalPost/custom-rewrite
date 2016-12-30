@@ -30,7 +30,7 @@ export default {
       axios.post('http://localhost:5000/api/v1/titles', 
         JSON.stringify({
           'name': self.title_name,
-          'type': self.title_type,
+          'type': self.title_type.toLowerCase(),
           'year': self.year
         }), {
         headers: {
