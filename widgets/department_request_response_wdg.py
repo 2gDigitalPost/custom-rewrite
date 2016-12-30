@@ -5,7 +5,7 @@ from pyasm.widget import SubmitWdg
 
 from order_builder.order_builder_utils import get_text_area_input_wdg
 
-from widgets.html_widgets import get_label_widget
+from widgets.html_widgets import get_label_widget, get_pre_widget
 
 
 class DepartmentRequestResponseWdg(BaseRefreshWdg):
@@ -20,10 +20,14 @@ class DepartmentRequestResponseWdg(BaseRefreshWdg):
         outer_div = DivWdg()
         outer_div.set_id('department-request-response')
 
+        if self.department_request_sobject.get('response'):
+            current_response_div = DivWdg()
+            current_response_div.add(get_pre_widget(self.department_request_sobject.get('response')))
+
+            outer_div.add(current_response_div)
+
         outer_div.add(get_label_widget('Response'))
         outer_div.add(get_text_area_input_wdg('response', 800, [('display', 'block')]))
-
-        print(self.department_request_sobject.get('response'))
 
         submit_button = SubmitWdg('Submit')
         submit_button.add_behavior(self.submit_button_behavior(self.department_request_sobject.get_search_key(),

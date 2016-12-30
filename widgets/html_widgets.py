@@ -21,3 +21,11 @@ def get_page_header(string):
     """
 
     return HtmlElement.h2(string)
+
+
+def get_paragraph_widget(string):
+    return HtmlElement.p(string)
+
+
+def get_pre_widget(string):
+    return  HtmlElement.pre(string)
