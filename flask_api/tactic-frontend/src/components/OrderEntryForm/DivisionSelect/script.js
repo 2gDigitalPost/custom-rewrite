@@ -21,7 +21,7 @@ export default {
       self.division_options = []
 
       // Get the divisions from the api, using the client code in the URL
-      axios.get('http://0.0.0.0:5000/api/v1/divisions/' + self.client, {
+      axios.get('/api/v1/divisions/' + self.client, {
         params: {
           token: localStorage.tactic_token,
         }

@@ -68,7 +68,7 @@ export default {
     addOrderToTactic: function() {
       var self = this
 
-      axios.post('http://0.0.0.0:5000/api/v1/orders', 
+      axios.post('/api/v1/orders', 
         JSON.stringify({
           'name': self.order_name,
           'division_code': self.selected_division,
