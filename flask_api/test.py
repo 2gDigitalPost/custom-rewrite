@@ -523,6 +523,21 @@ class TitleAdder(Resource):
         return {'status': 200, 'inserted_title': inserted_title}
 
 
+class Languages(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        language_sobjects = server.eval("@SOBJECT(twog/language)")
+
+        return jsonify({'languages': language_sobjects})
+
+
 class DepartmentInstructionsAdder(Resource):
     def post(self):
         ticket = session.get('ticket')
@@ -548,6 +563,7 @@ api.add_resource(FullOrder, '/api/v1/orders/<string:code>/full')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
 api.add_resource(Title, '/api/v1/title/name/<string:name>')
 api.add_resource(Titles, '/api/v1/titles')
+api.add_resource(Languages, '/api/v1/languages')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
 
 if __name__ == '__main__':

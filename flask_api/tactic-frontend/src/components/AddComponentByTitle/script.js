@@ -11,10 +11,12 @@ export default {
   data () {
     return {
       title_type: null,
-      selected_title: '',
+      selected_title: null,
+      selected_language: null,
+      selected_languages: [],
       titles: [],
-      searchable_titles: ['asdf'],
-      search_options: []
+      searchable_titles: [],
+      languages: []
     }
   },
   methods: {
@@ -36,10 +38,56 @@ export default {
       .catch(function (error) {
         console.log(error)
       })
+    },
+    loadLanguages: function () {
+      var self = this
+      
+      axios.get('/api/v1/languages', {
+        params: {
+          token: localStorage.tactic_token
+        }
+      })
+      .then(function (response) {
+        let languageData = response.data.languages
+
+        for (let i = 0; i < languageData.length; i++) {
+          self.languages.push({name: languageData[i].name, code: languageData[i].code})
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+    updateSelectedTitle: function (newSelectedTitle) {
+      this.selected_title = newSelectedTitle
+    },
+    updateSelectedLanguages: function (newSelectedLanguage) {
+      this.selected_language = newSelectedLanguage
     }
   },
   beforeMount: function () {
     this.loadTitles()
+    this.loadLanguages()
+  },
+  computed: {
+    created_components: function() {
+      if (this.selected_title) {
+        let selected_title_list = []
+
+        if (this.selected_languages.length === 0) {
+          selected_title_list.push(this.selected_title.name)
+
+          return selected_title_list
+        }
+        else {
+          for (let i = 0; i < this.selected_languages.length; i++) {
+            selected_title_list.push(this.selected_title.name + ' - ' + this.selected_languages[i].name)
+          }
+
+          return selected_title_list
+        }
+      }
+    }
   },
   watch: {
     title_type: function () {
@@ -64,6 +112,6 @@ export default {
           }
         }
       }
-    }
+    },
   }
 }

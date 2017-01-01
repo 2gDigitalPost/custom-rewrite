@@ -7,12 +7,32 @@
         <option>Episode</option>
     </select>
 
-    <span v-if="title_type !== null">
+    <div v-if="title_type !== null">
         <h4>
             Select the title below (type to search). If the title is not listed, you
             will have to add it to Tactic's Database
         </h4>
 
-        <multiselect :selected="selected_title" :options="searchable_titles" track-by="code" label="name"></multiselect>
-    </span>
+        <multiselect :selected="selected_title" :options="searchable_titles" @input="updateSelectedTitle" track-by="code" label="name"></multiselect>
+    </div>
+
+    <div v-if="selected_title !== null">
+        <h4>
+            Select the languages below. Each selected language will create a new
+            Component.
+        </h4>
+
+        <multiselect v-model="selected_languages" :options="languages" track-by="code" label="name" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+    </div>
+
+    <div id="components-created-div">
+        <h5>The following components will be created:</h5>
+
+        <ul>
+            <li v-for="created_component in created_components">
+                {{ created_component }}
+            </li>
+        </ul>
+
+    </div>
 </div>
