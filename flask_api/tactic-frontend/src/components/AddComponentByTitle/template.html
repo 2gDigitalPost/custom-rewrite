@@ -25,7 +25,7 @@
         <multiselect v-model="selected_languages" :options="languages" track-by="code" label="name" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
     </div>
 
-    <div id="components-created-div">
+    <div id="components-created-div" v-if="selected_title != null">
         <h5>The following components will be created:</h5>
 
         <ul>
@@ -33,6 +33,5 @@
                 {{ created_component }}
             </li>
         </ul>
-
     </div>
 </div>

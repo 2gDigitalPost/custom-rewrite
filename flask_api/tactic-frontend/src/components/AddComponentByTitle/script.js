@@ -16,7 +16,7 @@ export default {
       selected_languages: [],
       titles: [],
       searchable_titles: [],
-      languages: []
+      languages: [],
     }
   },
   methods: {
