@@ -17,6 +17,8 @@ export default {
       titles: [],
       searchable_titles: [],
       languages: [],
+      selected_pipeline: null,
+      pipelines: []
     }
   },
   methods: {
@@ -58,33 +60,104 @@ export default {
         console.log(error)
       })
     },
+    loadPipelines: function () {
+      var self = this
+
+      axios.get('/api/v1/pipelines/component', {
+        params: {
+          token: localStorage.tactic_token
+        }
+      })
+      .then(function (response) {
+        let pipelineData = response.data.pipelines
+
+        for (let i = 0; i < pipelineData.length; i++) {
+          self.pipelines.push(pipelineData[i])
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
     updateSelectedTitle: function (newSelectedTitle) {
       this.selected_title = newSelectedTitle
     },
     updateSelectedLanguages: function (newSelectedLanguage) {
       this.selected_language = newSelectedLanguage
+    },
+    addComponentsToTactic: function() {
+      var self = this
+      let components_to_send = []
+      let order_code = self.$route.params.code
+
+      if (this.selected_languages.length === 0) {
+        let component = {
+          'name': this.selected_title.name,
+          'title_code': this.selected_title.code,
+          'pipeline_code': this.selected_pipeline.code
+        }
+
+        components_to_send.push(component)
+      }
+      else {
+        for (let i = 0; i < this.selected_languages.length; i++) {
+          let component = {
+            'name': this.selected_title.name + ' - ' + this.selected_languages[i].name,
+            'title_code': this.selected_title.code,
+            'language_code': this.selected_languages[i].code,
+            'pipeline_code': this.selected_pipeline.code
+          }
+
+          components_to_send.push(component)
+        }
+      }
+
+      console.log(components_to_send)
+
+      let apiURL = '/api/v1/orders/' + order_code + '/components'
+      let json_to_send = {
+        'token': localStorage.tactic_token,
+        'components': components_to_send
+      }
+
+      axios.post(apiURL, JSON.stringify(json_to_send), {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+      })
+      .then(function (response) {
+        if (response.data) {
+          if (response.data.status === 200) {
+            console.log(response.data)
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
     }
   },
   beforeMount: function () {
     this.loadTitles()
     this.loadLanguages()
+    this.loadPipelines()
   },
   computed: {
     created_components: function() {
       if (this.selected_title) {
-        let selected_title_list = []
+        let created_components_list = []
 
         if (this.selected_languages.length === 0) {
-          selected_title_list.push(this.selected_title.name)
+          created_components_list.push(this.selected_title.name)
 
-          return selected_title_list
+          return created_components_list
         }
         else {
           for (let i = 0; i < this.selected_languages.length; i++) {
-            selected_title_list.push(this.selected_title.name + ' - ' + this.selected_languages[i].name)
+            created_components_list.push(this.selected_title.name + ' - ' + this.selected_languages[i].name)
           }
 
-          return selected_title_list
+          return created_components_list
         }
       }
     }

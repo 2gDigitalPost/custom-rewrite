@@ -33,9 +33,6 @@ project = config.get('credentials', 'project')
 # Just get the dev server URL for now
 url = config.get('server', 'dev')
 
-parser = reqparse.RequestParser()
-
-
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user, UserMixin
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
@@ -283,11 +280,6 @@ class InstructionsTemplate(Resource):
                 'department_instructions_in_template': department_instructions_sobjects_in_template,
                 'department_instructions_not_in_template': department_instructions_sobjects_not_in_template}
 
-    def post(self):
-        args = parser.parse_args()
-
-        print(args)
-
 
 class Clients(Resource):
     def get(self):
@@ -523,6 +515,39 @@ class TitleAdder(Resource):
         return {'status': 200, 'inserted_title': inserted_title}
 
 
+class ComponentsInOrder(Resource):
+    def get(self, code):
+        pass
+
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        print(json_data)
+
+        components_to_insert_list = []
+
+        for component in json_data.get('components'):
+            component_data_to_insert = {}
+
+            component_data_to_insert['name'] = component.get('name')
+            component_data_to_insert['order_code'] = code
+            component_data_to_insert['title_code'] = component.get('title_code')
+            component_data_to_insert['pipeline_code'] = component.get('pipeline_code')
+
+            if component.get('language_code'):
+                component_data_to_insert['language_code'] = component.get('language_code')
+
+            components_to_insert_list.append(component_data_to_insert)
+
+        server.insert_multiple('twog/component', components_to_insert_list)
+
+        return {'status': 200}
+
+
 class Languages(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -551,6 +576,21 @@ class DepartmentInstructionsAdder(Resource):
         return {'status': 200}
 
 
+class ComponentPipelines(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        pipeline_sobjects = server.eval("@SOBJECT(sthpw/pipeline['search_type', 'twog/component'])")
+
+        return jsonify({'pipelines': pipeline_sobjects})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
@@ -563,8 +603,10 @@ api.add_resource(FullOrder, '/api/v1/orders/<string:code>/full')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
 api.add_resource(Title, '/api/v1/title/name/<string:name>')
 api.add_resource(Titles, '/api/v1/titles')
+api.add_resource(ComponentsInOrder, '/api/v1/orders/<string:code>/components')
 api.add_resource(Languages, '/api/v1/languages')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
+api.add_resource(ComponentPipelines, '/api/v1/pipelines/component')
 
 if __name__ == '__main__':
     global ALL_USERS
