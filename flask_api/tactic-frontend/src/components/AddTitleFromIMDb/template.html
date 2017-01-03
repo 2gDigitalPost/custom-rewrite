@@ -14,9 +14,26 @@
         <br/>
 
         <button type="submit">Search</button>
-
-        <div v-if="search_results.length > 0">
-            <h4>{{ search_results.length }} results found</h4>
-        </div>
     </form>
+
+    <div v-if="search_results.length > 0">
+        <h4>{{ search_results.length }} results found</h4>
+
+        <ul>
+            <li v-for="result in search_results" v-on:click="selected_title = result">{{ result.Title }}</li>
+        </ul>
+    </div>
+
+    <div v-if="selected_title_full !== null">
+        <h4>Add this Title to Tactic?</h4>
+
+        <h5>{{ selected_title_full.Title }}</h5>
+        <img v-bind:src="selected_title_full.Poster"/>
+        <h5>Released: {{ selected_title_full.Released }}</h5>
+        <h5>Runtime: {{ selected_title_full.Runtime }}</h5>
+        <h5>Rated: {{ selected_title_full.Rated }}</h5>
+        <p>Plot: {{ selected_title_full.Plot }}</p>
+        
+        <button v-on:click="addTitleToTactic">Add Title to Tactic</button>
+    </div>
 </div>
