@@ -94,7 +94,10 @@ export default {
         let component = {
           'name': this.selected_title.name,
           'title_code': this.selected_title.code,
-          'pipeline_code': this.selected_pipeline.code
+        }
+
+        if (this.selected_pipeline) {
+          component['pipeline_code'] = this.selected_pipeline.code
         }
 
         components_to_send.push(component)
@@ -105,7 +108,10 @@ export default {
             'name': this.selected_title.name + ' - ' + this.selected_languages[i].name,
             'title_code': this.selected_title.code,
             'language_code': this.selected_languages[i].code,
-            'pipeline_code': this.selected_pipeline.code
+          }
+
+          if (this.selected_pipeline) {
+            component['pipeline_code'] = this.selected_pipeline.code
           }
 
           components_to_send.push(component)

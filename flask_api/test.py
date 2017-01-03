@@ -536,10 +536,12 @@ class ComponentsInOrder(Resource):
             component_data_to_insert['name'] = component.get('name')
             component_data_to_insert['order_code'] = code
             component_data_to_insert['title_code'] = component.get('title_code')
-            component_data_to_insert['pipeline_code'] = component.get('pipeline_code')
 
             if component.get('language_code'):
                 component_data_to_insert['language_code'] = component.get('language_code')
+
+            if component.get('pipeline_code'):
+                component_data_to_insert['pipeline_code'] = component.get('pipeline_code')
 
             components_to_insert_list.append(component_data_to_insert)
 
