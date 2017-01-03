@@ -1,5 +1,18 @@
 <div>
     <h1>Select Pipelines for {{ order_name }} ({{ order_code }})</h1>
 
-    
+    <h4>
+        Select a pipeline to attach to each component. This can be done later.
+    </h4>
+
+    <multiselect v-model="selected_pipeline" :options="pipelines" track-by="code" label="name"></multiselect>
+
+    <ul class="list-group">
+        <li
+            is="selectable-component"
+            v-for="component in components"
+            v-bind:component="component"
+            v-bind:pipeline_code="component.pipeline_code"
+        ></li>
+    </ul>
 </div>

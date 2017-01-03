@@ -1,0 +1,7 @@
+<li class="list-group-item" v-on:click="selected = !selected" v-bind:class="{active: selected}">
+
+    <div v-if="pipeline !== null">
+        <div>{{ component.name }} ({{ component.code }})</div>
+        <div>{{ pipeline.name }} ({{ pipeline.code }})</div>
+    </div>
+</li>

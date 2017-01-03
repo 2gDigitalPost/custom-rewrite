@@ -576,6 +576,21 @@ class DepartmentInstructionsAdder(Resource):
         return {'status': 200}
 
 
+class Pipeline(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        pipeline_sobject = server.eval("@SOBJECT(sthpw/pipeline['code', '{0}'])".format(code))[0]
+
+        return jsonify({'pipeline': pipeline_sobject})
+
+
 class ComponentPipelines(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -606,6 +621,7 @@ api.add_resource(Titles, '/api/v1/titles')
 api.add_resource(ComponentsInOrder, '/api/v1/orders/<string:code>/components')
 api.add_resource(Languages, '/api/v1/languages')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
+api.add_resource(Pipeline, '/api/v1/pipelines/code/<string:code>')
 api.add_resource(ComponentPipelines, '/api/v1/pipelines/component')
 
 if __name__ == '__main__':
