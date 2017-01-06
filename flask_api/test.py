@@ -526,8 +526,6 @@ class ComponentsInOrder(Resource):
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        print(json_data)
-
         components_to_insert_list = []
 
         for component in json_data.get('components'):
@@ -608,6 +606,40 @@ class ComponentPipelines(Resource):
         return jsonify({'pipelines': pipeline_sobjects})
 
 
+class FileFlowByOrderCode(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        file_flow_sobjects = server.eval("@SOBJECT(twog/file_flow['order_code', '{0}'])".format(code))
+
+        file_flow_json_data = {'file_flows': file_flow_sobjects}
+
+        # Only search for connections of the file flows exist
+        if len(file_flow_sobjects) > 0:
+            file_flow_codes = [file_flow_sobject.get('code') for file_flow_sobject in file_flow_sobjects]
+            file_flow_codes_string = '|'.join(file_flow_codes)
+            print(file_flow_codes_string)
+
+            file_flow_to_component_sobjects = server.eval(
+                "@SOBJECT(twog/file_flow_to_component['file_flow_code', 'in', '{0}'])".format(file_flow_codes_string))
+            file_flow_to_package_sobjects = server.eval(
+                "@SOBJECT(twog/file_flow_to_package['file_flow_code', 'in', '{0}'])".format(file_flow_codes_string))
+
+            file_flow_json_data['file_flow_to_components'] = file_flow_to_component_sobjects
+            file_flow_json_data['file_flow_to_packages'] = file_flow_to_package_sobjects
+        else:
+            file_flow_json_data['file_flow_to_components'] = []
+            file_flow_json_data['file_flow_to_packages'] = []
+
+        return jsonify(file_flow_json_data)
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
@@ -625,6 +657,7 @@ api.add_resource(Languages, '/api/v1/languages')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
 api.add_resource(Pipeline, '/api/v1/pipelines/code/<string:code>')
 api.add_resource(ComponentPipelines, '/api/v1/pipelines/component')
+api.add_resource(FileFlowByOrderCode, '/api/v1/orders/<string:code>/file-flows')
 
 if __name__ == '__main__':
     global ALL_USERS

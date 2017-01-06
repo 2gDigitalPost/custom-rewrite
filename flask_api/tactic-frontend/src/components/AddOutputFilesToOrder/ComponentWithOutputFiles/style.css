@@ -1,0 +1,11 @@
+.externallySelected {
+    background-color: #10dd0d;
+    border-color: #10dd0d;
+    color: #ffffff;
+}
+
+.active.externallySelected {
+    background-color: #e03b26 !important;
+    border-color: #e03b26 !important;
+    color: #ffffff;
+}

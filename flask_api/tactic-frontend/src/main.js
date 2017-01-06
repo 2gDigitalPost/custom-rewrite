@@ -7,6 +7,7 @@ import VueRouter from 'vue-router'
 import HomePage from './components/HomePage/index.vue'
 import AboutPage from './components/AboutPage/index.vue'
 import AddComponentByTitle from './components/AddComponentByTitle/index.vue'
+import AddOutputFilesToOrder from './components/AddOutputFilesToOrder/index.vue'
 import AddTitleFromIMDb from './components/AddTitleFromIMDb/index.vue'
 import AddTitleManually from './components/AddTitleManually/index.vue'
 import ComponentsInOrder from './components/ComponentsInOrder/index.vue'
@@ -27,6 +28,7 @@ const routes = [
   { path: '/orders/:code/titles/add', component: AddComponentByTitle, beforeEnter: requireAuth },
   { path: '/orders/:code/components', component: ComponentsInOrder, beforeEnter: requireAuth },
   { path: '/orders/:code/components/pipelines', component: SelectPipelines, beforeEnter: requireAuth },
+  { path: '/orders/:code/output-files/add', component: AddOutputFilesToOrder, beforeEnter: requireAuth },
   { path: '/titles/add/imdb', component: AddTitleFromIMDb, beforeEnter: requireAuth },
   { path: '/titles/add/manual', component: AddTitleManually, beforeEnter: requireAuth },
   { path: '/login', component: LoginForm },
