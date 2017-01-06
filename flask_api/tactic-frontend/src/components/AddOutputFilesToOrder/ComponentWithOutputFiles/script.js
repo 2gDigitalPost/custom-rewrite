@@ -15,32 +15,16 @@ export default {
     }
   },
   methods: {
-    /*
-    fileFlowSelected: function (componentCode) {
-      if (componentCode == this.component.code) {
-        this.externallySelected = true
-      }
-      else {
-        this.externallySelected = false
-      }
-    }
-    */
-    fileFlowSelected: function (componentCodes) {
-      // if (componentCodes.contains(this.component.code)) {
+    fileFlowSelected: function (componentCodes, selected) {
       if (_.includes(componentCodes, this.component.code)) {
-        this.externallySelected = true
-      }
-      else {
-        this.externallySelected = false
+        this.externallySelected = selected
       }
     }
   },
   created() {
-    // bus.$on('highlight-component', this.fileFlowSelected)
     bus.$on('highlight-components', this.fileFlowSelected)
   },
   destroyed() {
-    // bus.$off('highlight-component', this.fileFlowSelected)
     bus.$off('highlight-components', this.fileFlowSelected)
   }
 }

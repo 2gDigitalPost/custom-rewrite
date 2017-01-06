@@ -76,27 +76,21 @@ export default {
     fileFlowSelected: function (fileFlowCode, selected) {
       let self = this
 
-      if (selected) {
-        let componentCodes = []
-        
-        for (let i = 0; i < self.fileFlowToComponents.length; i++) {
-          if (self.fileFlowToComponents[i].file_flow_code === fileFlowCode) {
-            console.log(self.fileFlowToComponents[i])
+      let componentCodes = []
+      
+      for (let i = 0; i < self.fileFlowToComponents.length; i++) {
+        if (self.fileFlowToComponents[i].file_flow_code === fileFlowCode) {
+          let componentCode = self.fileFlowToComponents[i].component_code
 
-            let componentCode = self.fileFlowToComponents[i].component_code
-
-            for (let j = 0; j < self.components.length; j++) {
-              if (self.components[j].code === componentCode) {
-                // bus.$emit('highlight-component', componentCode)
-                componentCodes.push(componentCode)
-              }
+          for (let j = 0; j < self.components.length; j++) {
+            if (self.components[j].code === componentCode) {
+              componentCodes.push(componentCode)
             }
-
           }
         }
-        
-        bus.$emit('highlight-components', componentCodes)
       }
+      
+      bus.$emit('highlight-components', componentCodes, selected)
     }
   },
   beforeMount: function () {
