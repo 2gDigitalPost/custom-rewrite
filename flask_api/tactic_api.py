@@ -24,40 +24,13 @@ DEBUG = True
 
 app.secret_key = SECRET_KEY
 
-
 # Get credentials from config file
-# user = config.get('credentials', 'user')
-# password = config.get('credentials', 'password')
 project = config.get('credentials', 'project')
 
 # Just get the dev server URL for now
 url = config.get('server', 'dev')
 
-from flask_login import LoginManager, current_user, login_required, login_user, logout_user, UserMixin
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired
-
-
-class EmailPasswordForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-
-
-class User(UserMixin):
-    def __init__(self, name, id, active=True):
-        self.name = name
-        self.id = id
-        self.active = active
-
-    def is_active(self):
-        return self.active
-
-
-ALL_USERS = {}
-
-login_manager = LoginManager()
-login_manager.init_app(app)
+from flask_login import current_user
 
 
 @app.route("/api/v1/login", methods=["POST"])
@@ -77,155 +50,9 @@ def api_login():
     return jsonify({ 'ticket': ticket })
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    form = EmailPasswordForm()
-
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-
-        server = TacticServerStub(server=url, project=project, user=username, password=password)
-        ticket = server.get_ticket(username, password)
-
-        session['ticket'] = ticket
-
-        ALL_USERS[ticket] = username
-
-        user = User(username, ticket)
-        login_user(user, remember=False)
-
-        return redirect('/')
-    return render_template("login.html", form=form)
-
-
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    flash("Logged out.")
-    return redirect(url_for("index"))
-
-
-@login_manager.user_loader
-def user_loader(user_id):
-    try:
-        username = ALL_USERS[user_id]
-    except KeyError:
-        return None
-
-    user = User(username, user_id)
-
-    return user
-
-
-@app.route('/instructions_template_builder')
-def hello():
-    return render_template('instructions_template_builder.html')
-
-
-@app.route('/files_select')
-def files_select():
-    return render_template('files_select.html')
-
-
-@app.route('/orders/create')
-def order_creator():
-    ticket = session.get('ticket')
-
-    if ticket:
-        return render_template('order_creator.html')
-    else:
-        return redirect('/login')
-
-
-@app.route('/orders/<order_code>/add_components')
-def add_components_to_order(order_code):
-    ticket = session.get('ticket')
-
-    if ticket:
-        server = TacticServerStub(server=url, project=project, ticket=ticket)
-
-        order_sobject = server.eval("@SOBJECT(twog/order['code', '{0}'])".format(order_code))[0]
-
-        return render_template('add_components_to_order.html', order_name=order_sobject.get('name'),
-                               order_code=order_sobject.get('code'))
-    else:
-        return redirect('/login')
-
-
-@app.route('/orders/<order_code>/add_component_by_title')
-def order_add_component_by_title(order_code):
-    ticket = session.get('ticket')
-
-    if ticket:
-        server = TacticServerStub(server=url, project=project, ticket=ticket)
-
-        order_sobject = server.eval("@SOBJECT(twog/order['code', '{0}'])".format(order_code))[0]
-
-        return render_template('order_add_component_by_title.html', name=order_sobject.get('name'),
-                               code=order_sobject.get('code'))
-    else:
-        return redirect('/login')
-
-
-@app.route('/orders/edit/<order_code>/components')
-def order_component_editor(order_code):
-    ticket = session.get('ticket')
-
-    if ticket:
-        server = TacticServerStub(server=url, project=project, ticket=ticket)
-
-        order_sobject = server.eval("@SOBJECT(twog/order['code', '{0}'])".format(order_code))[0]
-
-        return render_template('order_component_editor.html', name=order_sobject.get('name'))
-    else:
-        return redirect('/login')
-
-
-@app.route('/orders/reprioritizer')
-def order_reprioritizer():
-    ticket = session.get('ticket')
-
-    if ticket:
-        return render_template('order_reprioritizer.html')
-    else:
-        return redirect('/login')
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
-
-@app.route('/titles/add')
-def title_adder():
-    ticket = session.get('ticket')
-
-    if ticket:
-        return render_template('add_title_to_tactic.html', ticket=ticket)
-    else:
-        return redirect('/login')
-
-
-@app.route('/instructions/department/add')
-def department_instructions_adder():
-    ticket = session.get('ticket')
-
-    if ticket:
-        return render_template('add_department_instructions.html', ticket=ticket)
-    else:
-        return redirect('/login')
-
-
-@app.route('/webpacktest')
-def webpacktest():
-    ticket = session.get('ticket')
-
-    if ticket:
-        return render_template('webpacktest.html', ticket=ticket)
-    else:
-        return redirect('/login')
 
 
 class DepartmentInstructions(Resource):
@@ -660,6 +487,4 @@ api.add_resource(ComponentPipelines, '/api/v1/pipelines/component')
 api.add_resource(FileFlowByOrderCode, '/api/v1/orders/<string:code>/file-flows')
 
 if __name__ == '__main__':
-    global ALL_USERS
-
     app.run(debug=True, host='0.0.0.0')
