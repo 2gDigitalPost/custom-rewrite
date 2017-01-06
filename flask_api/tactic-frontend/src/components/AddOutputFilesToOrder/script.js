@@ -89,8 +89,23 @@ export default {
           }
         }
       }
+
+      let packageCodes = []
+
+      for (let i = 0; i < self.fileFlowToPackages.length; i++) {
+        if (self.fileFlowToPackages[i].file_flow_code === fileFlowCode) {
+          let packageCode = self.fileFlowToPackages[i].package_code
+
+          for (let j = 0; j < self.packages.length; j++) {
+            if (self.packages[j].code === packageCode) {
+              packageCodes.push(packageCode)
+            }
+          }
+        }
+      }
       
       bus.$emit('highlight-components', componentCodes, selected)
+      bus.$emit('highlight-packages', packageCodes, selected)
     }
   },
   beforeMount: function () {
