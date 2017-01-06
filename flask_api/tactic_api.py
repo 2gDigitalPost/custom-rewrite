@@ -1,8 +1,8 @@
-from flask import Flask, flash, jsonify, render_template, request, redirect, flash, url_for, session, abort
-from flask_cors import CORS, cross_origin
+from flask import Flask, jsonify, render_template, request, flash, session, abort
+from flask_cors import CORS
 from flask_restful import reqparse, Resource, Api
 
-import os, sys, inspect
+import sys
 
 import ConfigParser
 
