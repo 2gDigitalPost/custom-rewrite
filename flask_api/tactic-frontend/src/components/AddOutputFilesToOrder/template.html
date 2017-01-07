@@ -12,17 +12,18 @@
     </select>
     
     <div class="row">
-        <div id="component-with-output-files" class="col-xs-4">
+        <div id="component-with-output-files" class="col-xs-3">
             <ul class="list-group">
                 <li
                     is="component-with-output-files"
-                    v-for="component in components"
-                    v-bind:component="component"
+                    v-for="component in selectable_components"
+                    v-bind:component="component.component"
+                    v-bind:selected="component.selected"
                 ></li>
             </ul>
         </div>
 
-        <div id="file-flows" class="col-xs-4">
+        <div id="file-flows" class="col-xs-3">
             <ul class="list-group">
                 <li
                     is="file-flow-selectable"
@@ -32,14 +33,19 @@
             </ul>
         </div>
 
-        <div id="packages" class="col-xs-4">
+        <div id="packages" class="col-xs-3">
             <ul class="list-group">
                 <li
                     is="package-selectable"
-                    v-for="package in packages"
-                    v-bind:package="package"
+                    v-for="package in selectable_packages"
+                    v-bind:package="package.package"
+                    v-bind:selected="package.selected"
                 ></li>
             </ul>
+        </div>
+
+        <div id="effect-list" class="col-xs-3">
+
         </div>
     </div>
 </div>

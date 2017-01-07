@@ -7,10 +7,9 @@ import bus from '../../../bus'
 
 export default {
   name: 'ComponentWithOutputFiles',
-  props: ['component'],
+  props: ['component', 'selected'],
   data () {
     return {
-      selected: false,
       externallySelected: false
     }
   },

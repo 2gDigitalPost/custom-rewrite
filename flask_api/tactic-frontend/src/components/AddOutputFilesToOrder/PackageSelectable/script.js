@@ -7,10 +7,9 @@ import bus from '../../../bus'
 
 export default {
   name: 'PackageSelectable',
-  props: ['package'],
+  props: ['package', 'selected'],
   data () {
     return {
-      selected: false,
       externallySelected: false
     }
   },

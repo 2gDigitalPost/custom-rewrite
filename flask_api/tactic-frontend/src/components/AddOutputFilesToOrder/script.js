@@ -19,8 +19,8 @@ export default {
       order_code: this.$route.params.code,
       order_sobject: null,
       order_name: null,
-      components: [],
-      packages: [],
+      selectable_components: [],
+      selectable_packages: [],
       file_name: null,
       file_type: null,
       fileFlows: [],
@@ -44,8 +44,20 @@ export default {
 
         self.order_sobject = orderData
         self.order_name = orderData['name']
-        self.components = componentsData
-        self.packages = packagesData
+
+        for (let i = 0; i < componentsData.length; i++) {
+          self.selectable_components.push({
+            'component': componentsData[i],
+            'selected': false
+          })
+        }
+
+        for (let i = 0; i < packagesData.length; i++) {
+          self.selectable_packages.push({
+            'package': packagesData[i],
+            'selected': false
+          })
+        }
       })
       .catch(function (error) {
         console.log(error)
@@ -60,7 +72,6 @@ export default {
         }
       })
       .then(function (response) {
-        console.log(response)
         let fileFlowData = response.data.file_flows
         let fileFlowToComponentData = response.data.file_flow_to_components
         let fileFlowToPackageData = response.data.file_flow_to_packages
@@ -77,13 +88,13 @@ export default {
       let self = this
 
       let componentCodes = []
-      
+
       for (let i = 0; i < self.fileFlowToComponents.length; i++) {
         if (self.fileFlowToComponents[i].file_flow_code === fileFlowCode) {
           let componentCode = self.fileFlowToComponents[i].component_code
 
-          for (let j = 0; j < self.components.length; j++) {
-            if (self.components[j].code === componentCode) {
+          for (let j = 0; j < self.selectable_components.length; j++) {
+            if (self.selectable_components[j].component.code === componentCode) {
               componentCodes.push(componentCode)
             }
           }
@@ -96,8 +107,8 @@ export default {
         if (self.fileFlowToPackages[i].file_flow_code === fileFlowCode) {
           let packageCode = self.fileFlowToPackages[i].package_code
 
-          for (let j = 0; j < self.packages.length; j++) {
-            if (self.packages[j].code === packageCode) {
+          for (let j = 0; j < self.selectable_packages.length; j++) {
+            if (self.selectable_packages[j].package.code === packageCode) {
               packageCodes.push(packageCode)
             }
           }
