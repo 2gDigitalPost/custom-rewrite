@@ -7,17 +7,10 @@ import bus from '../../../bus'
 
 export default {
   name: 'ComponentWithOutputFiles',
-  props: ['component', 'selected'],
-  data () {
-    return {
-      externallySelected: false
-    }
-  },
+  props: ['component', 'selected', 'externallySelected'],
   methods: {
-    fileFlowSelected: function (componentCodes, selected) {
-      if (_.includes(componentCodes, this.component.code)) {
-        this.externallySelected = selected
-      }
+    componentSelected: function () {
+      bus.$emit('component-selected', this.component.code)
     }
   },
   created() {

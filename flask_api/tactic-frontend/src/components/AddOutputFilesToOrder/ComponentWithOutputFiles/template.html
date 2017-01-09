@@ -1,4 +1,4 @@
-<li class="list-group-item" v-on:click="selected = !selected" v-bind:class="{active: selected, externallySelected: externallySelected}">
+<li class="list-group-item" v-on:click="componentSelected" v-bind:class="{active: selected, externallySelected: externallySelected}">
     <div>
         <div>{{ component.name }} ({{ component.code }})</div>
     </div>

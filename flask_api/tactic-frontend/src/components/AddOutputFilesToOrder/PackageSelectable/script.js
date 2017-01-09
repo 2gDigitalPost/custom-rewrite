@@ -7,17 +7,10 @@ import bus from '../../../bus'
 
 export default {
   name: 'PackageSelectable',
-  props: ['package', 'selected'],
-  data () {
-    return {
-      externallySelected: false
-    }
-  },
+  props: ['package', 'selected', 'externallySelected'],
   methods: {
-    fileFlowSelected: function (packageCodes, selected) {
-      if (_.includes(packageCodes, this.package.code)) {
-        this.externallySelected = selected
-      }
+    packageSelected: function () {
+      bus.$emit('package-selected', this.package.code)
     }
   },
   created() {

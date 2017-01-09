@@ -19,6 +19,7 @@
                     v-for="component in selectable_components"
                     v-bind:component="component.component"
                     v-bind:selected="component.selected"
+                    v-bind:externallySelected="component.externallySelected"
                 ></li>
             </ul>
         </div>
@@ -40,12 +41,18 @@
                     v-for="package in selectable_packages"
                     v-bind:package="package.package"
                     v-bind:selected="package.selected"
+                    v-bind:externallySelected="package.externallySelected"
                 ></li>
             </ul>
         </div>
 
-        <div id="effect-list" class="col-xs-3">
-
+        <div id="effect-list" class="col-xs-3" v-if="changes.length > 0">
+            <h4>The following changes will take effect on hitting "Submit"</h4>
+            <ul>
+                <li
+                    v-for="change in changes"
+                >{{ change }}</li>
+            </ul>
         </div>
     </div>
 </div>
