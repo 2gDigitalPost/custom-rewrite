@@ -4,6 +4,7 @@ import axios from 'axios'
 import ComponentWithOutputFiles from './ComponentWithOutputFiles/index.vue'
 import FileFlowSelectable from './FileFlowSelectable/index.vue'
 import PackageSelectable from './PackageSelectable/index.vue'
+import NewFileFlowModal from '../NewFileFlowModal/index.vue'
 
 import bus from '../../bus'
 
@@ -12,7 +13,8 @@ export default {
   components: {
     'component-with-output-files': ComponentWithOutputFiles,
     'file-flow-selectable': FileFlowSelectable,
-    'package-selectable': PackageSelectable
+    'package-selectable': PackageSelectable,
+    'modal': NewFileFlowModal
   },
   data () {
     return {
@@ -22,12 +24,11 @@ export default {
       selectable_components: [],
       selectable_packages: [],
       changes: [],
-      file_name: null,
-      file_type: null,
       fileFlows: [],
       fileFlowToComponents: [],
       fileFlowToPackages: [],
-      selectedFileFlow: null
+      selectedFileFlow: null,
+      showModal: false
     }
   },
   methods: {

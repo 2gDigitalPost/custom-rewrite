@@ -467,6 +467,23 @@ class FileFlowByOrderCode(Resource):
         return jsonify(file_flow_json_data)
 
 
+class FileFlow(Resource):
+    def get(self):
+        pass
+
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        file_flow = json_data.get('file_flow')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/file_flow', file_flow)
+
+        return jsonify({'status': 200})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
@@ -484,6 +501,7 @@ api.add_resource(Languages, '/api/v1/languages')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
 api.add_resource(Pipeline, '/api/v1/pipelines/code/<string:code>')
 api.add_resource(ComponentPipelines, '/api/v1/pipelines/component')
+api.add_resource(FileFlow, '/api/v1/file-flows')
 api.add_resource(FileFlowByOrderCode, '/api/v1/orders/<string:code>/file-flows')
 
 if __name__ == '__main__':

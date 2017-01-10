@@ -1,16 +1,6 @@
 <div>
     <h1>Add Output files to Order</h1>
 
-    <h4>Enter a description of the type of file you're expecting to see.</h4>
-    <input type="text" v-model="file_name" placeholder="File Name" />
-
-    <h4>Select the file's type</h4>
-    <select v-model="file_type">
-        <option>MP4</option>
-        <option>MOV</option>
-        <option>TXT</option>
-    </select>
-    
     <div class="row">
         <div id="component-with-output-files" class="col-xs-3">
             <ul class="list-group">
@@ -32,6 +22,11 @@
                     v-bind:file-flow="fileFlow"
                 ></li>
             </ul>
+
+            <button id="show-modal" v-on:click="showModal = true" class="btn btn-default">
+                <span class="glyphicon glyphicon-plus"></span> Add a new File Flow
+            </button>
+            <modal v-if="showModal" v-on:close="showModal = false" v-bind:order-code="order_code"></modal>
         </div>
 
         <div id="packages" class="col-xs-3">
