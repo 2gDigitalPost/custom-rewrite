@@ -468,9 +468,6 @@ class FileFlowByOrderCode(Resource):
 
 
 class FileFlow(Resource):
-    def get(self):
-        pass
-
     def post(self):
         json_data = request.get_json()
 
@@ -480,6 +477,68 @@ class FileFlow(Resource):
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         server.insert('twog/file_flow', file_flow)
+
+        return jsonify({'status': 200})
+
+
+class FileFlowToComponent(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        file_flow_to_component = json_data.get('file_flow_to_component')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/file_flow_to_component', file_flow_to_component)
+
+        return jsonify({'status': 200})
+
+
+class FileFlowToComponentWithCode(Resource):
+    def delete(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        search_key = server.build_search_key('twog/file_flow_to_component', code, project_code='twog')
+
+        server.delete_sobject(search_key)
+
+        return jsonify({'status': 200})
+
+
+class FileFlowToPackage(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        file_flow_to_package = json_data.get('file_flow_to_package')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/file_flow_to_package', file_flow_to_package)
+
+        return jsonify({'status': 200})
+
+
+class FileFlowToPackageWithCode(Resource):
+    def delete(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        search_key = server.build_search_key('twog/file_flow_to_package', code, project_code='twog')
+
+        server.delete_sobject(search_key)
 
         return jsonify({'status': 200})
 
@@ -503,6 +562,11 @@ api.add_resource(Pipeline, '/api/v1/pipelines/code/<string:code>')
 api.add_resource(ComponentPipelines, '/api/v1/pipelines/component')
 api.add_resource(FileFlow, '/api/v1/file-flows')
 api.add_resource(FileFlowByOrderCode, '/api/v1/orders/<string:code>/file-flows')
+api.add_resource(FileFlowToComponent, '/api/v1/file-flow-to-component')
+api.add_resource(FileFlowToComponentWithCode, '/api/v1/file-flow-to-component/<string:code>')
+api.add_resource(FileFlowToPackage, '/api/v1/file-flow-to-package')
+api.add_resource(FileFlowToPackageWithCode, '/api/v1/file-flow-to-package/<string:code>')
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

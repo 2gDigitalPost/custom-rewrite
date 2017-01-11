@@ -172,6 +172,169 @@ export default {
           }
         }
       }
+    },
+    findFileFlowToComponent: function (fileFlowCode, componentCode) {
+      let self = this
+
+      for (let i = 0; i < self.fileFlowToComponents.length; i++) {
+        let fileFlowToComponent = self.fileFlowToComponents[i]
+
+        if (fileFlowToComponent.component_code === componentCode && fileFlowToComponent.file_flow_code === fileFlowCode) {
+          return fileFlowToComponent.code
+        }
+      }
+
+      return null
+    },
+    findFileFlowToPackage: function (fileFlowCode, packageCode) {
+      let self = this
+
+      for (let i = 0; i < self.fileFlowToPackages.length; i++) {
+        let fileFlowToPackage = self.fileFlowToPackages[i]
+
+        if (fileFlowToPackage.package_code === packageCode && fileFlowToPackage.file_flow_code === fileFlowCode) {
+          return fileFlowToPackage.code
+        }
+      }
+
+      return null
+    },
+    submitFileFlowToComponent: function (fileFlowCode, componentCode) {
+      let self = this
+      
+      axios.post('/api/v1/file-flow-to-component',
+        JSON.stringify({
+          'file_flow_to_component': {
+            'file_flow_code': fileFlowCode,
+            'component_code': componentCode
+          },
+          'token': localStorage.tactic_token
+        }), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
+        }
+      )
+      .then(function (response) {
+        if (response.data) {
+          if (response.data.status === 200) {
+            self.$router.go(self.$router.currentRoute)
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+    deleteFileFlowToComponent: function (code) {
+      let self = this
+
+      axios.delete('/api/v1/file-flow-to-component/' + code,
+        {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          },
+          params: {
+            token: localStorage.tactic_token,
+          }
+        }
+      )
+      .then(function (response) {
+        if (response.data) {
+          if (response.data.status === 200) {
+            self.$router.go(self.$router.currentRoute)
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+    submitFileFlowToPackage: function (fileFlowCode, packageCode) {
+      let self = this
+
+      axios.post('/api/v1/file-flow-to-package',
+        JSON.stringify({
+          'file_flow_to_package': {
+            'file_flow_code': fileFlowCode,
+            'package_code': packageCode
+          },
+          'token': localStorage.tactic_token
+        }), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
+        }
+      )
+      .then(function (response) {
+        if (response.data) {
+          if (response.data.status === 200) {
+            self.$router.go(self.$router.currentRoute)
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+    deleteFileFlowToPackage: function (code) {
+      let self = this
+
+      axios.delete('/api/v1/file-flow-to-package/' + code,
+        {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          },
+          params: {
+            token: localStorage.tactic_token,
+          }
+        }
+      )
+      .then(function (response) {
+        if (response.data) {
+          if (response.data.status === 200) {
+            self.$router.go(self.$router.currentRoute)
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },  
+    submitToTactic: function () {
+      let self = this
+
+      if (self.selectedFileFlow !== null) {
+        let fileFlowCode = self.selectedFileFlow.code
+
+        for (let i = 0; i < self.selectable_components.length; i++) {
+          let selectedComponent = self.selectable_components[i]
+          let selectedComponentCode = selectedComponent.component.code
+
+          if (selectedComponent.selected && selectedComponent.externallySelected) {
+            let codeToDelete = self.findFileFlowToComponent(fileFlowCode, selectedComponentCode)
+
+            self.deleteFileFlowToComponent(codeToDelete)
+          }
+          else if (selectedComponent.selected) {
+            self.submitFileFlowToComponent(fileFlowCode, selectedComponentCode)
+          }
+        }
+
+        for (let i = 0; i < self.selectable_packages.length; i++) {
+          let selectedPackage = self.selectable_packages[i]
+          let selectedPackageCode = selectedPackage.package.code
+
+          if (selectedPackage.selected && selectedPackage.externallySelected) {
+            let codeToDelete = self.findFileFlowToPackage(fileFlowCode, selectedPackageCode)
+
+            self.deleteFileFlowToPackage(codeToDelete)
+          }
+          else if (selectedPackage.selected) {
+            self.submitFileFlowToPackage(fileFlowCode, selectedPackageCode)
+          }
+        }
+      }
     }
   },
   beforeMount: function () {
