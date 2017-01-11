@@ -220,10 +220,55 @@ class FullOrder(Resource):
         # Get all the components associated with the order
         component_sobjects = server.eval("@SOBJECT(twog/component['order_code', '{0}'])".format(code))
 
+        component_sobjects_full = []
+
+        title_codes_list = [component_sobject.get('title_code') for component_sobject in component_sobjects]
+        title_codes_string = '|'.join([title_code for title_code in title_codes_list])
+        titles = server.eval("@SOBJECT(twog/title['code', 'in', '{0}'])".format(title_codes_string))
+
+        titles_dict = {}
+
+        for title in titles:
+            titles_dict[title.get('code')] = title
+
+        # Get all the details of all the components
+        for component_sobject in component_sobjects:
+            component_sobject_full = {'code': component_sobject.get('code'), 'component': component_sobject}
+
+            # A component may or may not have a title associated with it
+            if component_sobject.get('title_code'):
+                component_sobject_full['title'] = titles_dict.get(component_sobject.get('title_code'))
+            else:
+                component_sobject_full['title'] = None
+
+            # Get the tasks assigned to the component, if any
+            task_sobjects = server.eval("@SOBJECT(sthpw/task['search_code', '{0}'])".format(component_sobject.get('code')))
+
+            component_sobject_full['tasks'] = task_sobjects
+
+            # Get the files needed for the component's file flows
+            file_flow_to_component_sobjects = server.eval("@SOBJECT(twog/file_flow_to_component['component_code', '{0}'])".format(component_sobject.get('code')))
+
+            component_sobject_full['file_flow_to_component'] = file_flow_to_component_sobjects
+
+            file_flows = []
+
+            for file_flow_to_component_sobject in file_flow_to_component_sobjects:
+                file_flow_code = file_flow_to_component_sobject.get('file_flow_code')
+
+                file_flow_sobject = server.get_by_code('twog/file_flow', file_flow_code)
+
+                file_flows.append(file_flow_sobject)
+
+            component_sobject_full['file_flows'] = file_flows
+
+            component_sobjects_full.append(component_sobject_full)
+
         # Get all the packages associated with the order
         package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
 
-        return jsonify({'order': order_sobject, 'components': component_sobjects, 'packages': package_sobjects})
+        return jsonify({'order': order_sobject, 'components': component_sobjects, 'packages': package_sobjects,
+                        'components_full': component_sobjects_full})
 
 
 class Orders(Resource):

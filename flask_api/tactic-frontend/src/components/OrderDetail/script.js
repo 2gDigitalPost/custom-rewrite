@@ -2,14 +2,20 @@
 
 import axios from 'axios'
 
+import ComponentDetailList from '../ComponentDetailList/index.vue'
+
 export default {
   name: 'OrderDetail',
+  components: {
+    'component-detail-list': ComponentDetailList
+  },
   data () {
     return {
       order_code: this.$route.params.code,
       order_sobject: null,
       order_name: null,
       components: [],
+      componentsFull: [],
       packages: [],
       add_title_link: null,
       edit_components_link: null,
@@ -32,6 +38,8 @@ export default {
 
         self.order_sobject = orderData
         self.order_name = orderData['name']
+        self.components = componentsData
+        self.componentsFull = response.data.components_full
       })
       .catch(function (error) {
         console.log(error)

@@ -1,12 +1,20 @@
 <div>
-    <div v-if="order_sobject !== null">
-        <h1>{{ order_sobject.name }} ({{ order_code }})</h1>
-        <h5>Submitted by: {{ order_sobject.division_code }}</h5>
-        <h5>Expected Completion Date: {{ order_sobject.expected_completion_date }}</h5>
-        <h5>Due Date: {{ order_sobject.due_date }}</h5>
+    <div class="row">
+        <div v-if="order_sobject !== null">
+            <div>
+                <h1>{{ order_sobject.name }} ({{ order_code }})</h1>
+                <h5>Submitted by: {{ order_sobject.division_code }}</h5>
+                <h5>Expected Completion Date: {{ order_sobject.expected_completion_date }}</h5>
+                <h5>Due Date: {{ order_sobject.due_date }}</h5>
 
-        <router-link :to="add_title_link">Add a Title to this Order</router-link><br/>
-        <router-link :to="edit_components_link">Edit Components</router-link><br/>
-        <router-link :to="add_output_files_link">Add Output Files</router-link>
+                <router-link :to="add_title_link">Add a Title to this Order</router-link><br/>
+                <router-link :to="edit_components_link">Edit Components</router-link><br/>
+                <router-link :to="add_output_files_link">Add Output Files</router-link>
+            </div>
+
+            <div class="col-xs-4">
+                <component-detail-list v-bind:components="components" v-bind:componentsFull="componentsFull"></component-detail-list>
+            </div>
+        </div>
     </div>
 </div>
