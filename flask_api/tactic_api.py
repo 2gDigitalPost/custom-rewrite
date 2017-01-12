@@ -706,6 +706,56 @@ class DepartmentRequestsByCode(Resource):
 
         return jsonify({'department_request': department_request})
 
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        department_request = json_data.get('department_request')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the search key, response (if any), and status (if any)
+        search_key = department_request.get('search_key')
+        response = department_request.get('response')
+        status = department_request.get('status').strip().lower()
+
+        # Only send an update if there is a response. Otherwise, only a task was updated
+        if response:
+            server.update(search_key, {'response': response})
+
+        # Get the twog/department_request sobject (need the code)
+        department_request_sobject = server.get_by_search_key(search_key)
+
+        # The api accepts a 'status' key, but this should update the task's status, not the request status.
+        # Determine which task to update, if any, and then update the task.
+        if status:
+            if status in ['in progress', 'additional information needed', 'complete']:
+                # Status should update the Request task
+                process_name = 'Request'
+
+                if status == 'in progress':
+                    updated_task_status = 'In Progress'
+                elif status == 'additional information needed':
+                    updated_task_status = 'Additional Info Needed'
+                else:
+                    updated_task_status = 'Complete'
+            else:
+                # Status should update the Approval task
+                process_name = 'Approval'
+
+                if status == 'rejected':
+                    updated_task_status = 'Rejected'
+                else:
+                    updated_task_status = 'Approved'
+
+            task = server.eval(
+                "@SOBJECT(sthpw/task['search_code', '{0}']['process', '{1}'])".format(
+                    department_request_sobject.get('code'), process_name))[0]
+
+            server.update(task.get('__search_key__'), {'status': updated_task_status})
+
+        return jsonify({'status': 200})
+
 
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')

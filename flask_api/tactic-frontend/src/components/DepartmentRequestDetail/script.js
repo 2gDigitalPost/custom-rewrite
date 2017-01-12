@@ -10,7 +10,8 @@ export default {
       departmentRequest: null,
       newStatusOptions: [],
       newStatus: null,
-      response: null
+      requestResponse: null,
+      responseRequired: false
     }
   },
   methods: {
@@ -33,6 +34,9 @@ export default {
         else if (currentStatus === 'In Progress' || currentStatus === 'Revise') {
           self.newStatusOptions = ['Additional Information Needed', 'Complete']
         }
+        else if (currentStatus === 'Additional Info Needed') {
+          self.newStatusOptions = ['Ready']
+        }
         else if (currentStatus === 'Needs Approval') {
           self.newStatusOptions = ['Rejected', 'Approved']
         }
@@ -42,16 +46,50 @@ export default {
       })
     },
     submitResponse: function () {
-      console.log('submit')
+      var self = this
+
+      let jsonToSubmit = {
+        'department_request': {
+          'search_key': self.departmentRequest['__search_key__'],
+          'status': self.newStatus
+        },
+        'token': localStorage.tactic_token
+      }
+
+      if (self.responseRequired) {
+        jsonToSubmit['department_request']['response'] = self.requestResponse
+      }
+
+      axios.post('/api/v1/department-requests/code/' + self.departmentRequestCode,
+        JSON.stringify(jsonToSubmit), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
+        }
+      )
+      .then(function (response) {
+        if (response.data) {
+          if (response.data.status === 200) {
+            self.$router.go(self.$router.currentRoute)
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
     }
   },
   beforeMount: function () {
     this.loadDepartmentRequest()
   },
-  computed: {
-    responseRequired: function () {
-      if (this.newStatus === null || this.newStatus === 'In Progress') return false
-      else return true
+  watch: {
+    newStatus: function () {
+      if (this.newStatus === null || this.newStatus === 'In Progress') {
+        this.responseRequired = false
+      }
+      else {
+        this.responseRequired = true
+      }
     }
   }
 }
