@@ -6,6 +6,8 @@ import sys
 
 import ConfigParser
 
+from api_functions.department_requests import add_tasks_to_department_request_dictionary
+
 config = ConfigParser.ConfigParser()
 config.read('config.ini')
 
@@ -641,6 +643,9 @@ class DepartmentRequests(Resource):
 
         department_requests = server.eval("@SOBJECT(twog/department_request['status', '!=', 'complete'])")
 
+        if len(department_requests) > 0:
+            add_tasks_to_department_request_dictionary(server, department_requests)
+
         return jsonify({'department_requests': department_requests})
 
 
@@ -658,6 +663,9 @@ class DepartmentRequestsByDepartment(Resource):
             "@SOBJECT(twog/department_request['assigned_department', '{0}']['status', '!=', 'complete'])".format(department)
         )
 
+        if len(department_requests) > 0:
+            add_tasks_to_department_request_dictionary(server, department_requests)
+
         return jsonify({'department_requests': department_requests})
 
 
@@ -674,6 +682,9 @@ class DepartmentRequestsByUser(Resource):
         department_requests = server.eval(
             "@SOBJECT(twog/department_request['login', '{0}']['status', '!=', 'complete'])".format(user)
         )
+
+        if len(department_requests) > 0:
+            add_tasks_to_department_request_dictionary(server, department_requests)
 
         return jsonify({'department_requests': department_requests})
 
