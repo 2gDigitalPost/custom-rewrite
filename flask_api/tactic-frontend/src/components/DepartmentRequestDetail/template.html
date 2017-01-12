@@ -1,0 +1,37 @@
+<div>
+    <template v-if="departmentRequest === null">
+        <h1>Loading...</h1>
+    </template>
+    <template v-else>
+        <h1>{{ departmentRequest.name }}</h1>
+        <h3>Assigned To: {{ departmentRequest.assigned_department }}</h3>
+        <h3>Current Status: {{ departmentRequest.summary_status }}</h3>
+        <h3>Due Date: {{ departmentRequest.due_date }}</h3>
+        <h3>Submitted By: {{ departmentRequest.login }}</h3>
+
+        <h4>Request description:</h4>
+        <div>{{ departmentRequest.description }}</div>
+
+        <pre v-if="departmentRequest.response !== ''">
+            {{ departmentRequest.response }}
+        </pre>
+
+        <form v-on:submit.prevent="submitResponse">
+            <h4>Change Status</h4>
+
+            <select v-model="newStatus" class="form-control">
+                <option v-for="option in newStatusOptions">
+                    {{ option }}
+                </option>
+            </select>
+
+            <template v-if="responseRequired">
+                <h4>Fill out a response to submit</h4>
+
+                <textarea class="form-control" rows="5" id="response-area" v-model="response"/>
+            </template>
+
+            <button class="btn btn-default" type="submit">Submit</button>
+        </form>
+    </template>
+</div>

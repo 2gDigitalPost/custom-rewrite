@@ -34,6 +34,11 @@ export default {
       .catch(function (error) {
         console.log(error)
       })
+    },
+    openDetailLink (departmentRequestCode) {
+      let departmentRequestDetailURL = '/department-request/' + departmentRequestCode
+
+      this.$router.push(departmentRequestDetailURL)
     }
   },
   beforeMount: function () {

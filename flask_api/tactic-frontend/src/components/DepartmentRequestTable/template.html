@@ -22,10 +22,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="request in requests">
+                <tr v-for="request in requests" v-on:click="openDetailLink(request.code)">
                     <td>{{ request.name }}</td>
                     <td>{{ request.description }}</td>
-                    <td></td>
+                    <td>{{ request.response }}</td>
                     <td>{{ request.summary_status }}</td>
                     <td>{{ request.due_date }}</td>
                     <td></td>
