@@ -43,5 +43,9 @@ export default {
   },
   beforeMount: function () {
     this.loadDepartmentRequests()
+
+    setInterval(function () {
+      this.loadDepartmentRequests()
+    }.bind(this), 60000)
   }
 }
