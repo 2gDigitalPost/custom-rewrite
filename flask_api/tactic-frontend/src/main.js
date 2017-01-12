@@ -11,6 +11,7 @@ import AddOutputFilesToOrder from './components/AddOutputFilesToOrder/index.vue'
 import AddTitleFromIMDb from './components/AddTitleFromIMDb/index.vue'
 import AddTitleManually from './components/AddTitleManually/index.vue'
 import ComponentsInOrder from './components/ComponentsInOrder/index.vue'
+import DepartmentRequestLinks from './components/DepartmentRequestLinks/index.vue'
 import DepartmentRequestTable from './components/DepartmentRequestTable/index.vue'
 import LoginForm from './components/LoginForm/index.vue'
 import OrderDetail from './components/OrderDetail/index.vue'
@@ -23,6 +24,7 @@ Vue.use(VueRouter)
 const routes = [
   { path: '/', component: HomePage },
   { path: '/about', component: AboutPage },
+  { path: '/department-requests', component: DepartmentRequestLinks, beforeEnter: requireAuth },
   { path: '/department-requests/:department', component: DepartmentRequestTable, beforeEnter: requireAuth },
   { path: '/order_entry', component: OrderEntryForm, beforeEnter: requireAuth },
   { path: '/orders', component: OrderList, beforeEnter: requireAuth },

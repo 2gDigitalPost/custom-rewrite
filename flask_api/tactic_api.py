@@ -630,6 +630,21 @@ class FileFlowToPackageWithCode(Resource):
 
 
 class DepartmentRequests(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        department_requests = server.eval("@SOBJECT(twog/department_request['status', '!=', 'complete'])")
+
+        return jsonify({'department_requests': department_requests})
+
+
+class DepartmentRequestsByDepartment(Resource):
     def get(self, department):
         parser = reqparse.RequestParser()
         parser.add_argument('token', required=True)
@@ -669,7 +684,7 @@ api.add_resource(FileFlowToComponent, '/api/v1/file-flow-to-component')
 api.add_resource(FileFlowToComponentWithCode, '/api/v1/file-flow-to-component/<string:code>')
 api.add_resource(FileFlowToPackage, '/api/v1/file-flow-to-package')
 api.add_resource(FileFlowToPackageWithCode, '/api/v1/file-flow-to-package/<string:code>')
-api.add_resource(DepartmentRequests, '/api/v1/department-requests/<string:department>')
+api.add_resource(DepartmentRequestsByDepartment, '/api/v1/department-requests/<string:department>')
 
 
 if __name__ == '__main__':

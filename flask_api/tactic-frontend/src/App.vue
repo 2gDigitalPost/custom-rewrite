@@ -33,6 +33,9 @@
               <router-link to="/titles/add/manual">Add a Title Manually</router-link>
             </li>
             <li>
+              <router-link to="/department-requests">Department Requests</router-link>
+            </li>
+            <li>
               <router-link to="/about">About</router-link>
             </li>
           </ul>
