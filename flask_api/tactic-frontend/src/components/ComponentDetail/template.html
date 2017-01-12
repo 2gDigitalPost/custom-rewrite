@@ -11,8 +11,9 @@
         </span>
     </div>
     <div class="component-files-needed">
-        Files created by this component:
+        
         <span v-if="fileFlows.length > 0">
+            <div>Files created by this component:</div>
             <li v-for="fileFlow in fileFlows">
                 {{ fileFlow.name }}
             </li>

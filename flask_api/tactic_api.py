@@ -231,6 +231,57 @@ class FullOrder(Resource):
         for title in titles:
             titles_dict[title.get('code')] = title
 
+        component_codes_list = [component_sobject.get('code') for component_sobject in component_sobjects]
+        component_codes_string = '|'.join([component_code for component_code in component_codes_list])
+
+        tasks = server.eval("@SOBJECT(sthpw/task['search_code', 'in', '{0}'])".format(component_codes_string))
+
+        tasks_dict = {}
+
+        for task in tasks:
+            task_search_code = task.get('search_code')
+
+            if task_search_code in tasks_dict:
+                tasks_dict[task_search_code].append(task)
+            else:
+                tasks_dict[task_search_code] = [task]
+
+        file_flow_to_components = server.eval(
+            "@SOBJECT(twog/file_flow_to_component['component_code', 'in', '{0}'])".format(component_codes_string)
+        )
+
+        file_flow_to_components_dict = {}
+        component_to_file_flow_dict = {}
+
+        file_flow_codes = []
+
+        for file_flow_to_component in file_flow_to_components:
+            component_code = file_flow_to_component.get('component_code')
+            file_flow_code = file_flow_to_component.get('file_flow_code')
+
+            file_flow_to_components_dict[component_code] = file_flow_to_component
+
+            if file_flow_code not in file_flow_codes:
+                file_flow_codes.append(file_flow_code)
+
+            if component_code in component_to_file_flow_dict:
+                component_to_file_flow_dict[component_code].append(file_flow_code)
+            else:
+                component_to_file_flow_dict[component_code] = [file_flow_code]
+
+        # for file_flow_to_component in file_flow_to_components:
+            # file_flow_to_components_dict[file_flow_to_component.get('code')] = file_flow_to_component
+            # file_flow_codes.append(file_flow_to_component.get('file_flow_code'))
+
+        file_flow_codes_string = '|'.join([file_flow_code for file_flow_code in file_flow_codes])
+
+        file_flows = server.eval("@SOBJECT(twog/file_flow['code', 'in', '{0}'])".format(file_flow_codes_string))
+
+        file_flows_dict = {}
+
+        for file_flow in file_flows:
+            file_flows_dict[file_flow.get('code')] = file_flow
+
         # Get all the details of all the components
         for component_sobject in component_sobjects:
             component_sobject_full = {'code': component_sobject.get('code'), 'component': component_sobject}
@@ -242,25 +293,15 @@ class FullOrder(Resource):
                 component_sobject_full['title'] = None
 
             # Get the tasks assigned to the component, if any
-            task_sobjects = server.eval("@SOBJECT(sthpw/task['search_code', '{0}'])".format(component_sobject.get('code')))
-
-            component_sobject_full['tasks'] = task_sobjects
+            component_sobject_full['tasks'] = tasks_dict.get(component_sobject.get('code'))
 
             # Get the files needed for the component's file flows
-            file_flow_to_component_sobjects = server.eval("@SOBJECT(twog/file_flow_to_component['component_code', '{0}'])".format(component_sobject.get('code')))
+            component_sobject_full['file_flow_to_component'] = file_flow_to_components_dict.get(component_sobject.get('code'))
 
-            component_sobject_full['file_flow_to_component'] = file_flow_to_component_sobjects
+            component_sobject_full['file_flows'] = []
 
-            file_flows = []
-
-            for file_flow_to_component_sobject in file_flow_to_component_sobjects:
-                file_flow_code = file_flow_to_component_sobject.get('file_flow_code')
-
-                file_flow_sobject = server.get_by_code('twog/file_flow', file_flow_code)
-
-                file_flows.append(file_flow_sobject)
-
-            component_sobject_full['file_flows'] = file_flows
+            for file_flow in component_to_file_flow_dict.get(component_sobject.get('code'), []):
+                component_sobject_full['file_flows'].append(file_flows_dict[file_flow])
 
             component_sobjects_full.append(component_sobject_full)
 
