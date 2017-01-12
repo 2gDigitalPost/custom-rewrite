@@ -1,32 +1,42 @@
 <div>
-    <h1>Department Requests</h1>
+    <h1 v-if="department === 'edel'">Edel Requests</h1>
+    <h1 v-else-if="department === 'compression'">Compression Requests</h1>
+    <h1 v-else-if="department === 'qc'">QC Requests</h1>
+    <h1 v-else-if="department === 'onboarding'">Onboarding Requests</h1>
+    <h1 v-else-if="department === 'user'">My Requests</h1>
+    <h1 v-else>All Department Requests</h1>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Responses</th>
-                <th>Status</th>
-                <th>Due Date</th>
-                <th>Files</th>
-                <th>Submitted By</th>
-                <th>Assigned User</th>
-                <th>Assigned Department</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="request in requests">
-                <td>{{ request.name }}</td>
-                <td>{{ request.description }}</td>
-                <td></td>
-                <td></td>
-                <td>{{ request.due_date }}</td>
-                <td></td>
-                <td>{{ request.login }}</td>
-                <td></td>
-                <td>{{ request.assigned_department }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <template v-if="requests.length > 0">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Responses</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Files</th>
+                    <th>Submitted By</th>
+                    <th>Assigned User</th>
+                    <th>Assigned Department</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="request in requests">
+                    <td>{{ request.name }}</td>
+                    <td>{{ request.description }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>{{ request.due_date }}</td>
+                    <td></td>
+                    <td>{{ request.login }}</td>
+                    <td></td>
+                    <td>{{ request.assigned_department }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+    <template v-else>
+        <p>No requests are currently active.</p>
+    </template>
 </div>

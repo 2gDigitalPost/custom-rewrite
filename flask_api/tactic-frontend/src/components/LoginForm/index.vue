@@ -23,6 +23,7 @@
         })
         .then(function (response) {
           localStorage.setItem('tactic_token', response.data.ticket)
+          localStorage.setItem('login', self.username)
 
           self.$router.replace(self.$route.query.redirect || '/')
         })

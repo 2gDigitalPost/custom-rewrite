@@ -661,6 +661,23 @@ class DepartmentRequestsByDepartment(Resource):
         return jsonify({'department_requests': department_requests})
 
 
+class DepartmentRequestsByUser(Resource):
+    def get(self, user):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        department_requests = server.eval(
+            "@SOBJECT(twog/department_request['login', '{0}']['status', '!=', 'complete'])".format(user)
+        )
+
+        return jsonify({'department_requests': department_requests})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
@@ -684,6 +701,8 @@ api.add_resource(FileFlowToComponent, '/api/v1/file-flow-to-component')
 api.add_resource(FileFlowToComponentWithCode, '/api/v1/file-flow-to-component/<string:code>')
 api.add_resource(FileFlowToPackage, '/api/v1/file-flow-to-package')
 api.add_resource(FileFlowToPackageWithCode, '/api/v1/file-flow-to-package/<string:code>')
+api.add_resource(DepartmentRequests, '/api/v1/department-requests')
+api.add_resource(DepartmentRequestsByUser, '/api/v1/department-requests/user/<string:user>')
 api.add_resource(DepartmentRequestsByDepartment, '/api/v1/department-requests/<string:department>')
 
 

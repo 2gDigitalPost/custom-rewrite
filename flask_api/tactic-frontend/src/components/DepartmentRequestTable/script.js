@@ -14,14 +14,21 @@ export default {
     loadDepartmentRequests: function () {
       var self = this
 
-      axios.get('/api/v1/department-requests/' + self.department, {
+      let apiURL = '/api/v1/department-requests'
+
+      if (self.$route.path === '/department-requests/user') {
+        apiURL += '/user/' + localStorage.login
+      }
+      else if (self.department !== undefined) {
+        apiURL += '/' + self.department
+      }
+
+      axios.get(apiURL, {
         params: {
           token: localStorage.tactic_token
         }
       })
       .then(function (response) {
-        console.log(response)
-
         self.requests = response.data.department_requests
       })
       .catch(function (error) {

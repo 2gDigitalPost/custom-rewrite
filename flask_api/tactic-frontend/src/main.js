@@ -24,8 +24,10 @@ Vue.use(VueRouter)
 const routes = [
   { path: '/', component: HomePage },
   { path: '/about', component: AboutPage },
-  { path: '/department-requests', component: DepartmentRequestLinks, beforeEnter: requireAuth },
+  { path: '/department-requests/links', component: DepartmentRequestLinks, beforeEnter: requireAuth },
+  { path: '/department-requests', component: DepartmentRequestTable, beforeEnter: requireAuth },
   { path: '/department-requests/:department', component: DepartmentRequestTable, beforeEnter: requireAuth },
+  { path: '/department-requests/user', component: DepartmentRequestTable, beforeEnter: requireAuth },
   { path: '/order_entry', component: OrderEntryForm, beforeEnter: requireAuth },
   { path: '/orders', component: OrderList, beforeEnter: requireAuth },
   { path: '/orders/:code', component: OrderDetail, beforeEnter: requireAuth },
