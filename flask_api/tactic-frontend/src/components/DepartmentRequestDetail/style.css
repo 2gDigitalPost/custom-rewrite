@@ -1,3 +1,28 @@
-.response-text {
+#description-text {
     white-space: pre-wrap
+}
+
+#response-text {
+    white-space: pre-wrap
+}
+
+#request-description {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#request-responses {
+    margin-bottom: 40px;
+}
+
+#change-status {
+    margin-bottom: 40px;
+}
+
+#response-textarea {
+    margin-bottom: 40px;
+}
+
+#submit-response-button {
+    margin-bottom: 40px;
 }

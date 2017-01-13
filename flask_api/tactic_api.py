@@ -724,9 +724,12 @@ class DepartmentRequestsByCode(Resource):
 
         # Only send an update if there is a response. Otherwise, only a task was updated
         if response:
+            existing_response = department_request_sobject.get('response')
+
             # If a response already exists, append the new one to it.
-            if department_request_sobject.get('response'):
-                response = department_request_sobject.get('response') + '\n\n' + response
+            if existing_response:
+                # response = department_request_sobject.get('response') + '\n\n' + response
+                response = response + '\n\n' + existing_response
 
             server.update(search_key, {'response': response})
 
