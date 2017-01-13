@@ -34,7 +34,7 @@ export default {
         else if (currentStatus === 'In Progress' || currentStatus === 'Revise') {
           self.newStatusOptions = ['Additional Information Needed', 'Complete']
         }
-        else if (currentStatus === 'Additional Info Needed') {
+        else if (currentStatus === 'Additional Info Requested') {
           self.newStatusOptions = ['Ready']
         }
         else if (currentStatus === 'Needs Approval') {
@@ -84,7 +84,7 @@ export default {
   },
   watch: {
     newStatus: function () {
-      if (this.newStatus === null || this.newStatus === 'In Progress') {
+      if (this.newStatus === null || this.newStatus === 'In Progress' || this.newStatus === 'Approved') {
         this.responseRequired = false
       }
       else {

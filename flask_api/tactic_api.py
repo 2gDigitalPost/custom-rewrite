@@ -729,11 +729,13 @@ class DepartmentRequestsByCode(Resource):
         # The api accepts a 'status' key, but this should update the task's status, not the request status.
         # Determine which task to update, if any, and then update the task.
         if status:
-            if status in ['in progress', 'additional information needed', 'complete']:
+            if status in ['ready', 'in progress', 'additional information needed', 'complete']:
                 # Status should update the Request task
                 process_name = 'Request'
 
-                if status == 'in progress':
+                if status == 'ready':
+                    updated_task_status = 'Ready'
+                elif status == 'in progress':
                     updated_task_status = 'In Progress'
                 elif status == 'additional information needed':
                     updated_task_status = 'Additional Info Needed'
