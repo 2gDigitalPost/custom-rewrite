@@ -6,6 +6,7 @@ export default {
   name: 'DepartmentRequestTable',
   data () {
     return {
+      loading: true,
       department: this.$route.params.department,
       requests: []
     }
@@ -30,6 +31,8 @@ export default {
       })
       .then(function (response) {
         self.requests = response.data.department_requests
+
+        self.loading = false
       })
       .catch(function (error) {
         console.log(error)
