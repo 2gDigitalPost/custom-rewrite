@@ -641,7 +641,7 @@ class DepartmentRequests(Resource):
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        department_requests = server.eval("@SOBJECT(twog/department_request['status', '!=', 'complete'])")
+        department_requests = server.eval("@SOBJECT(twog/department_request['status', '!=', 'complete']['@ORDER_BY', 'due_date asc'])")
 
         if len(department_requests) > 0:
             add_tasks_to_department_request_dictionary(server, department_requests)
@@ -660,7 +660,7 @@ class DepartmentRequestsByDepartment(Resource):
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         department_requests = server.eval(
-            "@SOBJECT(twog/department_request['assigned_department', '{0}']['status', 'in_progress'])".format(department)
+            "@SOBJECT(twog/department_request['assigned_department', '{0}']['status', 'in_progress']['@ORDER_BY', 'due_date asc'])".format(department)
         )
 
         if len(department_requests) > 0:
@@ -680,7 +680,7 @@ class DepartmentRequestsByUser(Resource):
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         department_requests = server.eval(
-            "@SOBJECT(twog/department_request['login', '{0}']['status', '!=', 'complete'])".format(user)
+            "@SOBJECT(twog/department_request['login', '{0}']['status', '!=', 'complete']['@ORDER_BY', 'due_date asc'])".format(user)
         )
 
         if len(department_requests) > 0:
