@@ -660,7 +660,7 @@ class DepartmentRequestsByDepartment(Resource):
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         department_requests = server.eval(
-            "@SOBJECT(twog/department_request['assigned_department', '{0}']['status', '!=', 'complete'])".format(department)
+            "@SOBJECT(twog/department_request['assigned_department', '{0}']['status', 'in_progress'])".format(department)
         )
 
         if len(department_requests) > 0:
@@ -719,12 +719,14 @@ class DepartmentRequestsByCode(Resource):
         response = department_request.get('response')
         status = department_request.get('status').strip().lower()
 
+        # Get the twog/department_request sobject (need the code and original response)
+        department_request_sobject = server.get_by_search_key(search_key)
+
         # Only send an update if there is a response. Otherwise, only a task was updated
         if response:
-            server.update(search_key, {'response': response})
+            response = department_request_sobject.get('response') + '\n\n' + response
 
-        # Get the twog/department_request sobject (need the code)
-        department_request_sobject = server.get_by_search_key(search_key)
+            server.update(search_key, {'response': response})
 
         # The api accepts a 'status' key, but this should update the task's status, not the request status.
         # Determine which task to update, if any, and then update the task.

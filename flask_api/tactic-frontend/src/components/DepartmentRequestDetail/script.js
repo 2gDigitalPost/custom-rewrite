@@ -57,7 +57,7 @@ export default {
       }
 
       if (self.responseRequired) {
-        jsonToSubmit['department_request']['response'] = self.requestResponse
+        jsonToSubmit['department_request']['response'] = localStorage.login + ' @ ' + new Date().toLocaleString() + ': ' + self.requestResponse
       }
 
       axios.post('/api/v1/department-requests/code/' + self.departmentRequestCode,
