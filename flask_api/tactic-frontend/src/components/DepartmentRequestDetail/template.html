@@ -9,12 +9,15 @@
         <h3>Due Date: {{ departmentRequest.due_date }}</h3>
         <h3>Submitted By: {{ departmentRequest.login }}</h3>
 
-        <h4>Request description:</h4>
-        <div>{{ departmentRequest.description }}</div>
+        <div id="request-description">
+            <h4>Request description:</h4>
+            <div>{{ departmentRequest.description }}</div>
+        </div>
 
-        <pre v-if="departmentRequest.response !== ''">
-            {{ departmentRequest.response }}
-        </pre>
+        <div v-if="departmentRequest.response !== ''">
+            <h4>Responses:</h4>
+            <pre id="response-text">{{ departmentRequest.response }}</pre>
+        </div>
 
         <form v-on:submit.prevent="submitResponse">
             <h4>Change Status</h4>
