@@ -91,5 +91,13 @@ export default {
         this.responseRequired = true
       }
     }
+  },
+  computed: {
+    displaySubmitButton: function () {
+      if (this.newStatus === null) return false
+      if (this.responseRequired === true && (this.requestResponse === '' || this.requestResponse === null)) return false
+
+      return true
+    }
   }
 }
