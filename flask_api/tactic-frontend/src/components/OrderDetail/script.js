@@ -48,7 +48,7 @@ export default {
     setupLinks: function () {
       this.add_title_link = '/orders/' + this.order_code + '/titles/add'
       this.edit_components_link = '/orders/' + this.order_code + '/components'
-      this.add_output_files_link = '/orders/' + this.order_code + '/output-files/add'
+      this.add_output_files_link = '/orders/' + this.order_code + '/file-flows/add'
     }
   },
   beforeMount: function () {

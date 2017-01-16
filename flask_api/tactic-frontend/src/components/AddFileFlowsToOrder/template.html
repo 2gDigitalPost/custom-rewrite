@@ -1,0 +1,33 @@
+<div>
+    <h1>Add File Flows to Order</h1>
+
+    <div class="row">
+        <div id="component-with-file-flows" class="col-xs-4">
+            <ul class="list-group">
+                <li class="list-group-item" v-for="component in components">
+                    <div>{{ component.component.component.name }}</div>
+                    <div v-if="component.component.title !== null">{{ component.component.title.name }}</div>
+                    <div v-else>No Title selected</div>
+                    <div v-if="component.component.component.pipeline_code !== null" class="no-title">{{ component.component.component.pipeline_code }}</div>
+                    <div v-else>No Pipeline selected</div>
+                    <div v-if="component.component.file_flows.length > 0">
+                        File Flows:
+
+                        <ul class="list-group">
+                            <li class="list-group-item" v-for="fileFlow in component.component.file_flows" v-on:click="fileFlowSelected(fileFlow)" v-bind:class="{active: fileFlow.code === selectedFileFlow}">
+                                {{ fileFlow.name }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div v-else class="no-file-flows">No File Flows have been added</div>
+                </li>
+            </ul>
+        </div>
+
+        <div id="packages" class="col-xs-4">
+            <ul class="list-group">
+                <li class="list-group-item" v-for="package in selectable_packages" v-on:click="packageSelected(package)" v-bind:class="{active: package.selected, externallySelected: package.externallySelected}">{{ package.package.name }}</li>
+            </ul>
+        </div>
+    </div>
+</div>

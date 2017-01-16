@@ -248,41 +248,18 @@ class FullOrder(Resource):
             else:
                 tasks_dict[task_search_code] = [task]
 
-        file_flow_to_components = server.eval(
-            "@SOBJECT(twog/file_flow_to_component['component_code', 'in', '{0}'])".format(component_codes_string)
-        )
-
-        file_flow_to_components_dict = {}
-        component_to_file_flow_dict = {}
-
-        file_flow_codes = []
-
-        for file_flow_to_component in file_flow_to_components:
-            component_code = file_flow_to_component.get('component_code')
-            file_flow_code = file_flow_to_component.get('file_flow_code')
-
-            file_flow_to_components_dict[component_code] = file_flow_to_component
-
-            if file_flow_code not in file_flow_codes:
-                file_flow_codes.append(file_flow_code)
-
-            if component_code in component_to_file_flow_dict:
-                component_to_file_flow_dict[component_code].append(file_flow_code)
-            else:
-                component_to_file_flow_dict[component_code] = [file_flow_code]
-
-        # for file_flow_to_component in file_flow_to_components:
-            # file_flow_to_components_dict[file_flow_to_component.get('code')] = file_flow_to_component
-            # file_flow_codes.append(file_flow_to_component.get('file_flow_code'))
-
-        file_flow_codes_string = '|'.join([file_flow_code for file_flow_code in file_flow_codes])
-
-        file_flows = server.eval("@SOBJECT(twog/file_flow['code', 'in', '{0}'])".format(file_flow_codes_string))
+        file_flows = server.eval("@SOBJECT(twog/file_flow['component_code', 'in', '{0}'])".format(component_codes_string))
 
         file_flows_dict = {}
+        file_flows_to_package_dict = {}
 
+        # TODO: Optimize file flow to package search
         for file_flow in file_flows:
             file_flows_dict[file_flow.get('code')] = file_flow
+
+            file_flow_to_package = server.eval("@SOBJECT(twog/file_flow_to_package['file_flow_code', '{0}'])".format(file_flow.get('code')))
+
+            file_flows_to_package_dict[file_flow.get('code')] = file_flow_to_package
 
         # Get all the details of all the components
         for component_sobject in component_sobjects:
@@ -297,13 +274,11 @@ class FullOrder(Resource):
             # Get the tasks assigned to the component, if any
             component_sobject_full['tasks'] = tasks_dict.get(component_sobject.get('code'))
 
-            # Get the files needed for the component's file flows
-            component_sobject_full['file_flow_to_component'] = file_flow_to_components_dict.get(component_sobject.get('code'))
-
             component_sobject_full['file_flows'] = []
 
-            for file_flow in component_to_file_flow_dict.get(component_sobject.get('code'), []):
-                component_sobject_full['file_flows'].append(file_flows_dict[file_flow])
+            # TODO: Optimize file flows search
+            file_flows = server.eval("@SOBJECT(twog/file_flow['component_code', '{0}'])".format(component_sobject.get('code')))
+            component_sobject_full['file_flows'] = file_flows
 
             component_sobjects_full.append(component_sobject_full)
 
@@ -311,7 +286,8 @@ class FullOrder(Resource):
         package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
 
         return jsonify({'order': order_sobject, 'components': component_sobjects, 'packages': package_sobjects,
-                        'components_full': component_sobjects_full})
+                        'components_full': component_sobjects_full,
+                        'file_flows_to_packages': file_flows_to_package_dict})
 
 
 class Orders(Resource):
