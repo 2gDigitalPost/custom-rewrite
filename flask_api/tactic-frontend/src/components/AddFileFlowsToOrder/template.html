@@ -34,5 +34,8 @@
                 <li class="list-group-item" v-for="package in selectable_packages" v-on:click="packageSelected(package)" v-bind:class="{active: package.selected, externallySelected: package.externallySelected}">{{ package.package.name }}</li>
             </ul>
         </div>
+        <div id="summary" class="col-xs-4">
+            <button id="submit-new-links" v-on:click="submitNewLinks" class="btn btn-default">Submit Changes</button>
+        </div>
     </div>
 </div>
