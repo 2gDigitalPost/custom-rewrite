@@ -85,7 +85,8 @@ export default {
       .then(function (response) {
         if (response.data) {
           if (response.data.status === 200) {
-            self.$router.go(self.$router.currentRoute)
+            // Redirect to the order detail page
+            self.$router.push('/orders/' + response.data.order_code)
           }
         }
       })
