@@ -3,8 +3,13 @@
 import _ from 'lodash'
 import axios from 'axios'
 
+import AddFileFlowToComponentModal from './AddFileFlowToComponentModal/index.vue'
+
 export default {
   name: 'AddFileFlowsToOrder',
+  components: {
+    'modal': AddFileFlowToComponentModal
+  },
   data () {
     return {
       order_code: this.$route.params.code,
@@ -16,7 +21,7 @@ export default {
       selectedFileFlow: null,
       fileFlows: [],
       fileFlowToPackages: [],
-      showModal: false
+      showModal: []
     }
   },
   methods: {
@@ -53,10 +58,19 @@ export default {
         }
 
         self.fileFlowToPackages = response.data.file_flows_to_packages
+
+        self.setupShowModalArray()
       })
       .catch(function (error) {
         console.log(error)
       })
+    },
+    setupShowModalArray: function () {
+      let self = this
+
+      for (let i = 0; i < self.components.length; i++) {
+        self.showModal.push(false)
+      }
     },
     fileFlowSelected(fileFlow) {
       // Start by setting all packages to not externally selected
@@ -92,5 +106,6 @@ export default {
   },
   beforeMount: function () {
     this.loadOrder()
+    // this.setupShowModalArray()
   }
 }

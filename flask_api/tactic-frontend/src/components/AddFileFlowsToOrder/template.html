@@ -4,7 +4,7 @@
     <div class="row">
         <div id="component-with-file-flows" class="col-xs-4">
             <ul class="list-group">
-                <li class="list-group-item" v-for="component in components">
+                <li class="list-group-item" v-for="(component, index) in components">
                     <div>{{ component.component.component.name }}</div>
                     <div v-if="component.component.title !== null">{{ component.component.title.name }}</div>
                     <div v-else>No Title selected</div>
@@ -20,6 +20,11 @@
                         </ul>
                     </div>
                     <div v-else class="no-file-flows">No File Flows have been added</div>
+
+                    <button id="show-modal" v-on:click="showModal.splice(index, 1, true)" class="btn btn-default">
+                        <span class="glyphicon glyphicon-plus"></span> Add a new File Flow
+                    </button>
+                    <modal v-if="showModal[index]" v-on:close="showModal.splice(index, 1, false)" v-bind:component="component.component.component"></modal>
                 </li>
             </ul>
         </div>
