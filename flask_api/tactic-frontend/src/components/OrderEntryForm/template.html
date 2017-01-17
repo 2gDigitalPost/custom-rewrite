@@ -1,19 +1,28 @@
 <div>
-    <h1>New Order</h1>
+    <div v-if="order_submitted === false">
+        <h1>New Order</h1>
 
-    <form v-on:submit.prevent="addOrderToTactic">
-        <h4>Select the Client (Company)</h4>
-        <client-select></client-select>
-        <div class="card">
-            <div class="row">
-                <span>Due Date：</span>
-                <date-picker :date="due_date" :option="option"></date-picker>
+        <form v-on:submit.prevent="addOrderToTactic">
+            <h4>Select the Client (Company)</h4>
+            <client-select></client-select>
+            <div class="card">
+                <div class="row">
+                    <span>Due Date：</span>
+                    <date-picker :date="due_date" :option="option"></date-picker>
+                </div>
+                <div class="row">
+                    <span>Expected Completion Date：</span>
+                    <date-picker :date="expected_completion_date" :option="option"></date-picker>
+                </div>
             </div>
-            <div class="row">
-                <span>Expected Completion Date：</span>
-                <date-picker :date="expected_completion_date" :option="option"></date-picker>
-            </div>
-        </div>
-        <button type="submit">Submit</button>
-    </form>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div v-else>
+        <h1>Order Submitted</h1>
+        <p>Your order was submitted successfully. The order code is {{ submitted_order_code }}</p>
+        <button v-on:click="refreshPage" class="btn btn-default">Enter another Order</button>
+        <button v-on:click="redirectToOrderDetail" class="btn btn-default">View Order Page</button>
+        <button v-on:click="redirectToAddTitle" class="btn btn-default">Add Titles to Order</button>
+    </div>
 </div>

@@ -19,6 +19,9 @@ export default {
 
       selected_division: null,
 
+      order_submitted: false,
+      submitted_order_code: null,
+
       option: {
         type: 'min',
         week: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
@@ -86,7 +89,8 @@ export default {
         if (response.data) {
           if (response.data.status === 200) {
             // Redirect to the order detail page
-            self.$router.push('/orders/' + response.data.order_code)
+            self.order_submitted = true
+            self.submitted_order_code = response.data.order_code
           }
         }
       })
@@ -97,6 +101,15 @@ export default {
     divisionSelected: function (division) {
       var self = this
       self.selected_division = division
+    },
+    redirectToOrderDetail: function () {
+      this.$router.push('/orders/' + this.submitted_order_code)
+    },
+    redirectToAddTitle: function () {
+      this.$router.push('/orders/' + this.submitted_order_code + '/titles/add')
+    },
+    refreshPage: function () {
+      this.$router.go(this.$router.currentRoute)
     }
   },
   created() {

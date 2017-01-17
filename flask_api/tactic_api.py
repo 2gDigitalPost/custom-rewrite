@@ -249,14 +249,22 @@ class FullOrder(Resource):
                 tasks_dict[task_search_code] = [task]
 
         file_flows = server.eval("@SOBJECT(twog/file_flow['component_code', 'in', '{0}'])".format(component_codes_string))
+        file_flow_codes = [file_flow.get('code') for file_flow in file_flows]
+        file_flow_codes_string = '|'.join(file_flow_codes)
 
-        file_flows_dict = {}
+        file_flow_to_package_sobjects = server.eval("@SOBJECT(twog/file_flow_to_package['file_flow_code', 'in', '{0}'])".format(file_flow_codes_string))
+
         file_flows_to_package_dict = {}
 
-        # TODO: Optimize file flow to package search
-        for file_flow in file_flows:
-            file_flows_dict[file_flow.get('code')] = file_flow
+        for file_flow_to_package_sobject in file_flow_to_package_sobjects:
+            file_flow_code = file_flow_to_package_sobject.get('file_flow_code')
 
+            if file_flow_code in file_flows_to_package_dict:
+                file_flows_to_package_dict[file_flow_code].append(file_flow_to_package_sobject)
+            else:
+                file_flows_to_package_dict[file_flow_code] = [file_flow_to_package_sobject]
+
+        for file_flow in file_flows:
             file_flow_to_package = server.eval("@SOBJECT(twog/file_flow_to_package['file_flow_code', '{0}'])".format(file_flow.get('code')))
 
             file_flows_to_package_dict[file_flow.get('code')] = file_flow_to_package
@@ -277,8 +285,11 @@ class FullOrder(Resource):
             component_sobject_full['file_flows'] = []
 
             # TODO: Optimize file flows search
-            file_flows = server.eval("@SOBJECT(twog/file_flow['component_code', '{0}'])".format(component_sobject.get('code')))
-            component_sobject_full['file_flows'] = file_flows
+            component_sobject_full['file_flows'] = []
+
+            for file_flow in file_flows:
+                if file_flow.get('component_code') == component_sobject.get('code'):
+                    component_sobject_full['file_flows'].append(file_flow)
 
             component_sobjects_full.append(component_sobject_full)
 
