@@ -3,19 +3,26 @@
 import bus from '../../../bus'
 
 import axios from 'axios'
+import Multiselect from 'vue-multiselect'
 
 export default {
   name: 'DivisionSelect',
   props: ['client'],
+  components: {
+    Multiselect,
+  },
   data () {
     return {
-      selected_division: '',
-      division_options: []
+      selected_division: null,
+      division_options: [],
+      loaded: false
     }
   },
   methods: {
     loadDivisions: function () {
       var self = this
+
+      self.loaded = false
 
       // Clear out the division options, in case the client code changed
       self.division_options = []
@@ -32,6 +39,8 @@ export default {
         for (let i = 0; i < divisionData.length; i++) {
           self.division_options.push({text: divisionData[i].name, value: divisionData[i].code})
         }
+
+        self.loaded = true
       })
       .catch(function (error) {
         console.log(error)
@@ -43,7 +52,7 @@ export default {
       this.loadDivisions()
     },
     selected_division: function () {
-      bus.$emit('division-selected', this.selected_division)
+      bus.$emit('division-selected', this.selected_division.value)
     }
   },
   beforeMount: function () {

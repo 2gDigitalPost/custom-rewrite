@@ -1,11 +1,7 @@
 <div>
-    <select v-model="selected_client">
-        <option v-for="option in client_options" v-bind:value="option.value">
-            {{ option.text }}
-        </option>
-    </select>
+    <multiselect v-model="selected_client" :options="client_options" track-by="value" label="text"></multiselect>
 
-    <div v-if="selected_client !== ''">
-        <division-select :client="selected_client"></division-select>
+    <div v-if="selected_client !== null">
+        <division-select :client="selected_client.value"></division-select>
     </div>
 </div>

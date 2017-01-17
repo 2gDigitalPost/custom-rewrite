@@ -1,12 +1,11 @@
 <div>
     <div v-if="division_options.length > 0">
-        <select v-model="selected_division">
-            <option v-for="option in division_options" v-bind:value="option.value">
-                {{ option.text }}
-            </option>
-        </select>
+        <multiselect v-model="selected_division" :options="division_options" track-by="value" label="text"></multiselect>
+    </div>
+    <div v-else-if="loaded">
+        <p>No divisions currently exist for the selected client. One will have to be added before you can enter the order.</p>
     </div>
     <div v-else>
-        <p>No divisions currently exist for the selected client. One will have to be added before you can enter the order.</p>
+        <p>Loading...</p>
     </div>
 </div>

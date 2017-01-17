@@ -1,16 +1,19 @@
 /* globals localStorage */
 
 import axios from 'axios'
+import Multiselect from 'vue-multiselect'
+
 import DivisionSelect from '../DivisionSelect/index.vue'
 
 export default {
   name: 'ClientSelect',
   components: {
+    Multiselect,
     'division-select': DivisionSelect
   },
   data () {
     return {
-      selected_client: '',
+      selected_client: null,
       client_options: []
     }
   },
