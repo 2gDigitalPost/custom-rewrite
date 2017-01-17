@@ -17,12 +17,12 @@ export default {
 
       console.log(self.component)
 
-      /*
       axios.post('/api/v1/file-flows', 
         JSON.stringify({
           'file_flow': {
             'name': self.name,
-            'order_code': self.orderCode
+            'component_code': self.component.code,
+            'order_code': self.component.order_code
           },
           'token': localStorage.tactic_token
         }), {
@@ -40,7 +40,6 @@ export default {
       .catch(function (error) {
         console.log(error)
       })
-    */
     }
   }
 }
