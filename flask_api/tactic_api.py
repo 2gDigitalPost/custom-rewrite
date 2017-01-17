@@ -264,11 +264,6 @@ class FullOrder(Resource):
             else:
                 file_flows_to_package_dict[file_flow_code] = [file_flow_to_package_sobject]
 
-        for file_flow in file_flows:
-            file_flow_to_package = server.eval("@SOBJECT(twog/file_flow_to_package['file_flow_code', '{0}'])".format(file_flow.get('code')))
-
-            file_flows_to_package_dict[file_flow.get('code')] = file_flow_to_package
-
         # Get all the details of all the components
         for component_sobject in component_sobjects:
             component_sobject_full = {'code': component_sobject.get('code'), 'component': component_sobject}
@@ -282,9 +277,6 @@ class FullOrder(Resource):
             # Get the tasks assigned to the component, if any
             component_sobject_full['tasks'] = tasks_dict.get(component_sobject.get('code'))
 
-            component_sobject_full['file_flows'] = []
-
-            # TODO: Optimize file flows search
             component_sobject_full['file_flows'] = []
 
             for file_flow in file_flows:
