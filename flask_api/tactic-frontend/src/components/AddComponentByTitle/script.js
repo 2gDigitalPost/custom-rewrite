@@ -1,6 +1,7 @@
 /* globals localStorage */
 
 import axios from 'axios'
+import _ from 'lodash'
 import Multiselect from 'vue-multiselect'
 
 export default {
@@ -11,9 +12,8 @@ export default {
   data () {
     return {
       title_type: null,
-      selected_title: null,
-      selected_language: null,
-      selected_languages: [],
+      selectedTitles: [],
+      selectedLanguages: [],
       titles: [],
       searchable_titles: [],
       languages: [],
@@ -79,54 +79,41 @@ export default {
         console.log(error)
       })
     },
-    updateSelectedTitle: function (newSelectedTitle) {
-      this.selected_title = newSelectedTitle
-    },
-    updateSelectedLanguages: function (newSelectedLanguage) {
-      this.selected_language = newSelectedLanguage
-    },
     addComponentsToTactic: function() {
       var self = this
-      let components_to_send = []
-      let order_code = self.$route.params.code
+      let componentsToSend = []
+      let orderCode = self.$route.params.code
 
-      if (this.selected_languages.length === 0) {
+      _.forEach(self.selectedTitles, function(selectedTitle) {
         let component = {
-          'name': this.selected_title.name,
-          'title_code': this.selected_title.code,
+          'name': selectedTitle.name,
+          'title_code': selectedTitle.code
+        }
+        
+        if (self.selected_pipeline) {
+          component['pipeline_code'] = self.selected_pipeline.code
         }
 
-        if (this.selected_pipeline) {
-          component['pipeline_code'] = this.selected_pipeline.code
+        if (self.selectedLanguages.length > 0) {
+          _.forEach(self.selectedLanguages, function(selectedLanguage) {
+            component['name'] = component['name'] + ' - ' + selectedLanguage.name
+            component['language_code'] = selectedLanguage.code
+
+            componentsToSend.push(component)
+          })
         }
-
-        components_to_send.push(component)
-      }
-      else {
-        for (let i = 0; i < this.selected_languages.length; i++) {
-          let component = {
-            'name': this.selected_title.name + ' - ' + this.selected_languages[i].name,
-            'title_code': this.selected_title.code,
-            'language_code': this.selected_languages[i].code,
-          }
-
-          if (this.selected_pipeline) {
-            component['pipeline_code'] = this.selected_pipeline.code
-          }
-
-          components_to_send.push(component)
+        else {
+          componentsToSend.push(component)
         }
-      }
+      })
 
-      console.log(components_to_send)
-
-      let apiURL = '/api/v1/orders/' + order_code + '/components'
-      let json_to_send = {
+      let apiURL = '/api/v1/orders/' + orderCode + '/components'
+      let jsonToSend = {
         'token': localStorage.tactic_token,
-        'components': components_to_send
+        'components': componentsToSend
       }
 
-      axios.post(apiURL, JSON.stringify(json_to_send), {
+      axios.post(apiURL, JSON.stringify(jsonToSend), {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8'
         },
@@ -150,22 +137,21 @@ export default {
   },
   computed: {
     created_components: function() {
-      if (this.selected_title) {
-        let created_components_list = []
+      let self = this
+      let createdComponentsList = []
 
-        if (this.selected_languages.length === 0) {
-          created_components_list.push(this.selected_title.name)
-
-          return created_components_list
+      _.forEach(self.selectedTitles, function(selectedTitle) {
+        if (self.selectedLanguages.length > 0) {
+          _.forEach(self.selectedLanguages, function(selectedLanguage) {
+            createdComponentsList.push(selectedTitle.name + ' - ' + selectedLanguage.name)
+          })
         }
         else {
-          for (let i = 0; i < this.selected_languages.length; i++) {
-            created_components_list.push(this.selected_title.name + ' - ' + this.selected_languages[i].name)
-          }
-
-          return created_components_list
+          createdComponentsList.push(selectedTitle.name)
         }
-      }
+      })
+
+      return createdComponentsList
     }
   },
   watch: {

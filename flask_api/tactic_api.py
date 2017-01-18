@@ -423,11 +423,11 @@ class ComponentsInOrder(Resource):
         components_to_insert_list = []
 
         for component in json_data.get('components'):
-            component_data_to_insert = {}
-
-            component_data_to_insert['name'] = component.get('name')
-            component_data_to_insert['order_code'] = code
-            component_data_to_insert['title_code'] = component.get('title_code')
+            component_data_to_insert = {
+                'name': component.get('name'),
+                'order_code': code,
+                'title_code': component.get('title_code')
+            }
 
             if component.get('language_code'):
                 component_data_to_insert['language_code'] = component.get('language_code')
@@ -439,7 +439,7 @@ class ComponentsInOrder(Resource):
 
         server.insert_multiple('twog/component', components_to_insert_list)
 
-        return {'status': 200}
+        return jsonify({'status': 200})
 
 
 class Languages(Resource):
