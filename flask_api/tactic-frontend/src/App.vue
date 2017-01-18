@@ -36,6 +36,9 @@
               <router-link to="/department-requests/links">Department Requests</router-link>
             </li>
             <li>
+              <router-link to="/project-templates">Project Templates</router-link>
+            </li>
+            <li>
               <router-link to="/about">About</router-link>
             </li>
           </ul>

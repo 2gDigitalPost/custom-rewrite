@@ -745,6 +745,101 @@ class DepartmentRequestsByCode(Resource):
         return jsonify({'status': 200})
 
 
+class ProjectTemplates(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        project_templates = server.eval('@SOBJECT(twog/project_template)')
+
+        return jsonify({'project_templates': project_templates})
+
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        name = json_data.get('name')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        new_project_template = server.insert('twog/project_template', {'name': name})
+
+        return jsonify({'status': 200, 'project_template_code': new_project_template.get('code')})
+
+
+class ProjectTemplatesFull(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        project_template = server.get_by_code('twog/project_template', code)
+
+        # Get all the associated component_template sobjects
+        component_templates = server.eval("@SOBJECT(twog/component_template['project_template_code', '{0}'])".format(code))
+
+        for component_template in component_templates:
+            component_template['pipeline'] = server.get_by_code('sthpw/pipeline', component_template.get('component_pipeline_code'))
+
+        return jsonify({'project_template': project_template, 'component_templates': component_templates})
+
+
+class ComponentTemplates(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        component_templates = server.eval('@SOBJECT(twog/component_template)')
+
+        return jsonify({'component_templates': component_templates})
+
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        name = json_data.get('name')
+        project_template_code = json_data.get('project_template_code')
+        component_pipeline_code = json_data.get('component_pipeline_code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        new_component_template = server.insert('twog/component_template',
+                                               {'name': name, 'project_template_code': project_template_code,
+                                                'component_pipeline_code': component_pipeline_code
+                                                })
+
+        return jsonify({'status': 200, 'project_template_code': new_component_template.get('code')})
+
+
+class PipelinesByType(Resource):
+    def get(self, type):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        pipelines = server.eval("@SOBJECT(sthpw/pipeline['search_type', 'twog/{0}'])".format(type))
+
+        return jsonify({'pipelines': pipelines})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
@@ -772,6 +867,10 @@ api.add_resource(DepartmentRequests, '/api/v1/department-requests')
 api.add_resource(DepartmentRequestsByUser, '/api/v1/department-requests/user/<string:user>')
 api.add_resource(DepartmentRequestsByCode, '/api/v1/department-requests/code/<string:code>')
 api.add_resource(DepartmentRequestsByDepartment, '/api/v1/department-requests/<string:department>')
+api.add_resource(ProjectTemplates, '/api/v1/project-templates')
+api.add_resource(ProjectTemplatesFull, '/api/v1/project-templates/<string:code>/full')
+api.add_resource(ComponentTemplates, '/api/v1/component-templates')
+api.add_resource(PipelinesByType, '/api/v1/pipelines/<string:type>')
 
 
 if __name__ == '__main__':

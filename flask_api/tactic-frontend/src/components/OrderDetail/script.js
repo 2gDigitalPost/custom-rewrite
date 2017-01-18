@@ -3,11 +3,13 @@
 import axios from 'axios'
 
 import ComponentDetailList from '../ComponentDetailList/index.vue'
+import PackageDetailList from '../PackageDetailList/index.vue'
 
 export default {
   name: 'OrderDetail',
   components: {
-    'component-detail-list': ComponentDetailList
+    'component-detail-list': ComponentDetailList,
+    'package-detail-list': PackageDetailList
   },
   data () {
     return {
@@ -40,6 +42,7 @@ export default {
         self.order_name = orderData['name']
         self.components = componentsData
         self.componentsFull = response.data.components_full
+        self.packages = packagesData
       })
       .catch(function (error) {
         console.log(error)

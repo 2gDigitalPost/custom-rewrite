@@ -16,9 +16,12 @@ import DepartmentRequestDetail from './components/DepartmentRequestDetail/index.
 import DepartmentRequestLinks from './components/DepartmentRequestLinks/index.vue'
 import DepartmentRequestTable from './components/DepartmentRequestTable/index.vue'
 import LoginForm from './components/LoginForm/index.vue'
+import NewProjectTemplateForm from './components/NewProjectTemplateForm/index.vue'
 import OrderDetail from './components/OrderDetail/index.vue'
 import OrderEntryForm from './components/OrderEntryForm/index.vue'
 import OrderList from './components/OrderList/index.vue'
+import ProjectTemplate from './components/ProjectTemplate/index.vue'
+import ProjectTemplatesList from './components/ProjectTemplatesList/index.vue'
 import SelectPipelines from './components/SelectPipelines/index.vue'
 
 Vue.use(VueRouter)
@@ -41,6 +44,9 @@ const routes = [
   { path: '/orders/:code/output-files/add', component: AddOutputFilesToOrder, beforeEnter: requireAuth },
   { path: '/titles/add/imdb', component: AddTitleFromIMDb, beforeEnter: requireAuth },
   { path: '/titles/add/manual', component: AddTitleManually, beforeEnter: requireAuth },
+  { path: '/project-templates', component: ProjectTemplatesList, beforeenter: requireAuth },
+  { path: '/project-templates/new', component: NewProjectTemplateForm, beforeEnter: requireAuth },
+  { path: '/project-templates/:code', component: ProjectTemplate, beforeEnter: requireAuth },
   { path: '/login', component: LoginForm },
   { path: '/logout',
     beforeEnter (to, from, next) {
