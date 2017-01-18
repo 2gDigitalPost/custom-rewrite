@@ -13,17 +13,5 @@ export default {
       tasks: this.componentFull.tasks,
       title: this.componentFull.title
     }
-  },
-  methods: {
-    loadTitle: function (titleCode) {
-      console.log(this.componentFull)
-
-      if (titleCode === null) return null
-
-
-    }
-  },
-  beforeMount: function () {
-    this.loadTitle(this.component.title_code)
   }
 }
