@@ -49,6 +49,33 @@ export default {
       .catch(function (error) {
         console.log(error)
       })
+    },
+    deletePackageTemplate: function () {
+      let self = this
+
+      let confirmation = window.confirm('Are you sure you want to delete the package "' + self.name + '"?')
+
+      if (confirmation) {
+        axios.delete('/api/v1/package-templates/' + self.code,
+        {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          },
+          params: {
+            token: localStorage.tactic_token,
+          }
+        })
+        .then(function (response) {
+          if (response.data) {
+            if (response.data.status === 200) {
+              bus.$emit('package-template-updated')
+            }
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+      }
     }
   }
 }

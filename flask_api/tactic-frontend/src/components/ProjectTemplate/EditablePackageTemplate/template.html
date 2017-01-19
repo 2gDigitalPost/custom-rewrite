@@ -19,8 +19,13 @@
             <div>Pipeline: {{ packageTemplate.pipeline.name }}</div>
         </div>
         
-        <button v-on:click="editing = true" class="btn btn-default pull-right">
+        <div class="pull-right">
+        <button v-on:click="editing = true" class="btn btn-default">
             <span class="glyphicon glyphicon-pencil"></span>
         </button>
+        <button v-on:click="deletePackageTemplate()" class="btn btn-default">
+            <span class="glyphicon glyphicon-trash"></span>
+        </button>
+        </div>
     </template>
 </div>

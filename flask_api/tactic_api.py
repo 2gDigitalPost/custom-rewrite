@@ -941,6 +941,21 @@ class PackageTemplateByCode(Resource):
 
         return jsonify({'status': 200})
 
+    def delete(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        search_key = server.build_search_key('twog/package_template', code, project_code='twog')
+
+        server.delete_sobject(search_key)
+
+        return jsonify({'status': 200})
+
 
 class Platforms(Resource):
     def get(self):
