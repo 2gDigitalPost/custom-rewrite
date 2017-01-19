@@ -1,0 +1,26 @@
+<div>
+    <template v-if="editing">
+        <h4>Name</h4>
+        <input type="text" v-model="name" /><br/>
+        
+        <h4>Platform</h4>
+        <multiselect v-model="platform" :options="platformOptions" track-by="code" label="name"></multiselect>
+
+        <h4>Pipeline</h4>
+        <multiselect v-model="pipeline" :options="pipelineOptions" track-by="code" label="name"></multiselect>
+
+        <button class="btn btn-default" v-on:click="editing = false">Cancel</button>
+        <button type="submit" class="btn btn-default" v-on:click="submitChanges">Submit</button>
+    </template>
+    <template v-else>
+        <div class="pull-left">
+            <div>Name: {{ packageTemplate.name }}</div>
+            <div>Platform: {{ packageTemplate.platform.name }}</div>
+            <div>Pipeline: {{ packageTemplate.pipeline.name }}</div>
+        </div>
+        
+        <button v-on:click="editing = true" class="btn btn-default pull-right">
+            <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+    </template>
+</div>

@@ -562,6 +562,40 @@ class FileFlowTemplate(Resource):
         return jsonify({'status': 200})
 
 
+class FileFlowTemplateToPackageTemplates(Resource):
+    def get(self, file_flow_template_code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        file_flow_sobjects = server.eval("@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}'])".format(file_flow_template_code))
+
+        file_flow_json_data = {'file_flows': file_flow_sobjects}
+
+        # Only search for connections of the file flows exist
+        if len(file_flow_sobjects) > 0:
+            file_flow_codes = [file_flow_sobject.get('code') for file_flow_sobject in file_flow_sobjects]
+            file_flow_codes_string = '|'.join(file_flow_codes)
+            print(file_flow_codes_string)
+
+            file_flow_to_component_sobjects = server.eval(
+                "@SOBJECT(twog/file_flow_to_component['file_flow_code', 'in', '{0}'])".format(file_flow_codes_string))
+            file_flow_to_package_sobjects = server.eval(
+                "@SOBJECT(twog/file_flow_to_package['file_flow_code', 'in', '{0}'])".format(file_flow_codes_string))
+
+            file_flow_json_data['file_flow_to_components'] = file_flow_to_component_sobjects
+            file_flow_json_data['file_flow_to_packages'] = file_flow_to_package_sobjects
+        else:
+            file_flow_json_data['file_flow_to_components'] = []
+            file_flow_json_data['file_flow_to_packages'] = []
+
+        return jsonify(file_flow_json_data)
+
+
 class FileFlowToComponent(Resource):
     def post(self):
         json_data = request.get_json()
@@ -805,6 +839,9 @@ class ProjectTemplatesFull(Resource):
             component_template['pipeline'] = server.get_by_code('sthpw/pipeline', component_template.get('component_pipeline_code'))
             component_template['file_flow_templates'] = server.eval("@SOBJECT(twog/file_flow_template['component_template_code', '{0}'])".format(component_template.get('code')))
 
+            for file_flow_template in component_template['file_flow_templates']:
+                file_flow_template['file_flow_template_to_package_template'] = server.eval("@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}'])".format(file_flow_template.get('code')))
+
         # Get all the associated package_template sobjects
         package_templates = server.eval("@SOBJECT(twog/package_template['project_template_code', '{0}'])".format(code))
 
@@ -882,6 +919,29 @@ class PackageTemplates(Resource):
         return jsonify({'status': 200, 'project_template_code': new_package_template.get('code')})
 
 
+class PackageTemplateByCode(Resource):
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        name = json_data.get('name')
+        package_pipeline_code = json_data.get('package_pipeline_code')
+        platform_code = json_data.get('platform_code')
+        project_template_code = json_data.get('project_template_code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the existing object
+        package_template_sobject = server.get_by_code('twog/package_template', code)
+
+        # Update the existing object
+        server.update(package_template_sobject.get('__search_key__'),
+                      {'name': name, 'package_pipeline_code': package_pipeline_code, 'platform_code': platform_code,
+                       'project_template_code': project_template_code})
+
+        return jsonify({'status': 200})
+
+
 class Platforms(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -945,6 +1005,7 @@ api.add_resource(ProjectTemplates, '/api/v1/project-templates')
 api.add_resource(ProjectTemplatesFull, '/api/v1/project-templates/<string:code>/full')
 api.add_resource(ComponentTemplates, '/api/v1/component-templates')
 api.add_resource(PackageTemplates, '/api/v1/package-templates')
+api.add_resource(PackageTemplateByCode, '/api/v1/package-templates/<string:code>')
 api.add_resource(PipelinesByType, '/api/v1/pipelines/<string:type>')
 
 

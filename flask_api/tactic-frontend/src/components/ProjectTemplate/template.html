@@ -10,7 +10,7 @@
                 <h3>Components</h3>
 
                 <ul class="list-group">
-                    <li class="list-group-item" v-for="(componentTemplate, index) in componentTemplates">
+                    <li class="list-group-item clearfix" v-for="(componentTemplate, index) in componentTemplates">
                         <div>Name: {{ componentTemplate.name }}</div>
                         <div>Pipeline: {{ componentTemplate.pipeline.name }}</div>
 
@@ -18,8 +18,11 @@
                             File Flows:
 
                             <ul class="list-group">
-                                <li class="list-group-item" v-for="fileFlowTemplate in componentTemplate.file_flow_templates" v-on:click="fileFlowTemplateSelected(fileFlowTemplate)" v-bind:class="{active: fileFlowTemplate.code === selectedFileFlow}">
-                                    {{ fileFlowTemplate.name }}
+                                <li class="list-group-item clearfix" v-for="fileFlowTemplate in componentTemplate.file_flow_templates" v-on:click="fileFlowTemplateSelected(fileFlowTemplate)" v-bind:class="{active: fileFlowTemplate.code === selectedFileFlow}">
+                                    <span>{{ fileFlowTemplate.name }}</span>
+                                    <button v-on:click="editFileFlowTemplate(fileFlowTemplate)" class="btn btn-default pull-right">
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -54,11 +57,15 @@
             <div class="col-xs-5">
                 <h3>Packages</h3>
                 <ul class="list-group">
-                    <li class="list-group-item" v-for="packageTemplate in packageTemplates">
-                        <div>Name: {{ packageTemplate.name }}</div>
-                        <div>Platform: {{ packageTemplate.platform.name }}</div>
-                        <div>Pipeline: {{ packageTemplate.pipeline.name }}</div>
-                    </li>
+                    <li
+                        is="editable-package-template"
+                        v-for="packageTemplate in packageTemplates"
+                        v-bind:packageTemplate="packageTemplate"
+                        v-bind:platformOptions="platformOptions"
+                        v-bind:pipelineOptions="packagePipelineOptions"
+                        v-bind:projectTemplateCode="templateCode"
+                        class="list-group-item clearfix"
+                    ></li>
                 </ul>
 
                 <button v-on:click="toggleNewPackageTemplateForm" class="btn btn-default">

@@ -4,12 +4,16 @@ import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
 import AddFileFlowTemplateToComponentTemplateModal from './AddFileFlowTemplateToComponentTemplateModal/index.vue'
+import EditablePackageTemplate from './EditablePackageTemplate/index.vue'
+
+import bus from '../../bus'
 
 export default {
   name: 'ProjectTemplate',
   components: {
     'multiselect': Multiselect,
-    'modal': AddFileFlowTemplateToComponentTemplateModal
+    'modal': AddFileFlowTemplateToComponentTemplateModal,
+    'editable-package-template': EditablePackageTemplate
   },
   data () {
     return {
@@ -115,6 +119,9 @@ export default {
     toggleNewPackageTemplateForm: function () {
       this.newPackageTemplateFormVisible = !this.newPackageTemplateFormVisible
     },
+    fileFlowTemplateSelected: function (fileFlowTemplate) {
+
+    },
     submitNewComponentTemplate: function () {
       let self = this
 
@@ -125,7 +132,7 @@ export default {
         'token': localStorage.tactic_token
       }
 
-      axios.post('/api/v1/component-templates', 
+      axios.post('/api/v1/component-templates',
         JSON.stringify(jsonToSend), {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8'
@@ -189,5 +196,11 @@ export default {
     this.loadComponentPipelineOptions()
     this.loadPackagePipelineOptions()
     this.loadPlatformOptions()
+  },
+  created() {
+    bus.$on('package-template-updated', this.loadProjectTemplate)
+  },
+  destroyed() {
+    bus.$off('package-template-updated', this.loadProjectTemplate)
   }
 }
