@@ -18,12 +18,12 @@
                             File Flows:
 
                             <ul class="list-group">
-                                <li class="list-group-item clearfix" v-for="fileFlowTemplate in componentTemplate.file_flow_templates" v-on:click="fileFlowTemplateSelected(fileFlowTemplate)" v-bind:class="{active: fileFlowTemplate.code === selectedFileFlow}">
-                                    <span>{{ fileFlowTemplate.name }}</span>
-                                    <button v-on:click="editFileFlowTemplate(fileFlowTemplate)" class="btn btn-default pull-right">
-                                        <span class="glyphicon glyphicon-pencil"></span>
-                                    </button>
-                                </li>
+                                <li
+                                    is="editable-file-flow-template"
+                                    v-for="fileFlowTemplate in componentTemplate.file_flow_templates"
+                                    v-bind:fileFlowTemplate="fileFlowTemplate"
+                                    class="list-group-item clearfix"
+                                ></li>
                             </ul>
                         </div>
                         <div v-else class="no-file-flows">No File Flows have been added</div>

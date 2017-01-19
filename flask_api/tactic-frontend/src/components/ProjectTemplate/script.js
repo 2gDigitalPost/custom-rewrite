@@ -4,6 +4,7 @@ import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
 import AddFileFlowTemplateToComponentTemplateModal from './AddFileFlowTemplateToComponentTemplateModal/index.vue'
+import EditableFileFlowTemplate from './EditableFileFlowTemplate/index.vue'
 import EditablePackageTemplate from './EditablePackageTemplate/index.vue'
 
 import bus from '../../bus'
@@ -13,6 +14,7 @@ export default {
   components: {
     'multiselect': Multiselect,
     'modal': AddFileFlowTemplateToComponentTemplateModal,
+    'editable-file-flow-template': EditableFileFlowTemplate,
     'editable-package-template': EditablePackageTemplate
   },
   data () {
