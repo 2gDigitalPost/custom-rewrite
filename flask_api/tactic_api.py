@@ -548,6 +548,20 @@ class FileFlow(Resource):
         return jsonify({'status': 200})
 
 
+class FileFlowTemplate(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        file_flow_template = json_data.get('file_flow_template')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/file_flow_template', file_flow_template)
+
+        return jsonify({'status': 200})
+
+
 class FileFlowToComponent(Resource):
     def post(self):
         json_data = request.get_json()
@@ -789,8 +803,17 @@ class ProjectTemplatesFull(Resource):
 
         for component_template in component_templates:
             component_template['pipeline'] = server.get_by_code('sthpw/pipeline', component_template.get('component_pipeline_code'))
+            component_template['file_flow_templates'] = server.eval("@SOBJECT(twog/file_flow_template['component_template_code', '{0}'])".format(component_template.get('code')))
 
-        return jsonify({'project_template': project_template, 'component_templates': component_templates})
+        # Get all the associated package_template sobjects
+        package_templates = server.eval("@SOBJECT(twog/package_template['project_template_code', '{0}'])".format(code))
+
+        for package_template in package_templates:
+            package_template['pipeline'] = server.get_by_code('sthpw/pipeline', package_template.get('package_pipeline_code'))
+            package_template['platform'] = server.get_by_code('twog/platform', package_template.get('platform_code'))
+
+        return jsonify({'project_template': project_template, 'component_templates': component_templates,
+                        'package_templates': package_templates})
 
 
 class ComponentTemplates(Resource):
@@ -825,6 +848,55 @@ class ComponentTemplates(Resource):
         return jsonify({'status': 200, 'project_template_code': new_component_template.get('code')})
 
 
+class PackageTemplates(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        package_templates = server.eval('@SOBJECT(twog/package_template)')
+
+        return jsonify({'package_templates': package_templates})
+
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        name = json_data.get('name')
+        project_template_code = json_data.get('project_template_code')
+        package_pipeline_code = json_data.get('package_pipeline_code')
+        platform_code = json_data.get('platform_code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        new_package_template = server.insert('twog/package_template',
+                                             {'name': name, 'project_template_code': project_template_code,
+                                              'package_pipeline_code': package_pipeline_code,
+                                              'platform_code': platform_code
+                                              })
+
+        return jsonify({'status': 200, 'project_template_code': new_package_template.get('code')})
+
+
+class Platforms(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        platforms = server.eval('@SOBJECT(twog/platform)')
+
+        return jsonify({'platforms': platforms})
+
+
 class PipelinesByType(Resource):
     def get(self, type):
         parser = reqparse.RequestParser()
@@ -852,6 +924,7 @@ api.add_resource(FullOrder, '/api/v1/orders/<string:code>/full')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
 api.add_resource(Title, '/api/v1/title/name/<string:name>')
 api.add_resource(Titles, '/api/v1/titles')
+api.add_resource(Platforms, '/api/v1/platforms')
 api.add_resource(ComponentsInOrder, '/api/v1/orders/<string:code>/components')
 api.add_resource(Languages, '/api/v1/languages')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
@@ -863,6 +936,7 @@ api.add_resource(FileFlowToComponent, '/api/v1/file-flow-to-component')
 api.add_resource(FileFlowToComponentWithCode, '/api/v1/file-flow-to-component/<string:code>')
 api.add_resource(FileFlowToPackage, '/api/v1/file-flow-to-package')
 api.add_resource(FileFlowToPackageWithCode, '/api/v1/file-flow-to-package/<string:code>')
+api.add_resource(FileFlowTemplate, '/api/v1/file-flow-templates')
 api.add_resource(DepartmentRequests, '/api/v1/department-requests')
 api.add_resource(DepartmentRequestsByUser, '/api/v1/department-requests/user/<string:user>')
 api.add_resource(DepartmentRequestsByCode, '/api/v1/department-requests/code/<string:code>')
@@ -870,6 +944,7 @@ api.add_resource(DepartmentRequestsByDepartment, '/api/v1/department-requests/<s
 api.add_resource(ProjectTemplates, '/api/v1/project-templates')
 api.add_resource(ProjectTemplatesFull, '/api/v1/project-templates/<string:code>/full')
 api.add_resource(ComponentTemplates, '/api/v1/component-templates')
+api.add_resource(PackageTemplates, '/api/v1/package-templates')
 api.add_resource(PipelinesByType, '/api/v1/pipelines/<string:type>')
 
 

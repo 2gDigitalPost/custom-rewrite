@@ -1,0 +1,27 @@
+<!-- template for the modal component -->
+<div id="modal-template">
+    <transition name="modal">
+        <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <h4>New File Flow for {{ componentTemplate.name }}</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        Enter the name
+
+                        <input type="text" v-model="name" placeholder="Name" />
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="modal-cancel-button btn btn-default" v-on:click="$emit('close')">
+                            Cancel
+                        </button>
+                        <button class="modal-submit-button btn btn-default" v-on:click="submitToTactic">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </transition>
+</div>
