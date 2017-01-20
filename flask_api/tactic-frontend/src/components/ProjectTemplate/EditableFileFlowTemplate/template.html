@@ -1,6 +1,14 @@
 <div>
-    <span>{{ name }}</span>
-    <button v-on:click="editFileFlowTemplate(fileFlowTemplate)" class="btn btn-default pull-right">
-        <span class="glyphicon glyphicon-pencil"></span>
-    </button>
+    <div class="pull-left">
+        <span>{{ name }}</span>
+    </div>
+
+    <div class="pull-right">
+        <button v-on:click="editFileFlowTemplate(fileFlowTemplate)" class="btn btn-default">
+            <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+        <button v-on:click="deleteFileFlowTemplate()" class="btn btn-default">
+            <span class="glyphicon glyphicon-trash"></span>
+        </button>
+    </div>
 </div>

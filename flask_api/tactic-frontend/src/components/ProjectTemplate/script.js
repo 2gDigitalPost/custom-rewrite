@@ -201,8 +201,10 @@ export default {
   },
   created() {
     bus.$on('package-template-updated', this.loadProjectTemplate)
+    bus.$on('file-flow-template-updated', this.loadProjectTemplate)
   },
   destroyed() {
     bus.$off('package-template-updated', this.loadProjectTemplate)
+    bus.$off('file-flow-template-updated', this.loadProjectTemplate)
   }
 }
