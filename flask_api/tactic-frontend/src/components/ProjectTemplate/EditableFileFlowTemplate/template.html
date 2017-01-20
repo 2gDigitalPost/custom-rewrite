@@ -1,14 +1,31 @@
 <div>
-    <div class="pull-left">
-        <span>{{ name }}</span>
-    </div>
+    <template v-if="editing">
+        <h4>Name</h4>
+        <input type="text" v-model="name" /><br/>
+        
+        <h4>Packages</h4>
+        <ul>
+            <li v-for="packageOption in packageOptions">
+                <input type="checkbox" :value="packageOption.code" v-model="checkedOptions">
+                {{ packageOption.name }}
+            </li>
+        </ul>
 
-    <div class="pull-right">
-        <button v-on:click="editFileFlowTemplate(fileFlowTemplate)" class="btn btn-default">
-            <span class="glyphicon glyphicon-pencil"></span>
-        </button>
-        <button v-on:click="deleteFileFlowTemplate()" class="btn btn-default">
-            <span class="glyphicon glyphicon-trash"></span>
-        </button>
-    </div>
+        <button class="btn btn-default" v-on:click="editing = false">Cancel</button>
+        <button type="submit" class="btn btn-default" v-on:click="submitChanges">Submit</button>
+    </template>
+    <template v-else>
+        <div class="pull-left">
+            <span>{{ name }}</span>
+        </div>
+
+        <div class="pull-right">
+            <button v-on:click="editing = true" class="btn btn-default">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </button>
+            <button v-on:click="deleteFileFlowTemplate()" class="btn btn-default">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
+        </div>
+    </template>
 </div>

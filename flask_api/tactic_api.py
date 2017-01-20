@@ -572,28 +572,32 @@ class FileFlowTemplateToPackageTemplates(Resource):
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        file_flow_sobjects = server.eval("@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}'])".format(file_flow_template_code))
+        file_flow_to_package_sobjects = server.eval("@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}'])".format(file_flow_template_code))
 
-        file_flow_json_data = {'file_flows': file_flow_sobjects}
+        return jsonify({'file_flow_to_package_sobjects': file_flow_to_package_sobjects})
 
-        # Only search for connections of the file flows exist
-        if len(file_flow_sobjects) > 0:
-            file_flow_codes = [file_flow_sobject.get('code') for file_flow_sobject in file_flow_sobjects]
-            file_flow_codes_string = '|'.join(file_flow_codes)
-            print(file_flow_codes_string)
+    def post(self, file_flow_template_code):
+        json_data = request.get_json()
 
-            file_flow_to_component_sobjects = server.eval(
-                "@SOBJECT(twog/file_flow_to_component['file_flow_code', 'in', '{0}'])".format(file_flow_codes_string))
-            file_flow_to_package_sobjects = server.eval(
-                "@SOBJECT(twog/file_flow_to_package['file_flow_code', 'in', '{0}'])".format(file_flow_codes_string))
+        ticket = json_data.get('token')
+        new_package_connections = json_data.get('new_package_connections')
+        deleted_package_connections = json_data.get('deleted_package_connections')
 
-            file_flow_json_data['file_flow_to_components'] = file_flow_to_component_sobjects
-            file_flow_json_data['file_flow_to_packages'] = file_flow_to_package_sobjects
-        else:
-            file_flow_json_data['file_flow_to_components'] = []
-            file_flow_json_data['file_flow_to_packages'] = []
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        return jsonify(file_flow_json_data)
+        for new_package_connection in new_package_connections:
+            server.insert('twog/file_flow_template_to_package_template',
+                          {'file_flow_template_code': file_flow_template_code,
+                           'package_template_code': new_package_connection})
+
+        for deleted_package_connection in deleted_package_connections:
+            file_flow_template_to_package_template_sobject = server.eval("@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}']['package_template_code', '{1}'])".format(file_flow_template_code, deleted_package_connection))[0]
+            search_key = server.build_search_key('twog/file_flow_template_to_package_template',
+                                                 file_flow_template_to_package_template_sobject.get('code'),
+                                                 project_code='twog')
+            server.delete_sobject(search_key)
+
+        return jsonify({'status': 200})
 
 
 class FileFlowTemplateByCode(Resource):
@@ -857,7 +861,11 @@ class ProjectTemplatesFull(Resource):
             component_template['file_flow_templates'] = server.eval("@SOBJECT(twog/file_flow_template['component_template_code', '{0}'])".format(component_template.get('code')))
 
             for file_flow_template in component_template['file_flow_templates']:
-                file_flow_template['file_flow_template_to_package_template'] = server.eval("@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}'])".format(file_flow_template.get('code')))
+                file_flow_template['connected_packages'] = []
+                file_flow_template_to_package_template_sobjects = server.eval("@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}'])".format(file_flow_template.get('code')))
+
+                for file_flow_template_to_package_template_sobject in file_flow_template_to_package_template_sobjects:
+                    file_flow_template['connected_packages'].append(file_flow_template_to_package_template_sobject.get('package_template_code'))
 
         # Get all the associated package_template sobjects
         package_templates = server.eval("@SOBJECT(twog/package_template['project_template_code', '{0}'])".format(code))
@@ -1030,6 +1038,7 @@ api.add_resource(FileFlowToPackage, '/api/v1/file-flow-to-package')
 api.add_resource(FileFlowToPackageWithCode, '/api/v1/file-flow-to-package/<string:code>')
 api.add_resource(FileFlowTemplate, '/api/v1/file-flow-templates')
 api.add_resource(FileFlowTemplateByCode, '/api/v1/file-flow-templates/<string:code>')
+api.add_resource(FileFlowTemplateToPackageTemplates, '/api/v1/file-flow-templates/<string:file_flow_template_code>/package-templates')
 api.add_resource(DepartmentRequests, '/api/v1/department-requests')
 api.add_resource(DepartmentRequestsByUser, '/api/v1/department-requests/user/<string:user>')
 api.add_resource(DepartmentRequestsByCode, '/api/v1/department-requests/code/<string:code>')
