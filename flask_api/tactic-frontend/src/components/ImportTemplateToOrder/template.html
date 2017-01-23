@@ -1,0 +1,34 @@
+<div>
+    <form v-on:submit.prevent="submitToTactic">
+        <h4>Is the title a movie, trailer, or episode?</h4>
+
+        <select v-model="title_type">
+            <option>Movie</option>
+            <option>Trailer</option>
+            <option>Episode</option>
+        </select>
+
+        <div v-if="title_type !== null">
+            <h4>
+                Select the title below (type to search). If the title is not listed, you
+                will have to add it to Tactic's Database
+            </h4>
+
+            <multiselect v-model="selectedTitles" :options="searchable_titles" track-by="code" label="name" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+        </div>
+
+        <div v-if="selectedTitles.length > 0">
+            <h4>
+                Select the languages below. Each selected language will create a new
+                Component.
+            </h4>
+
+            <multiselect v-model="selectedLanguages" :options="languages" track-by="code" label="name" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+
+            <h4>Select the template</h4>
+            <multiselect v-model="selectedProjectTemplate" :options="projectTemplates" track-by="code" label="name"></multiselect>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>

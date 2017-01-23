@@ -878,6 +878,157 @@ class ProjectTemplatesFull(Resource):
                         'package_templates': package_templates})
 
 
+class CreateFromProjectTemplate(Resource):
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        titles = json_data.get('titles')
+        languages = json_data.get('languages')
+        project_template_code = json_data.get('project_template_code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        order_sobject = server.get_by_code('twog/order', code)
+        project_template_sobject = server.get_by_code('twog/project_template', project_template_code)
+
+        component_template_sobjects = server.eval("@SOBJECT(twog/component_template['project_template_code', '{0}'])".format(project_template_sobject.get('code')))
+
+        component_template_file_flows_dict = {}
+        for component_template_sobject in component_template_sobjects:
+            component_template_code = component_template_sobject.get('code')
+
+            file_flow_templates = server.eval("@SOBJECT(twog/file_flow_template['component_template_code' '{0}'])".format(component_template_code))
+
+            if component_template_code in component_template_file_flows_dict:
+                component_template_file_flows_dict[component_template_code].append(file_flow_templates)
+            else:
+                component_template_file_flows_dict[component_template_code] = file_flow_templates
+
+        package_template_sobjects = server.eval("@SOBJECT(twog/package_template['project_template_code', '{0}'])".format(project_template_sobject.get('code')))
+
+        components_to_create = []
+        for component_template_sobject in component_template_sobjects:
+            for title in titles:
+                if languages:
+                    for language in languages:
+                        component_to_create = {
+                            'name': title.get('name') + ' - ' + language.get('name') + ': ' + component_template_sobject.get('name'),
+                            'order_code': order_sobject.get('code'),
+                            'pipeline_code': component_template_sobject.get('component_pipeline_code'),
+                            'title_code': title.get('code'),
+                            'component_template_code': component_template_sobject.get('code')
+                        }
+
+                        components_to_create.append(component_to_create)
+                else:
+                    component_to_create = {
+                        'name': title.get('name') + ': ' + component_template_sobject.get('name'),
+                        'order_code': order_sobject.get('code'),
+                        'pipeline_code': component_template_sobject.get('component_pipeline_code'),
+                        'title_code': title.get('code'),
+                        'component_template_code': component_template_sobject.get('code')
+                    }
+
+                    components_to_create.append(component_to_create)
+
+        component_results = server.insert_multiple('twog/component', components_to_create)
+
+        print(component_results)
+        print(package_template_sobjects)
+
+        packages_to_create = []
+        for package_template_sobject in package_template_sobjects:
+            package_to_create = {
+                'name': package_template_sobject.get('name'),
+                'order_code': order_sobject.get('code'),
+                'platform_code': package_template_sobject.get('platform_code'),
+                'pipeline_code': package_template_sobject.get('package_pipeline_code'),
+                'package_template_code': package_template_sobject.get('code')
+            }
+
+            packages_to_create.append(package_to_create)
+
+        package_results = server.insert_multiple('twog/package', packages_to_create)
+
+        print(package_results)
+
+        file_flows_to_create = []
+        for component_result in component_results:
+            file_flow_templates = component_template_file_flows_dict[component_result.get('component_template_code')]
+
+            for file_flow_template in file_flow_templates:
+                file_flow_to_create = {
+                    'name': file_flow_template.get('name'),
+                    'component_code': component_result.get('code'),
+                    'file_flow_template_code': file_flow_template.get('code')
+                }
+
+                file_flows_to_create.append(file_flow_to_create)
+
+        file_flow_results = server.insert_multiple('twog/file_flow', file_flows_to_create)
+
+        print(file_flow_results)
+
+        file_flow_template_codes_to_created_file_flow_codes = {}
+        file_flow_template_codes = []
+        for file_flow_result in file_flow_results:
+            template_code = file_flow_result.get('file_flow_template_code')
+
+            if template_code in file_flow_template_codes_to_created_file_flow_codes:
+                file_flow_template_codes_to_created_file_flow_codes[template_code].append(file_flow_result.get('code'))
+            else:
+                file_flow_template_codes_to_created_file_flow_codes[template_code] = [file_flow_result.get('code')]
+
+            if template_code not in file_flow_template_codes:
+                file_flow_template_codes.append(template_code)
+
+        package_template_codes_to_created_package_codes = {}
+        for package_result in package_results:
+            template_code = package_result.get('package_template_code')
+
+            if template_code in package_template_codes_to_created_package_codes:
+                package_template_codes_to_created_package_codes[template_code].append(package_result.get('code'))
+            else:
+                package_template_codes_to_created_package_codes[template_code] = [package_result.get('code')]
+
+        """
+        file_flow_template_codes_string = '|'.join(
+            [file_flow_template_code for file_flow_template_code in file_flow_template_codes])
+
+        file_flow_template_to_package_template_sobjects = server.eval(
+            "@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template', 'in', '{0}'])".format(
+                file_flow_template_codes_string))
+
+        file_flow_to_packages_to_create = []
+        for template_code, file_flow_codes in file_flow_template_codes_to_created_file_flow_codes:
+
+            for file_flow_code in file_flow_codes:
+                file_flow_to_package_to_create = {
+                    'file_flow_code': file_flow_code,
+                    'package_code': None
+                }
+        """
+
+        for file_flow_result in file_flow_results:
+            for package_result in package_results:
+                file_flow_template_to_package_template_sobject = server.eval(
+                    "@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}']['package_template_code', '{1}'])".format(
+                        file_flow_result.get('file_flow_template_code'), package_result.get('package_template_code')
+                    ))
+
+                if file_flow_template_to_package_template_sobject:
+                    file_flow_to_package_to_create = {
+                        'file_flow_code': file_flow_result.get('code'),
+                        'package_code': package_result.get('code')
+                    }
+
+                    server.insert('twog/file_flow_to_package', file_flow_to_package_to_create)
+
+
+
+
+
 class ComponentTemplates(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -1045,6 +1196,7 @@ api.add_resource(DepartmentRequestsByCode, '/api/v1/department-requests/code/<st
 api.add_resource(DepartmentRequestsByDepartment, '/api/v1/department-requests/<string:department>')
 api.add_resource(ProjectTemplates, '/api/v1/project-templates')
 api.add_resource(ProjectTemplatesFull, '/api/v1/project-templates/<string:code>/full')
+api.add_resource(CreateFromProjectTemplate, '/api/v1/orders/<string:code>/create-from-template')
 api.add_resource(ComponentTemplates, '/api/v1/component-templates')
 api.add_resource(PackageTemplates, '/api/v1/package-templates')
 api.add_resource(PackageTemplateByCode, '/api/v1/package-templates/<string:code>')

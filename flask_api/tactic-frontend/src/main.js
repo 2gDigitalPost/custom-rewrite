@@ -15,6 +15,7 @@ import ComponentsInOrder from './components/ComponentsInOrder/index.vue'
 import DepartmentRequestDetail from './components/DepartmentRequestDetail/index.vue'
 import DepartmentRequestLinks from './components/DepartmentRequestLinks/index.vue'
 import DepartmentRequestTable from './components/DepartmentRequestTable/index.vue'
+import ImportTemplateToOrder from './components/ImportTemplateToOrder/index.vue'
 import LoginForm from './components/LoginForm/index.vue'
 import NewProjectTemplateForm from './components/NewProjectTemplateForm/index.vue'
 import OrderDetail from './components/OrderDetail/index.vue'
@@ -42,6 +43,7 @@ const routes = [
   { path: '/orders/:code/components', component: ComponentsInOrder, beforeEnter: requireAuth },
   { path: '/orders/:code/components/pipelines', component: SelectPipelines, beforeEnter: requireAuth },
   { path: '/orders/:code/output-files/add', component: AddOutputFilesToOrder, beforeEnter: requireAuth },
+  { path: '/orders/:code/template/add', component: ImportTemplateToOrder, beforeEnter: requireAuth },
   { path: '/titles/add/imdb', component: AddTitleFromIMDb, beforeEnter: requireAuth },
   { path: '/titles/add/manual', component: AddTitleManually, beforeEnter: requireAuth },
   { path: '/project-templates', component: ProjectTemplatesList, beforeenter: requireAuth },

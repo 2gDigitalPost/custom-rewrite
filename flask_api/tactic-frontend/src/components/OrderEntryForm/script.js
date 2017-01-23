@@ -108,6 +108,9 @@ export default {
     redirectToAddTitle: function () {
       this.$router.push('/orders/' + this.submitted_order_code + '/titles/add')
     },
+    redirectToImportTemplate: function () {
+      this.$router.push('/orders/' + this.submitted_order_code + '/template/add')
+    },
     refreshPage: function () {
       this.$router.go(this.$router.currentRoute)
     }
