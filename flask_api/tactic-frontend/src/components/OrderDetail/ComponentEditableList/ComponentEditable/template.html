@@ -6,7 +6,6 @@
         <editable-title v-bind:title="title" v-bind:componentCode="componentObject.code"></editable-title>
     </div>
     <div class="component-files-needed">
-        
         <span v-if="fileFlows.length > 0">
             <div>Files created by this component:</div>
             <li v-for="fileFlow in fileFlows">
@@ -17,4 +16,5 @@
             No File flows assigned.
         </span>
     </div>
+    <task-editable-list v-bind:tasks="tasks"/>
 </div>

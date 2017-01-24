@@ -3,12 +3,14 @@
 import axios from 'axios'
 
 import EditableTitle from './EditableTitle/index.vue'
+import TaskEditableList from './TaskEditableList/index.vue'
 
 export default {
   name: 'ComponentEditable',
   props: ['component'],
   components: {
-    EditableTitle
+    EditableTitle,
+    TaskEditableList
   },
   data () {
     return {
