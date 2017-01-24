@@ -383,6 +383,36 @@ class Titles(Resource):
         return {'status': 200, 'inserted_title': inserted_title}
 
 
+class TitleExistsByIMDbID(Resource):
+    def get(self, imdb_id):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        existing_title = server.eval("@SOBJECT(twog/title['imdb_id', '{0}'])".format(imdb_id))
+
+        if existing_title:
+            return jsonify({'status': 200, 'exists': True})
+        else:
+            return jsonify({'status': 200, 'exists': False})
+
+
+class TitlesExistByIMDbID(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+
+
 class TitleAdder(Resource):
     def post(self):
         ticket = session.get('ticket')
@@ -1180,6 +1210,8 @@ api.add_resource(FullOrder, '/api/v1/orders/<string:code>/full')
 api.add_resource(TitleAdder, '/api/v1/titles/add')
 api.add_resource(Title, '/api/v1/title/name/<string:name>')
 api.add_resource(Titles, '/api/v1/titles')
+api.add_resource(TitleExistsByIMDbID, '/api/v1/titles/imdb/<string:imdb_id>/exists')
+api.add_resource(TitlesExistByIMDbID, '/api/v1/titles/imdb/exists')
 api.add_resource(Platforms, '/api/v1/platforms')
 api.add_resource(ComponentsInOrder, '/api/v1/orders/<string:code>/components')
 api.add_resource(ComponentByCode, '/api/v1/components/<string:code>')
