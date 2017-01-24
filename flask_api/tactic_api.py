@@ -96,6 +96,21 @@ class NewInstructionsTemplate(Resource):
         return {'status': 200}
 
 
+class InstructionsTemplates(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        instructions_template_sobjects = server.eval("@SOBJECT(twog/instructions_template)")
+
+        return jsonify({'instructions_templates': instructions_template_sobjects})
+
+
 class InstructionsTemplate(Resource):
     def get(self, instructions_template_id):
         server = TacticServerStub(server=url, project=project, ticket=current_user.id)

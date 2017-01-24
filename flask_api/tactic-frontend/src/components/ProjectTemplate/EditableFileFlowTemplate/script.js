@@ -14,10 +14,22 @@ export default {
       code: this.fileFlowTemplate.code,
       name: this.fileFlowTemplate.name,
       checkedOptions: [],
-      connectedPackages: this.fileFlowTemplate.connected_packages
+      connectedPackages: this.fileFlowTemplate.connected_packages,
+      connectedPackagesNames: []
     }
   },
   methods: {
+    setupPackageNames: function () {
+      this.connectedPackagesNames = []
+
+      for (let i = 0; i < this.connectedPackages.length; i++) {
+        for (let j = 0; j < this.packageOptions.length; j++) {
+          if (this.connectedPackages[i] === this.packageOptions[j].code) {
+            this.connectedPackagesNames.push(this.packageOptions[j].name)
+          }
+        }
+      }
+    },
     setupCheckedOptions: function () {
       this.checkedOptions = []
 
@@ -81,6 +93,9 @@ export default {
         })
       }
     }
+  },
+  beforeMount: function () {
+    this.setupPackageNames()
   },
   watch: {
     editing: function () {

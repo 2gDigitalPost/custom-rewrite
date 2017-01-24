@@ -16,7 +16,11 @@
     </template>
     <template v-else>
         <div class="pull-left">
-            <span>{{ name }}</span>
+            <div><strong>{{ name }}</strong></div>
+            <div>Delivering to:</div>
+            <ul>
+                <li v-for="connectedPackageName in connectedPackagesNames">{{ connectedPackageName }}</li>
+            </ul>
         </div>
 
         <div class="pull-right">
