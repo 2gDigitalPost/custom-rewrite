@@ -1,0 +1,28 @@
+<div>
+    <template v-if="editing">
+        <template v-if="loading">
+            <p>Loading...</p>
+        </template>
+        <template v-else>
+            <div class="pull-left">
+                <multiselect v-model="selectedTitle" :options="selectableTitles" track-by="code" label="name" :hide-selected="true"></multiselect>
+            </div>
+            <div class="pull-right">
+                <button type="button" class="btn btn-default" aria-label="Left Align" v-on:click="submitToTactic()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-default" aria-label="Left Align" v-on:click="editing = false">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+        </template>
+    </template>
+    <template v-else>
+        <span v-if="title !== null">
+            Title: <strong>{{ title.name }}</strong> <a v-on:click="editing = true"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+        </span>
+        <span v-else>
+            No Title selected
+        </span>
+    </template>
+</div>

@@ -2,13 +2,15 @@
 
 import axios from 'axios'
 
-import ComponentDetailList from '../ComponentDetailList/index.vue'
+import ComponentEditableList from './ComponentEditableList/index.vue'
 import PackageDetailList from '../PackageDetailList/index.vue'
+
+import bus from '../../bus'
 
 export default {
   name: 'OrderDetail',
   components: {
-    'component-detail-list': ComponentDetailList,
+    ComponentEditableList,
     'package-detail-list': PackageDetailList
   },
   data () {
@@ -27,6 +29,8 @@ export default {
   methods: {
     loadOrder: function () {
       var self = this
+
+      console.log("load")
 
       axios.get('/api/v1/orders/' + self.order_code + '/full', {
         params: {
@@ -57,5 +61,11 @@ export default {
   beforeMount: function () {
     this.loadOrder()
     this.setupLinks()
+  },
+  created() {
+    bus.$on('component-title-updated', this.loadOrder)
+  },
+  destroyed() {
+    bus.$off('component-title-updated', this.loadOrder)
   }
 }

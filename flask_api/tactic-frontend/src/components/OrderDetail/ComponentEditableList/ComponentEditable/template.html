@@ -1,0 +1,20 @@
+<div>
+    <div class="component-name">
+        {{ componentObject.name }} ({{ componentObject.code }})
+    </div>
+    <div class="component-title">
+        <editable-title v-bind:title="title" v-bind:componentCode="componentObject.code"></editable-title>
+    </div>
+    <div class="component-files-needed">
+        
+        <span v-if="fileFlows.length > 0">
+            <div>Files created by this component:</div>
+            <li v-for="fileFlow in fileFlows">
+                {{ fileFlow.name }}
+            </li>
+        </span>
+        <span v-else>
+            No File flows assigned.
+        </span>
+    </div>
+</div>

@@ -442,6 +442,21 @@ class ComponentsInOrder(Resource):
         return jsonify({'status': 200})
 
 
+class ComponentByCode(Resource):
+
+    def post(self, code):
+        json_data = request.get_json()
+        component_data = json_data.get('component')
+        ticket = json_data.get('token')
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        search_key = server.build_search_key('twog/component', code, project_code='twog')
+
+        server.update(search_key, component_data)
+
+        return jsonify({'status': 200})
+
+
 class Languages(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -934,9 +949,6 @@ class CreateFromProjectTemplate(Resource):
 
         component_results = server.insert_multiple('twog/component', components_to_create)
 
-        print(component_results)
-        print(package_template_sobjects)
-
         packages_to_create = []
         for package_template_sobject in package_template_sobjects:
             package_to_create = {
@@ -950,8 +962,6 @@ class CreateFromProjectTemplate(Resource):
             packages_to_create.append(package_to_create)
 
         package_results = server.insert_multiple('twog/package', packages_to_create)
-
-        print(package_results)
 
         file_flows_to_create = []
         for component_result in component_results:
@@ -967,8 +977,6 @@ class CreateFromProjectTemplate(Resource):
                 file_flows_to_create.append(file_flow_to_create)
 
         file_flow_results = server.insert_multiple('twog/file_flow', file_flows_to_create)
-
-        print(file_flow_results)
 
         file_flow_template_codes_to_created_file_flow_codes = {}
         file_flow_template_codes = []
@@ -1024,9 +1032,6 @@ class CreateFromProjectTemplate(Resource):
                     }
 
                     server.insert('twog/file_flow_to_package', file_flow_to_package_to_create)
-
-
-
 
 
 class ComponentTemplates(Resource):
@@ -1177,6 +1182,7 @@ api.add_resource(Title, '/api/v1/title/name/<string:name>')
 api.add_resource(Titles, '/api/v1/titles')
 api.add_resource(Platforms, '/api/v1/platforms')
 api.add_resource(ComponentsInOrder, '/api/v1/orders/<string:code>/components')
+api.add_resource(ComponentByCode, '/api/v1/components/<string:code>')
 api.add_resource(Languages, '/api/v1/languages')
 api.add_resource(DepartmentInstructionsAdder, '/api/v1/instructions/department/add')
 api.add_resource(Pipeline, '/api/v1/pipelines/code/<string:code>')

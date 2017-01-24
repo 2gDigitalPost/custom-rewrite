@@ -69,5 +69,5 @@ export default {
 }
 </script>
 
-<style src='../node_modules/bootstrap/dist/css/bootstrap.css'>
-</style>
+<style src='../node_modules/bootstrap/dist/css/bootstrap.css'></style>
+<style src='../node_modules/font-awesome/css/font-awesome.min.css'></style>
