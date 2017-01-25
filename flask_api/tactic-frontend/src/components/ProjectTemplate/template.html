@@ -49,6 +49,9 @@
                             <h4>Pipeline</h4>
                             <multiselect v-model="newComponentSelectedPipeline" :options="componentPipelineOptions" track-by="code" label="name"></multiselect>
 
+                            <h4>Instructions Template</h4>
+                            <multiselect v-model="newComponentSelectedInstructionsTemplate" :options="componentInstructionsTemplateOptions" track-by="code" label="name"></multiselect>
+
                             <button type="submit" class="btn btn-default">Submit</button>
                         </form>
                     </div>

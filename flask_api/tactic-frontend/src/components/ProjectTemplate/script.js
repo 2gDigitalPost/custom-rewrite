@@ -28,6 +28,8 @@ export default {
       newComponentName: null,
       newComponentSelectedPipeline: null,
       componentPipelineOptions: [],
+      newComponentSelectedInstructionsTemplate: null,
+      componentInstructionsTemplateOptions: [],
       newPackageTemplateFormVisible: false,
       newPackageName: null,
       newPackageSelectedPipeline: null,
@@ -73,6 +75,21 @@ export default {
       })
       .then(function (response) {
         self.componentPipelineOptions = response.data.pipelines
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+    loadComponentInstructionsTemplateOptions: function () {
+      let self = this
+
+      axios.get('/api/v1/instructions-templates', {
+        params: {
+          token: localStorage.tactic_token
+        }
+      })
+      .then(function (response) {
+        self.componentInstructionsTemplateOptions = response.data.instructions_templates
       })
       .catch(function (error) {
         console.log(error)
@@ -131,6 +148,7 @@ export default {
         'name': self.newComponentName,
         'component_pipeline_code': self.newComponentSelectedPipeline.code,
         'project_template_code': self.templateCode,
+        'instructions_template_code': self.newComponentSelectedInstructionsTemplate.code,
         'token': localStorage.tactic_token
       }
 
@@ -196,6 +214,7 @@ export default {
   beforeMount: function () {
     this.loadProjectTemplate()
     this.loadComponentPipelineOptions()
+    this.loadComponentInstructionsTemplateOptions()
     this.loadPackagePipelineOptions()
     this.loadPlatformOptions()
   },

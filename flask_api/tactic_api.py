@@ -1115,13 +1115,14 @@ class ComponentTemplates(Resource):
         name = json_data.get('name')
         project_template_code = json_data.get('project_template_code')
         component_pipeline_code = json_data.get('component_pipeline_code')
+        instructions_template_code = json_data.get('instructions_template_code')
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         new_component_template = server.insert('twog/component_template',
                                                {'name': name, 'project_template_code': project_template_code,
-                                                'component_pipeline_code': component_pipeline_code
-                                                })
+                                                'component_pipeline_code': component_pipeline_code,
+                                                'instructions_template_code': instructions_template_code})
 
         return jsonify({'status': 200, 'project_template_code': new_component_template.get('code')})
 
