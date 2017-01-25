@@ -1,0 +1,46 @@
+<div>
+    <template v-if="editing">
+        <h4>Name</h4>
+        <input type="text" v-model="name" /><br/>
+        
+        <h4>Pipeline</h4>
+        <multiselect v-model="pipeline" :options="pipelineOptions" track-by="code" label="name"></multiselect>
+
+        <h4>Instructions Template</h4>
+        <multiselect v-model="instructionsTemplate" :options="instructionsTemplateOptions" track-by="code" label="name"></multiselect>
+
+        <button class="btn btn-default" v-on:click="editing = false">Cancel</button>
+        <button type="submit" class="btn btn-default" v-on:click="submitChanges">Submit</button>
+    </template>
+    <template v-else>
+        <div class="pull-left">
+            <div>Name: {{ componentTemplate.name }}</div>
+            <div>Pipeline: {{ componentTemplate.pipeline.name }}</div>
+            <div>Instructions Template: {{ instructionsTemplate.name }}</div>
+
+            <ul class="list-group">
+                <li
+                    is="editable-file-flow-template"
+                    v-for="fileFlowTemplate in componentTemplate.file_flow_templates"
+                    v-bind:fileFlowTemplate="fileFlowTemplate"
+                    v-bind:packageOptions="packageOptions"
+                    class="list-group-item clearfix"
+                ></li>
+            </ul>
+        </div>
+        
+        <div class="pull-right">
+            <button v-on:click="editing = true" class="btn btn-default">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </button>
+            <button v-on:click="deleteComponentTemplate()" class="btn btn-default">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
+        </div>
+
+        <button id="show-modal" v-on:click="showModal = true" class="btn btn-default">
+            <span class="glyphicon glyphicon-plus"></span> Add a new File Flow
+        </button>
+        <modal v-if="showModal" v-on:close="showModal = false" v-bind:componentTemplate="componentTemplate"></modal>
+    </template>
+</div>

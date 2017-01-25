@@ -934,6 +934,7 @@ class ProjectTemplatesFull(Resource):
         for component_template in component_templates:
             component_template['pipeline'] = server.get_by_code('sthpw/pipeline', component_template.get('component_pipeline_code'))
             component_template['file_flow_templates'] = server.eval("@SOBJECT(twog/file_flow_template['component_template_code', '{0}'])".format(component_template.get('code')))
+            component_template['instructions_template'] = server.get_by_code('twog/instructions_template', component_template.get('instructions_template_code'))
 
             for file_flow_template in component_template['file_flow_templates']:
                 file_flow_template['connected_packages'] = []
@@ -1127,6 +1128,43 @@ class ComponentTemplates(Resource):
         return jsonify({'status': 200, 'project_template_code': new_component_template.get('code')})
 
 
+class ComponentTemplateByCode(Resource):
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        name = json_data.get('name')
+        component_pipeline_code = json_data.get('component_pipeline_code')
+        instructions_template_code = json_data.get('instructions_template_code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        existing_component_template = server.get_by_code('twog/component_template', code)
+
+        server.update(existing_component_template.get('__search_key__'), {
+            'name': name,
+            'component_pipeline_code': component_pipeline_code,
+            'instructions_template_code': instructions_template_code
+        })
+
+        return jsonify({'status': 200})
+
+    def delete(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        search_key = server.build_search_key('twog/component_template', code, project_code='twog')
+
+        server.delete_sobject(search_key)
+
+        return jsonify({'status': 200})
+
+
 class PackageTemplates(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -1268,6 +1306,7 @@ api.add_resource(ProjectTemplates, '/api/v1/project-templates')
 api.add_resource(ProjectTemplatesFull, '/api/v1/project-templates/<string:code>/full')
 api.add_resource(CreateFromProjectTemplate, '/api/v1/orders/<string:code>/create-from-template')
 api.add_resource(ComponentTemplates, '/api/v1/component-templates')
+api.add_resource(ComponentTemplateByCode, '/api/v1/component-templates/<string:code>')
 api.add_resource(PackageTemplates, '/api/v1/package-templates')
 api.add_resource(PackageTemplateByCode, '/api/v1/package-templates/<string:code>')
 api.add_resource(PipelinesByType, '/api/v1/pipelines/<string:type>')

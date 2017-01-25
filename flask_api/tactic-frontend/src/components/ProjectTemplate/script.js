@@ -4,6 +4,7 @@ import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
 import AddFileFlowTemplateToComponentTemplateModal from './AddFileFlowTemplateToComponentTemplateModal/index.vue'
+import EditableComponentTemplate from './EditableComponentTemplate/index.vue'
 import EditableFileFlowTemplate from './EditableFileFlowTemplate/index.vue'
 import EditablePackageTemplate from './EditablePackageTemplate/index.vue'
 
@@ -14,6 +15,7 @@ export default {
   components: {
     'multiselect': Multiselect,
     'modal': AddFileFlowTemplateToComponentTemplateModal,
+    'editable-component-template': EditableComponentTemplate,
     'editable-file-flow-template': EditableFileFlowTemplate,
     'editable-package-template': EditablePackageTemplate
   },
@@ -220,10 +222,12 @@ export default {
   },
   created() {
     bus.$on('package-template-updated', this.loadProjectTemplate)
+    bus.$on('component-template-updated', this.loadProjectTemplate)
     bus.$on('file-flow-template-updated', this.loadProjectTemplate)
   },
   destroyed() {
     bus.$off('package-template-updated', this.loadProjectTemplate)
+    bus.$off('component-template-updated', this.loadProjectTemplate)
     bus.$off('file-flow-template-updated', this.loadProjectTemplate)
   }
 }

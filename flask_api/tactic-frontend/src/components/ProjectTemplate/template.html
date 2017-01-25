@@ -10,30 +10,16 @@
                 <h3>Components</h3>
 
                 <ul class="list-group">
-                    <li class="list-group-item clearfix" v-for="(componentTemplate, index) in componentTemplates">
-                        <div>Name: {{ componentTemplate.name }}</div>
-                        <div>Pipeline: {{ componentTemplate.pipeline.name }}</div>
-
-                        <div v-if="componentTemplate.file_flow_templates.length > 0">
-                            File Flows:
-
-                            <ul class="list-group">
-                                <li
-                                    is="editable-file-flow-template"
-                                    v-for="fileFlowTemplate in componentTemplate.file_flow_templates"
-                                    v-bind:fileFlowTemplate="fileFlowTemplate"
-                                    v-bind:packageOptions="packageTemplates"
-                                    class="list-group-item clearfix"
-                                ></li>
-                            </ul>
-                        </div>
-                        <div v-else class="no-file-flows">No File Flows have been added</div>
-
-                        <button id="show-modal" v-on:click="showModal.splice(index, 1, true)" class="btn btn-default">
-                            <span class="glyphicon glyphicon-plus"></span> Add a new File Flow
-                        </button>
-                        <modal v-if="showModal[index]" v-on:close="showModal.splice(index, 1, false)" v-bind:componentTemplate="componentTemplate"></modal>
-                    </li>
+                    <li
+                        is="editable-component-template"
+                        v-for="componentTemplate in componentTemplates"
+                        v-bind:componentTemplate="componentTemplate"
+                        v-bind:pipelineOptions="componentPipelineOptions"
+                        v-bind:instructionsTemplateOptions="componentInstructionsTemplateOptions"
+                        v-bind:packageOptions="packageTemplates"
+                        v-bind:projectTemplateCode="templateCode"
+                        class="list-group-item clearfix"
+                    ></li>
                 </ul>
 
                 <button v-on:click="toggleNewComponentTemplateForm" class="btn btn-default">
