@@ -88,7 +88,7 @@ export default {
       let jsonToSend = {
         'token': localStorage.tactic_token,
         'titles': self.selectedTitles,
-        'langages': self.selectedLanguages,
+        'languages': self.selectedLanguages,
         'project_template_code': self.selectedProjectTemplate.code
       }
 
