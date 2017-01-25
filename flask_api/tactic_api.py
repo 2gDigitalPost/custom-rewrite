@@ -139,6 +139,23 @@ class InstructionsTemplate(Resource):
 
         return jsonify({'instructions_template': instructions_template_sobject})
 
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        name = json_data.get('name')
+        instructions_text = json_data.get('instructions_text')
+
+        instructions_template_sobject = server.get_by_code('twog/instructions_template', code)
+
+        server.update(instructions_template_sobject.get('__search_key__'), {'name': name,
+                                                                            'instructions_text': instructions_text})
+
+        return jsonify({'instructions_template': instructions_template_sobject})
+
 
 class Clients(Resource):
     def get(self):
