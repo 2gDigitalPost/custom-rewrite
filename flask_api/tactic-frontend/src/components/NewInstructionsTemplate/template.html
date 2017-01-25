@@ -1,0 +1,23 @@
+<div>
+    <div class="row">
+        <div class="col-md-6">
+            <h1>New Instructions Template</h1>
+
+            <h4>Enter the name</h4>
+
+            <form v-on:submit.prevent="submitToTactic">
+                <input type="text" v-model="name" placeholder="Name" />
+                <br/>
+
+                <h4>Enter the text</h4>
+
+                <textarea v-model="instructionsText" @input="update" />
+                <br/>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <div v-html="compiledMarkdown"></div>
+        </div>
+    </div>
+</div>

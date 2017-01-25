@@ -1,0 +1,15 @@
+<div>
+    <div class="row">
+        <template v-if="loading">
+            Loading....
+        </template>
+        <template v-else>
+            <div class="col-md-6">
+                <h1>Instructions Template: {{ instructionsTemplate.name }}</h1>
+
+                <h4>Instructions Text:</h4>
+                <div v-html="compiledMarkdown"></div>
+            </div>
+        </template>
+    </div>
+</div>

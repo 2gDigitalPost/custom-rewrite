@@ -110,19 +110,34 @@ class InstructionsTemplates(Resource):
 
         return jsonify({'instructions_templates': instructions_template_sobjects})
 
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        name = json_data.get('name')
+        instructions_text = json_data.get('instructions_text')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        created_instructions_template = server.insert('twog/instructions_template',
+                                                      {'name': name, 'instructions_text': instructions_text})
+
+        return jsonify({'code': created_instructions_template.get('code')})
+
 
 class InstructionsTemplate(Resource):
-    def get(self, instructions_template_id):
-        server = TacticServerStub(server=url, project=project, ticket=current_user.id)
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
 
-        instructions_template_sobject = server.eval('@SOBJECT(twog/instructions_template["code", "{0}"])'.format(instructions_template_id))
-        department_instructions_in_template_sobjects = server.eval('@SOBJECT(twog/department_instructions_in_template["instructions_template_code", "{0}"])'.format(instructions_template_id))
-        department_instructions_sobjects_in_template = server.eval('@SOBJECT(twog/department_instructions["code", "in", "{0}"])'.format('|'.join([department_instructions_in_template_sobject.get('department_instructions_code') for department_instructions_in_template_sobject in department_instructions_in_template_sobjects])))
-        department_instructions_sobjects_not_in_template = server.eval('@SOBJECT(twog/department_instructions["code", "not in", "{0}"])'.format('|'.join([department_instructions_in_template_sobject.get('department_instructions_code') for department_instructions_in_template_sobject in department_instructions_in_template_sobjects])))
+        ticket = args.get('token')
 
-        return {'instructions_template': instructions_template_sobject,
-                'department_instructions_in_template': department_instructions_sobjects_in_template,
-                'department_instructions_not_in_template': department_instructions_sobjects_not_in_template}
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        instructions_template_sobject = server.get_by_code('twog/instructions_template', code)
+
+        return jsonify({'instructions_template': instructions_template_sobject})
 
 
 class Clients(Resource):
@@ -1215,7 +1230,8 @@ class PipelinesByType(Resource):
 
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
-api.add_resource(InstructionsTemplate, '/instructions_template/<string:instructions_template_id>')
+api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
+api.add_resource(InstructionsTemplates, '/api/v1/instructions-templates')
 api.add_resource(Clients, '/api/v1/clients')
 api.add_resource(Divisions, '/api/v1/divisions/<string:client_code>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')

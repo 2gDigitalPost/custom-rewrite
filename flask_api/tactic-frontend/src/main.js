@@ -16,7 +16,10 @@ import DepartmentRequestDetail from './components/DepartmentRequestDetail/index.
 import DepartmentRequestLinks from './components/DepartmentRequestLinks/index.vue'
 import DepartmentRequestTable from './components/DepartmentRequestTable/index.vue'
 import ImportTemplateToOrder from './components/ImportTemplateToOrder/index.vue'
+import InstructionsTemplate from './components/InstructionsTemplate/index.vue'
+import InstructionsTemplatesList from './components/InstructionsTemplatesList/index.vue'
 import LoginForm from './components/LoginForm/index.vue'
+import NewInstructionsTemplate from './components/NewInstructionsTemplate/index.vue'
 import NewProjectTemplateForm from './components/NewProjectTemplateForm/index.vue'
 import OrderDetail from './components/OrderDetail/index.vue'
 import OrderEntryForm from './components/OrderEntryForm/index.vue'
@@ -49,6 +52,9 @@ const routes = [
   { path: '/project-templates', component: ProjectTemplatesList, beforeenter: requireAuth },
   { path: '/project-templates/new', component: NewProjectTemplateForm, beforeEnter: requireAuth },
   { path: '/project-templates/:code', component: ProjectTemplate, beforeEnter: requireAuth },
+  { path: '/instructions-templates/', component: InstructionsTemplatesList, beforeEnter: requireAuth },
+  { path: '/instructions-templates/new', component: NewInstructionsTemplate, beforeEnter: requireAuth },
+  { path: '/instructions-templates/:code', component: InstructionsTemplate, beforeEnter: requireAuth },
   { path: '/login', component: LoginForm },
   { path: '/logout',
     beforeEnter (to, from, next) {

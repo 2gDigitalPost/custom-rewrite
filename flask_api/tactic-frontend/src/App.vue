@@ -30,13 +30,13 @@
               <router-link to="/titles/add/imdb">Add a Title from IMDb</router-link>
             </li>
             <li>
-              <router-link to="/titles/add/manual">Add a Title Manually</router-link>
-            </li>
-            <li>
               <router-link to="/department-requests/links">Department Requests</router-link>
             </li>
             <li>
               <router-link to="/project-templates">Project Templates</router-link>
+            </li>
+            <li>
+              <router-link to="/instructions-templates">Instructions Templates</router-link>
             </li>
             <li>
               <router-link to="/about">About</router-link>
@@ -45,9 +45,7 @@
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
     </nav>
-    <div class="container">
-      <router-view class="view"></router-view>
-    </div>
+    <router-view class="container"></router-view>
   </div>
 </template>
 
