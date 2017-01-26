@@ -30,6 +30,7 @@ Numbered Lists
 5. But they will resume after the indent.
 
 Surround words with * to *make them italicized.*
+
 Use two asterisks to **bold something.**`,
     }
   },
