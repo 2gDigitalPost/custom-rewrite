@@ -30,8 +30,6 @@ export default {
     loadOrder: function () {
       var self = this
 
-      console.log("load")
-
       axios.get('/api/v1/orders/' + self.order_code + '/full', {
         params: {
           token: localStorage.tactic_token

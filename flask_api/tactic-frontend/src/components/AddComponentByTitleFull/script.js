@@ -5,7 +5,7 @@ import _ from 'lodash'
 import Multiselect from 'vue-multiselect'
 
 export default {
-  name: 'AddComponent',
+  name: 'AddComponentByTitleFull',
   components: {
     Multiselect
   },
@@ -22,8 +22,10 @@ export default {
       selectedOMDBTitles: [],
       languages: [],
       selectedLanguages: [],
-      selected_pipeline: null,
-      pipelines: []
+      selectedProjectTemplate: null,
+      projectTemplates: [],
+      submitting: false,
+      newComponentsSubmitted: false
     }
   },
   methods: {
@@ -65,24 +67,49 @@ export default {
         console.log(error)
       })
     },
-    loadPipelines: function () {
+    loadProjectTemplates: function () {
       var self = this
 
-      axios.get('/api/v1/pipelines/component', {
+      axios.get('/api/v1/project-templates', {
         params: {
           token: localStorage.tactic_token
         }
       })
       .then(function (response) {
-        let pipelineData = response.data.pipelines
+        let projectTemplateData = response.data.project_templates
 
-        for (let i = 0; i < pipelineData.length; i++) {
-          self.pipelines.push(pipelineData[i])
+        for (let i = 0; i < projectTemplateData.length; i++) {
+          self.projectTemplates.push({name: projectTemplateData[i].name, code: projectTemplateData[i].code})
         }
       })
       .catch(function (error) {
         console.log(error)
       })
+    },
+    reloadAll: function () {
+      // Reset all variables to their defaults
+      this.titleType = null
+      this.selectedTitles = []
+      this.titles = []
+      this.searchableTitles = []
+      this.titleNotAvailable = false
+      this.titleToSearch = null
+      this.searchResults = []
+      this.searchResultsAlreadyInTactic = []
+      this.selectedOMDBTitles = []
+      this.languages = []
+      this.selectedLanguages = []
+      this.selectedProjectTemplate = null
+      this.projectTemplates = []
+      this.submitting = false
+      this.newComponentsSubmitted = false
+
+      this.loadTitles()
+      this.loadLanguages()
+      this.loadProjectTemplates()
+    },
+    redirectToOrderDetail: function () {
+      this.$router.push('/orders/' + this.$route.params.code)
     },
     searchOMDB: function () {
       let self = this
@@ -113,23 +140,9 @@ export default {
     getDetailsFromOMDb: function (imdbID) {
       var self = this
 
-      let omdbURL = 'http://www.omdbapi.com'
+      let omdbURL = 'http://www.omdbapi.com?i=' + imdbID
 
-      axios.get(omdbURL, {
-        params: {
-          i: imdbID
-        }
-      })
-      .then(function (response) {
-        let gotResponse = response.data.Response
-
-        if (gotResponse) {
-          return response.data
-        }
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+      return axios.get(omdbURL)
     },
     getTitleExistsByIMDbID: function (title) {
       var self = this
@@ -159,11 +172,87 @@ export default {
       }
       else {
         for (let i = 0; i < self.selectedOMDBTitles.length; i++) {
-          let titleObject = self.getDetailsFromOMDb(self.selectedOMDBTitles[i].imdbID)
+          let titleObject = self.getDetailsFromOMDb(self.selectedOMDBTitles[i])
 
-          console.log(titleObject)
+          titleObject.then(function (responseData) {
+            let titleData = responseData.data
+
+            let jsonToSend = {
+              'title_data': {
+                'actors': titleData.Actors,
+                'awards': titleData.Awards,
+                'country': titleData.Country,
+                'director': titleData.Director,
+                'genre': titleData.Genre,
+                'language': titleData.Language,
+                'metascore': parseInt(titleData.Metascore),
+                'plot': titleData.Plot,
+                'poster': titleData.Poster,
+                'rated': titleData.Rated,
+                'released': titleData.Released,
+                'runtime': titleData.Runtime,
+                'name': titleData.Title,
+                'writer': titleData.Writer,
+                'year': titleData.Year,
+                'imdb_id': titleData.imdbID,
+                'imdb_rating': parseFloat(titleData.imdbRating.replace(/,/g, '')),
+                'imdb_votes': parseInt(titleData.imdbVotes),
+                'type': titleData.Type
+              },
+              'token': localStorage.tactic_token
+            }
+
+            axios.post('/api/v1/titles/omdb', JSON.stringify(jsonToSend), {
+              headers: {
+                'Content-Type': 'application/json;charset=UTF-8'
+              },
+            })
+            .then(function (response) {
+              if (response.status === 200) {
+                self.reloadAll()
+              }
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
         }
       }
+    },
+    submitNewComponentsToTactic: function () {
+      var self = this
+
+      self.submitting = true
+
+      let orderCode = self.$route.params.code
+
+      let apiURL = '/api/v1/orders/' + orderCode + '/create-from-template'
+      let jsonToSend = {
+        'token': localStorage.tactic_token,
+        'titles': self.selectedTitles,
+        'languages': self.selectedLanguages,
+        'project_template_code': self.selectedProjectTemplate.code
+      }
+
+      axios.post(apiURL, JSON.stringify(jsonToSend), {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+      })
+      .then(function (response) {
+        if (response.data) {
+          if (response.status === 200) {
+            self.submitting = false
+            self.newComponentsSubmitted = true
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
     }
   },
   watch: {
@@ -194,6 +283,6 @@ export default {
   beforeMount: function () {
     this.loadTitles()
     this.loadLanguages()
-    this.loadPipelines()
+    this.loadProjectTemplates()
   }
 }

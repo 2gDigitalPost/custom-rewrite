@@ -1,72 +1,100 @@
 <div>
-    <h4>Is the title a movie, trailer, or episode?</h4>
+    <template v-if="newComponentsSubmitted == false">
+        <h4>Is the title a movie, trailer, or episode?</h4>
 
-    <select v-model="titleType">
-        <option>Movie</option>
-        <option>Trailer</option>
-        <option>Episode</option>
-    </select>
+        <select v-model="titleType">
+            <option>Movie</option>
+            <option>Trailer</option>
+            <option>Episode</option>
+        </select>
 
-    <div v-if="titleType !== null">
-        <template v-if="titleNotAvailable === false">
-            <h4>
-                Select the title below (type to search).
-            </h4>
+        <div v-if="titleType !== null">
+            <template v-if="titleNotAvailable === false">
+                <h4>
+                    Select the title below (type to search).
+                </h4>
 
-            <multiselect v-model="selectedTitles" :options="searchableTitles" track-by="code" label="name" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
-        </template>
-    </div>
-
-    <template v-if="titleType !== null">
-        <input type="checkbox" id="titleNotAvailableCheckbox" v-model="titleNotAvailable">
-        <label for="titleNotAvailableCheckbox">The Title is not listed</label>
-
-        <div v-if="titleNotAvailable">
-            <h4>Type in the name of the title below to search for it in IMDb.</h4>
-
-            <input type="text" v-model="titleToSearch" />
-            <button type="submit" class="btn btn-default" v-on:click="searchOMDB">Submit</button>
-
-            <div class="row">
-                <div class="col-9">
-                    <table v-if="searchResults.length > 0" class="table table-striped">
-                        <caption>Click on a row for details</caption>
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Title</th>
-                                <th>Year</th>
-                                <th>imdbID</th>
-                                <th>Poster</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="searchResult in searchResults" v-on:click="getDetailsFromOMDb(searchResult.imdbID)">
-                                <td><input type="checkbox" :value="searchResult.imdbID" v-model="selectedOMDBTitles"/></td>
-                                <td>{{ searchResult.Title }}</td>
-                                <td>{{ searchResult.Year }}</td>
-                                <td>{{ searchResult.imdbID }}</td>
-                                <td><img :src="searchResult.Poster" class="omdb-poster"/></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div v-if="searchResultsAlreadyInTactic.length > 0">
-                        Also found {{ searchResultsAlreadyInTactic.length }} result(s) already in Tactic:
-
-                        <ul>
-                            <li v-for="result in searchResultsAlreadyInTactic">{{ result.Title }}</li>
-                        </ul>                     
-                    </div>
-
-                    <template v-if="selectedOMDBTitles.length > 0">
-                        <button class="btn btn-submit" v-on:click="submitOMDbTitlesToTactic">Submit</button>
-                    </template>
-                </div>
-                <div class="col-3">
-
-                </div>
-            </div>
+                <multiselect v-model="selectedTitles" :options="searchableTitles" track-by="code" label="name" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+            </template>
         </div>
+
+        <template v-if="titleType !== null">
+            <template v-if="selectedTitles.length > 0">
+                <h4>
+                    Select the languages below. Each selected language will create a new
+                    Component.
+                </h4>
+
+                <multiselect v-model="selectedLanguages" :options="languages" track-by="code" label="name" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+
+                <h4>Select the template</h4>
+                <multiselect v-model="selectedProjectTemplate" :options="projectTemplates" track-by="code" label="name"></multiselect>
+
+                <template v-if="selectedProjectTemplate !== null && !submitting">
+                    <button type="submit" class="btn btn-default" v-on:click="submitNewComponentsToTactic">Submit</button>
+                </template>
+            </template>
+            <template v-else>
+                <input type="checkbox" id="titleNotAvailableCheckbox" v-model="titleNotAvailable">
+                <label for="titleNotAvailableCheckbox">The Title is not listed</label>
+
+                <div v-if="titleNotAvailable">
+                    <h4>Type in the name of the title below to search for it in IMDb.</h4>
+
+                    <input type="text" v-model="titleToSearch" />
+                    <button type="submit" class="btn btn-default" v-on:click="searchOMDB">Submit</button>
+
+                    <div class="row">
+                        <div class="col-9">
+                            <table v-if="searchResults.length > 0" class="table table-striped">
+                                <caption>Click on a row for details</caption>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Title</th>
+                                        <th>Year</th>
+                                        <th>imdbID</th>
+                                        <th>Poster</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="searchResult in searchResults" v-on:click="getDetailsFromOMDb(searchResult.imdbID)">
+                                        <td><input type="checkbox" :value="searchResult.imdbID" v-model="selectedOMDBTitles"/></td>
+                                        <td>{{ searchResult.Title }}</td>
+                                        <td>{{ searchResult.Year }}</td>
+                                        <td>{{ searchResult.imdbID }}</td>
+                                        <td><img :src="searchResult.Poster" class="omdb-poster"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div v-if="searchResultsAlreadyInTactic.length > 0">
+                                Also found {{ searchResultsAlreadyInTactic.length }} result(s) already in Tactic:
+
+                                <ul>
+                                    <li v-for="result in searchResultsAlreadyInTactic">{{ result.Title }}</li>
+                                </ul>
+                            </div>
+
+                            <template v-if="(selectedOMDBTitles.length > 0) && (!submitting)">
+                                <button class="btn btn-default" v-on:click="submitOMDbTitlesToTactic">Submit</button>
+                            </template>
+                        </div>
+                        <div class="col-3">
+
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <template v-if="submitting">
+            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Submitting...
+        </template>
+    </template>
+    <template v-else>
+        <h1>The Template was added to the Order successfully</h1>
+        <button v-on:click="reloadAll" class="btn btn-default">Enter another template</button>
+        <button v-on:click="redirectToOrderDetail" class="btn btn-default">View Order Page</button>
     </template>
 </div>
