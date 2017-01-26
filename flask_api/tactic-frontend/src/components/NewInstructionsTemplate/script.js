@@ -29,7 +29,7 @@ Numbered Lists
   4. (Numbers revert back to "1" when indenting)
 5. But they will resume after the indent.
 
-Surround words with * to *make them italicized.*
+Surround words with an asterisk to *make them italicized.*
 
 Use two asterisks to **bold something.**`,
     }
