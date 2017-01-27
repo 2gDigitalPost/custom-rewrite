@@ -1052,6 +1052,10 @@ class CreateFromProjectTemplate(Resource):
 
         component_results = server.insert_multiple('twog/component', components_to_create)
 
+        # Attach the tasks to each component
+        for component_result in component_results:
+            server.add_initial_tasks(component_result.get('__search_key__'))
+
         packages_to_create = []
         for package_template_sobject in package_template_sobjects:
             package_to_create = {
@@ -1065,6 +1069,9 @@ class CreateFromProjectTemplate(Resource):
             packages_to_create.append(package_to_create)
 
         package_results = server.insert_multiple('twog/package', packages_to_create)
+
+        for package_result in package_results:
+            server.add_initial_tasks(package_result.get('__search_key__'))
 
         file_flows_to_create = []
         for component_result in component_results:
