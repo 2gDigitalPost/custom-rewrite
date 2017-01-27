@@ -30,6 +30,9 @@
                 <h4>Select the template</h4>
                 <multiselect v-model="selectedProjectTemplate" :options="projectTemplates" track-by="code" label="name"></multiselect>
 
+                <input type="checkbox" id="splitInstructionsCheckbox" v-model="splitInstructions">
+                <label for="splitInstructionsCheckbox">Give each component an individual Instructions Document</label>
+
                 <template v-if="selectedProjectTemplate !== null && !submitting">
                     <button type="submit" class="btn btn-default" v-on:click="submitNewComponentsToTactic">Submit</button>
                 </template>

@@ -1004,6 +1004,7 @@ class CreateFromProjectTemplate(Resource):
         titles = json_data.get('titles')
         languages = json_data.get('languages')
         project_template_code = json_data.get('project_template_code')
+        split_instructions = json_data.get('split_instructions')
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
@@ -1056,6 +1057,52 @@ class CreateFromProjectTemplate(Resource):
         for component_result in component_results:
             server.add_initial_tasks(component_result.get('__search_key__'))
 
+        # Give each component an instructions document
+        component_template_code_to_instructions_template = {}
+
+        for component_template_sobject in component_template_sobjects:
+            if component_template_sobject.get('code') not in component_template_code_to_instructions_template:
+                instructions_template_sobject = server.get_by_code('twog/instructions_template',
+                                                                   component_template_sobject.get('instructions_template_code'))
+                component_template_code_to_instructions_template[component_template_sobject.get('code')] = instructions_template_sobject
+
+        if split_instructions:
+            for component_result in component_results:
+                component_template_code = component_result.get('component_template_code')
+
+                instructions_template = component_template_code_to_instructions_template[component_template_code]
+                name = instructions_template.get('name')
+                instructions_text = instructions_template.get('instructions_text')
+
+                new_instructions_document = server.insert('twog/instructions', {'name': name,
+                                                                                'instructions_text': instructions_text})
+
+                search_key = component_result.get('__search_key__')
+                server.update(search_key, {'instructions_code': new_instructions_document.get('code')})
+        else:
+            instructions_template_code_to_instructions_document = {}
+
+            for component_template_code, instructions_template in component_template_code_to_instructions_template.iteritems():
+                instructions_template_code = instructions_template.get('code')
+
+                if instructions_template_code not in instructions_template_code_to_instructions_document:
+                    name = instructions_template.get('name')
+                    instructions_text = instructions_template.get('instructions_text')
+
+                    new_instructions_document = server.insert('twog/instructions', {'name': name,
+                                                                                    'instructions_text': instructions_text})
+
+                    instructions_template_code_to_instructions_document[instructions_template_code] = new_instructions_document
+
+            for component_result in component_results:
+                search_key = component_result.get('__search_key__')
+
+                instructions_template = component_template_code_to_instructions_template[component_result.get('component_template_code')]
+                instructions_template_code = instructions_template.get('code')
+
+                new_instructions_document = instructions_template_code_to_instructions_document[instructions_template_code]
+                server.update(search_key, {'instructions_code': new_instructions_document.get('code')})
+
         packages_to_create = []
         for package_template_sobject in package_template_sobjects:
             package_to_create = {
@@ -1070,6 +1117,7 @@ class CreateFromProjectTemplate(Resource):
 
         package_results = server.insert_multiple('twog/package', packages_to_create)
 
+        # Attach the tasks to each package
         for package_result in package_results:
             server.add_initial_tasks(package_result.get('__search_key__'))
 

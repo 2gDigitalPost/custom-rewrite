@@ -24,6 +24,7 @@ export default {
       selectedLanguages: [],
       selectedProjectTemplate: null,
       projectTemplates: [],
+      splitInstructions: false,
       submitting: false,
       newComponentsSubmitted: false
     }
@@ -101,6 +102,7 @@ export default {
       this.selectedLanguages = []
       this.selectedProjectTemplate = null
       this.projectTemplates = []
+      this.splitInstructions = false
       this.submitting = false
       this.newComponentsSubmitted = false
 
@@ -234,7 +236,8 @@ export default {
         'token': localStorage.tactic_token,
         'titles': self.selectedTitles,
         'languages': self.selectedLanguages,
-        'project_template_code': self.selectedProjectTemplate.code
+        'project_template_code': self.selectedProjectTemplate.code,
+        'split_instructions': self.splitInstructions
       }
 
       axios.post(apiURL, JSON.stringify(jsonToSend), {
