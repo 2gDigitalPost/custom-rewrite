@@ -2,7 +2,7 @@
     <div class="row">
         <div v-if="order_sobject !== null">
             <div>
-                <h1>{{ order_sobject.name }} ({{ order_code }})</h1>
+                <h1>{{ order_code }}</h1>
                 <h5>Submitted by: {{ order_sobject.division_code }}</h5>
                 <h5>Expected Completion Date: {{ order_sobject.expected_completion_date }}</h5>
                 <h5>Due Date: {{ order_sobject.due_date }}</h5>
@@ -16,7 +16,7 @@
                 <component-editable-list v-bind:components="componentsFull"></component-editable-list>
             </div>
             <div class="col-xs-4">
-                <package-detail-list v-bind:packages="packages"></package-detail-list>
+                <package-editable-list v-bind:packages="packages"></package-detail-list>
             </div>
         </div>
     </div>

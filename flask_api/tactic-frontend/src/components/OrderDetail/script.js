@@ -3,7 +3,7 @@
 import axios from 'axios'
 
 import ComponentEditableList from './ComponentEditableList/index.vue'
-import PackageDetailList from '../PackageDetailList/index.vue'
+import PackageEditableList from './PackageEditableList/index.vue'
 
 import bus from '../../bus'
 
@@ -11,7 +11,7 @@ export default {
   name: 'OrderDetail',
   components: {
     ComponentEditableList,
-    'package-detail-list': PackageDetailList
+    PackageEditableList
   },
   data () {
     return {
