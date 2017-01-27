@@ -321,8 +321,9 @@ class FullOrder(Resource):
             else:
                 component_sobject_full['title'] = None
 
-            # Get the tasks assigned to the component, if any
-            component_sobject_full['tasks'] = tasks_dict.get(component_sobject.get('code'))
+            # Get the tasks assigned to the component, if any (sorted by code)
+            tasks_list = tasks_dict.get(component_sobject.get('code'))
+            component_sobject_full['tasks'] = sorted(tasks_list, key=lambda task: task.get('code'))
 
             component_sobject_full['file_flows'] = []
 
