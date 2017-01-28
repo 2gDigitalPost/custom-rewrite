@@ -30,6 +30,12 @@ export default {
     loadOrder: function () {
       var self = this
 
+      self.order_sobject = null,
+      self.order_name = null,
+      self.components = []
+      self.componentsFull = []
+      self.packages = []
+
       axios.get('/api/v1/orders/' + self.order_code + '/full', {
         params: {
           token: localStorage.tactic_token
@@ -62,8 +68,10 @@ export default {
   },
   created() {
     bus.$on('component-title-updated', this.loadOrder)
+    bus.$on('task-updated', this.loadOrder)
   },
   destroyed() {
     bus.$off('component-title-updated', this.loadOrder)
+    bus.$off('task-updated', this.loadOrder)
   }
 }

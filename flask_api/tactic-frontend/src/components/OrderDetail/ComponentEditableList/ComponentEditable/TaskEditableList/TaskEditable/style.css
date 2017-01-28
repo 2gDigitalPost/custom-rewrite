@@ -1,3 +1,7 @@
 .task-name {
     font-weight: bold
 }
+
+.status-select {
+    width: 100%
+}

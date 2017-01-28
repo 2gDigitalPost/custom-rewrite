@@ -1367,6 +1367,40 @@ class PipelinesByType(Resource):
         return jsonify({'pipelines': pipelines})
 
 
+class Task(Resource):
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        update_data = json_data.get('update_data')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the existing object
+        task_sobject = server.get_by_code('sthpw/task', code)
+
+        # Update the existing object
+        server.update(task_sobject.get('__search_key__'), update_data)
+
+        return jsonify({'status': 200})
+
+
+class TaskStatusOptions(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        task = server.get_by_code('sthpw/task', code)
+        processes = server.get_pipeline_processes_info(task.get('__search_key__'))
+
+        return jsonify({'processes': processes['processes']})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -1411,6 +1445,8 @@ api.add_resource(ComponentTemplateByCode, '/api/v1/component-templates/<string:c
 api.add_resource(PackageTemplates, '/api/v1/package-templates')
 api.add_resource(PackageTemplateByCode, '/api/v1/package-templates/<string:code>')
 api.add_resource(PipelinesByType, '/api/v1/pipelines/<string:type>')
+api.add_resource(Task, '/api/v1/tasks/<string:code>')
+api.add_resource(TaskStatusOptions, '/api/v1/tasks/<string:code>/status-options')
 
 
 if __name__ == '__main__':
