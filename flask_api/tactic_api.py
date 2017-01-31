@@ -358,6 +358,28 @@ class Orders(Resource):
 
         order_sobjects = server.eval("@SOBJECT(twog/order)")
 
+        # Get the division sobject for each order.
+        # Start by getting a list of all the division codes
+        division_codes = [order_sobject.get('division_code') for order_sobject in order_sobjects]
+
+        # Then, get a string of all the codes, separated by the pipe character
+        division_codes_string = '|'.join(division_codes)
+
+        # Now query for all the divisions
+        division_sobjects = server.eval("@SOBJECT(twog/division['code', 'in', '{0}'])".format(division_codes_string))
+
+        # Create a dictionary of the divisions, with the codes being the keys and the division sobject being the
+        # value (allows for easier searching for the next part)
+        divisions_dict = {}
+
+        for division_sobject in division_sobjects:
+            divisions_dict[division_sobject.get('code')] = division_sobject
+
+        # Now attach the divisions to their orders
+        for order_sobject in order_sobjects:
+            order_sobject['division'] = divisions_dict.get(order_sobject.get('division_code'))
+
+        # Return the orders
         return jsonify({'orders': order_sobjects})
 
     def post(self):

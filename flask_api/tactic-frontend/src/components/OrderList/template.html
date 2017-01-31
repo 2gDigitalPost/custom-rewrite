@@ -4,24 +4,18 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Name</th>
                 <th>Code</th>
                 <th>Client Division</th>
                 <th>Expected Completion Date</th>
                 <th>Due Date</th>
-                <th># of Titles</th>
-                <th># of Packages</th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="order in orders" v-on:click="openOrderLink(order.code)">
-                <td>{{ order.name }}</td>
                 <td>{{ order.code }}</td>
-                <td>{{ order.division_code }}</td>
+                <td>{{ order.division.name }}</td>
                 <td>{{ order.expected_completion_date }}</td>
                 <td>{{ order.due_date }}</td>
-                <td></td>
-                <td></td>
             </tr>
         </tbody>
     </table>
