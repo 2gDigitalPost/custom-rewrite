@@ -27,6 +27,7 @@ import OrderList from './components/OrderList/index.vue'
 import ProjectTemplate from './components/ProjectTemplate/index.vue'
 import ProjectTemplatesList from './components/ProjectTemplatesList/index.vue'
 import SelectPipelines from './components/SelectPipelines/index.vue'
+import TaskDetail from './components/TaskDetail/index.vue'
 
 Vue.use(VueRouter)
 
@@ -49,7 +50,8 @@ const routes = [
   { path: '/orders/:code/template/add', component: ImportTemplateToOrder, beforeEnter: requireAuth },
   { path: '/titles/add/imdb', component: AddTitleFromIMDb, beforeEnter: requireAuth },
   { path: '/titles/add/manual', component: AddTitleManually, beforeEnter: requireAuth },
-  { path: '/project-templates', component: ProjectTemplatesList, beforeenter: requireAuth },
+  { path: '/tasks/:code', component: TaskDetail, beforeEnter: requireAuth },
+  { path: '/project-templates', component: ProjectTemplatesList, beforeEnter: requireAuth },
   { path: '/project-templates/new', component: NewProjectTemplateForm, beforeEnter: requireAuth },
   { path: '/project-templates/:code', component: ProjectTemplate, beforeEnter: requireAuth },
   { path: '/instructions-templates/', component: InstructionsTemplatesList, beforeEnter: requireAuth },

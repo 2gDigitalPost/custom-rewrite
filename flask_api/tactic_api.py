@@ -1395,6 +1395,19 @@ class PipelinesByType(Resource):
 
 
 class Task(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        task = server.get_by_code('sthpw/task', code)
+
+        return jsonify({'task': task})
+
     def post(self, code):
         json_data = request.get_json()
 
@@ -1410,6 +1423,33 @@ class Task(Resource):
         server.update(task_sobject.get('__search_key__'), update_data)
 
         return jsonify({'status': 200})
+
+
+class TaskFull(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        task = server.get_by_code('sthpw/task', code)
+
+        # Get the parent sobject
+        task['parent'] = server.get_parent(task.get('__search_key__'))
+
+        # Get the tasks that come before this task
+        input_tasks = server.get_input_tasks(task.get('__search_key__'))
+
+        # Get the tasks that come after this task
+        output_tasks = server.get_output_tasks(task.get('__search_key__'))
+
+        # Get the task_data object (should exist for tasks created for twog/component and twog/package sobjects)
+        task_data = server.get_unique_sobject('twog/task_data', {'task_code': task.get('code')})
+
+        return jsonify({'task': task, 'task_data': task_data, 'input_tasks': input_tasks, 'output_tasks': output_tasks})
 
 
 class TaskStatusOptions(Resource):
@@ -1473,6 +1513,7 @@ api.add_resource(PackageTemplates, '/api/v1/package-templates')
 api.add_resource(PackageTemplateByCode, '/api/v1/package-templates/<string:code>')
 api.add_resource(PipelinesByType, '/api/v1/pipelines/<string:type>')
 api.add_resource(Task, '/api/v1/tasks/<string:code>')
+api.add_resource(TaskFull, '/api/v1/tasks/<string:code>/full')
 api.add_resource(TaskStatusOptions, '/api/v1/tasks/<string:code>/status-options')
 
 

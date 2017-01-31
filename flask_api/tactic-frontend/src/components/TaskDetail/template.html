@@ -1,2 +1,29 @@
 <div>
+    <div class="row">
+        <div v-if="taskObject !== null">
+            <h1>{{ taskObject.process }}</h1>
+            <h3>Parent: {{ taskObject.parent.name }} ({{ taskObject.parent.code }})</h3>
+
+            <div>Status: {{ taskObject.status }} <a v-on:click="editingStatus = true"><i class="fa fa-edit" aria-hidden="true"></i></a></div>
+
+            <div v-if="inputTasks.length > 0">
+                Input Tasks:
+
+                <ul>
+                    <li v-for="inputTaskLink in inputTaskLinks">
+                        <router-link :to="inputTaskLink.url" replace>{{ inputTaskLink.name }}</router-link>
+                    </li>
+                </ul>
+            </div>
+            <div v-if="outputTasks.length > 0">
+                Output Tasks:
+
+                <ul>
+                    <li v-for="outputTaskLink in outputTaskLinks">
+                        <router-link :to="outputTaskLink.url" replace>{{ outputTaskLink.name }}</router-link>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
