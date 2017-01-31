@@ -18,6 +18,7 @@ export default {
       selectedStatus: this.task.status,
       loadingStatuses: false,
       loading: false,
+      inspectLink: '/tasks/' + this.task.code
     }
   },
   methods: {
