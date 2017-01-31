@@ -24,6 +24,10 @@
                     </li>
                 </ul>
             </div>
+            <div v-if="estimatedHours !== null">
+                <h4 v-if="estimatedHours == 0">Estimated Hours: Not Set</h4>
+                <h4 v-else>Estimated Hours: {{ estimatedHours }}</h4>
+            </div>
             <div v-if="equipment.length > 0">
                 Equipment:
 

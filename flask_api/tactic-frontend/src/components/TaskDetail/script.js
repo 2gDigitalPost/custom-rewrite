@@ -16,6 +16,7 @@ export default {
       instructionsText: null,
       inputTasks: [],
       outputTasks: [],
+      estimatedHours: null,
       equipment: [],
       editingStatus: false,
     }
@@ -32,6 +33,7 @@ export default {
       self.instructionsText = null
       self.inputTasks = []
       self.outputTasks = []
+      self.estimatedHours = null
       self.equipment = []
 
       axios.get('/api/v1/tasks/' + taskCodeParam + '/full', {
@@ -46,6 +48,7 @@ export default {
         self.instructionsText = response.data.instructions_text
         self.inputTasks = response.data.input_tasks
         self.outputTasks = response.data.output_tasks
+        self.estimatedHours = response.data.task_data.estimated_hours
         self.equipment = response.data.equipment
       })
       .catch(function (error) {
