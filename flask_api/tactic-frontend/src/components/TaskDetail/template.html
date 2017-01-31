@@ -2,7 +2,7 @@
     <div class="row">
         <div v-if="taskObject !== null">
             <h1>{{ taskObject.process }}</h1>
-            <h3>Parent: {{ taskObject.parent.name }} ({{ taskObject.parent.code }})</h3>
+            <h3>Parent: {{ parent.name }} ({{ parent.code }})</h3>
 
             <div>Status: {{ taskObject.status }} <a v-on:click="editingStatus = true"><i class="fa fa-edit" aria-hidden="true"></i></a></div>
 
@@ -23,6 +23,20 @@
                         <router-link :to="outputTaskLink.url" replace>{{ outputTaskLink.name }}</router-link>
                     </li>
                 </ul>
+            </div>
+            <div v-if="equipment.length > 0">
+                Equipment:
+
+                <ul>
+                    <li v-for="eachEquipment in equipment">
+                        {{ eachEquipment.name }}
+                    </li>
+                </ul>
+            </div>
+
+            <div v-if="instructions !== null">
+                <h4>Instructions Text:</h4>
+                <div v-html="compiledMarkdown"></div>
             </div>
         </div>
     </div>

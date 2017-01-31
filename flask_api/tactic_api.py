@@ -1425,6 +1425,31 @@ class Task(Resource):
         return jsonify({'status': 200})
 
 
+def parse_instructions_text_for_task(instructions, task_name):
+    instructions_text = instructions.get('instructions_text', 'Sorry, no instructions are available for this task')
+
+    task_instructions_text = ''
+    instruction_text_in_task = False
+
+    for line in instructions_text.split('\n'):
+        if line:
+            if line.startswith('!@|'):
+                name = line.split('|')[1].strip()
+
+                if task_name == name:
+                    task_instructions_text += name + '\n'
+                    instruction_text_in_task = True
+                else:
+                    instruction_text_in_task = False
+            elif instruction_text_in_task:
+                task_instructions_text += line + '\n'
+
+    if not task_instructions_text:
+        task_instructions_text = 'Sorry, no instructions are available for this task.'
+
+    return task_instructions_text
+
+
 class TaskFull(Resource):
     def get(self, code):
         parser = reqparse.RequestParser()
@@ -1437,8 +1462,17 @@ class TaskFull(Resource):
 
         task = server.get_by_code('sthpw/task', code)
 
+        # Get the task_data object (should exist for tasks created for twog/component and twog/package sobjects)
+        task_data = server.get_unique_sobject('twog/task_data', {'task_code': task.get('code')})
+
         # Get the parent sobject
-        task['parent'] = server.get_parent(task.get('__search_key__'))
+        parent = server.get_parent(task.get('__search_key__'))
+
+        # Get the twog/instructions sobject (from the parent)
+        instructions = server.get_by_code('twog/instructions', parent.get('instructions_code'))
+
+        # Parse out the instructions text that is relevant to this task
+        instructions_text = parse_instructions_text_for_task(instructions, task.get('process'))
 
         # Get the tasks that come before this task
         input_tasks = server.get_input_tasks(task.get('__search_key__'))
@@ -1446,10 +1480,20 @@ class TaskFull(Resource):
         # Get the tasks that come after this task
         output_tasks = server.get_output_tasks(task.get('__search_key__'))
 
-        # Get the task_data object (should exist for tasks created for twog/component and twog/package sobjects)
-        task_data = server.get_unique_sobject('twog/task_data', {'task_code': task.get('code')})
+        # Get the equipment. Start by querying the twog/equipment_in_task_data table
+        equipment_in_task_data_sobjects = server.eval("@SOBJECT(twog/equipment_in_task_data['task_data_code', '{0}'])".format(task_data.get('code')))
 
-        return jsonify({'task': task, 'task_data': task_data, 'input_tasks': input_tasks, 'output_tasks': output_tasks})
+        # Now query for each equipment entry. Start by getting a list of all the equipment codes
+        equipment_codes = [equipment_in_task_data_sobject.get('equipment_code') for equipment_in_task_data_sobject in equipment_in_task_data_sobjects]
+
+        # Put the codes into string format, separated by the pipe character
+        equipment_codes_string = '|'.join(equipment_codes)
+
+        # Search for the twog/equipment sobjects
+        equipment = server.eval("@SOBJECT(twog/equipment['code', 'in', '{0}'])".format(equipment_codes_string))
+
+        return jsonify({'task': task, 'task_data': task_data, 'parent': parent, 'instructions_text': instructions_text,
+                        'input_tasks': input_tasks, 'output_tasks': output_tasks, 'equipment': equipment})
 
 
 class TaskStatusOptions(Resource):
