@@ -1,5 +1,8 @@
 <div>
     <div class="row">
+        <div class="col-md-4">
+            <img :src="title.poster" class="omdb-poster"/>
+        </div>
         <div class="col-md-8">
             <div class="component-name">
                 {{ componentObject.name }} ({{ componentObject.code }})
@@ -7,23 +10,26 @@
             <div class="component-title">
                 <editable-title v-bind:title="title" v-bind:componentCode="componentObject.code"></editable-title>
             </div>
+        </div>
+
+        <div class="col-md-12">
+            <task-editable-list v-bind:tasks="tasks"/>
+        </div>
+
+        <div class="col-md-12">
             <div class="component-files-needed">
                 <span v-if="fileFlows.length > 0">
                     <div>Files created by this component:</div>
-                    <li v-for="fileFlow in fileFlows">
-                        {{ fileFlow.name }}
-                    </li>
+                    <ul class="list-group">
+                        <li v-for="fileFlow in fileFlows" class="list-group-item">
+                            {{ fileFlow.name }}
+                        </li>
+                    </ul>
                 </span>
                 <span v-else>
                     No File flows assigned.
                 </span>
             </div>
-        </div>
-        <div class="col-md-4">
-            <img :src="title.poster" class="omdb-poster"/>
-        </div>
-        <div class="col-md-12">
-            <task-editable-list v-bind:tasks="tasks"/>
         </div>
     </div>
 </div>

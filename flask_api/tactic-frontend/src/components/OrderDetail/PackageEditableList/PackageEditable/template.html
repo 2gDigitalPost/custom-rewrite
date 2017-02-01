@@ -1,16 +1,23 @@
 <div>
-    <div class="package-name">
-        {{ package.name }} ({{ package.code }})
-    </div>
-    <div class="platform">
-        Platform: {{ package.platform.name }}
-    </div>
-    <div class="connection-status">
-        Connection Status: 
-        <span v-bind:class="{ 'platform-disconnected': connectionStatus === 'disconnected',
-                              'platform-testing': connectionStatus === 'testing',
-                              'platform-connected': connectionStatus === 'connected' }">
-            {{ connectionStatusText }}
-        </span>
+    <div class="row">
+        <div class="col-md-4">
+            <img v-if="platformImage !== null" :src="platformImageSource" class="platform-image"/>
+        </div>
+        <div class="col-md-8">
+            <div class="package-name">
+                {{ package.name }} ({{ package.code }})
+            </div>
+            <div class="platform">
+                Platform: {{ package.platform.name }}
+            </div>
+            <div class="connection-status">
+                Connection Status: 
+                <span v-bind:class="{ 'platform-disconnected': connectionStatus === 'disconnected',
+                                    'platform-testing': connectionStatus === 'testing',
+                                    'platform-connected': connectionStatus === 'connected' }">
+                    {{ connectionStatusText }}
+                </span>
+            </div>
+        </div>
     </div>
 </div>

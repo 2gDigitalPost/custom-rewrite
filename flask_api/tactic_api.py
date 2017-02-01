@@ -362,6 +362,17 @@ class FullOrder(Resource):
             platform_connection_sobject = server.eval("@SOBJECT(twog/platform_connection['platform_code', '{0}']['division_code', '{1}'])".format(package_sobject.get('platform_code'), order_sobject.get('division_code')))[0]
             package_sobject['platform_connection'] = platform_connection_sobject
 
+            # Also get the image associated with the platform, if there is one
+            platform_image_sobjects = server.eval(
+                "@SOBJECT(sthpw/file['search_code', '{0}'])".format(platform_sobject.get('code')))
+
+            if platform_image_sobjects:
+                platform_image = platform_image_sobjects[-1].get('file_name')
+            else:
+                platform_image = None
+
+            package_sobject['platform_image'] = platform_image
+
         return jsonify({'order': order_sobject, 'division': division_sobject, 'division_image': division_image,
                         'components': component_sobjects, 'packages': package_sobjects,
                         'components_full': component_sobjects_full,

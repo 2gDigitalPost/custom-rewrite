@@ -3,7 +3,7 @@
         <div v-if="order_sobject !== null">
             <div>
                 <h1>{{ order_code }}</h1>
-                <h5>Client: {{ division.name }} <img v-if="divisionImage !== null" :src="divisionImageSource" class="division-image" onclick="javascript:window.location.port=8081"/></h5>
+                <h5>Client: {{ division.name }} <img v-if="divisionImage !== null" :src="divisionImageSource" class="division-image"/></h5>
                 <h5>Expected Completion Date: {{ order_sobject.expected_completion_date }}</h5>
                 <h5>Due Date: {{ order_sobject.due_date }}</h5>
 
