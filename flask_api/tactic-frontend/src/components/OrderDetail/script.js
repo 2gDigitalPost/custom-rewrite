@@ -75,7 +75,7 @@ export default {
   computed: {
     divisionImageSource: function () {
       if (this.divisionImage !== null) {
-        return 'http://localhost:8081/assets/twog/division/' + this.divisionImage.file_name
+        return 'http://localhost:8081/assets/twog/division/' + this.divisionImage
       }
     }
   },

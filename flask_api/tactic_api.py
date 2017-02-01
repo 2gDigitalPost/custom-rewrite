@@ -270,7 +270,12 @@ class FullOrder(Resource):
         division_sobject = server.get_by_code('twog/division', order_sobject.get('division_code'))
 
         # Also get the image associated with the division, if there is one
-        division_image_sobject = server.eval("@SOBJECT(sthpw/file['search_code', '{0}'])".format(division_sobject.get('code')))[-1]
+        division_image_sobjects = server.eval("@SOBJECT(sthpw/file['search_code', '{0}'])".format(division_sobject.get('code')))
+
+        if division_image_sobjects:
+            division_image = division_image_sobjects[-1].get('file_name')
+        else:
+            division_image = None
 
         # Get all the components associated with the order
         component_sobjects = server.eval("@SOBJECT(twog/component['order_code', '{0}'])".format(code))
@@ -347,7 +352,7 @@ class FullOrder(Resource):
         # Get all the packages associated with the order
         package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
 
-        return jsonify({'order': order_sobject, 'division': division_sobject, 'division_image': division_image_sobject,
+        return jsonify({'order': order_sobject, 'division': division_sobject, 'division_image': division_image,
                         'components': component_sobjects, 'packages': package_sobjects,
                         'components_full': component_sobjects_full,
                         'file_flows_to_packages': file_flows_to_package_dict})
