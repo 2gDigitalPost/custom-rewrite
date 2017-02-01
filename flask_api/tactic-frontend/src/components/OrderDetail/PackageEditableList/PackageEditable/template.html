@@ -3,6 +3,14 @@
         {{ package.name }} ({{ package.code }})
     </div>
     <div class="platform">
-        {{ package.platform_code }}
+        Platform: {{ package.platform.name }}
+    </div>
+    <div class="connection-status">
+        Connection Status: 
+        <span v-bind:class="{ 'platform-disconnected': connectionStatus === 'disconnected',
+                              'platform-testing': connectionStatus === 'testing',
+                              'platform-connected': connectionStatus === 'connected' }">
+            {{ connectionStatusText }}
+        </span>
     </div>
 </div>

@@ -352,6 +352,16 @@ class FullOrder(Resource):
         # Get all the packages associated with the order
         package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
 
+        # Get all the extra data needed for the package objects, including the platform and connection status
+        for package_sobject in package_sobjects:
+            # Get the platform object and add it to the package dictionary
+            platform_sobject = server.get_by_code('twog/platform', package_sobject.get('platform_code'))
+            package_sobject['platform'] = platform_sobject
+
+            # Get the platform connection sobject and add it to the package dictionary
+            platform_connection_sobject = server.eval("@SOBJECT(twog/platform_connection['platform_code', '{0}']['division_code', '{1}'])".format(package_sobject.get('platform_code'), order_sobject.get('division_code')))[0]
+            package_sobject['platform_connection'] = platform_connection_sobject
+
         return jsonify({'order': order_sobject, 'division': division_sobject, 'division_image': division_image,
                         'components': component_sobjects, 'packages': package_sobjects,
                         'components_full': component_sobjects_full,

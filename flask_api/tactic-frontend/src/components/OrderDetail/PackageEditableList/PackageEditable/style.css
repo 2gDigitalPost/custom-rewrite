@@ -1,0 +1,15 @@
+.package-name {
+    font-weight: bold
+}
+
+.platform-disconnected {
+    color: darkred
+}
+
+.platform-testing {
+    color: #b9b904
+}
+
+.platform-connected {
+    color: green
+}
