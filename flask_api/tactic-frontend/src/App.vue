@@ -24,9 +24,6 @@
               <router-link to="/orders">Orders</router-link>
             </li>
             <li>
-              <router-link to="/order_entry">Enter a new Order</router-link>
-            </li>
-            <li>
               <router-link to="/titles/add/imdb">Add a Title from IMDb</router-link>
             </li>
             <li>

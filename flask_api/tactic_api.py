@@ -264,7 +264,13 @@ class FullOrder(Resource):
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         # Get the order sobject (there should be only one, but it still returns in a list)
-        order_sobject = server.eval("@SOBJECT(twog/order['code', '{0}'])".format(code))[0]
+        order_sobject = server.get_by_code('twog/order', code)
+
+        # Get the division sobject
+        division_sobject = server.get_by_code('twog/division', order_sobject.get('division_code'))
+
+        # Also get the image associated with the division, if there is one
+        division_image_sobject = server.eval("@SOBJECT(sthpw/file['search_code', '{0}'])".format(division_sobject.get('code')))[-1]
 
         # Get all the components associated with the order
         component_sobjects = server.eval("@SOBJECT(twog/component['order_code', '{0}'])".format(code))
@@ -341,7 +347,8 @@ class FullOrder(Resource):
         # Get all the packages associated with the order
         package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
 
-        return jsonify({'order': order_sobject, 'components': component_sobjects, 'packages': package_sobjects,
+        return jsonify({'order': order_sobject, 'division': division_sobject, 'division_image': division_image_sobject,
+                        'components': component_sobjects, 'packages': package_sobjects,
                         'components_full': component_sobjects_full,
                         'file_flows_to_packages': file_flows_to_package_dict})
 

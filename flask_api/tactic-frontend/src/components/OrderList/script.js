@@ -33,6 +33,9 @@ export default {
       let orderDetailURL = '/orders/' + orderCode
 
       this.$router.push(orderDetailURL)
+    },
+    loadOrderEntryLink: function() {
+      this.$router.push('/orders/new')
     }
   },
   beforeMount: function () {

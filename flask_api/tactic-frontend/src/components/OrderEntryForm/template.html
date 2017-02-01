@@ -15,15 +15,14 @@
                     <date-picker :date="expected_completion_date" :option="option"></date-picker>
                 </div>
             </div>
-            <button type="submit">Submit</button>
+            <button type="submit" class="btn btn-default">Submit</button>
         </form>
     </div>
     <div v-else>
         <h1>Order Submitted</h1>
         <p>Your order was submitted successfully. The order code is {{ submitted_order_code }}</p>
+        <button v-on:click="redirectToAddTitle" class="btn btn-default">Add Titles/Pipelines to Order</button>
+        <button v-on:click="redirectToOrderDetail" class="btn btn-default">View Order</button>
         <button v-on:click="refreshPage" class="btn btn-default">Enter another Order</button>
-        <button v-on:click="redirectToOrderDetail" class="btn btn-default">View Order Page</button>
-        <button v-on:click="redirectToAddTitle" class="btn btn-default">Add Titles to Order</button>
-        <button v-on:click="redirectToImportTemplate" class="btn btn-default">Import Template</button>
     </div>
 </div>

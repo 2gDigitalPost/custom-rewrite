@@ -18,6 +18,8 @@ export default {
       order_code: this.$route.params.code,
       order_sobject: null,
       order_name: null,
+      division: null,
+      divisionImage: null,
       components: [],
       componentsFull: [],
       packages: [],
@@ -30,8 +32,10 @@ export default {
     loadOrder: function () {
       var self = this
 
-      self.order_sobject = null,
-      self.order_name = null,
+      self.order_sobject = null
+      self.order_name = null
+      self.division = null
+      self.divisionImage = null
       self.components = []
       self.componentsFull = []
       self.packages = []
@@ -48,6 +52,8 @@ export default {
 
         self.order_sobject = orderData
         self.order_name = orderData['name']
+        self.division = response.data.division
+        self.divisionImage = response.data.division_image
         self.components = componentsData
         self.componentsFull = response.data.components_full
         self.packages = packagesData
@@ -65,6 +71,13 @@ export default {
   beforeMount: function () {
     this.loadOrder()
     this.setupLinks()
+  },
+  computed: {
+    divisionImageSource: function () {
+      if (this.divisionImage !== null) {
+        return 'http://localhost:8081/assets/twog/division/' + this.divisionImage.file_name
+      }
+    }
   },
   created() {
     bus.$on('component-title-updated', this.loadOrder)
