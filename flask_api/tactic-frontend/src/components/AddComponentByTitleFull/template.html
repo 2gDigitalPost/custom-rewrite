@@ -41,7 +41,7 @@
                 <input type="checkbox" id="titleNotAvailableCheckbox" v-model="titleNotAvailable">
                 <label for="titleNotAvailableCheckbox">The Title is not listed</label>
 
-                <div v-if="titleNotAvailable">
+                <div v-if="titleNotAvailable && !titleNotInOMDb">
                     <h4>Type in the name of the title below to search for it in IMDb.</h4>
 
                     <input type="text" v-model="titleToSearch" />
@@ -86,12 +86,33 @@
                                 <button class="btn btn-default" v-on:click="nextPage" v-if="totalPages !== currentPage">Next Page</button>
                             </div>
 
+
                             <template v-if="(selectedOMDBTitles.length > 0) && (!submitting)">
                                 <button class="btn btn-default" v-on:click="submitOMDbTitlesToTactic">Submit</button>
                             </template>
                         </div>
-                        </div>
                     </div>
+                </div>
+
+                <div v-if="omdbSearched">
+                    <input type="checkbox" id="titleNotFoundCheckbox" v-model="titleNotInOMDb">
+                    <label for="titleNotFoundCheckbox">The Title is not in IMDb</label>
+                </div>
+
+                <div v-if="titleNotInOMDb">
+                    <h4>Enter the Title Manually</h4>
+
+                    <input type="text" v-model="newTitleName" placeholder="Name" />
+
+                    <h5>Select the year, if you know it</h5>
+                    <select v-model="year">
+                        <option v-for="option in yearOptions">
+                            {{ option }}
+                        </option>
+                    </select>
+                    <br/>
+
+                    <button class="btn btn-default" v-on:click="submitManualTitle">Submit New Title</button>
                 </div>
             </template>
         </template>

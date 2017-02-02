@@ -572,6 +572,24 @@ class TitleFromOMDb(Resource):
         return jsonify({'inserted_title': inserted_title})
 
 
+class ManualTitleEntry(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        title_data = json_data.get('title')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Some data can have None set as the value. This does not work when inserting to the database, so remove
+        # these keys/values
+        cleaned_json_data = {key: value for key, value in title_data.iteritems() if value != None}
+
+        inserted_title = server.insert('twog/title', cleaned_json_data)
+
+        return jsonify({'inserted_title': inserted_title})
+
+
 class ComponentsInOrder(Resource):
     def get(self, code):
         pass
@@ -1561,6 +1579,7 @@ api.add_resource(Titles, '/api/v1/titles')
 api.add_resource(TitleExistsByIMDbID, '/api/v1/titles/imdb/<string:imdb_id>/exists')
 api.add_resource(TitlesExistByIMDbID, '/api/v1/titles/imdb/exists')
 api.add_resource(TitleFromOMDb, '/api/v1/titles/omdb')
+api.add_resource(ManualTitleEntry, '/api/v1/titles/manual')
 api.add_resource(Platforms, '/api/v1/platforms')
 api.add_resource(ComponentsInOrder, '/api/v1/orders/<string:code>/components')
 api.add_resource(ComponentByCode, '/api/v1/components/<string:code>')

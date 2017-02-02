@@ -18,19 +18,24 @@ export default {
       searchableTitles: [],
       titleNotAvailable: false,
       titleToSearch: null,
+      omdbSearched: false,
       searchResults: [],
       totalSearchResults: null,
       currentPage: null,
       totalPages: null,
       searchResultsAlreadyInTactic: [],
       selectedOMDBTitles: [],
+      titleNotInOMDb: false,
       languages: [],
       selectedLanguages: [],
       selectedProjectTemplate: null,
       projectTemplates: [],
       splitInstructions: false,
       submitting: false,
-      newComponentsSubmitted: false
+      newComponentsSubmitted: false,
+      newTitleName: null,
+      year: null,
+      yearOptions: this.getYearOptions()
     }
   },
   methods: {
@@ -104,12 +109,14 @@ export default {
       this.searchableTitles = []
       this.titleNotAvailable = false
       this.titleToSearch = null
+      this.omdbSearched = false
       this.searchResults = []
       this.totalSearchResults = null
       this.currentPage = null
       this.totalPages = null
       this.searchResultsAlreadyInTactic = []
       this.selectedOMDBTitles = []
+      this.titleNotInOMDb = false
       this.languages = []
       this.selectedLanguages = []
       this.selectedProjectTemplate = null
@@ -117,6 +124,8 @@ export default {
       this.splitInstructions = false
       this.submitting = false
       this.newComponentsSubmitted = false
+      this.newTitleName
+      this.year = null
 
       this.loadTitles()
       this.loadLanguages()
@@ -140,6 +149,8 @@ export default {
       })
       .then(function (response) {
         let gotResponse = response.data.Response
+
+        self.omdbSearched = true
 
         if (gotResponse) {
           for (let i = 0; i < response.data.Search.length; i++) {
@@ -317,6 +328,47 @@ export default {
       .catch(function (error) {
         console.log(error)
       })
+    },
+    submitManualTitle: function () {
+      var self = this
+
+      let jsonToSend = {
+        'token': localStorage.tactic_token,
+        'title': {
+          'name': self.newTitleName,
+          'type': self.titleType.toLowerCase(),
+        }
+      }
+
+      if (self.year !== null) {
+        jsonToSend['title']['year'] = self.year
+      }
+
+      axios.post('/api/v1/titles/manual', JSON.stringify(jsonToSend), {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8'
+        }
+      })
+      .then(function (response) {
+        if (response.data) {
+          if (response.status === 200) {
+            self.reloadAll()
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+    getYearOptions: function () {
+      let currentYear = new Date().getFullYear();
+      let years = [];
+
+      for (let yearIterator = currentYear; yearIterator >= 1888; yearIterator--) {
+        years.push(yearIterator);
+      }
+
+      return years;
     }
   },
   watch: {
