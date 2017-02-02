@@ -1,6 +1,7 @@
 /* globals localStorage */
 
 import axios from 'axios'
+import _ from 'lodash'
 
 export default {
   name: 'OrderList',
@@ -21,9 +22,11 @@ export default {
       .then(function (response) {
         let ordersData = response.data.orders
 
+        self.orders = self.sortByDueDate(response.data.orders)
+        /*
         for (let i = 0; i < ordersData.length; i++) {
           self.orders.push(ordersData[i])
-        }
+        } */
       })
       .catch(function (error) {
         console.log(error)
@@ -36,6 +39,9 @@ export default {
     },
     loadOrderEntryLink: function() {
       this.$router.push('/orders/new')
+    },
+    sortByDueDate: function (orderObjects) {
+      return _.sortBy(orderObjects, 'due_date')
     }
   },
   beforeMount: function () {
