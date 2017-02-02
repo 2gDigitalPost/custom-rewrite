@@ -11,6 +11,7 @@ export default {
   },
   data () {
     return {
+      loading: true,
       titleType: null,
       selectedTitles: [],
       titles: [],
@@ -18,6 +19,9 @@ export default {
       titleNotAvailable: false,
       titleToSearch: null,
       searchResults: [],
+      totalSearchResults: null,
+      currentPage: null,
+      totalPages: null,
       searchResultsAlreadyInTactic: [],
       selectedOMDBTitles: [],
       languages: [],
@@ -33,6 +37,8 @@ export default {
     loadTitles: function () {
       var self = this
 
+      self.loading = true
+
       axios.get('/api/v1/titles', {
         params: {
           token: localStorage.tactic_token
@@ -44,6 +50,8 @@ export default {
         for (let i = 0; i < titleData.length; i++) {
           self.titles.push({name: titleData[i].name, code: titleData[i].code, type: titleData[i].type})
         }
+
+        self.loading = false
       })
       .catch(function (error) {
         console.log(error)
@@ -89,6 +97,7 @@ export default {
     },
     reloadAll: function () {
       // Reset all variables to their defaults
+      this.loading = true
       this.titleType = null
       this.selectedTitles = []
       this.titles = []
@@ -96,6 +105,9 @@ export default {
       this.titleNotAvailable = false
       this.titleToSearch = null
       this.searchResults = []
+      this.totalSearchResults = null
+      this.currentPage = null
+      this.totalPages = null
       this.searchResultsAlreadyInTactic = []
       this.selectedOMDBTitles = []
       this.languages = []
@@ -133,11 +145,60 @@ export default {
           for (let i = 0; i < response.data.Search.length; i++) {
             self.getTitleExistsByIMDbID(response.data.Search[i])
           }
+
+          self.totalSearchResults = response.data.totalResults
+          self.currentPage = 1
+          self.totalPages = Math.ceil(self.totalSearchResults / 10)
         }
       })
       .catch(function (error) {
         console.log(error)
       })
+    },
+    searchOMDBWithPageNumber: function (pageNumber) {
+      let self = this
+      self.searchResults = []
+      self.searchResultsAlreadyInTactic = []
+
+      let omdbURL = 'http://www.omdbapi.com'
+
+      axios.get(omdbURL, {
+        params: {
+          s: self.titleToSearch,
+          type: self.titleType,
+          page: pageNumber
+        }
+      })
+      .then(function (response) {
+        let gotResponse = response.data.Response
+
+        if (gotResponse) {
+          for (let i = 0; i < response.data.Search.length; i++) {
+            self.getTitleExistsByIMDbID(response.data.Search[i])
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+    previousPage: function () {
+      let self = this
+
+      if (self.currentPage > 1) {
+        self.currentPage--
+      }
+
+      self.searchOMDBWithPageNumber(self.currentPage)
+    },
+    nextPage: function () {
+      let self = this
+
+      if (self.currentPage < self.totalPages) {
+        self.currentPage++
+      }
+
+      self.searchOMDBWithPageNumber(self.currentPage)
     },
     getDetailsFromOMDb: function (imdbID) {
       var self = this
