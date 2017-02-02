@@ -23,10 +23,6 @@ export default {
         let ordersData = response.data.orders
 
         self.orders = self.sortByDueDate(response.data.orders)
-        /*
-        for (let i = 0; i < ordersData.length; i++) {
-          self.orders.push(ordersData[i])
-        } */
       })
       .catch(function (error) {
         console.log(error)
