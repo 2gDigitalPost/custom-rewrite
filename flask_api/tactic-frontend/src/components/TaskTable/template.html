@@ -1,34 +1,48 @@
 <div>
-    <h1>Tasks</h1>
+    <div class="row">
+        <template v-if="displayedTasks.length > 0 && !loading">
+            <div class="col-md-10">
+                <h1>Tasks</h1>
+            </div>
+            <div class="col-md-2">
+                Page {{ currentPage }} of {{ numberOfPages }}
+            </div>
 
-    <template v-if="tasks.length > 0 && !loading">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Due Date</th>
-                    <th>Submitted By</th>
-                    <th>Assigned User</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="task in tasks" v-on:click="openDetailLink(task.code)">
-                    <td>{{ task.code }}</td>
-                    <td>{{ task.process }}</td>
-                    <td>{{ task.status }}</td>
-                    <td>{{ task.bid_end_date }}</td>
-                    <td>{{ task.login }}</td>
-                    <td>{{ task.assigned }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </template>
-    <template v-else-if="loading">
-        <p>Loading...</p>
-    </template>
-    <template v-else>
-        <p>No tasks are currently active.</p>
-    </template>
+            <div class="col-md-12">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                            <th>Submitted By</th>
+                            <th>Assigned User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="task in displayedTasks" v-on:click="openDetailLink(task.code)">
+                            <td>{{ task.code }}</td>
+                            <td>{{ task.process }}</td>
+                            <td>{{ task.status }}</td>
+                            <td>{{ task.bid_end_date }}</td>
+                            <td>{{ task.login }}</td>
+                            <td>{{ task.assigned }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <ul class="pager">
+                    <li class="previous" v-if="currentPage > 1"><a v-on:click.stop="modifyCurrentPage(-1)">Previos</a></li>
+                    <li class="next" v-if="currentPage < numberOfPages"><a v-on:click.stop="modifyCurrentPage(1)">Next</a></li>
+                </ul>
+            </div>
+        </template>
+        <template v-else-if="loading">
+            <p><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading...</p>
+        </template>
+        <template v-else>
+            <p>No tasks are currently active.</p>
+        </template>
+    </div>
 </div>

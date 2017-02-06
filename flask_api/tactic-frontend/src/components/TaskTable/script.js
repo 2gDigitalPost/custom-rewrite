@@ -9,7 +9,9 @@ export default {
       loading: true,
       department: this.$route.params.department,
       tasks: [],
-      timer: null
+      timer: null,
+      currentPage: 1,
+      numberOfResultsDisplayed: 50
     }
   },
   methods: {
@@ -46,6 +48,17 @@ export default {
     },
     sortByDueDate: function (taskObjects) {
       return _.sortBy(taskObjects, 'bid_end_date')
+    },
+    modifyCurrentPage: function (modifier) {
+      this.currentPage += modifier
+    }
+  },
+  computed: {
+    numberOfPages: function () {
+      return Math.ceil(this.tasks.length / this.numberOfResultsDisplayed)
+    },
+    displayedTasks: function () {
+      return this.tasks.slice((this.currentPage - 1) * this.numberOfResultsDisplayed, (this.currentPage * this.numberOfResultsDisplayed))
     }
   },
   beforeMount: function () {
