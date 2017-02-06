@@ -17,6 +17,7 @@ from edit_file_wdg import EditFileWdg
 from edit_instructions_wdg import EditInstructionsWdg
 from equipment_in_task_wdg import EquipmentInTaskWdg
 from generic_task_inspect_wdg import GenericTaskInspectWdg
+from iframe_wdg import *
 from insert_component_in_order_wdg import InsertComponentInOrderWdg, InsertComponentByLanguageWdg,\
     InsertComponentBySeasonWdg
 from instructions_builder_load_page import InstructionsBuilderLoadPageWdg
