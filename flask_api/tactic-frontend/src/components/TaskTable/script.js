@@ -31,8 +31,7 @@ export default {
         }
       })
       .then(function (response) {
-        console.log(response)
-        self.tasks = response.data.tasks
+        self.tasks = self.sortByDueDate(response.data.tasks)
 
         self.loading = false
       })
@@ -40,10 +39,13 @@ export default {
         console.log(error)
       })
     },
-    openDetailLink (taskCode) {
+    openDetailLink: function (taskCode) {
       let taskDetailURL = '/task/' + taskCode
 
       this.$router.push(taskDetailURL)
+    },
+    sortByDueDate: function (taskObjects) {
+      return _.sortBy(taskObjects, 'bid_end_date')
     }
   },
   beforeMount: function () {

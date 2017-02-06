@@ -164,6 +164,12 @@ export default {
       })
       .catch(function (error) {
         console.log(error)
+
+        if (error.response) {
+          if (error.response.status === 503) {
+            window.alert("The OMDb API is returning status 503. This means the service is currently unavailable. Please try again later, or enter the Title manually.")
+          }
+        }
       })
     },
     searchOMDBWithPageNumber: function (pageNumber) {
