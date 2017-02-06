@@ -1,0 +1,34 @@
+<div>
+    <h1>Tasks</h1>
+
+    <template v-if="tasks.length > 0 && !loading">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Submitted By</th>
+                    <th>Assigned User</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="task in tasks" v-on:click="openDetailLink(task.code)">
+                    <td>{{ task.code }}</td>
+                    <td>{{ task.process }}</td>
+                    <td>{{ task.status }}</td>
+                    <td>{{ task.bid_end_date }}</td>
+                    <td>{{ task.login }}</td>
+                    <td>{{ task.assigned }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+    <template v-else-if="loading">
+        <p>Loading...</p>
+    </template>
+    <template v-else>
+        <p>No tasks are currently active.</p>
+    </template>
+</div>

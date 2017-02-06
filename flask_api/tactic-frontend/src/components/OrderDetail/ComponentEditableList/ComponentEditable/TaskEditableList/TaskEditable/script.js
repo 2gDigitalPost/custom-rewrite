@@ -18,7 +18,7 @@ export default {
       selectedStatus: this.task.status,
       loadingStatuses: false,
       loading: false,
-      inspectLink: '/tasks/' + this.task.code
+      inspectLink: '/task/' + this.task.code
     }
   },
   methods: {
@@ -33,7 +33,7 @@ export default {
 
       self.loadingStatuses = true
 
-      axios.get('/api/v1/tasks/' + self.task.code + '/status-options', {
+      axios.get('/api/v1/task/' + self.task.code + '/status-options', {
         params: {
           token: localStorage.tactic_token
         }
@@ -49,7 +49,7 @@ export default {
     submitStatusChangeToTactic: function () {
       let self = this
 
-      let apiURL = '/api/v1/tasks/' + self.task.code
+      let apiURL = '/api/v1/task/' + self.task.code
 
       let updateData = {'status': self.selectedStatus}
       let jsonToSend = {

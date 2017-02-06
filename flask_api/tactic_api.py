@@ -1476,6 +1476,100 @@ class Task(Resource):
         return jsonify({'status': 200})
 
 
+class Tasks(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        search_types = ['twog/component?project=twog', 'twog/package?project=twog']
+        search_types_string = '|'.join(search_types)
+
+        excluded_statuses = ['Pending', 'Complete']
+        excluded_statuses_string = '|'.join(excluded_statuses)
+
+        tasks = server.eval("@SOBJECT(sthpw/task['search_type', 'in', '{0}']['status', 'not in', '{1}'])".format(search_types_string, excluded_statuses_string))
+
+        return jsonify({'tasks': tasks})
+
+
+class TasksByDepartment(Resource):
+    def get(self, department):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        search_types = ['twog/component?project=twog', 'twog/package?project=twog']
+        search_types_string = '|'.join(search_types)
+
+        excluded_statuses = ['Pending', 'Complete']
+        excluded_statuses_string = '|'.join(excluded_statuses)
+
+        tasks = server.eval(
+            "@SOBJECT(sthpw/task['search_type', 'in', '{0}']['status', 'not in', '{1}'])".format(search_types_string, excluded_statuses_string))
+
+        department_tasks = []
+
+        for task in tasks:
+            process = task.get('process')
+            process_department = process.split(':')[0].strip().lower()
+
+            if process_department == department:
+                department_tasks.append(task)
+
+        return jsonify({'tasks': department_tasks})
+
+
+class TasksBySubmittedUser(Resource):
+    def get(self, user):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        search_types = ['twog/component?project=twog', 'twog/package?project=twog']
+        search_types_string = '|'.join(search_types)
+
+        excluded_statuses = ['Pending', 'Complete']
+        excluded_statuses_string = '|'.join(excluded_statuses)
+
+        tasks = server.eval("@SOBJECT(sthpw/task['search_type', 'in', '{0}']['status', 'not in', '{1}']['login', '{2}'])".format(search_types_string, excluded_statuses_string, user))
+
+        return jsonify({'tasks': tasks})
+
+
+class TasksByAssignedUser(Resource):
+    def get(self, user):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        search_types = ['twog/component?project=twog', 'twog/package?project=twog']
+        search_types_string = '|'.join(search_types)
+
+        excluded_statuses = ['Pending', 'Complete']
+        excluded_statuses_string = '|'.join(excluded_statuses)
+
+        tasks = server.eval("@SOBJECT(sthpw/task['search_type', 'in', '{0}']['status', 'not in', '{1}']['assigned_user', '{2}'])".format(search_types_string, excluded_statuses_string, user))
+
+        return jsonify({'tasks': tasks})
+
+
 def parse_instructions_text_for_task(instructions, task_name):
     instructions_text = instructions.get('instructions_text', 'Sorry, no instructions are available for this task')
 
@@ -1608,9 +1702,13 @@ api.add_resource(ComponentTemplateByCode, '/api/v1/component-templates/<string:c
 api.add_resource(PackageTemplates, '/api/v1/package-templates')
 api.add_resource(PackageTemplateByCode, '/api/v1/package-templates/<string:code>')
 api.add_resource(PipelinesByType, '/api/v1/pipelines/<string:type>')
-api.add_resource(Task, '/api/v1/tasks/<string:code>')
-api.add_resource(TaskFull, '/api/v1/tasks/<string:code>/full')
-api.add_resource(TaskStatusOptions, '/api/v1/tasks/<string:code>/status-options')
+api.add_resource(Tasks, '/api/v1/tasks')
+api.add_resource(TasksByDepartment, '/api/v1/tasks/<string:department>')
+api.add_resource(TasksBySubmittedUser, '/api/v1/tasks/user/<string:user>/submitted')
+api.add_resource(TasksByAssignedUser, '/api/v1/tasks/user/<string:user>/assigned')
+api.add_resource(Task, '/api/v1/task/<string:code>')
+api.add_resource(TaskFull, '/api/v1/task/<string:code>/full')
+api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
 
 if __name__ == '__main__':

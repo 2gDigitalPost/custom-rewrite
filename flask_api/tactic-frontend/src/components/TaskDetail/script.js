@@ -36,7 +36,7 @@ export default {
       self.estimatedHours = null
       self.equipment = []
 
-      axios.get('/api/v1/tasks/' + taskCodeParam + '/full', {
+      axios.get('/api/v1/task/' + taskCodeParam + '/full', {
         params: {
           token: localStorage.tactic_token
         }
@@ -59,7 +59,7 @@ export default {
       let links = []
 
       _.forEach(taskList, function (task) {
-        links.push({name: task.process, url: '/tasks/' + task.code})
+        links.push({name: task.process, url: '/task/' + task.code})
       })
 
       return links

@@ -24,6 +24,9 @@
               <router-link to="/orders">Orders</router-link>
             </li>
             <li>
+              <router-link to="/tasks/links">Tasks</router-link>
+            </li>
+            <li>
               <router-link to="/department-requests/links">Department Requests</router-link>
             </li>
             <li>
