@@ -8,7 +8,8 @@ export default {
     return {
       loading: true,
       department: this.$route.params.department,
-      tasks: []
+      tasks: [],
+      timer: null
     }
   },
   methods: {
@@ -30,6 +31,7 @@ export default {
         }
       })
       .then(function (response) {
+        console.log(response)
         self.tasks = response.data.tasks
 
         self.loading = false
@@ -46,9 +48,13 @@ export default {
   },
   beforeMount: function () {
     this.loadTasks()
-
-    setInterval(function () {
+  },
+  created: function () {
+    this.timer = setInterval(function () {
       this.loadTasks()
     }.bind(this), 60000)
+  },
+  destroyed: function () {
+    clearInterval(this.timer)
   }
 }
