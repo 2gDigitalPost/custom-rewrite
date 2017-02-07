@@ -1,43 +1,111 @@
 <div>
-    <template v-if="loading">
-        Loading....
-    </template>
-    <template v-else-if="editing">
-        <div class="row">
-            <div class="col-md-6">
-                <h1>Editing Instructions Document</h1>
-
-                <label for="instructions-name">Name</label>
-                <input id="instructions-name" type="text" v-model="name" placeholder="Name" />
-
-                <h4>Instructions text</h4>
-
-                <textarea v-model="newInstructionsText" @input="update" />
-                <br/>
-                <button type="submit" class="btn btn-default" v-on:click="submitToTactic">Submit</button>
-                <button class="btn btn-default" v-on:click="editing = false">Cancel</button>
-            </div>
-            <div class="col-md-6">
-                <div v-html="newCompiledMarkdown"></div>
-            </div>
-        </div>
-    </template>
-    <template v-else>
-        <div class="row">
-            <div class="col-md-6">
-                <h1>Instructions Document: {{ instructionsDocument.name }}</h1>
-            </div>
-            <div class="col-md-6">
-                <button v-on:click="editing = true" class="btn btn-default">
-                    <span class="glyphicon glyphicon-pencil"></span> Edit
-                </button>
-            </div>
-        </div>
-        <div class="row">
+    <div class="row">
+        <template v-if="loading">
+            Loading....
+        </template>
+        <template v-else>
             <div class="col-md-12">
-                <h4>Instructions Text:</h4>
-                <div v-html="currentCompiledMarkdown"></div>
+                <h1>Instructions Document: {{ instructionsDocument.name }}</h1>
+                <div class="btn-group">
+                    <button v-on:click="editing = !editing" class="btn btn-default" v-bind:class="{active: editing}">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+                    </button>
+                    <button v-on:click="splitting = !splitting" class="btn btn-default" v-bind:class="{active: splitting}">
+                        <i class="fa fa-chain-broken" aria-hidden="true"></i> Split
+                    </button>
+                </div>
             </div>
-        </div>
-    </template>
+            <div class="col-md-12">
+                <hr>
+                
+                <template v-if="editing">
+                    <h3>Editing Instructions</h3>
+
+                    <div class="col-md-6">
+                        <label for="instructions-name">Name</label>
+                        <input id="instructions-name" type="text" v-model="name" placeholder="Name" class="form-control" />
+
+                        <h4>Instructions text</h4>
+
+                        <textarea v-model="newInstructionsText" @input="update" />
+                        <br/>
+                        <button type="submit" class="btn btn-default" v-on:click="submitToTactic">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+                        </button>
+                        <button class="btn btn-default" v-on:click="editing = false">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <div v-html="newCompiledMarkdown"></div>
+                    </div>
+                </template>
+                <template v-else-if="splitting">
+                    <h3>Splitting Instructions</h3>
+
+                    <p>
+                        Create a new Instructions Document from this existing one. The new document will replace the old one, but only on the
+                        Components that you select from the list below. Unselected Components will retain the old document.
+                    </p>
+                    <p>
+                        Use this option if you want to adjust the instructions for one or a few components without changing the instructions for
+                        them all.
+                    </p>
+                    <p>
+                        <strong>WARNING:</strong> If you split the instructions for two components, you will <strong>not</strong> be able to edit
+                        the instructions for both simultaneously. Two separate documents are created from this process, so editing one will not affect
+                        the other.  
+                    </p>
+
+                    <template v-if="components.length == 1">
+                        <h4>Cannot split this Instructions Document</h4>
+                        <p>
+                            These instructions are attached to only one component and therefore cannot be split.
+                        </p>
+                    </template>
+                    <template v-else>
+                        <h4>Enter a name for the new Instructions Document</h4>
+                        <input type="text" class="form-control" v-model="name" />
+
+                        <div class="attached-components">
+                            Attached Components:
+
+                            <ul class="list-group">
+                                <li class="list-group-item" v-for="component in components" v-on:click="toggleSelectedComponent(component.code)" v-bind:class="{active: componentSelected(component.code)}">{{ component.name }} ({{ component.code }})</li>
+                            </ul>
+                        </div>
+
+                        <div v-if="selectedComponents.length === 0">
+                            <p>Select at least one component to split the instructions.</p>
+                        </div>
+                        <div v-else-if="selectedComponents.length === components.length">
+                            <p>
+                                You cannot select <strong>all</strong> the components; that doesn't make sense. If you want to edit the instructions for every component this
+                                document is attached to, use the edit button above.
+                            </p>
+                        </div>
+                        <div v-else>
+                            <button type="submit" class="btn btn-default" v-on:click="submitSplitInstructions">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+                            </button>
+                        </div>
+                    </template>
+                </template>
+                <template v-else>
+                    <div class="col-md-8">
+                        <div v-html="currentCompiledMarkdown"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="attached-components">
+                            Attached Components:
+
+                            <ul class="list-group">
+                                <li class="list-group-item" v-for="component in components">{{ component.name }} ({{ component.code }})</li>
+                            </ul>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
 </div>

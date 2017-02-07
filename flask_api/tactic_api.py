@@ -137,6 +137,11 @@ class InstructionsDocument(Resource):
 
         instructions_sobject = server.get_by_code('twog/instructions', code)
 
+        # Also include any components that reference this document
+        attached_components = server.eval("@SOBJECT(twog/component['instructions_code', '{0}'])".format(
+            instructions_sobject.get('code')))
+        instructions_sobject['components'] = attached_components
+
         return jsonify({'instructions': instructions_sobject})
 
     def post(self, code):
@@ -155,6 +160,32 @@ class InstructionsDocument(Resource):
                                                                    'instructions_text': instructions_text})
 
         return jsonify({'instructions': instructions_sobject})
+
+
+class NewInstructionsForMultipleComponents(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        name = json_data.get('name')
+        instructions_text = json_data.get('instructions_text')
+        component_codes = json_data.get('component_codes')
+
+        created_instructions_document = server.insert('twog/instructions',
+                                                      {'name': name, 'instructions_text': instructions_text})
+
+        update_data = {}
+
+        for component_code in component_codes:
+            search_key = server.build_search_key('twog/component', component_code, project_code='twog')
+            update_data[search_key] = {'instructions_code': created_instructions_document.get('code')}
+
+        server.update_multiple(update_data)
+
+        return jsonify({'new_instructions_code': created_instructions_document.get('code')})
 
 
 class InstructionsTemplate(Resource):
@@ -1694,6 +1725,7 @@ api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
 api.add_resource(InstructionsTemplates, '/api/v1/instructions-templates')
 api.add_resource(InstructionsDocument, '/api/v1/instructions/<string:code>')
+api.add_resource(NewInstructionsForMultipleComponents, '/api/v1/instructions/components')
 api.add_resource(Clients, '/api/v1/clients')
 api.add_resource(Divisions, '/api/v1/divisions/<string:client_code>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')
