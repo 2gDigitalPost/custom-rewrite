@@ -10,6 +10,9 @@
             <div class="component-title">
                 <editable-title v-bind:title="title" v-bind:componentCode="componentObject.code"></editable-title>
             </div>
+            <div class="component-instructions">
+                Instructions <a v-on:click="loadInstructionsPage"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+            </div>
         </div>
 
         <div class="col-md-12">

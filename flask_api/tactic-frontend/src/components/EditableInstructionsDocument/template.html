@@ -1,0 +1,43 @@
+<div>
+    <template v-if="loading">
+        Loading....
+    </template>
+    <template v-else-if="editing">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Editing Instructions Document</h1>
+
+                <label for="instructions-name">Name</label>
+                <input id="instructions-name" type="text" v-model="name" placeholder="Name" />
+
+                <h4>Instructions text</h4>
+
+                <textarea v-model="newInstructionsText" @input="update" />
+                <br/>
+                <button type="submit" class="btn btn-default" v-on:click="submitToTactic">Submit</button>
+                <button class="btn btn-default" v-on:click="editing = false">Cancel</button>
+            </div>
+            <div class="col-md-6">
+                <div v-html="newCompiledMarkdown"></div>
+            </div>
+        </div>
+    </template>
+    <template v-else>
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Instructions Document: {{ instructionsDocument.name }}</h1>
+            </div>
+            <div class="col-md-6">
+                <button v-on:click="editing = true" class="btn btn-default">
+                    <span class="glyphicon glyphicon-pencil"></span> Edit
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Instructions Text:</h4>
+                <div v-html="currentCompiledMarkdown"></div>
+            </div>
+        </div>
+    </template>
+</div>

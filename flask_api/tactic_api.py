@@ -125,6 +125,38 @@ class InstructionsTemplates(Resource):
         return jsonify({'code': created_instructions_template.get('code')})
 
 
+class InstructionsDocument(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        instructions_sobject = server.get_by_code('twog/instructions', code)
+
+        return jsonify({'instructions': instructions_sobject})
+
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        name = json_data.get('name')
+        instructions_text = json_data.get('instructions_text')
+
+        instructions_sobject = server.get_by_code('twog/instructions', code)
+
+        server.update(instructions_sobject.get('__search_key__'), {'name': name,
+                                                                   'instructions_text': instructions_text})
+
+        return jsonify({'instructions': instructions_sobject})
+
+
 class InstructionsTemplate(Resource):
     def get(self, code):
         parser = reqparse.RequestParser()
@@ -1661,6 +1693,7 @@ api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
 api.add_resource(InstructionsTemplates, '/api/v1/instructions-templates')
+api.add_resource(InstructionsDocument, '/api/v1/instructions/<string:code>')
 api.add_resource(Clients, '/api/v1/clients')
 api.add_resource(Divisions, '/api/v1/divisions/<string:client_code>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')

@@ -15,6 +15,7 @@ import ComponentsInOrder from './components/ComponentsInOrder/index.vue'
 import DepartmentRequestDetail from './components/DepartmentRequestDetail/index.vue'
 import DepartmentRequestLinks from './components/DepartmentRequestLinks/index.vue'
 import DepartmentRequestTable from './components/DepartmentRequestTable/index.vue'
+import EditableInstructionsDocument from './components/EditableInstructionsDocument/index.vue'
 import ImportTemplateToOrder from './components/ImportTemplateToOrder/index.vue'
 import InstructionsTemplate from './components/InstructionsTemplate/index.vue'
 import InstructionsTemplatesList from './components/InstructionsTemplatesList/index.vue'
@@ -58,6 +59,7 @@ const routes = [
   { path: '/project-templates', component: ProjectTemplatesList, beforeEnter: requireAuth },
   { path: '/project-templates/new', component: NewProjectTemplateForm, beforeEnter: requireAuth },
   { path: '/project-templates/:code', component: ProjectTemplate, beforeEnter: requireAuth },
+  { path: '/instructions/:code', component: EditableInstructionsDocument, beforeEnter: requireAuth },
   { path: '/instructions-templates/', component: InstructionsTemplatesList, beforeEnter: requireAuth },
   { path: '/instructions-templates/new', component: NewInstructionsTemplate, beforeEnter: requireAuth },
   { path: '/instructions-templates/:code', component: InstructionsTemplate, beforeEnter: requireAuth },
