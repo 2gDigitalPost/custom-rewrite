@@ -21,7 +21,7 @@ export default {
       let apiURL = '/api/v1/tasks'
 
       if (self.$route.path === '/tasks/user') {
-        apiURL += '/user/' + localStorage.login
+        apiURL += '/user/' + localStorage.login + '/assigned'
       }
       else if (self.department !== undefined) {
         apiURL += '/' + self.department

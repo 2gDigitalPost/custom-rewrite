@@ -1628,7 +1628,7 @@ class TasksByAssignedUser(Resource):
         excluded_statuses = ['Pending', 'Complete']
         excluded_statuses_string = '|'.join(excluded_statuses)
 
-        tasks = server.eval("@SOBJECT(sthpw/task['search_type', 'in', '{0}']['status', 'not in', '{1}']['assigned_user', '{2}'])".format(search_types_string, excluded_statuses_string, user))
+        tasks = server.eval("@SOBJECT(sthpw/task['search_type', 'in', '{0}']['status', 'not in', '{1}']['assigned', '{2}'])".format(search_types_string, excluded_statuses_string, user))
 
         return jsonify({'tasks': tasks})
 
