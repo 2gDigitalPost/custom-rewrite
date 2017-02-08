@@ -1886,6 +1886,45 @@ class TaskInputFiles(Resource):
         return jsonify({'status': 200})
 
 
+class TaskOutputFile(Resource):
+    def post(self, task_code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        name = json_data.get('name')
+        file_path = json_data.get('file_path')
+        original_file_codes = json_data.get('original_file_codes', [])
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Submit the new twog/file to the server
+        new_output_file_data = {
+            'name': name,
+            'file_path': file_path,
+        }
+        new_output_file = server.insert('twog/file', new_output_file_data)
+
+        # Now make the connections between the new file and the files it came from (if any)
+        original_file_to_output_file_data = []
+
+        for original_file_code in original_file_codes:
+            original_file_to_output_file_data.append({'origin_file': original_file_code,
+                                                      'file_code': new_output_file.get('code')})
+
+        if original_file_to_output_file_data:
+            server.insert_multiple('twog/file_to_origin_file', original_file_to_output_file_data)
+
+        # Finally, associate the new output file to the task (twog/task_data_out_file)
+        # First, get the twog/task_data object
+        task_data = server.get_unique_sobject('twog/task_data', {'task_code': task_code})
+
+        # Insert a link between the new output file and the task_data object
+        server.insert('twog/task_data_out_file', {'task_data': task_data.get('code'),
+                                                  'file_code': new_output_file.get('code')})
+
+        return jsonify({'status': 200})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')

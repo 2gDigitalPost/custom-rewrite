@@ -120,11 +120,15 @@ export default {
     bus.$on('equipment-changed', this.loadTask)
     bus.$on('input-files-edit-cancel', this.cancelInputFilesEdit)
     bus.$on('input-files-changed', this.loadTask)
+    bus.$on('output-files-edit-cancel', this.cancelOutputFilesEdit)
+    bus.$on('output-files-changed', this.loadTask)
   },
   destroyed() {
     bus.$off('equipment-edit-cancel', this.cancelEquipmentEdit)
     bus.$off('equipment-changed', this.loadTask)
     bus.$off('input-files-edit-cancel', this.cancelInputFilesEdit)
     bus.$off('input-files-changed', this.loadTask)
+    bus.$on('output-files-edit-cancel', this.cancelOutputFilesEdit)
+    bus.$on('output-files-changed', this.loadTask)
   },
 }
