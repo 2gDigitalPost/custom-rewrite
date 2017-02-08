@@ -7,11 +7,15 @@ import marked from 'marked'
 import bus from '../../bus'
 
 import EquipmentInTask from './EquipmentInTask/index.vue'
+import InputFilesInTask from './InputFilesInTask/index.vue'
+import OutputFilesInTask from './OutputFilesInTask/index.vue'
 
 export default {
   name: 'TaskDetail',
   components: {
-    EquipmentInTask
+    EquipmentInTask,
+    InputFilesInTask,
+    OutputFilesInTask
   },
   data () {
     return {
@@ -23,8 +27,12 @@ export default {
       outputTasks: [],
       estimatedHours: null,
       equipment: [],
+      inputFiles: [],
+      outputFiles: [],
       editingStatus: false,
-      editingEquipment: false
+      editingEquipment: false,
+      editingInputFiles: false,
+      editingOutputFiles: false
     }
   },
   methods: {
@@ -41,8 +49,12 @@ export default {
       self.outputTasks = []
       self.estimatedHours = null
       self.equipment = []
+      self.inputFiles = []
+      self.outputFiles = []
       self.editingStatus = false
       self.editingEquipment = false
+      self.editingInputFiles = false
+      self.editingOutputFiles = false
 
       axios.get('/api/v1/task/' + taskCodeParam + '/full', {
         params: {
@@ -58,6 +70,8 @@ export default {
         self.outputTasks = response.data.output_tasks
         self.estimatedHours = response.data.task_data.estimated_hours
         self.equipment = response.data.equipment
+        self.inputFiles = response.data.input_files
+        self.outputFiles = response.data.output_files
       })
       .catch(function (error) {
         console.log(error)
@@ -74,6 +88,12 @@ export default {
     },
     cancelEquipmentEdit: function () {
       this.editingEquipment = false
+    },
+    cancelInputFilesEdit: function () {
+      this.editingInputFiles = false
+    },
+    cancelOutputFilesEdit: function () {
+      this.editingOutputFiles = false
     }
   },
   beforeMount: function () {
@@ -98,9 +118,13 @@ export default {
   created() {
     bus.$on('equipment-edit-cancel', this.cancelEquipmentEdit)
     bus.$on('equipment-changed', this.loadTask)
+    bus.$on('input-files-edit-cancel', this.cancelInputFilesEdit)
+    bus.$on('input-files-changed', this.loadTask)
   },
   destroyed() {
     bus.$off('equipment-edit-cancel', this.cancelEquipmentEdit)
     bus.$off('equipment-changed', this.loadTask)
+    bus.$off('input-files-edit-cancel', this.cancelInputFilesEdit)
+    bus.$off('input-files-changed', this.loadTask)
   },
 }

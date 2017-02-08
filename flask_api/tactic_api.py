@@ -1672,6 +1672,7 @@ class TaskFull(Resource):
 
         # Get the task_data object (should exist for tasks created for twog/component and twog/package sobjects)
         task_data = server.get_unique_sobject('twog/task_data', {'task_code': task.get('code')})
+        task_data_code = task_data.get('code')
 
         # Get the parent sobject
         parent = server.get_parent(task.get('__search_key__'))
@@ -1689,7 +1690,8 @@ class TaskFull(Resource):
         output_tasks = server.get_output_tasks(task.get('__search_key__'))
 
         # Get the equipment. Start by querying the twog/equipment_in_task_data table
-        equipment_in_task_data_sobjects = server.eval("@SOBJECT(twog/equipment_in_task_data['task_data_code', '{0}'])".format(task_data.get('code')))
+        equipment_in_task_data_sobjects = server.eval(
+            "@SOBJECT(twog/equipment_in_task_data['task_data_code', '{0}'])".format(task_data_code))
 
         # Now query for each equipment entry. Start by getting a list of all the equipment codes
         equipment_codes = [equipment_in_task_data_sobject.get('equipment_code') for equipment_in_task_data_sobject in equipment_in_task_data_sobjects]
@@ -1700,8 +1702,35 @@ class TaskFull(Resource):
         # Search for the twog/equipment sobjects
         equipment = server.eval("@SOBJECT(twog/equipment['code', 'in', '{0}'])".format(equipment_codes_string))
 
+        # Get the input files for the task
+        # Start by searching the twog/task_data_in_file table for relevant entries
+        task_data_input_file_sobjects = server.eval("@SOBJECT(twog/task_data_in_file['task_data_code', '{0}'])".format(
+            task_data_code))
+
+        # Get the file codes in string format for faster searching
+        input_file_codes = [task_data_input_file_sobject.get('file_code')
+                            for task_data_input_file_sobject in task_data_input_file_sobjects]
+        input_file_codes_string = '|'.join(input_file_codes)
+
+        # Get all the input files that match the codes string
+        input_files = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(input_file_codes_string))
+
+        # Get the output files for the task
+        # Start by searching the twog/task_data_out_file table for relevant entries
+        task_data_output_file_sobjects = server.eval(
+            "@SOBJECT(twog/task_data_out_file['task_data_code', '{0}'])".format(task_data_code))
+
+        # Get the file codes in string format for faster searching
+        output_file_codes = [task_data_output_file_sobject.get('file_code')
+                             for task_data_output_file_sobject in task_data_output_file_sobjects]
+        output_file_codes_string = '|'.join(output_file_codes)
+
+        # Get all the output files that match the codes string
+        output_files = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(output_file_codes_string))
+
         return jsonify({'task': task, 'task_data': task_data, 'parent': parent, 'instructions_text': instructions_text,
-                        'input_tasks': input_tasks, 'output_tasks': output_tasks, 'equipment': equipment})
+                        'input_tasks': input_tasks, 'output_tasks': output_tasks, 'equipment': equipment,
+                        'input_files': input_files, 'output_files': output_files})
 
 
 class TaskStatusOptions(Resource):
@@ -1780,6 +1809,83 @@ class EquipmentInTask(Resource):
         return jsonify({'status': 200})
 
 
+class TaskInputFileOptions(Resource):
+    def get(self, task_code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the actual sthpw/task sobject
+        task = server.get_by_code('sthpw/task', task_code)
+
+        # Get the twog/component sobject
+        component = server.get_by_code('twog/component', task.get('search_code'))
+
+        # Get the twog/order sobject
+        order = server.get_by_code('twog/order', component.get('order_code'))
+
+        # Get all the relevant twog/file_in_order entries
+        files_in_order = server.eval("@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(order.get('code')))
+
+        # Get a list of the file codes for faster searching
+        file_codes = [file_in_order.get('file_code') for file_in_order in files_in_order]
+        file_codes_string = '|'.join(file_codes)
+
+        # Get the actual twog/file sobjects
+        files = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(file_codes_string))
+
+        return jsonify({'files': files})
+
+
+class TaskInputFiles(Resource):
+    def post(self, task_code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        file_codes = json_data.get('file_codes', [])
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the twog/task_data object associated with the task code
+        # There should be one and only one twog/task_data object associated with one task code
+        task_data = server.get_unique_sobject('twog/task_data', {'task_code': task_code})
+
+        # Start by getting the existing input file in task entries.
+        existing_entries = server.eval("@SOBJECT(twog/task_data_in_file['task_data_code', '{0}'])".format(
+            task_data.get('code')))
+
+        # Compare the submitted codes with the existing entries to get a list of what needs to be added
+        entries_to_add = []
+
+        for file_code in file_codes:
+            if file_code not in [existing_entry.get('code') for existing_entry in existing_entries]:
+                entries_to_add.append({'file_code': file_code, 'task_data_code': task_data.get('code')})
+
+        # Add the new entries to the twog/task_data_in_file table
+        server.insert_multiple('twog/task_data_in_file', entries_to_add)
+
+        # Compare the existing entries with the file codes to get a list of what needs to be removed
+        entries_to_delete = []
+
+        for existing_entry in existing_entries:
+            existing_entry_code = existing_entry.get('code')
+
+            if existing_entry_code not in file_codes:
+                entries_to_delete.append(existing_entry)
+
+        # Delete entries that exist but were not included in the submission (the user unselected them)
+        for entry_to_delete in entries_to_delete:
+            search_key = entry_to_delete.get('__search_key__')
+
+            server.delete_sobject(search_key)
+
+        return jsonify({'status': 200})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -1837,6 +1943,8 @@ api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
 api.add_resource(Equipment, '/api/v1/equipment')
 api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
+api.add_resource(TaskInputFileOptions, '/api/v1/task/<string:task_code>/input-file-options')
+api.add_resource(TaskInputFiles, '/api/v1/task/<string:task_code>/input-files')
 
 
 if __name__ == '__main__':

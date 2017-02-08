@@ -7,39 +7,39 @@ import _ from 'lodash'
 import Multiselect from 'vue-multiselect'
 
 export default {
-  name: 'EquipmentInTask',
-  props: ['task', 'currentEquipment'],
+  name: 'InputFilesInTask',
+  props: ['task', 'currentInputFiles'],
   components: {
     Multiselect,
   },
   data () {
     return {
-      selectedEquipment: [],
-      equipmentOptions: [],
+      selectedFiles: [],
+      fileOptions: [],
       loading: true,
       submitting: false
     }
   },
   methods: {
-    loadEquipment: function () {
+    loadFiles: function () {
       let self = this
 
       self.loading = true
 
-      self.selectedEquipment = self.currentEquipment
-      self.equipmentOptions = []
+      self.selectedFiles = self.currentInputFiles
+      self.fileOptions = []
 
-      axios.get('/api/v1/equipment', {
+      axios.get('/api/v1/task/' + self.task.code + '/input-file-options', {
         params: {
           token: localStorage.tactic_token,
         }
       })
       .then(function (response) {
         console.log(response)
-        let equipmentData = response.data.equipment
+        let fileData = response.data.files
 
-        for (let i = 0; i < equipmentData.length; i++) {
-          self.equipmentOptions.push({name: equipmentData[i].name, code: equipmentData[i].code})
+        for (let i = 0; i < fileData.length; i++) {
+          self.fileOptions.push({file_path: fileData[i].file_path, code: fileData[i].code})
         }
 
         self.loading = false
@@ -51,11 +51,11 @@ export default {
     submitToTactic: function () {
       let self = this
 
-      let apiURL = '/api/v1/task/' + self.task.code + '/equipment'
-      let equipmentCodes = _.map(self.selectedEquipment, 'code')
+      let apiURL = '/api/v1/task/' + self.task.code + '/input-files'
+      let fileCodes = _.map(self.selectedFiles, 'code')
       let jsonToSend = {
         'token': localStorage.tactic_token,
-        'equipment_codes': equipmentCodes
+        'file_codes': fileCodes
       }
 
       self.submitting = true
@@ -69,7 +69,7 @@ export default {
         if (response.status === 200) {
           self.submitting = false
 
-          bus.$emit('equipment-changed')
+          bus.$emit('input-files-changed')
         }
       })
       .catch(function (error) {
@@ -77,10 +77,10 @@ export default {
       })
     },
     cancelEdit: function () {
-      bus.$emit('equipment-edit-cancel')
+      bus.$emit('input-files-edit-cancel')
     }
   },
   beforeMount: function () {
-    this.loadEquipment()
+    this.loadFiles()
   }
 }

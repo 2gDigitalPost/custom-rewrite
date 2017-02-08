@@ -28,6 +28,7 @@
                 <h4 v-if="estimatedHours == 0">Estimated Hours: Not Set</h4>
                 <h4 v-else>Estimated Hours: {{ estimatedHours }}</h4>
             </div>
+
             <div v-if="editingEquipment">
                 <equipment-in-task v-bind:task="taskObject" v-bind:currentEquipment="equipment"></equipment-in-task>
             </div>
@@ -40,6 +41,34 @@
                     </li>
                 </ul>
                 <p v-else>No Equipment currently assigned</p>
+            </div>
+
+            <div v-if="editingInputFiles">
+                <input-files-in-task v-bind:task="taskObject" v-bind:currentInputFiles="inputFiles"></input-files-in-task>
+            </div>
+            <div v-else>
+                Input Files <a v-on:click="editingInputFiles = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
+
+                <ul v-if="inputFiles.length > 0" class="list-group">
+                    <li v-for="inputFile in inputFiles" class="list-group-item">
+                        {{ inputFile.file_path }}
+                    </li>
+                </ul>
+                <p v-else>No Input Files currently exist</p>
+            </div>
+
+            <div v-if="editingOutputFiles">
+                <output-files-in-task v-bind:task="taskObject" v-bind:currentOutputFiles="outputfiles"></output-files-in-task>
+            </div>
+            <div v-else>
+                Output Files <a v-on:click="editingOutputFiles = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
+
+                <ul v-if="outputFiles.length > 0" class="list-group">
+                    <li v-for="outputFile in outputFiles" class="list-group-item">
+                        {{ outputFile.path }}
+                    </li>
+                </ul>
+                <p v-else>No Output Files currently exist</p>
             </div>
 
             <div v-if="instructions !== null">
