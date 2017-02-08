@@ -9,9 +9,9 @@ class IFrameWdg(BaseRefreshWdg):
 
     def get_display(self):
         if self.location:
-            location = 'http://localhost:5000/#/' + self.location
+            location = 'http://tactic2.2gdigital.com:5000/#/' + self.location
         else:
-            location = 'http://localhost:5000'
+            location = 'http://tactic2.2gdigital.com:5000'
 
         iframe_div = DivWdg('<iframe src="{0}" style="width: 100%; height: 150%"></iframe>'.format(location))
 
