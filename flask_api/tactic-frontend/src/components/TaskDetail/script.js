@@ -6,8 +6,13 @@ import marked from 'marked'
 
 import bus from '../../bus'
 
+import EquipmentInTask from './EquipmentInTask/index.vue'
+
 export default {
   name: 'TaskDetail',
+  components: {
+    EquipmentInTask
+  },
   data () {
     return {
       taskObject: null,
@@ -19,6 +24,7 @@ export default {
       estimatedHours: null,
       equipment: [],
       editingStatus: false,
+      editingEquipment: false
     }
   },
   methods: {
@@ -35,6 +41,8 @@ export default {
       self.outputTasks = []
       self.estimatedHours = null
       self.equipment = []
+      self.editingStatus = false
+      self.editingEquipment = false
 
       axios.get('/api/v1/task/' + taskCodeParam + '/full', {
         params: {
@@ -63,6 +71,9 @@ export default {
       })
 
       return links
+    },
+    cancelEquipmentEdit: function () {
+      this.editingEquipment = false
     }
   },
   beforeMount: function () {
@@ -83,5 +94,13 @@ export default {
     '$route': function () {
       this.loadTask()
     }
-  }
+  },
+  created() {
+    bus.$on('equipment-edit-cancel', this.cancelEquipmentEdit)
+    bus.$on('equipment-changed', this.loadTask)
+  },
+  destroyed() {
+    bus.$off('equipment-edit-cancel', this.cancelEquipmentEdit)
+    bus.$off('equipment-changed', this.loadTask)
+  },
 }

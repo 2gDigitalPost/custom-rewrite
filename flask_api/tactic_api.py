@@ -1720,6 +1720,66 @@ class TaskStatusOptions(Resource):
         return jsonify({'processes': processes['processes']})
 
 
+class Equipment(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        equipment = server.eval("@SOBJECT(twog/equipment)")
+
+        return jsonify({'equipment': equipment})
+
+
+class EquipmentInTask(Resource):
+    def post(self, task_code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        equipment_codes = json_data.get('equipment_codes', [])
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the twog/task_data object associated with the task code
+        # There should be one and only one twog/task_data object associated with one task code
+        task_data = server.get_unique_sobject('twog/task_data', {'task_code': task_code})
+
+        # Start by getting the existing equipment in task entries.
+        existing_entries = server.eval("@SOBJECT(twog/equipment_in_task_data['task_data_code', '{0}'])".format(
+            task_data.get('code')))
+
+        # Compare the submitted codes with the existing entries to get a list of what needs to be added
+        entries_to_add = []
+
+        for equipment_code in equipment_codes:
+            if equipment_code not in [existing_entry.get('code') for existing_entry in existing_entries]:
+                entries_to_add.append({'equipment_code': equipment_code, 'task_data_code': task_data.get('code')})
+
+        # Add the new entries to the twog/equipment_in_task_data table
+        server.insert_multiple('twog/equipment_in_task_data', entries_to_add)
+
+        # Compare the existing entries with the equipment codes to get a list of what needs to be removed
+        entries_to_delete = []
+
+        for existing_entry in existing_entries:
+            existing_entry_code = existing_entry.get('code')
+
+            if existing_entry_code not in equipment_codes:
+                entries_to_delete.append(existing_entry)
+
+        # Delete entries that exist but were not included in the submission (the user unselected them)
+        for entry_to_delete in entries_to_delete:
+            search_key = entry_to_delete.get('__search_key__')
+
+            server.delete_sobject(search_key)
+
+        return jsonify({'status': 200})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -1774,6 +1834,9 @@ api.add_resource(TasksByAssignedUser, '/api/v1/tasks/user/<string:user>/assigned
 api.add_resource(Task, '/api/v1/task/<string:code>')
 api.add_resource(TaskFull, '/api/v1/task/<string:code>/full')
 api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
+
+api.add_resource(Equipment, '/api/v1/equipment')
+api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
 
 
 if __name__ == '__main__':

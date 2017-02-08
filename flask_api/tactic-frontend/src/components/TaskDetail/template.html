@@ -28,14 +28,18 @@
                 <h4 v-if="estimatedHours == 0">Estimated Hours: Not Set</h4>
                 <h4 v-else>Estimated Hours: {{ estimatedHours }}</h4>
             </div>
-            <div v-if="equipment.length > 0">
-                Equipment:
+            <div v-if="editingEquipment">
+                <equipment-in-task v-bind:task="taskObject" v-bind:currentEquipment="equipment"></equipment-in-task>
+            </div>
+            <div v-else>
+                Equipment <a v-on:click="editingEquipment = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
 
-                <ul>
-                    <li v-for="eachEquipment in equipment">
+                <ul v-if="equipment.length > 0" class="list-group">
+                    <li v-for="eachEquipment in equipment" class="list-group-item">
                         {{ eachEquipment.name }}
                     </li>
                 </ul>
+                <p v-else>No Equipment currently assigned</p>
             </div>
 
             <div v-if="instructions !== null">
