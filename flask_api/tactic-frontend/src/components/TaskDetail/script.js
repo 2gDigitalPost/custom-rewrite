@@ -8,14 +8,16 @@ import bus from '../../bus'
 
 import EquipmentInTask from './EquipmentInTask/index.vue'
 import InputFilesInTask from './InputFilesInTask/index.vue'
-import OutputFilesInTask from './OutputFilesInTask/index.vue'
+import AddOutputFileToTask from './AddOutputFileToTask/index.vue'
+import EditableOutputFile from './EditableOutputFile/index.vue'
 
 export default {
   name: 'TaskDetail',
   components: {
     EquipmentInTask,
     InputFilesInTask,
-    OutputFilesInTask
+    AddOutputFileToTask,
+    EditableOutputFile
   },
   data () {
     return {
@@ -32,6 +34,7 @@ export default {
       editingStatus: false,
       editingEquipment: false,
       editingInputFiles: false,
+      addingOutputFile: false,
       editingOutputFiles: false
     }
   },
@@ -54,6 +57,7 @@ export default {
       self.editingStatus = false
       self.editingEquipment = false
       self.editingInputFiles = false
+      self.addingOutputFile = false
       self.editingOutputFiles = false
 
       axios.get('/api/v1/task/' + taskCodeParam + '/full', {
@@ -92,6 +96,9 @@ export default {
     cancelInputFilesEdit: function () {
       this.editingInputFiles = false
     },
+    cancelAddOutputFile: function () {
+      this.addingOutputFile = false
+    },
     cancelOutputFilesEdit: function () {
       this.editingOutputFiles = false
     }
@@ -122,13 +129,17 @@ export default {
     bus.$on('input-files-changed', this.loadTask)
     bus.$on('output-files-edit-cancel', this.cancelOutputFilesEdit)
     bus.$on('output-files-changed', this.loadTask)
+    bus.$on('add-output-file-cancel', this.cancelAddOutputFile)
+    bus.$on('output-file-added', this.loadTask)
   },
   destroyed() {
     bus.$off('equipment-edit-cancel', this.cancelEquipmentEdit)
     bus.$off('equipment-changed', this.loadTask)
     bus.$off('input-files-edit-cancel', this.cancelInputFilesEdit)
     bus.$off('input-files-changed', this.loadTask)
-    bus.$on('output-files-edit-cancel', this.cancelOutputFilesEdit)
-    bus.$on('output-files-changed', this.loadTask)
+    bus.$off('output-files-edit-cancel', this.cancelOutputFilesEdit)
+    bus.$off('output-files-changed', this.loadTask)
+    bus.$off('add-output-file-cancel', this.cancelAddOutputFile)
+    bus.$off('output-file-added', this.loadTask)
   },
 }

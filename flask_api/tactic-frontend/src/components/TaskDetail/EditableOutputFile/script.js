@@ -8,12 +8,13 @@ import Multiselect from 'vue-multiselect'
 
 export default {
   name: 'AddOutputFileToTask',
-  props: ['task', 'inputFiles'],
+  props: ['outputFileCode', 'inputFiles'],
   components: {
     Multiselect,
   },
   data () {
     return {
+      editing: false,
       name: null,
       filePath: null,
       classification: null,
@@ -23,6 +24,27 @@ export default {
     }
   },
   methods: {
+    loadFile: function () {
+      let self = this
+
+      axios.get('/api/v1/file/' + self.outputFileCode, {
+        params: {
+          token: localStorage.tactic_token
+        }
+      })
+      .then(function (response) {
+        console.log(response)
+        let fileObject = response.data.file_object
+
+        self.name = fileObject.name
+        self.filePath = fileObject.file_path
+        self.classification = fileObject.classification
+        self.selectedFiles = fileObject.origin_files
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
     submitToTactic: function () {
       let self = this
 
@@ -40,7 +62,7 @@ export default {
 
       if (self.errors.length > 0) return
 
-      let apiURL = '/api/v1/task/' + self.task.code + '/output-file'
+      let apiURL = '/api/v1/file/' + self.outputFileCode
       let originFileCodes = _.map(self.selectedFiles, 'code')
       let jsonToSend = {
         'token': localStorage.tactic_token,
@@ -64,8 +86,8 @@ export default {
         console.log(error)
       })
     },
-    cancelEdit: function () {
-      bus.$emit('add-output-file-cancel')
+    remove: function () {
+      console.log("remove")
     }
   },
   computed: {
@@ -78,5 +100,8 @@ export default {
     classificationError: function () {
       return _.includes(_.map(this.errors, 'type'), 'classification')
     }
+  },
+  beforeMount: function () {
+    this.loadFile()
   }
 }

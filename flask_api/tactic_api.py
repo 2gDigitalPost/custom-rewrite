@@ -1893,6 +1893,7 @@ class TaskOutputFile(Resource):
         ticket = json_data.get('token')
         name = json_data.get('name')
         file_path = json_data.get('file_path')
+        classification = json_data.get('classification').lower()
         original_file_codes = json_data.get('original_file_codes', [])
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
@@ -1901,6 +1902,7 @@ class TaskOutputFile(Resource):
         new_output_file_data = {
             'name': name,
             'file_path': file_path,
+            'classification': classification
         }
         new_output_file = server.insert('twog/file', new_output_file_data)
 
@@ -1919,8 +1921,67 @@ class TaskOutputFile(Resource):
         task_data = server.get_unique_sobject('twog/task_data', {'task_code': task_code})
 
         # Insert a link between the new output file and the task_data object
-        server.insert('twog/task_data_out_file', {'task_data': task_data.get('code'),
+        server.insert('twog/task_data_out_file', {'task_data_code': task_data.get('code'),
                                                   'file_code': new_output_file.get('code')})
+
+        return jsonify({'status': 200})
+
+
+class FileObject(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the actual twog/file sobject
+        file_object = server.get_by_code('twog/file', code)
+
+        # Also include the origin files
+        origin_file_entries = server.eval("@SOBJECT(twog/file_to_origin_file['file_code', '{0}'])".format(
+            file_object.get('code')))
+
+        origin_file_codes = [origin_file_entry.get('code') for origin_file_entry in origin_file_entries]
+        origin_file_codes_string = '|'.join(origin_file_codes)
+
+        origin_files = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(origin_file_codes_string))
+
+        file_object['origin_files'] = origin_files
+
+        return jsonify({'file_object': file_object})
+
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        name = json_data.get('name')
+        file_path = json_data.get('file_path')
+        classification = json_data.get('classification').lower()
+        original_file_codes = json_data.get('original_file_codes', [])
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the existing object
+        existing_output_file = server.get_by_code('twog/file', code)
+
+        # Get the data to submit. Only data that has changed should be submitted
+        data_to_submit = {}
+
+        if name != existing_output_file.get('name'):
+            data_to_submit['name'] = name
+
+        if file_path != existing_output_file.get('file_path'):
+            data_to_submit['file_path'] = file_path
+
+        if classification != existing_output_file.get('classification'):
+            data_to_submit['classification'] = classification
+
+        if data_to_submit:
+            server.update(existing_output_file.get('__search_key__'), data_to_submit)
+
 
         return jsonify({'status': 200})
 
@@ -1982,8 +2043,10 @@ api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
 api.add_resource(Equipment, '/api/v1/equipment')
 api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
+api.add_resource(FileObject, '/api/v1/file/<string:code>')
 api.add_resource(TaskInputFileOptions, '/api/v1/task/<string:task_code>/input-file-options')
 api.add_resource(TaskInputFiles, '/api/v1/task/<string:task_code>/input-files')
+api.add_resource(TaskOutputFile, '/api/v1/task/<string:task_code>/output-file')
 
 
 if __name__ == '__main__':

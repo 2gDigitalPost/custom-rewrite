@@ -57,16 +57,20 @@
                 <p v-else>No Input Files currently exist</p>
             </div>
 
-            <div v-if="editingOutputFiles">
-                <output-files-in-task v-bind:task="taskObject" v-bind:currentOutputFiles="outputfiles"></output-files-in-task>
+            <div v-if="addingOutputFile">
+                <add-output-file-to-task v-bind:task="taskObject" v-bind:inputFiles="inputFiles"></output-files-in-task>
             </div>
-            <div v-else>
-                Output Files <a v-on:click="editingOutputFiles = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
+            <div>
+                Output Files <a v-on:click="addingOutputFile = true"><i class="fa fa-plus" aria-hidden="true"></i></a> <a v-on:click="editingOutputFile = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
 
                 <ul v-if="outputFiles.length > 0" class="list-group">
-                    <li v-for="outputFile in outputFiles" class="list-group-item">
-                        {{ outputFile.path }}
-                    </li>
+                    <li 
+                        is="editable-output-file"
+                        v-for="outputFile in outputFiles"
+                        v-bind:outputFileCode="outputFile.code"
+                        v-bind:inputFiles="inputFiles"
+                        class="list-group-item"
+                    ></li>
                 </ul>
                 <p v-else>No Output Files currently exist</p>
             </div>
