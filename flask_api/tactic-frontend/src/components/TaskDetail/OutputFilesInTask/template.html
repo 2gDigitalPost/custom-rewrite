@@ -1,0 +1,19 @@
+<div>
+    <div v-if="fileOptions.length > 0">
+        <multiselect v-model="selectedFiles" :options="fileOptions" track-by="code" label="file_path" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+    </div>
+    <div v-else-if="loading">
+        <p><i class="fa fa-spinner fa-spin"></i> Loading...</p>
+    </div>
+    <div v-else>
+        <p>No file options were able to load.</p>
+    </div>
+    <div class="btn-group">
+        <button type="submit" class="btn btn-default" v-on:click="submitToTactic">
+            <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+        </button>
+        <button class="btn btn-default" v-on:click="cancelEdit">
+            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+        </button>
+    </div>
+</div>

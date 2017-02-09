@@ -1,0 +1,56 @@
+<div>
+    <template v-if="!editing">
+        <div class="editable-output-file-description">
+            <div><strong>{{ name }}</strong></div>
+            <div>Path: {{ filePath }}</div>
+        </div>
+        <div class="editable-output-file-icons">
+            <a v-on:click="editing = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
+            <a v-on:click="remove"><i class="fa fa-times" aria-hidden="true"></i></a>
+        </div>
+    </template>
+    <template v-else>
+        <h4>Editing Output File</h4>
+
+        <div class="alert alert-danger" v-if="errors.length > 0">
+            <strong>The following errors were detected:</strong>
+            <ul>
+                <li v-for="error in errors">
+                    {{ error.message }}
+                </li>
+            </ul>
+        </div>
+
+        <div class="form-group" v-bind:class="{'has-error': nameError}">
+            <label class="control-label" for="newOutputFileName">Name</label>
+            <input type="text" v-model="name" class="form-control" id="newOutputFileName" aria-describedby="nameHelpBlock"/>
+            <span id="nameHelpBlock" class="help-block">This field is required.</span>
+        </div>
+
+        <div class="form-group" v-bind:class="{'has-error': filePathError}">
+            <label class="control-label" for="newOutputFilePath">Path</label>
+            <input type="text" v-model="filePath" class="form-control" id="newOutputFilePath" aria-describedby="filePathHelpBlock" />
+            <span id="filePathHelpBlock" class="help-block">This field is required.</span>
+        </div>
+
+        <div class="form-group" v-bind:class="{'has-error': classificationError}">
+            <label class="control-label" for="newOutputFileClassification">Classification</label>
+            <multiselect v-model="classification" :options="classificationOptions" id="newOutputFileClassification" aria-describedby="classificationHelpBlock"></multiselect>
+            <span id="classificationHelpBlock" class="help-block">This field is required.</span>
+        </div>
+
+        <template v-if="inputFiles.length > 0">
+            <label class="control-label" for="newOutputFileOriginalFiles">Origin Files</label>
+            <multiselect v-model="selectedFiles" :options="inputFiles" id="newOutputFileOriginalFiles" track-by="code" label="file_path" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+        </template>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-default" v-on:click="submitToTactic">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+            </button>
+            <button class="btn btn-default" v-on:click="editing = false">
+                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+            </button>
+        </div>
+    </template>
+</div>
