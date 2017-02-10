@@ -1,0 +1,23 @@
+<div>
+    <template v-if="editingStatus">
+        <template v-if="loadingStatuses">
+            <p>Loading...</p>
+        </template>
+        <template v-else>
+            <div class="status-select">
+                <multiselect v-model="selectedStatus" :options="statusOptions" :hide-selected="true"></multiselect>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default" aria-label="Left Align" v-on:click="submitStatusChangeToTactic()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+                </button>
+                <button type="button" class="btn btn-default" aria-label="Left Align" v-on:click="editingStatus = false">
+                    <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                </button>
+            </div>
+        </template>
+    </template>
+    <template v-else>
+        <div>Status: {{ task.status }} <a v-on:click="editingStatus = true"><i class="fa fa-edit" aria-hidden="true"></i></a></div>
+    </template>
+</div>

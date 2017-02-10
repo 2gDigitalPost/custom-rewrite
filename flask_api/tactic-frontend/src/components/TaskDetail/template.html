@@ -4,7 +4,9 @@
             <h1>{{ taskObject.process }}</h1>
             <h3>Parent: {{ parent.name }} ({{ parent.code }})</h3>
 
-            <div>Status: {{ taskObject.status }} <a v-on:click="editingStatus = true"><i class="fa fa-edit" aria-hidden="true"></i></a></div>
+            <div>
+                <edit-task-status v-bind:task="taskObject"></edit-task-status>    
+            </div>
 
             <div v-if="inputTasks.length > 0">
                 Input Tasks:
