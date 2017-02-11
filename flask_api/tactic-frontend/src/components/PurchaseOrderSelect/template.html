@@ -1,0 +1,9 @@
+<div>
+    <template v-if="loading">
+        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading...
+    </template>
+    <template v-else>
+        <label for="purchaseOrderSelect">Purchase Order</label>
+        <multiselect v-model="selectedPurchaseOrder" :options="purchaseOrderOptions" track-by="code" label="number" id="purchaseOrderSelect"></multiselect>
+    </template>
+</div>

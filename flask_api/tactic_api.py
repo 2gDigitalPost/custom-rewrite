@@ -479,23 +479,32 @@ class Orders(Resource):
         return jsonify({'orders': order_sobjects})
 
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('token', required=True)
-        args = parser.parse_args()
+        json_data = request.get_json()
 
-        ticket = args.get('token')
+        ticket = json_data.get('token')
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        json_data = request.get_json()
+        order_data = json_data.get('order')
 
         # Some data can have None set as the value. This does not work when inserting to the database, so remove
         # these keys/values
-        cleaned_json_data = {key: value for key, value in json_data.iteritems() if value != None}
+        cleaned_order_data = {key: value for key, value in order_data.iteritems() if value != None}
 
-        print(cleaned_json_data)
+        inserted_order = server.insert('twog/order', cleaned_order_data)
 
-        inserted_order = server.insert('twog/order', cleaned_json_data)
+        # Only one of the following should be submitted, not both
+        new_po_data = json_data.get('new_purchase_order')
+        existing_po_data = json_data.get('existing_purchase_order')
+
+        if new_po_data:
+            inserted_po = server.insert('twog/purchase_order', new_po_data)
+
+            server.insert('twog/order_to_purchase_order', {'order_code': inserted_order.get('code'),
+                                                           'purchase_order_code': inserted_po.get('code')})
+        elif existing_po_data:
+            server.insert('twog/order_to_purchase_order', {'order_code': inserted_order.get('code'),
+                                                           'purchase_order_code': existing_po_data.get('code')})
 
         return {'status': 200, 'order_code': inserted_order.get('code')}
 
@@ -1986,6 +1995,44 @@ class FileObject(Resource):
         return jsonify({'status': 200})
 
 
+class PurchaseOrdersByDivision(Resource):
+    def get(self, division_code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        purchase_orders = server.eval("@SOBJECT(twog/purchase_order['division_code', '{0}'])".format(division_code))
+
+        return jsonify({'purchase_orders': purchase_orders})
+
+
+class PurchaseOrderExists(Resource):
+    def get(self, number, division_code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        purchase_orders = server.eval("@SOBJECT(twog/purchase_order['name', '{0}']['division_code', '{1}'])".format(
+            number, division_code))
+
+        if purchase_orders:
+            purchase_order = purchase_orders[0]
+            result_found = True
+        else:
+            purchase_order = None
+            result_found = False
+
+        return jsonify({'purchase_order': purchase_order, 'result_found': result_found})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -2044,6 +2091,9 @@ api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 api.add_resource(Equipment, '/api/v1/equipment')
 api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
 api.add_resource(FileObject, '/api/v1/file/<string:code>')
+api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
+api.add_resource(PurchaseOrderExists,
+                 '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')
 api.add_resource(TaskInputFileOptions, '/api/v1/task/<string:task_code>/input-file-options')
 api.add_resource(TaskInputFiles, '/api/v1/task/<string:task_code>/input-files')
 api.add_resource(TaskOutputFile, '/api/v1/task/<string:task_code>/output-file')

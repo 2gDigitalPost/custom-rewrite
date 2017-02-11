@@ -1,10 +1,31 @@
 <div>
-    <div v-if="order_submitted === false">
-        <h1>New Order</h1>
+    <div class="row">
+        <template v-if="order_submitted === false">
+            <h1>New Order</h1>
 
-        <form v-on:submit.prevent="addOrderToTactic">
             <h4>Select the Client (Company)</h4>
             <client-select></client-select>
+
+            <template v-if="selectedDivision !== null">
+                <h4>Select an option below</h4>
+                <div class="radio">
+                    <label><input type="radio" name="purchaseOrderRadioButton" v-model="purchaseOrderOption" value="new">I want to enter a new Purchase Order.</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="purchaseOrderRadioButton" v-model="purchaseOrderOption" value="existing">I am using an existing Purchase Order.</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="purchaseOrderRadioButton" v-model="purchaseOrderOption" value="none">I do not have a Purchase Order.</label>
+                </div>
+
+                <template v-if="purchaseOrderOption === 'existing'">
+                    <purchase-order-select v-bind:division="selectedDivision"></purchase-order-select>
+                </template>
+                <template v-else-if="purchaseOrderOption === 'new'">
+                    <purchase-order-entry-form v-bind:division="selectedDivision"></purchase-order-entry-form>
+                </template>
+            </template>
+
             <div class="card">
                 <div class="row">
                     <span>Due Date：</span>
@@ -15,14 +36,14 @@
                     <date-picker :date="expected_completion_date" :option="option"></date-picker>
                 </div>
             </div>
-            <button type="submit" class="btn btn-default">Submit</button>
-        </form>
-    </div>
-    <div v-else>
-        <h1>Order Submitted</h1>
-        <p>Your order was submitted successfully. The order code is {{ submitted_order_code }}</p>
-        <button v-on:click="redirectToAddTitle" class="btn btn-default">Add Titles/Pipelines to Order</button>
-        <button v-on:click="redirectToOrderDetail" class="btn btn-default">View Order</button>
-        <button v-on:click="refreshPage" class="btn btn-default">Enter another Order</button>
+            <button type="submit" class="btn btn-default" v-on:click="addOrderToTactic">Submit</button>
+        </template>
+        <template v-else>
+            <h1>Order Submitted</h1>
+            <p>Your order was submitted successfully. The order code is {{ submitted_order_code }}</p>
+            <button v-on:click="redirectToAddTitle" class="btn btn-default">Add Titles/Pipelines to Order</button>
+            <button v-on:click="redirectToOrderDetail" class="btn btn-default">View Order</button>
+            <button v-on:click="refreshPage" class="btn btn-default">Enter another Order</button>
+        </template>
     </div>
 </div>

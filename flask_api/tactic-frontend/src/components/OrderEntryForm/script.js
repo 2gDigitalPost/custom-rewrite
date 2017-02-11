@@ -1,14 +1,21 @@
-import bus from '../../bus'
-import ClientSelect from './ClientSelect/index.vue'
+import axios from 'axios'
 import myDatepicker from 'vue-datepicker'
 
-import axios from 'axios'
+import ClientSelect from './ClientSelect/index.vue'
+import PurchaseOrderSelect from '../PurchaseOrderSelect/index.vue'
+import PurchaseOrderEntryForm from '../PurchaseOrderEntryForm/index.vue'
+
+import bus from '../../bus'
 
 export default {
   name: 'OrderEntryForm',
   data () {
     return {
       order_name: '',
+      
+      purchaseOrderOption: null,
+      newPurchaseOrderNumber: null,
+      selectedPurchaseOrderCode: null,
 
       due_date: {
         time: ''
@@ -17,7 +24,7 @@ export default {
         time: ''
       },
 
-      selected_division: null,
+      selectedDivision: null,
 
       order_submitted: false,
       submitted_order_code: null,
@@ -65,24 +72,34 @@ export default {
   },
   components: {
     'client-select': ClientSelect,
-    'date-picker': myDatepicker
+    'date-picker': myDatepicker,
+    PurchaseOrderSelect,
+    PurchaseOrderEntryForm
   },
   methods: {
     addOrderToTactic: function() {
-      var self = this
+      let self = this
 
-      axios.post('/api/v1/orders', 
-        JSON.stringify({
+      let jsonData = {
+        'token': localStorage.tactic_token,
+        'order': {
           'name': self.order_name,
-          'division_code': self.selected_division,
+          'division_code': self.selectedDivision,
           'expected_completion_date': self.expected_completion_date.time,
           'due_date': self.due_date.time
-        }), {
+        }
+      }
+
+      if (self.purchaseOrderOption === 'new') {
+        jsonData['new_purchase_order'] = {'name': self.newPurchaseOrderNumber}
+      }
+      else if (self.purchaseOrderOption === 'existing') {
+        jsonData['existing_purchase_order'] = {'code': self.selectedPurchaseOrderCode}
+      }
+
+      axios.post('/api/v1/orders', JSON.stringify(jsonData), {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8'
-        },
-        params: {
-          token: localStorage.tactic_token
         }
       })
       .then(function (response) {
@@ -100,7 +117,18 @@ export default {
     },
     divisionSelected: function (division) {
       var self = this
-      self.selected_division = division
+      self.selectedDivision = division
+    },
+    purchaseOrderNumberChanged: function (number, exists) {
+      if (exists) {
+        this.newPurchaseOrderNumber = null
+      }
+      else {
+        this.newPurchaseOrderNumber = number
+      }
+    },
+    purchaseOrderSelected: function (code) {
+      this.selectedPurchaseOrderCode = code
     },
     redirectToOrderDetail: function () {
       this.$router.push('/orders/' + this.submitted_order_code)
@@ -114,8 +142,12 @@ export default {
   },
   created() {
     bus.$on('division-selected', this.divisionSelected)
+    bus.$on('po-number-changed', this.purchaseOrderNumberChanged)
+    bus.$on('purchase-order-selected', this.purchaseOrderSelected)
   },
   destroyed() {
     bus.$off('division-selected', this.divisionSelected)
+    bus.$off('po-number-changed', this.purchaseOrderNumberChanged)
+    bus.$off('purchase-order-selected', this.purchaseOrderSelected)
   },
 }

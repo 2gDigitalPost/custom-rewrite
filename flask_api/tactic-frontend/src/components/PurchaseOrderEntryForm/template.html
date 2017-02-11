@@ -1,0 +1,20 @@
+<div>
+    <label for="purchaseOrderNumber">PO Number</label>
+
+    <div class="form-group" v-bind:class="{'has-success': inputOkay, 'has-error': inputError}">
+        <input type="text" v-model="number" class="form-control has-feedback" id="purchaseOrderNumber"/>
+
+        <template v-if="searching">
+            <i class="fa fa-spinner fa-spin"></i> Searcing...
+        </template>
+        <template v-else-if="inputError">
+            <p>That purchase order number exists already!</p>
+        </template>
+        <template v-else-if="inputOkay">
+            <p>PO Number okay!</p>
+        </template>
+        <template v-else-if="number === null || number === ''">
+            <p>Enter a PO Number. If the number already exists, an error message will display.
+        </template>
+    </div>
+</div>
