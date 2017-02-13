@@ -2033,6 +2033,26 @@ class PurchaseOrderExists(Resource):
         return jsonify({'purchase_order': purchase_order, 'result_found': result_found})
 
 
+class EstimatedHours(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        task_data_code = json_data.get('task_data_code')
+        estimated_hours = json_data.get('estimated_hours')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the twog/task_data object and search key
+        task_data = server.get_by_code('twog/task_data', task_data_code)
+        search_key = task_data.get('__search_key__')
+
+        # Update the task data's estimated hours (cast to float just in case)
+        server.update(search_key, {'estimated_hours': float(estimated_hours)})
+
+        return jsonify({'status': 200})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -2090,6 +2110,7 @@ api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
 api.add_resource(Equipment, '/api/v1/equipment')
 api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
+api.add_resource(EstimatedHours, '/api/v1/estimated-hours')
 api.add_resource(FileObject, '/api/v1/file/<string:code>')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,

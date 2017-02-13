@@ -9,6 +9,7 @@ import bus from '../../bus'
 import EquipmentInTask from './EquipmentInTask/index.vue'
 import InputFilesInTask from './InputFilesInTask/index.vue'
 import AddOutputFileToTask from './AddOutputFileToTask/index.vue'
+import EditableEstimatedHours from '../EditableEstimatedHours/index.vue'
 import EditableOutputFile from './EditableOutputFile/index.vue'
 import EditTaskStatus from './EditTaskStatus/index.vue'
 
@@ -18,6 +19,7 @@ export default {
     EquipmentInTask,
     InputFilesInTask,
     AddOutputFileToTask,
+    EditableEstimatedHours,
     EditableOutputFile,
     EditTaskStatus
   },
@@ -128,6 +130,7 @@ export default {
     bus.$on('add-output-file-cancel', this.cancelAddOutputFile)
     bus.$on('output-file-added', this.loadTask)
     bus.$on('task-updated', this.loadTask)
+    bus.$on('estimated-hours-updated', this.loadTask)
   },
   destroyed() {
     bus.$off('equipment-edit-cancel', this.cancelEquipmentEdit)
@@ -138,5 +141,6 @@ export default {
     bus.$off('add-output-file-cancel', this.cancelAddOutputFile)
     bus.$off('output-file-added', this.loadTask)
     bus.$off('task-updated', this.loadTask)
+    bus.$off('estimated-hours-updated', this.loadTask)
   },
 }

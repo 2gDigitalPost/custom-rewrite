@@ -1,0 +1,17 @@
+<div>
+    <template v-if="editing">
+        <span>Estimated Hours:</span>
+        <input v-model.number="newEstimatedHours" type="number" class="form-control" />
+        <div class="btn-group">
+            <button type="submit" class="btn btn-default" v-on:click="submitToTactic">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+            </button>
+            <button class="btn btn-default" v-on:click="editing = false">
+                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+            </button>
+        </div>
+    </template>
+    <template v-else>
+        <span>Estimated Hours:</span> {{ currentEstimatedHours }} <a v-on:click="editing = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
+    </template>
+</div>
