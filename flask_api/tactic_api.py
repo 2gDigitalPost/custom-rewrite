@@ -475,6 +475,58 @@ class Orders(Resource):
         for order_sobject in order_sobjects:
             order_sobject['division'] = divisions_dict.get(order_sobject.get('division_code'))
 
+        # Now get the list of titles for each order
+        # Start by getting all the components for each order (from the list of order codes)
+        order_codes = [order_sobject.get('code') for order_sobject in order_sobjects]
+        order_codes_string = '|'.join(order_codes)
+
+        # Query for the components
+        components = server.eval("@SOBJECT(twog/component['order_code', 'in', '{0}'])".format(order_codes_string))
+
+        # Set up a dictionary of order codes to title codes
+        order_codes_to_title_codes_dict = {}
+
+        for component in components:
+            order_code = component.get('order_code')
+            title_code = component.get('title_code')
+
+            if order_code in order_codes_to_title_codes_dict:
+                order_codes_to_title_codes_dict[order_code].add(title_code)
+            else:
+                order_codes_to_title_codes_dict[order_code] = {title_code}
+
+        # Get all the title codes in a set
+        title_codes = set()
+
+        for component in components:
+            # Do not add an empty title code
+            title_code = component.get('title_code')
+
+            if title_code:
+                title_codes.add(title_code)
+
+        # Get the actual title sobjects for all the codes
+        title_codes_string = '|'.join(title_codes)
+        title_sobjects = server.eval("@SOBJECT(twog/title['code', 'in', '{0}'])".format(title_codes_string))
+
+        # Sort the title objects by their codes for faster searching
+        title_code_to_title_sobjects_dict = {}
+
+        for title_sobject in title_sobjects:
+            title_code = title_sobject.get('code')
+
+            title_code_to_title_sobjects_dict[title_code] = title_sobject
+
+        # Finally, assign each order sobject its appropriate titles
+        for order_sobject in order_sobjects:
+            order_code = order_sobject.get('code')
+            order_title_codes = order_codes_to_title_codes_dict.get(order_code)
+            order_sobject['title_sobjects'] = []
+
+            if order_title_codes:
+                for order_title_code in order_title_codes:
+                    order_sobject['title_sobjects'].append(title_code_to_title_sobjects_dict.get(order_title_code))
+
         # Return the orders
         return jsonify({'orders': order_sobjects})
 

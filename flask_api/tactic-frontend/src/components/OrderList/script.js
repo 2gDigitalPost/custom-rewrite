@@ -38,6 +38,20 @@ export default {
     },
     sortByDueDate: function (orderObjects) {
       return _.sortBy(orderObjects, 'due_date')
+    },
+    getTitleListForOrder: function (order) {
+      let titles = order['title_sobjects']
+
+      if (_.isEmpty(titles)) return "None"
+
+      let titlesToDisplay = _.take(titles, 3)
+      let titlesString = _.join(_.map(titlesToDisplay, 'name'), ', ')
+
+      if (titles.length > 3) {
+        titlesString += ', + ' + (titles.length - 3) + ' more' 
+      }
+
+      return titlesString
     }
   },
   beforeMount: function () {

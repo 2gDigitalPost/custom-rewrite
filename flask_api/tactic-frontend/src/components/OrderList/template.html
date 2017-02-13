@@ -10,6 +10,7 @@
             <tr>
                 <th>Code</th>
                 <th>Client Division</th>
+                <th>Titles</th>
                 <th>Expected Completion Date</th>
                 <th>Due Date</th>
             </tr>
@@ -18,6 +19,7 @@
             <tr v-for="order in orders" v-on:click="openOrderLink(order.code)">
                 <td>{{ order.code }}</td>
                 <td>{{ order.division.name }}</td>
+                <td>{{ getTitleListForOrder(order) }}</td>
                 <td>{{ order.expected_completion_date }}</td>
                 <td>{{ order.due_date }}</td>
             </tr>
