@@ -91,10 +91,10 @@ export default {
       }
 
       if (self.purchaseOrderOption === 'new') {
-        jsonData['new_purchase_order'] = {'name': self.newPurchaseOrderNumber}
+        jsonData['new_purchase_order'] = {'name': self.newPurchaseOrderNumber, 'division_code': self.selectedDivision}
       }
       else if (self.purchaseOrderOption === 'existing') {
-        jsonData['existing_purchase_order'] = {'code': self.selectedPurchaseOrderCode}
+        jsonData['existing_purchase_order'] = {'code': self.selectedPurchaseOrderCode, 'division_code': self.selectedDivision}
       }
 
       axios.post('/api/v1/orders', JSON.stringify(jsonData), {
