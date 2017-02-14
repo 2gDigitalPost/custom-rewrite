@@ -1,0 +1,40 @@
+<div>
+    <div v-if="sourceFiles.length > 0">
+        <div>Source Files</div>
+        <ul class="list-group">
+            <li
+                is="file-editable"
+                v-for="file in sourceFiles"
+                v-bind:file="file"
+                class="list-group-item"
+            >
+            </li>
+        </ul>
+    </div>
+
+    <div v-if="intermediateFiles.length > 0">
+        <div>Intermediate Files</div>
+        <ul class="list-group">
+            <li
+                is="file-editable"
+                v-for="file in intermediateFiles"
+                v-bind:file="file"
+                class="list-group-item"
+            >
+            </li>
+        </ul>
+    </div>
+
+    <div v-if="deliverableFiles.length > 0">
+        <div>Deliverable Files</div>
+        <ul class="list-group">
+            <li
+                is="file-editable"
+                v-for="file in deliverableFiles"
+                v-bind:file="file"
+                class="list-group-item"
+            >
+            </li>
+        </ul>
+    </div>
+</div>

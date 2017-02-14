@@ -1,7 +1,7 @@
 <div>
     <div class="row">
         <div v-if="order_sobject !== null">
-            <div>
+            <div class="col-md-12">
                 <h1>{{ order_code }}</h1>
                 <h5>Client: {{ division.name }} <img v-if="divisionImage !== null" :src="divisionImageSource" class="division-image"/></h5>
                 <h5>Expected Completion Date: {{ order_sobject.expected_completion_date }}</h5>
@@ -12,11 +12,17 @@
                 <router-link :to="add_output_files_link">Add Output Files</router-link>
             </div>
 
-            <div class="col-xs-4">
+            <div class="col-md-4">
+                <h4>Components</h4>
                 <component-editable-list v-bind:components="componentsFull"></component-editable-list>
             </div>
-            <div class="col-xs-4">
+            <div class="col-md-4">
+                <h4>Packages</h4>
                 <package-editable-list v-bind:packages="packages"></package-detail-list>
+            </div>
+            <div class="col-md-4">
+                <h4>Files</h4>
+                <file-editable-list v-bind:files="files"></file-editable-list>
             </div>
         </div>
         <div v-else>

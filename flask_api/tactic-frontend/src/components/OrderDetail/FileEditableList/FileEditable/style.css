@@ -1,0 +1,8 @@
+.file-name {
+    font-weight: bold
+}
+
+.file-path {
+    font-style: italic;
+    word-wrap: break-word
+}

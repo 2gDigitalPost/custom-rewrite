@@ -4,6 +4,7 @@ import axios from 'axios'
 
 import ComponentEditableList from './ComponentEditableList/index.vue'
 import PackageEditableList from './PackageEditableList/index.vue'
+import FileEditableList from './FileEditableList/index.vue'
 
 import bus from '../../bus'
 
@@ -11,7 +12,8 @@ export default {
   name: 'OrderDetail',
   components: {
     ComponentEditableList,
-    PackageEditableList
+    PackageEditableList,
+    FileEditableList
   },
   data () {
     return {
@@ -25,7 +27,8 @@ export default {
       packages: [],
       add_title_link: null,
       edit_components_link: null,
-      add_output_files_link: null
+      add_output_files_link: null,
+      files: []
     }
   },
   methods: {
@@ -39,6 +42,7 @@ export default {
       self.components = []
       self.componentsFull = []
       self.packages = []
+      self.files = []
 
       axios.get('/api/v1/orders/' + self.order_code + '/full', {
         params: {
@@ -57,6 +61,7 @@ export default {
         self.components = componentsData
         self.componentsFull = response.data.components_full
         self.packages = packagesData
+        self.files = response.data.files
       })
       .catch(function (error) {
         console.log(error)

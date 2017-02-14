@@ -436,10 +436,24 @@ class FullOrder(Resource):
 
             package_sobject['platform_image'] = platform_image
 
+        # Get all the files associated with this order, if any
+        # Start by getting the file to order connection objects
+        file_to_order_sobjects = server.eval("@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(
+            order_sobject.get('code')))
+
+        # Get a list of the file codes in string format
+        file_codes = [file_to_order_sobject.get('file_code') for file_to_order_sobject in file_to_order_sobjects]
+        file_codes_string = '|'.join(file_codes)
+
+        # Get the actual file sobjects
+        file_sobjects = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(file_codes_string))
+
+        # Finally, return the full order object in all its glory
         return jsonify({'order': order_sobject, 'division': division_sobject, 'division_image': division_image,
                         'components': component_sobjects, 'packages': package_sobjects,
                         'components_full': component_sobjects_full,
-                        'file_flows_to_packages': file_flows_to_package_dict})
+                        'file_flows_to_packages': file_flows_to_package_dict,
+                        'files': file_sobjects})
 
 
 class Orders(Resource):
