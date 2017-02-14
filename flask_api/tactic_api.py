@@ -2003,6 +2003,59 @@ class TaskOutputFile(Resource):
 
 
 class FileObject(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        file_data = json_data.get('file')
+        order_code = json_data.get('order_code')
+        origin_file_codes = json_data.get('origin_file_codes', [])
+
+        name = file_data.get('name')
+        file_path = file_data.get('file_path')
+        classification = file_data.get('classification').lower()
+        division_code = file_data.get('division_code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # If an order code was given and a division code was not, the division can still be found by looking up the
+        # order
+        if order_code and not division_code:
+            order_sobject = server.get_by_code('twog/order', order_code)
+
+            division_code = order_sobject.get('division_code')
+
+        file_data_to_insert = {
+            'name': name,
+            'file_path': file_path,
+            'classification': classification
+        }
+
+        if division_code:
+            file_data_to_insert['division_code'] = division_code
+
+        # Start by creating the new twog/file sobject
+        file_sobject = server.insert('twog/file', file_data_to_insert)
+
+        # Next, link the file to its origin files, if any
+        if origin_file_codes:
+            data_to_insert = []
+
+            for origin_file_code in origin_file_codes:
+                data_to_insert.append({'file_code': file_sobject.get('code'), 'origin_file': origin_file_code})
+
+            server.insert_multiple('twog/file_to_origin_file', data_to_insert)
+
+        # Then, link the file to an order, if an order code was provided
+        if order_code:
+            server.insert('twog/file_in_order', {'file_code': file_sobject.get('code'), 'order_code': order_code})
+
+
+        # Return the code of the created file
+        return jsonify({'file_code': file_sobject.get('code')})
+
+
+class FileObjectByCode(Resource):
     def get(self, code):
         parser = reqparse.RequestParser()
         parser.add_argument('token', required=True)
@@ -2177,7 +2230,8 @@ api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 api.add_resource(Equipment, '/api/v1/equipment')
 api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
 api.add_resource(EstimatedHours, '/api/v1/estimated-hours')
-api.add_resource(FileObject, '/api/v1/file/<string:code>')
+api.add_resource(FileObject, '/api/v1/file')
+api.add_resource(FileObjectByCode, '/api/v1/file/<string:code>')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')

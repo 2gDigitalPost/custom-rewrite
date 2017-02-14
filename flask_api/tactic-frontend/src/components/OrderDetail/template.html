@@ -21,8 +21,7 @@
                 <package-editable-list v-bind:packages="packages"></package-detail-list>
             </div>
             <div class="col-md-4">
-                <h4>Files</h4>
-                <file-editable-list v-bind:files="files"></file-editable-list>
+                <file-editable-list v-bind:files="files" v-bind:orderCode="order_code"></file-editable-list>
             </div>
         </div>
         <div v-else>
