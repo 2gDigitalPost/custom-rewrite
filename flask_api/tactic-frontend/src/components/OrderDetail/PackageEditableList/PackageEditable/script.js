@@ -1,6 +1,7 @@
 /* globals localStorage */
 
 import axios from 'axios'
+import _ from 'lodash'
 
 export default {
   name: 'PackageEditable',
@@ -16,10 +17,7 @@ export default {
   },
   computed: {
     connectionStatusText: function () {
-      if (this.connectionStatus === 'disconnected') return 'Disconnected'
-      else if (this.connectionStatus === 'testing') return 'Testing'
-      else if (this.connectionStatus === 'connected') return 'Connected'
-      else return this.connectionStatus
+      return _.startCase(this.connectionStatus)
     },
     platformImageSource: function () {
       if (this.platformImage !== null) {
