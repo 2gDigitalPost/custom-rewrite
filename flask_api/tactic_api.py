@@ -1327,6 +1327,129 @@ class ProjectTemplatesFull(Resource):
                         'package_templates': package_templates})
 
 
+def create_components_from_component_templates(server, project_template_code, titles, languages, order_code,
+                                               split_instructions=False):
+    component_template_sobjects = server.eval(
+        "@SOBJECT(twog/component_template['project_template_code', '{0}'])".format(project_template_code))
+
+    components_to_create = []
+    for component_template_sobject in component_template_sobjects:
+        for title in titles:
+            if languages:
+                for language in languages:
+                    component_to_create = {
+                        'name': title.get('name') + ' - ' + language.get(
+                            'name') + ': ' + component_template_sobject.get('name'),
+                        'order_code': order_code,
+                        'pipeline_code': component_template_sobject.get('component_pipeline_code'),
+                        'title_code': title.get('code'),
+                        'component_template_code': component_template_sobject.get('code')
+                    }
+
+                    components_to_create.append(component_to_create)
+            else:
+                component_to_create = {
+                    'name': title.get('name') + ': ' + component_template_sobject.get('name'),
+                    'order_code': order_code,
+                    'pipeline_code': component_template_sobject.get('component_pipeline_code'),
+                    'title_code': title.get('code'),
+                    'component_template_code': component_template_sobject.get('code')
+                }
+
+                components_to_create.append(component_to_create)
+
+    component_results = server.insert_multiple('twog/component', components_to_create)
+
+    return component_results
+
+
+def assign_instructions_to_components(server, component_templates, components, split_instructions=False):
+
+    # Give each component an instructions document
+    component_template_code_to_instructions_template = {}
+
+    for component_template in component_templates:
+        if component_template_sobject.get('code') not in component_template_code_to_instructions_template:
+            instructions_template_sobject = server.get_by_code('twog/instructions_template',
+                                                               component_template_sobject.get(
+                                                                   'instructions_template_code'))
+            component_template_code_to_instructions_template[
+                component_template_sobject.get('code')] = instructions_template_sobject
+
+    # Get all the instructions templates
+    # Start by getting a list of the codes in string format
+    instructions_template_codes = [component_template.get('instructions_template_code')
+                                   for component_template in component_templates]
+    instructions_template_codes_string = '|'.join(instructions_template_codes)
+
+    # Get the instructions template objects
+    instructions_templates = server.eval("@SOBJECT(twog/instructions_template['code', 'in', '{0}'])".format(
+        instructions_template_codes_string))
+
+    # Sort the instructions documents by their codes
+    instructions_template_code_to_object_dict = {}
+    for instructions_template in instructions_templates:
+        instructions_template_code_to_object_dict[instructions_template.get('code')] = instructions_template
+
+    instructions_documents_to_insert = []
+    component_data_to_update = []
+
+    if split_instructions:
+        for component in components:
+            instructions_template = instructions_template_code_to_object_dict.get(
+                component.get('instructions_template_code'))
+
+            name = instructions_template.get('name')
+            instructions_text = instructions_template.get('instructions_text')
+
+            instructions_documents_to_insert.append({
+                'name': name,
+                'instructions_text': instructions_text,
+                'component_search_key': component.get('__search_key__')
+            })
+    else:
+        pass
+
+    if split_instructions:
+        for component_result in components:
+            component_template_code = component_result.get('component_template_code')
+
+            instructions_template = component_template_code_to_instructions_template[component_template_code]
+            name = instructions_template.get('name')
+            instructions_text = instructions_template.get('instructions_text')
+
+            new_instructions_document = server.insert('twog/instructions', {'name': name,
+                                                                            'instructions_text': instructions_text})
+
+            search_key = component_result.get('__search_key__')
+            server.update(search_key, {'instructions_code': new_instructions_document.get('code')})
+    else:
+        instructions_template_code_to_instructions_document = {}
+
+        for component_template_code, instructions_template in component_template_code_to_instructions_template.iteritems():
+            instructions_template_code = instructions_template.get('code')
+
+            if instructions_template_code not in instructions_template_code_to_instructions_document:
+                name = instructions_template.get('name')
+                instructions_text = instructions_template.get('instructions_text')
+
+                new_instructions_document = server.insert('twog/instructions', {'name': name,
+                                                                                'instructions_text': instructions_text})
+
+                instructions_template_code_to_instructions_document[
+                    instructions_template_code] = new_instructions_document
+
+        for component_result in components:
+            search_key = component_result.get('__search_key__')
+
+            instructions_template = component_template_code_to_instructions_template[
+                component_result.get('component_template_code')]
+            instructions_template_code = instructions_template.get('code')
+
+            new_instructions_document = instructions_template_code_to_instructions_document[instructions_template_code]
+            server.update(search_key, {'instructions_code': new_instructions_document.get('code')})
+
+
 class CreateFromProjectTemplate(Resource):
     def post(self, code):
         json_data = request.get_json()
@@ -1348,91 +1471,24 @@ class CreateFromProjectTemplate(Resource):
         for component_template_sobject in component_template_sobjects:
             component_template_code = component_template_sobject.get('code')
 
-            file_flow_templates = server.eval("@SOBJECT(twog/file_flow_template['component_template_code' '{0}'])".format(component_template_code))
+            file_flow_templates = server.eval(
+                "@SOBJECT(twog/file_flow_template['component_template_code' '{0}'])".format(component_template_code))
 
             if component_template_code in component_template_file_flows_dict:
                 component_template_file_flows_dict[component_template_code].append(file_flow_templates)
             else:
                 component_template_file_flows_dict[component_template_code] = file_flow_templates
 
-        package_template_sobjects = server.eval("@SOBJECT(twog/package_template['project_template_code', '{0}'])".format(project_template_sobject.get('code')))
-
-        components_to_create = []
-        for component_template_sobject in component_template_sobjects:
-            for title in titles:
-                if languages:
-                    for language in languages:
-                        component_to_create = {
-                            'name': title.get('name') + ' - ' + language.get('name') + ': ' + component_template_sobject.get('name'),
-                            'order_code': order_sobject.get('code'),
-                            'pipeline_code': component_template_sobject.get('component_pipeline_code'),
-                            'title_code': title.get('code'),
-                            'component_template_code': component_template_sobject.get('code')
-                        }
-
-                        components_to_create.append(component_to_create)
-                else:
-                    component_to_create = {
-                        'name': title.get('name') + ': ' + component_template_sobject.get('name'),
-                        'order_code': order_sobject.get('code'),
-                        'pipeline_code': component_template_sobject.get('component_pipeline_code'),
-                        'title_code': title.get('code'),
-                        'component_template_code': component_template_sobject.get('code')
-                    }
-
-                    components_to_create.append(component_to_create)
-
-        component_results = server.insert_multiple('twog/component', components_to_create)
+        component_results = create_components_from_component_templates(server, project_template_code, titles, languages,
+                                                                       order_sobject.get('code'), split_instructions)
 
         # Attach the tasks to each component
         for component_result in component_results:
             server.add_initial_tasks(component_result.get('__search_key__'))
 
-        # Give each component an instructions document
-        component_template_code_to_instructions_template = {}
+        assign_instructions_to_components(server, component_results, split_instructions)
 
-        for component_template_sobject in component_template_sobjects:
-            if component_template_sobject.get('code') not in component_template_code_to_instructions_template:
-                instructions_template_sobject = server.get_by_code('twog/instructions_template',
-                                                                   component_template_sobject.get('instructions_template_code'))
-                component_template_code_to_instructions_template[component_template_sobject.get('code')] = instructions_template_sobject
-
-        if split_instructions:
-            for component_result in component_results:
-                component_template_code = component_result.get('component_template_code')
-
-                instructions_template = component_template_code_to_instructions_template[component_template_code]
-                name = instructions_template.get('name')
-                instructions_text = instructions_template.get('instructions_text')
-
-                new_instructions_document = server.insert('twog/instructions', {'name': name,
-                                                                                'instructions_text': instructions_text})
-
-                search_key = component_result.get('__search_key__')
-                server.update(search_key, {'instructions_code': new_instructions_document.get('code')})
-        else:
-            instructions_template_code_to_instructions_document = {}
-
-            for component_template_code, instructions_template in component_template_code_to_instructions_template.iteritems():
-                instructions_template_code = instructions_template.get('code')
-
-                if instructions_template_code not in instructions_template_code_to_instructions_document:
-                    name = instructions_template.get('name')
-                    instructions_text = instructions_template.get('instructions_text')
-
-                    new_instructions_document = server.insert('twog/instructions', {'name': name,
-                                                                                    'instructions_text': instructions_text})
-
-                    instructions_template_code_to_instructions_document[instructions_template_code] = new_instructions_document
-
-            for component_result in component_results:
-                search_key = component_result.get('__search_key__')
-
-                instructions_template = component_template_code_to_instructions_template[component_result.get('component_template_code')]
-                instructions_template_code = instructions_template.get('code')
-
-                new_instructions_document = instructions_template_code_to_instructions_document[instructions_template_code]
-                server.update(search_key, {'instructions_code': new_instructions_document.get('code')})
+        package_template_sobjects = server.eval("@SOBJECT(twog/package_template['project_template_code', '{0}'])".format(project_template_sobject.get('code')))
 
         packages_to_create = []
         for package_template_sobject in package_template_sobjects:
