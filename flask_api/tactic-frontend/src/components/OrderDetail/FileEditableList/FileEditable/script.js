@@ -5,5 +5,20 @@ import _ from 'lodash'
 
 export default {
   name: 'FileEditable',
-  props: ['file']
+  props: ['file', 'orderCode'],
+  data () {
+    return {
+      editing: false,
+      editName: null,
+      editPath: null
+    }
+  },
+  methods: {
+    submitChanges: function () {
+
+    },
+    removeFileFromOrder: function () {
+      let self = this
+    }
+  }
 }

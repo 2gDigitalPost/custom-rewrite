@@ -1,4 +1,24 @@
 <div>
-    <div class="file-name">{{ file.name }}</div>
-    <div>Path: <span class="file-path">{{ file.file_path }}</span></div>
+    <template v-if="editing">
+        <div class="btn-group">
+            <button class="btn btn-default" v-on:click="submitChanges">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+            </button>
+            <button class="btn btn-default" v-on:click="editing = false">
+                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+            </button>
+        </div>
+    </template>
+    <template v-else>
+        <div class="file-name">{{ file.name }}</div>
+        <div>Path: <span class="file-path">{{ file.file_path }}</span></div>
+        <div class="btn-group">
+            <button class="btn btn-default" v-on:click="editing = true">
+                <i class="fa fa-edit" aria-hidden="true"></i> Edit
+            </button>
+            <button class="btn btn-default" v-on:click="removeFileFromOrder">
+                <i class="fa fa-times" aria-hidden="true"></i> Remove from Order
+            </button>
+        </div>
+    </template>
 </div>
