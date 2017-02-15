@@ -1188,26 +1188,140 @@ class ProjectTemplatesFull(Resource):
         project_template = server.get_by_code('twog/project_template', code)
 
         # Get all the associated component_template sobjects
-        component_templates = server.eval("@SOBJECT(twog/component_template['project_template_code', '{0}'])".format(code))
+        component_templates = server.eval(
+            "@SOBJECT(twog/component_template['project_template_code', '{0}'])".format(code))
 
+        # Get the component template codes in string form
+        component_template_codes = [component_template.get('code') for component_template in component_templates]
+        component_template_codes_string = '|'.join(component_template_codes)
+
+        # Get the component template pipelines
+        # Get a list of the codes to search for, in string format
+        component_template_pipeline_codes = [component_template.get('component_pipeline_code')
+                                             for component_template in component_templates]
+        component_template_pipeline_codes_string = '|'.join(component_template_pipeline_codes)
+
+        # Search for the pipelines
+        component_template_pipelines = server.eval("@SOBJECT(sthpw/pipeline['code', 'in', '{0}'])".format(
+            component_template_pipeline_codes_string))
+
+        # Sort the pipelines by code
+        component_template_pipeline_code_to_object = {}
+
+        for component_template_pipeline in component_template_pipelines:
+            component_template_pipeline_code_to_object[component_template_pipeline.get('code')] = component_template_pipeline
+
+        # Add the pipelines to the component templates dictionary
         for component_template in component_templates:
-            component_template['pipeline'] = server.get_by_code('sthpw/pipeline', component_template.get('component_pipeline_code'))
-            component_template['file_flow_templates'] = server.eval("@SOBJECT(twog/file_flow_template['component_template_code', '{0}'])".format(component_template.get('code')))
-            component_template['instructions_template'] = server.get_by_code('twog/instructions_template', component_template.get('instructions_template_code'))
+            component_template['pipeline'] = component_template_pipeline_code_to_object.get(
+                component_template.get('component_pipeline_code'))
 
-            for file_flow_template in component_template['file_flow_templates']:
-                file_flow_template['connected_packages'] = []
-                file_flow_template_to_package_template_sobjects = server.eval("@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}'])".format(file_flow_template.get('code')))
+        # Get all the file flow templates belonging to the component templates
+        file_flow_templates = server.eval(
+            "@SOBJECT(twog/file_flow_template['component_template_code', 'in', '{0}'])".format(
+                component_template_codes_string))
 
-                for file_flow_template_to_package_template_sobject in file_flow_template_to_package_template_sobjects:
-                    file_flow_template['connected_packages'].append(file_flow_template_to_package_template_sobject.get('package_template_code'))
+        # Now search for the links between the file flow templates and the package templates
+        # Start by getting the file flow template codes in string format
+        file_flow_template_codes = [file_flow_template.get('code') for file_flow_template in file_flow_templates]
+        file_flow_template_codes_string = '|'.join(file_flow_template_codes)
+
+        # Get the connection objects
+        file_flow_template_to_package_templates = server.eval(
+            "@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', 'in', '{0}'])".format(
+                file_flow_template_codes_string))
+
+        # Sort the connection objects by template code to package template code
+        file_flow_template_code_to_package_template_code_dict = {}
+
+        for file_flow_template_to_package_template in file_flow_template_to_package_templates:
+            file_flow_template_code = file_flow_template_to_package_template.get('file_flow_template_code')
+            package_template_code = file_flow_template_to_package_template.get('package_template_code')
+
+            if file_flow_template_code in file_flow_template_code_to_package_template_code_dict:
+                file_flow_template_code_to_package_template_code_dict[file_flow_template_code].append(
+                    package_template_code)
+            else:
+                file_flow_template_code_to_package_template_code_dict[file_flow_template_code] = [package_template_code]
+
+        # Add the package template codes to the file flow templates
+        for file_flow_template in file_flow_templates:
+            file_flow_template['connected_packages'] = file_flow_template_code_to_package_template_code_dict.get(
+                file_flow_template.get('code'), [])
+
+        # Put the file flow templates in a dictionary, sorted by the component codes they are attached to
+        component_code_to_file_flow_templates_dict = {}
+
+        for file_flow_template in file_flow_templates:
+            component_template_code = file_flow_template.get('component_template_code')
+
+            if component_template_code in component_code_to_file_flow_templates_dict:
+                component_code_to_file_flow_templates_dict[component_template_code].append(file_flow_template)
+            else:
+                component_code_to_file_flow_templates_dict[component_template_code] = [file_flow_template]
+
+        # Put the file flow templates in the component templates dictionary
+        for component_template in component_templates:
+            component_template['file_flow_templates'] = component_code_to_file_flow_templates_dict.get(
+                component_template.get('code'))
+
+        # Get the instructions templates for all the component templates
+        # Start by getting the list of instructions template codes in string format
+        instructions_template_codes = [component_template.get('instructions_template_code')
+                                       for component_template in component_templates]
+        instructions_template_codes_string = '|'.join(instructions_template_codes)
+
+        # Get the instructions template objects
+        instructions_template_sobjects = server.eval(
+            "@SOBJECT(twog/instructions_template['code', 'in', '{0}'])".format(instructions_template_codes_string))
+
+        # Sort the instructions templates by their codes
+        instructions_template_code_to_object_dict = {}
+
+        for instructions_template_sobject in instructions_template_sobjects:
+            instructions_template_code_to_object_dict[instructions_template_sobject.get('code')] = instructions_template_sobject
+
+        # Add the instructions templates to the component templates dictionary
+        for component_template in component_templates:
+            component_template['instructions_template'] = instructions_template_code_to_object_dict.get(
+                component_template.get('instructions_template_code'))
 
         # Get all the associated package_template sobjects
         package_templates = server.eval("@SOBJECT(twog/package_template['project_template_code', '{0}'])".format(code))
 
+        # Get the package template pipeline codes in string format
+        package_template_pipeline_codes = [package_template.get('package_pipeline_code')
+                                           for package_template in package_templates]
+        package_template_pipeline_codes_string = '|'.join(package_template_pipeline_codes)
+
+        # Get all the pipeline objects for the package templates
+        package_template_pipelines = server.eval("@SOBJECT(sthpw/pipeline['code', 'in', '{0}'])".format(
+            package_template_pipeline_codes_string))
+
+        # Sort the pipelines by their codes
+        pipeline_code_to_objects = {}
+
+        for pipeline in package_template_pipelines:
+            pipeline_code_to_objects[pipeline.get('code')] = pipeline
+
+        # Get the platform codes in string format
+        platform_codes = [package_template.get('platform_code') for package_template in package_templates]
+        platform_codes_string = '|'.join(platform_codes)
+
+        # Get all the platform objects for the package templates
+        package_template_platforms = server.eval("@SOBJECT(twog/platform['code', 'in', '{0}'])".format(
+            platform_codes_string))
+
+        # Sort the platforms by codes
+        platform_code_to_objects = {}
+
+        for platform in package_template_platforms:
+            platform_code_to_objects[platform.get('code')] = platform
+
+        # Add the pipeline and package objects to the package templates dictionary
         for package_template in package_templates:
-            package_template['pipeline'] = server.get_by_code('sthpw/pipeline', package_template.get('package_pipeline_code'))
-            package_template['platform'] = server.get_by_code('twog/platform', package_template.get('platform_code'))
+            package_template['pipeline'] = pipeline_code_to_objects.get(package_template.get('package_pipeline_code'))
+            package_template['platform'] = platform_code_to_objects.get(package_template.get('platform_code'))
 
         return jsonify({'project_template': project_template, 'component_templates': component_templates,
                         'package_templates': package_templates})
