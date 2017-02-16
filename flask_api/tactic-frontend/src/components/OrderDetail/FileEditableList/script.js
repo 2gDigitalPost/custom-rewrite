@@ -23,7 +23,7 @@ export default {
       newFileClassification: null,
       classificationOptions: ['Source', 'Intermediate', 'Deliverable'],
       selectedFiles: [],
-      errors: [],
+      errors: []
     }
   },
   methods: {
