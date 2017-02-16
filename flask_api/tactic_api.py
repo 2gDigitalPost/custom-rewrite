@@ -2105,13 +2105,30 @@ class TaskOutputFile(Resource):
         if original_file_to_output_file_data:
             server.insert_multiple('twog/file_to_origin_file', original_file_to_output_file_data)
 
-        # Finally, associate the new output file to the task (twog/task_data_out_file)
+        # Associate the new output file to the task (twog/task_data_out_file)
         # First, get the twog/task_data object
         task_data = server.get_unique_sobject('twog/task_data', {'task_code': task_code})
 
         # Insert a link between the new output file and the task_data object
         server.insert('twog/task_data_out_file', {'task_data_code': task_data.get('code'),
                                                   'file_code': new_output_file.get('code')})
+
+        # Also need to associate the file to the order and the division
+        # Travel up the chain to get the order. Start by identifying which type the task belongs to
+        task_object = server.get_by_code('sthpw/task', task_code)
+        search_type = task_object.get('search_type')
+        search_code = task_object.get('search_code')
+
+        # Search type includes '?project=twog', don't need that
+        search_type = search_type.split('?')[0]
+
+        # Get the parent
+        parent_object = server.get_by_code(search_type, search_code)
+
+        # Regardless of if the parent is a component or package, it should have an order code
+        # Make the connection between the file and the order
+        server.insert('twog/file_in_order', {'file_code': new_output_file.get('code'),
+                                             'order_code': parent_object.get('order_code')})
 
         return jsonify({'status': 200})
 
@@ -2186,7 +2203,7 @@ class FileObjectByCode(Resource):
         origin_file_entries = server.eval("@SOBJECT(twog/file_to_origin_file['file_code', '{0}'])".format(
             file_object.get('code')))
 
-        origin_file_codes = [origin_file_entry.get('code') for origin_file_entry in origin_file_entries]
+        origin_file_codes = [origin_file_entry.get('origin_file') for origin_file_entry in origin_file_entries]
         origin_file_codes_string = '|'.join(origin_file_codes)
 
         origin_files = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(origin_file_codes_string))
@@ -2199,10 +2216,15 @@ class FileObjectByCode(Resource):
         json_data = request.get_json()
 
         ticket = json_data.get('token')
-        name = json_data.get('name')
-        file_path = json_data.get('file_path')
-        classification = json_data.get('classification').lower()
-        original_file_codes = json_data.get('original_file_codes', [])
+        file_json = json_data.get('file')
+        origin_file_codes = json_data.get('origin_file_codes', [])
+
+        name = file_json.get('name')
+        file_path = file_json.get('file_path')
+        classification = file_json.get('classification')
+
+        if classification is not None:
+            classification = classification.lower()
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
@@ -2212,13 +2234,13 @@ class FileObjectByCode(Resource):
         # Get the data to submit. Only data that has changed should be submitted
         data_to_submit = {}
 
-        if name != existing_output_file.get('name'):
+        if name and name != existing_output_file.get('name'):
             data_to_submit['name'] = name
 
-        if file_path != existing_output_file.get('file_path'):
+        if file_path and file_path != existing_output_file.get('file_path'):
             data_to_submit['file_path'] = file_path
 
-        if classification != existing_output_file.get('classification'):
+        if classification and classification != existing_output_file.get('classification'):
             data_to_submit['classification'] = classification
 
         if data_to_submit:

@@ -88,10 +88,12 @@ export default {
     bus.$on('component-title-updated', this.loadOrder)
     bus.$on('task-updated', this.loadOrder)
     bus.$on('new-file-added-to-order', this.loadOrder)
+    bus.$on('file-updated', this.loadOrder)
   },
   destroyed() {
     bus.$off('component-title-updated', this.loadOrder)
     bus.$off('task-updated', this.loadOrder)
     bus.$off('new-file-added-to-order', this.loadOrder)
+    bus.$off('file-updated', this.loadOrder)
   }
 }

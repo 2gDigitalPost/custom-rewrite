@@ -49,6 +49,8 @@
                 is="file-editable"
                 v-for="file in sourceFiles"
                 v-bind:file="file"
+                v-bind:orderCode="orderCode"
+                v-bind:fileOptions="files"
                 class="list-group-item"
             >
             </li>
@@ -62,6 +64,8 @@
                 is="file-editable"
                 v-for="file in intermediateFiles"
                 v-bind:file="file"
+                v-bind:orderCode="orderCode"
+                v-bind:fileOptions="files"
                 class="list-group-item"
             >
             </li>
@@ -75,6 +79,8 @@
                 is="file-editable"
                 v-for="file in deliverableFiles"
                 v-bind:file="file"
+                v-bind:orderCode="orderCode"
+                v-bind:fileOptions="files"
                 class="list-group-item"
             >
             </li>
