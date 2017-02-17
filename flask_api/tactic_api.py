@@ -1544,14 +1544,6 @@ class CreateFromProjectTemplate(Resource):
                     instructions_template_code = instructions.get('instructions_template_code')
 
                     if component_instructions_template_code == instructions_template_code:
-                        # update_data = {
-                            # str(component.get('__search_key__')): {
-                                # 'instructions_code': instructions.get('code')
-                            # }
-                        # }
-
-                        # components_to_update.append(update_data)
-
                         components_to_update[component.get('__search_key__')] = {
                             'instructions_code': instructions.get('code')}
 
