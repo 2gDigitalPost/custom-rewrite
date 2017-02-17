@@ -1369,12 +1369,12 @@ def assign_instructions_to_components(server, component_templates, components, s
     component_template_code_to_instructions_template = {}
 
     for component_template in component_templates:
-        if component_template_sobject.get('code') not in component_template_code_to_instructions_template:
+        if component_template.get('code') not in component_template_code_to_instructions_template:
             instructions_template_sobject = server.get_by_code('twog/instructions_template',
-                                                               component_template_sobject.get(
+                                                               component_template.get(
                                                                    'instructions_template_code'))
             component_template_code_to_instructions_template[
-                component_template_sobject.get('code')] = instructions_template_sobject
+                component_template.get('code')] = instructions_template_sobject
 
     # Get all the instructions templates
     # Start by getting a list of the codes in string format
@@ -1462,121 +1462,235 @@ class CreateFromProjectTemplate(Resource):
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
+        # Fetch the order object that we are creating for
         order_sobject = server.get_by_code('twog/order', code)
-        project_template_sobject = server.get_by_code('twog/project_template', project_template_code)
 
-        component_template_sobjects = server.eval("@SOBJECT(twog/component_template['project_template_code', '{0}'])".format(project_template_sobject.get('code')))
+        # Get the project template object that was specified
+        project_template = server.get_by_code('twog/project_template', project_template_code)
 
-        component_template_file_flows_dict = {}
-        for component_template_sobject in component_template_sobjects:
-            component_template_code = component_template_sobject.get('code')
+        # Get the component templates contained in the project template
+        component_templates = server.eval("@SOBJECT(twog/component_template['project_template_code', '{0}'])".format(
+            project_template.get('code')))
 
-            file_flow_templates = server.eval(
-                "@SOBJECT(twog/file_flow_template['component_template_code' '{0}'])".format(component_template_code))
+        # Get the component codes in string format
+        component_template_codes = [component_template.get('code') for component_template in component_templates]
+        component_template_codes_string = '|'.join(component_template_codes)
 
-            if component_template_code in component_template_file_flows_dict:
-                component_template_file_flows_dict[component_template_code].append(file_flow_templates)
+        # Get the instructions template codes in string format
+        instructions_template_codes = [component_template.get('instructions_template_code')
+                                       for component_template in component_templates]
+        instructions_template_codes_string = '|'.join(instructions_template_codes)
+
+        # Get the package templates contained in the project template
+        package_templates = server.eval("@SOBJECT(twog/package_template['project_template_code', '{0}'])".format(
+            project_template.get('code')))
+
+        # Get all the instructions templates for all the component templates
+        instructions_templates = server.eval(
+            "@SOBJECT(twog/instructions_template['code', 'in', '{0}'])".format(instructions_template_codes_string))
+
+        # Get the file flow templates for all the component templates
+        file_flow_templates = server.eval(
+            "@SOBJECT(twog/file_flow_template['component_template_code', 'in', '{0}'])".format(
+                component_template_codes_string))
+
+        # Get the file flow template to package template connection objects
+        # Start by getting a list of the file flow template codes in string format
+        file_flow_template_codes = [file_flow_template.get('code') for file_flow_template in file_flow_templates]
+        file_flow_template_codes_string = '|'.join(file_flow_template_codes)
+
+        # Search for all the file flow template to package template connections
+        file_flow_template_to_package_template_connections = server.eval(
+            "@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', 'in', '{0}'])".format(
+                file_flow_template_codes_string))
+
+        # All the data has been gathered, time to start inserting some new entries!
+        # Start with the components
+        created_components = create_components_from_component_templates(server, project_template_code, titles,
+                                                                        languages, order_sobject.get('code'),
+                                                                        split_instructions)
+
+        # Get a dictionary that related the component templates to the actual component codes that they created
+        component_template_code_to_created_component_codes = {}
+
+        for component in created_components:
+            component_template_code = component.get('component_template_code')
+
+            if component_template_code in component_template_code_to_created_component_codes:
+                component_template_code_to_created_component_codes[component_template_code].append(component.get('code'))
             else:
-                component_template_file_flows_dict[component_template_code] = file_flow_templates
+                component_template_code_to_created_component_codes[component_template_code] = [component.get('code')]
 
-        component_results = create_components_from_component_templates(server, project_template_code, titles, languages,
-                                                                       order_sobject.get('code'), split_instructions)
+        # Get a dictionary that related the component templates to the actual components that they created
+        component_template_code_to_created_components = {}
 
-        # Attach the tasks to each component
-        for component_result in component_results:
-            server.add_initial_tasks(component_result.get('__search_key__'))
+        for component in created_components:
+            component_template_code = component.get('component_template_code')
 
-        assign_instructions_to_components(server, component_results, split_instructions)
+            if component_template_code in component_template_code_to_created_components:
+                component_template_code_to_created_components[component_template_code].append(component)
+            else:
+                component_template_code_to_created_components[component_template_code] = [component]
 
-        package_template_sobjects = server.eval("@SOBJECT(twog/package_template['project_template_code', '{0}'])".format(project_template_sobject.get('code')))
+        # Now create the instructions
+        instructions_to_create = []
 
+        # Get a dictionary that lists the instructions template code to the instructions template object
+        instructions_template_code_to_instructions_template_object = {}
+
+        for instructions_template in instructions_templates:
+            instructions_template_code_to_instructions_template_object[instructions_template.get('code')] = instructions_template
+
+        # Also get a dictionary that lists the component template codes to their instructions template code
+        component_template_code_to_instructions_template_code = {}
+
+        for component_template in component_templates:
+            component_template_code_to_instructions_template_code[component_template.get('code')] = component_template.get('instructions_template_code')
+
+
+        if split_instructions:
+            for created_component in created_components:
+                instructions_template_code = component_template_code_to_instructions_template_code.get(
+                    created_component.get('component_template_code'))
+                instructions_template = instructions_template_code_to_instructions_template_object.get(
+                    instructions_template_code)
+
+                instructions_document_to_add = {
+                    'name': instructions_template.get('name'),
+                    'instructions_text': instructions_template.get('instructions_text'),
+                    'instructions_template_code': instructions_template.get('code')
+                }
+
+                instructions_to_create.append(instructions_document_to_add)
+        else:
+            for instructions_template in instructions_templates:
+                # Set up the instructions dictionary to be submitted
+                instructions_document_to_add = {
+                    'name': instructions_template.get('name'),
+                    'instructions_text': instructions_template.get('instructions_text'),
+                    'instructions_template_code': instructions_template.get('code')
+                }
+
+                instructions_to_create.append(instructions_document_to_add)
+
+        # Create the new instructions
+        created_instructions = server.insert_multiple('twog/instructions', instructions_to_create)
+
+        components_to_update = {}
+        if split_instructions:
+            # Sort the created instructions by their template codes
+            instructions_template_code_to_created_instructions_code = {}
+
+            for instructions in created_instructions:
+                instructions_template_code = instructions.get('instructions_template_code')
+
+                if instructions_template_code in instructions_template_code_to_created_instructions_code:
+                    instructions_template_code_to_created_instructions_code[instructions_template_code].append(instructions.get('code'))
+                else:
+                    instructions_template_code_to_created_instructions_code[instructions_template_code] = [instructions.get('code')]
+
+            for component_template_code, components in component_template_code_to_created_components.items():
+                component_instructions_template_code = component_template_code_to_instructions_template_code.get(
+                    component_template_code)
+
+                available_instructions_documents = instructions_template_code_to_created_instructions_code.get(
+                    component_instructions_template_code)
+
+                for component, instruction_document_code in zip(components, available_instructions_documents):
+                    components_to_update[component.get('__search_key__')] = {'instructions_code': instruction_document_code}
+        else:
+            # Sort the created instructions by their template codes
+            instructions_template_code_to_created_instructions_code = {}
+
+            for instructions in created_instructions:
+                instructions_template_code_to_created_instructions_code[
+                    instructions.get('instructions_template_code')] = instructions.get('code')
+
+            for component in created_components:
+                component_template_code = component.get('component_template_code')
+                component_instructions_template_code = component_template_code_to_instructions_template_code.get(component_template_code)
+
+                for instructions in created_instructions:
+                    instructions_template_code = instructions.get('instructions_template_code')
+
+                    if component_instructions_template_code == instructions_template_code:
+                        # update_data = {
+                            # str(component.get('__search_key__')): {
+                                # 'instructions_code': instructions.get('code')
+                            # }
+                        # }
+
+                        # components_to_update.append(update_data)
+
+                        components_to_update[component.get('__search_key__')] = {
+                            'instructions_code': instructions.get('code')}
+
+        server.update_multiple(components_to_update)
+
+        # Now create the file flows
+        file_flows_to_create = []
+
+        for file_flow_template in file_flow_templates:
+            # Get the parent component codes to relate the file flow to
+            component_codes = component_template_code_to_created_component_codes.get(
+                file_flow_template.get('component_template_code'))
+
+            for component_code in component_codes:
+                # Set up a dictionary to submit
+                new_file_flow_data = {
+                    'name': file_flow_template.get('name'),
+                    'component_code': component_code,
+                    'file_flow_template_code': file_flow_template.get('code')
+                }
+
+                # Add the entry to the creation list
+                file_flows_to_create.append(new_file_flow_data)
+
+        # Submit all the file flows at once
+        created_file_flows = server.insert_multiple('twog/file_flow', file_flows_to_create)
+
+        # Now for the packages
         packages_to_create = []
-        for package_template_sobject in package_template_sobjects:
+        for package_template in package_templates:
             package_to_create = {
-                'name': package_template_sobject.get('name'),
+                'name': package_template.get('name'),
                 'order_code': order_sobject.get('code'),
-                'platform_code': package_template_sobject.get('platform_code'),
-                'pipeline_code': package_template_sobject.get('package_pipeline_code'),
-                'package_template_code': package_template_sobject.get('code')
+                'platform_code': package_template.get('platform_code'),
+                'pipeline_code': package_template.get('package_pipeline_code'),
+                'package_template_code': package_template.get('code')
             }
 
             packages_to_create.append(package_to_create)
 
-        package_results = server.insert_multiple('twog/package', packages_to_create)
+        created_packages = server.insert_multiple('twog/package', packages_to_create)
 
-        # Attach the tasks to each package
-        for package_result in package_results:
-            server.add_initial_tasks(package_result.get('__search_key__'))
+        # Lastly, create the file flow to package connections
+        # We need to relate the file flows to their template codes and the packages to their template codes
+        # Create a dictionary for each
+        file_flow_template_code_to_created_file_flow_code = {}
+        package_template_code_to_created_package_code = {}
 
-        file_flows_to_create = []
-        for component_result in component_results:
-            file_flow_templates = component_template_file_flows_dict[component_result.get('component_template_code')]
+        for created_file_flow in created_file_flows:
+            file_flow_template_code_to_created_file_flow_code[created_file_flow.get('file_flow_template_code')] = created_file_flow.get('code')
 
-            for file_flow_template in file_flow_templates:
-                file_flow_to_create = {
-                    'name': file_flow_template.get('name'),
-                    'component_code': component_result.get('code'),
-                    'file_flow_template_code': file_flow_template.get('code')
-                }
+        for created_package in created_packages:
+            package_template_code_to_created_package_code[created_package.get('package_template_code')] = created_package.get('code')
 
-                file_flows_to_create.append(file_flow_to_create)
+        file_flow_to_package_connections_to_create = []
 
-        file_flow_results = server.insert_multiple('twog/file_flow', file_flows_to_create)
+        for file_flow_template_to_package_template_connection in file_flow_template_to_package_template_connections:
+            file_flow_to_package_connection_to_create = {
+                'file_flow_code': file_flow_template_code_to_created_file_flow_code.get(
+                    file_flow_template_to_package_template_connection.get('file_flow_template_code')),
+                'package_code': package_template_code_to_created_package_code.get(
+                    file_flow_template_to_package_template_connection.get('package_template_code')
+                )
+            }
 
-        file_flow_template_codes_to_created_file_flow_codes = {}
-        file_flow_template_codes = []
-        for file_flow_result in file_flow_results:
-            template_code = file_flow_result.get('file_flow_template_code')
+            file_flow_to_package_connections_to_create.append(file_flow_to_package_connection_to_create)
 
-            if template_code in file_flow_template_codes_to_created_file_flow_codes:
-                file_flow_template_codes_to_created_file_flow_codes[template_code].append(file_flow_result.get('code'))
-            else:
-                file_flow_template_codes_to_created_file_flow_codes[template_code] = [file_flow_result.get('code')]
-
-            if template_code not in file_flow_template_codes:
-                file_flow_template_codes.append(template_code)
-
-        package_template_codes_to_created_package_codes = {}
-        for package_result in package_results:
-            template_code = package_result.get('package_template_code')
-
-            if template_code in package_template_codes_to_created_package_codes:
-                package_template_codes_to_created_package_codes[template_code].append(package_result.get('code'))
-            else:
-                package_template_codes_to_created_package_codes[template_code] = [package_result.get('code')]
-
-        """
-        file_flow_template_codes_string = '|'.join(
-            [file_flow_template_code for file_flow_template_code in file_flow_template_codes])
-
-        file_flow_template_to_package_template_sobjects = server.eval(
-            "@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template', 'in', '{0}'])".format(
-                file_flow_template_codes_string))
-
-        file_flow_to_packages_to_create = []
-        for template_code, file_flow_codes in file_flow_template_codes_to_created_file_flow_codes:
-
-            for file_flow_code in file_flow_codes:
-                file_flow_to_package_to_create = {
-                    'file_flow_code': file_flow_code,
-                    'package_code': None
-                }
-        """
-
-        for file_flow_result in file_flow_results:
-            for package_result in package_results:
-                file_flow_template_to_package_template_sobject = server.eval(
-                    "@SOBJECT(twog/file_flow_template_to_package_template['file_flow_template_code', '{0}']['package_template_code', '{1}'])".format(
-                        file_flow_result.get('file_flow_template_code'), package_result.get('package_template_code')
-                    ))
-
-                if file_flow_template_to_package_template_sobject:
-                    file_flow_to_package_to_create = {
-                        'file_flow_code': file_flow_result.get('code'),
-                        'package_code': package_result.get('code')
-                    }
-
-                    server.insert('twog/file_flow_to_package', file_flow_to_package_to_create)
+        created_file_flow_to_package_connections = server.insert_multiple('twog/file_flow_to_package',
+                                                                          file_flow_to_package_connections_to_create)
 
         return jsonify({'order_code': order_sobject.get('code')})
 
