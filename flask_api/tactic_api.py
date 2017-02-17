@@ -357,11 +357,11 @@ class FullOrder(Resource):
         component_codes_list = [component_sobject.get('code') for component_sobject in component_sobjects]
         component_codes_string = '|'.join([component_code for component_code in component_codes_list])
 
-        tasks = server.eval("@SOBJECT(sthpw/task['search_code', 'in', '{0}'])".format(component_codes_string))
+        component_tasks = server.eval("@SOBJECT(sthpw/task['search_code', 'in', '{0}'])".format(component_codes_string))
 
         tasks_dict = {}
 
-        for task in tasks:
+        for task in component_tasks:
             task_search_code = task.get('search_code')
 
             if task_search_code in tasks_dict:
@@ -388,6 +388,19 @@ class FullOrder(Resource):
         # Get all the packages associated with the order
         package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
 
+        package_codes_string = '|'.join([package.get('code') for package in package_sobjects])
+        package_tasks = server.eval("@SOBJECT(sthpw/task['search_code', 'in', '{0}'])".format(package_codes_string))
+
+        package_tasks_dict = {}
+
+        for task in package_tasks:
+            task_search_code = task.get('search_code')
+
+            if task_search_code in package_tasks_dict:
+                package_tasks_dict[task_search_code].append(task)
+            else:
+                package_tasks_dict[task_search_code] = [task]
+
         # Get all the extra data needed for the package objects, including the platform and connection status
         for package_sobject in package_sobjects:
             # Get the platform object and add it to the package dictionary
@@ -408,6 +421,11 @@ class FullOrder(Resource):
                 platform_image = None
 
             package_sobject['platform_image'] = platform_image
+
+            # Get the tasks assigned to the component, if any (sorted by code)
+            tasks_list = package_tasks_dict.get(package_sobject.get('code'))
+
+            package_sobject['tasks'] = tasks_list
 
         # Get the package names sorted by package code
         package_code_to_package_name_dict = {}
@@ -1585,6 +1603,10 @@ class CreateFromProjectTemplate(Resource):
             packages_to_create.append(package_to_create)
 
         created_packages = server.insert_multiple('twog/package', packages_to_create)
+
+        # Attach the initial tasks to the packages
+        for package in created_packages:
+            server.add_initial_tasks(package.get('__search_key__'))
 
         # Lastly, create the file flow to package connections
         # We need to relate the file flows to their template codes and the packages to their template codes

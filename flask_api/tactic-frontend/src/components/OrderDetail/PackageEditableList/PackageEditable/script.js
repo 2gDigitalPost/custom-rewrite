@@ -3,9 +3,14 @@
 import axios from 'axios'
 import _ from 'lodash'
 
+import TaskEditableList from '../../ComponentEditableList/ComponentEditable/TaskEditableList/index.vue'
+
 export default {
   name: 'PackageEditable',
   props: ['package'],
+  components: {
+    TaskEditableList
+  },
   data () {
     return {
       connectionStatus: this.package.platform_connection.connection_status,
