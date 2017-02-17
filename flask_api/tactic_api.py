@@ -1360,94 +1360,10 @@ def create_components_from_component_templates(server, project_template_code, ti
 
     component_results = server.insert_multiple('twog/component', components_to_create)
 
+    for component_result in component_results:
+        server.add_initial_tasks(component_result.get('__search_key__'))
+
     return component_results
-
-
-def assign_instructions_to_components(server, component_templates, components, split_instructions=False):
-
-    # Give each component an instructions document
-    component_template_code_to_instructions_template = {}
-
-    for component_template in component_templates:
-        if component_template.get('code') not in component_template_code_to_instructions_template:
-            instructions_template_sobject = server.get_by_code('twog/instructions_template',
-                                                               component_template.get(
-                                                                   'instructions_template_code'))
-            component_template_code_to_instructions_template[
-                component_template.get('code')] = instructions_template_sobject
-
-    # Get all the instructions templates
-    # Start by getting a list of the codes in string format
-    instructions_template_codes = [component_template.get('instructions_template_code')
-                                   for component_template in component_templates]
-    instructions_template_codes_string = '|'.join(instructions_template_codes)
-
-    # Get the instructions template objects
-    instructions_templates = server.eval("@SOBJECT(twog/instructions_template['code', 'in', '{0}'])".format(
-        instructions_template_codes_string))
-
-    # Sort the instructions documents by their codes
-    instructions_template_code_to_object_dict = {}
-    for instructions_template in instructions_templates:
-        instructions_template_code_to_object_dict[instructions_template.get('code')] = instructions_template
-
-    instructions_documents_to_insert = []
-    component_data_to_update = []
-
-    if split_instructions:
-        for component in components:
-            instructions_template = instructions_template_code_to_object_dict.get(
-                component.get('instructions_template_code'))
-
-            name = instructions_template.get('name')
-            instructions_text = instructions_template.get('instructions_text')
-
-            instructions_documents_to_insert.append({
-                'name': name,
-                'instructions_text': instructions_text,
-                'component_search_key': component.get('__search_key__')
-            })
-    else:
-        pass
-
-    if split_instructions:
-        for component_result in components:
-            component_template_code = component_result.get('component_template_code')
-
-            instructions_template = component_template_code_to_instructions_template[component_template_code]
-            name = instructions_template.get('name')
-            instructions_text = instructions_template.get('instructions_text')
-
-            new_instructions_document = server.insert('twog/instructions', {'name': name,
-                                                                            'instructions_text': instructions_text})
-
-            search_key = component_result.get('__search_key__')
-            server.update(search_key, {'instructions_code': new_instructions_document.get('code')})
-    else:
-        instructions_template_code_to_instructions_document = {}
-
-        for component_template_code, instructions_template in component_template_code_to_instructions_template.iteritems():
-            instructions_template_code = instructions_template.get('code')
-
-            if instructions_template_code not in instructions_template_code_to_instructions_document:
-                name = instructions_template.get('name')
-                instructions_text = instructions_template.get('instructions_text')
-
-                new_instructions_document = server.insert('twog/instructions', {'name': name,
-                                                                                'instructions_text': instructions_text})
-
-                instructions_template_code_to_instructions_document[
-                    instructions_template_code] = new_instructions_document
-
-        for component_result in components:
-            search_key = component_result.get('__search_key__')
-
-            instructions_template = component_template_code_to_instructions_template[
-                component_result.get('component_template_code')]
-            instructions_template_code = instructions_template.get('code')
-
-            new_instructions_document = instructions_template_code_to_instructions_document[instructions_template_code]
-            server.update(search_key, {'instructions_code': new_instructions_document.get('code')})
 
 
 class CreateFromProjectTemplate(Resource):
@@ -1546,7 +1462,6 @@ class CreateFromProjectTemplate(Resource):
 
         for component_template in component_templates:
             component_template_code_to_instructions_template_code[component_template.get('code')] = component_template.get('instructions_template_code')
-
 
         if split_instructions:
             for created_component in created_components:
