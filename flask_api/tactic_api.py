@@ -1601,7 +1601,12 @@ class CreateFromProjectTemplate(Resource):
         package_template_code_to_created_package_code = {}
 
         for created_file_flow in created_file_flows:
-            file_flow_template_code_to_created_file_flow_code[created_file_flow.get('file_flow_template_code')] = created_file_flow.get('code')
+            file_flow_template_code = created_file_flow.get('file_flow_template_code')
+
+            if file_flow_template_code in file_flow_template_code_to_created_file_flow_code:
+                file_flow_template_code_to_created_file_flow_code[file_flow_template_code].append(created_file_flow.get('code'))
+            else:
+                file_flow_template_code_to_created_file_flow_code[file_flow_template_code] = [created_file_flow.get('code')]
 
         for created_package in created_packages:
             package_template_code_to_created_package_code[created_package.get('package_template_code')] = created_package.get('code')
@@ -1609,18 +1614,19 @@ class CreateFromProjectTemplate(Resource):
         file_flow_to_package_connections_to_create = []
 
         for file_flow_template_to_package_template_connection in file_flow_template_to_package_template_connections:
-            file_flow_to_package_connection_to_create = {
-                'file_flow_code': file_flow_template_code_to_created_file_flow_code.get(
-                    file_flow_template_to_package_template_connection.get('file_flow_template_code')),
-                'package_code': package_template_code_to_created_package_code.get(
-                    file_flow_template_to_package_template_connection.get('package_template_code')
-                )
-            }
+            created_file_flow_codes = file_flow_template_code_to_created_file_flow_code.get(file_flow_template_to_package_template_connection.get('file_flow_template_code'))
 
-            file_flow_to_package_connections_to_create.append(file_flow_to_package_connection_to_create)
+            for created_file_flow_code in created_file_flow_codes:
+                file_flow_to_package_connection_to_create = {
+                    'file_flow_code': created_file_flow_code,
+                    'package_code': package_template_code_to_created_package_code.get(
+                        file_flow_template_to_package_template_connection.get('package_template_code')
+                    )
+                }
 
-        created_file_flow_to_package_connections = server.insert_multiple('twog/file_flow_to_package',
-                                                                          file_flow_to_package_connections_to_create)
+                file_flow_to_package_connections_to_create.append(file_flow_to_package_connection_to_create)
+
+        server.insert_multiple('twog/file_flow_to_package', file_flow_to_package_connections_to_create)
 
         return jsonify({'order_code': order_sobject.get('code')})
 
