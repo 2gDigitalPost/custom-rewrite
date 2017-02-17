@@ -385,6 +385,45 @@ class FullOrder(Resource):
             else:
                 file_flows_to_package_dict[file_flow_code] = [file_flow_to_package_sobject]
 
+        # Get all the packages associated with the order
+        package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
+
+        # Get all the extra data needed for the package objects, including the platform and connection status
+        for package_sobject in package_sobjects:
+            # Get the platform object and add it to the package dictionary
+            platform_sobject = server.get_by_code('twog/platform', package_sobject.get('platform_code'))
+            package_sobject['platform'] = platform_sobject
+
+            # Get the platform connection sobject and add it to the package dictionary
+            platform_connection_sobject = server.eval("@SOBJECT(twog/platform_connection['platform_code', '{0}']['division_code', '{1}'])".format(package_sobject.get('platform_code'), order_sobject.get('division_code')))[0]
+            package_sobject['platform_connection'] = platform_connection_sobject
+
+            # Also get the image associated with the platform, if there is one
+            platform_image_sobjects = server.eval(
+                "@SOBJECT(sthpw/file['search_code', '{0}'])".format(platform_sobject.get('code')))
+
+            if platform_image_sobjects:
+                platform_image = platform_image_sobjects[-1].get('file_name')
+            else:
+                platform_image = None
+
+            package_sobject['platform_image'] = platform_image
+
+        # Get the package names sorted by package code
+        package_code_to_package_name_dict = {}
+
+        for package_sobject in package_sobjects:
+            package_code_to_package_name_dict[package_sobject.get('code')] = package_sobject.get('name')
+
+        for file_flow in file_flows:
+            file_flow['delivering_to'] = []
+
+            if file_flow.get('code') in file_flows_to_package_dict:
+                packages_delivering_to = file_flows_to_package_dict.get(file_flow.get('code'))
+
+                for package_delivering_to in packages_delivering_to:
+                    file_flow['delivering_to'].append(package_code_to_package_name_dict.get(package_delivering_to.get('package_code')))
+
         # Get all the details of all the components
         for component_sobject in component_sobjects:
             component_sobject_full = {'code': component_sobject.get('code'), 'component': component_sobject}
@@ -411,30 +450,6 @@ class FullOrder(Resource):
                     component_sobject_full['file_flows'].append(file_flow)
 
             component_sobjects_full.append(component_sobject_full)
-
-        # Get all the packages associated with the order
-        package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
-
-        # Get all the extra data needed for the package objects, including the platform and connection status
-        for package_sobject in package_sobjects:
-            # Get the platform object and add it to the package dictionary
-            platform_sobject = server.get_by_code('twog/platform', package_sobject.get('platform_code'))
-            package_sobject['platform'] = platform_sobject
-
-            # Get the platform connection sobject and add it to the package dictionary
-            platform_connection_sobject = server.eval("@SOBJECT(twog/platform_connection['platform_code', '{0}']['division_code', '{1}'])".format(package_sobject.get('platform_code'), order_sobject.get('division_code')))[0]
-            package_sobject['platform_connection'] = platform_connection_sobject
-
-            # Also get the image associated with the platform, if there is one
-            platform_image_sobjects = server.eval(
-                "@SOBJECT(sthpw/file['search_code', '{0}'])".format(platform_sobject.get('code')))
-
-            if platform_image_sobjects:
-                platform_image = platform_image_sobjects[-1].get('file_name')
-            else:
-                platform_image = None
-
-            package_sobject['platform_image'] = platform_image
 
         # Get all the files associated with this order, if any
         # Start by getting the file to order connection objects
