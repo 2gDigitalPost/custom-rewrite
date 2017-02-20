@@ -1,6 +1,7 @@
 /* globals localStorage */
 
 import NewFileForm from '../../NewFileForm/index.vue'
+import ImportFileToOrder from '../../ImportFileToOrder/index.vue'
 import FileEditable from './FileEditable/index.vue'
 
 import _ from 'lodash'
@@ -11,9 +12,10 @@ import bus from '../../../bus'
 
 export default {
   name: 'FileEditableList',
-  props: ['files', 'orderCode'],
+  props: ['files', 'orderCode', 'divisionCode'],
   components: {
     NewFileForm,
+    ImportFileToOrder,
     FileEditable,
     Multiselect
   },
@@ -29,6 +31,9 @@ export default {
     },
     cancelEdit: function () {
       this.creatingNewFile = false
+    },
+    cancelImport: function () {
+      this.importingFiles = false
     }
   },
   computed: {
@@ -44,8 +49,10 @@ export default {
   },
   created() {
     bus.$on('new-file-entry-cancel', this.cancelEdit)
+    bus.$on('file-import-cancel', this.cancelImport)
   },
   destroyed() {
     bus.$off('new-file-entry-cancel', this.cancelEdit)
+    bus.$off('file-import-cancel', this.cancelImport)
   }
 }

@@ -2387,6 +2387,42 @@ class FileObjectByCode(Resource):
         return jsonify({'status': 200})
 
 
+class FilesByDivision(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        files = server.eval("@SOBJECT(twog/file['division_code', '{0}'])".format(code))
+
+        return jsonify({'files': files})
+
+
+class FilesInOrder(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        order_code = json_data.get('order_code')
+        file_codes = json_data.get('file_codes')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get a list of entries to insert
+        entries = []
+
+        for file_code in file_codes:
+            entries.append({'order_code': order_code, 'file_code': file_code})
+
+        server.insert_multiple('twog/file_in_order', entries)
+
+        return jsonify({'status': 200})
+
+
 class PurchaseOrdersByDivision(Resource):
     def get(self, division_code):
         parser = reqparse.RequestParser()
@@ -2505,6 +2541,8 @@ api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
 api.add_resource(EstimatedHours, '/api/v1/estimated-hours')
 api.add_resource(FileObject, '/api/v1/file')
 api.add_resource(FileObjectByCode, '/api/v1/file/<string:code>')
+api.add_resource(FilesByDivision, '/api/v1/division/<string:code>/files')
+api.add_resource(FilesInOrder, '/api/v1/files-in-order')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')

@@ -1,0 +1,20 @@
+<div>
+    <template v-if="loading">
+        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading...
+    </template>
+    <template v-else>
+        <template v-if="divisionFiles.length > 0">
+            <label class="control-label" for="import-files">Import Files</label>
+            <multiselect v-model="selectedFiles" :options="divisionFiles" id="import-files" track-by="code" label="file_path" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+        </template>
+
+        <div class="btn-group">
+            <button class="btn btn-default" v-on:click="submitFileImport">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+            </button>
+            <button class="btn btn-default" v-on:click="cancel">
+                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+            </button>
+        </div>
+    </template>
+</div>

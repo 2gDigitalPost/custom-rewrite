@@ -13,6 +13,9 @@
     <div v-if="creatingNewFile">
         <new-file-form v-bind:files="files" v-bind:orderCode="orderCode"></new-file-form>
     </div>
+    <div v-if="importingFiles">
+        <import-file-to-order v-bind:divisionCode="divisionCode" v-bind:orderCode="orderCode" v-bind:importedFiles="files"></import-file-to-order>
+    </div>
 
     <div v-if="sourceFiles.length > 0">
         <div>Source Files</div>
