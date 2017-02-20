@@ -11,7 +11,8 @@
     </div>
 
     <div v-if="creatingNewFile">
-        <div class="form-group" v-bind:class="{'has-error': nameError}">
+        <new-file-form v-bind:files="files" v-bind:orderCode="orderCode"></new-file-form>
+        <!-- <div class="form-group" v-bind:class="{'has-error': nameError}">
             <label class="control-label" for="new-file-input">Name</label>
             <input type="text" class="form-control" id="new-file-input" v-model="newFileName" aria-describedby="name-help-block" />
             <span id="name-help-block" class="help-block">This field is required.</span>
@@ -39,7 +40,8 @@
         </button>
         <button class="btn btn-default" v-on:click="creatingNewFile = false">
             <i class="fa fa-times" aria-hidden="true"></i> Cancel
-        </button>
+        </button> -->
+
     </div>
 
     <div v-if="sourceFiles.length > 0">

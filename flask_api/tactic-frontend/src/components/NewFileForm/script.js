@@ -1,25 +1,19 @@
 /* globals localStorage */
 
-import NewFileForm from '../../NewFileForm/index.vue'
-import FileEditable from './FileEditable/index.vue'
-
 import _ from 'lodash'
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
-import bus from '../../../bus'
+import bus from '../../bus'
 
 export default {
-  name: 'FileEditableList',
+  name: 'NewFileForm',
   props: ['files', 'orderCode'],
   components: {
-    NewFileForm,
-    FileEditable,
     Multiselect
   },
   data () {
     return {
-      creatingNewFile: false,
       newFileName: null,
       newFilePath: null,
       newFileClassification: null,
@@ -29,9 +23,6 @@ export default {
     }
   },
   methods: {
-    filterFilesByClassification: function (classification) {
-      return _.filter(this.files, function(file) { return _.lowerCase(file['classification']) === classification })
-    },
     submitNewFile: function () {
       let self = this
 
@@ -76,20 +67,11 @@ export default {
         console.log(error)
       })
     },
-    cancelEdit: function () {
-      this.creatingNewFile = false
+    cancel: function () {
+      bus.$emit('new-file-entry-cancel')
     }
   },
   computed: {
-    sourceFiles: function () {
-      return this.filterFilesByClassification('source')
-    },
-    intermediateFiles: function () {
-      return this.filterFilesByClassification('intermediate')
-    },
-    deliverableFiles: function () {
-      return this.filterFilesByClassification('deliverable')
-    },
     nameError: function () {
       return _.includes(_.map(this.errors, 'type'), 'name')
     },
@@ -99,11 +81,5 @@ export default {
     classificationError: function () {
       return _.includes(_.map(this.errors, 'type'), 'classification')
     }
-  },
-  created() {
-    bus.$on('new-file-entry-cancel', this.cancelEdit)
-  },
-  destroyed() {
-    bus.$off('new-file-entry-cancel', this.cancelEdit)
   }
 }

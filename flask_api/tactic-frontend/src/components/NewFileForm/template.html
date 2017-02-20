@@ -1,0 +1,33 @@
+<div>
+    <div class="form-group" v-bind:class="{'has-error': nameError}">
+        <label class="control-label" for="new-file-input">Name</label>
+        <input type="text" class="form-control" id="new-file-input" v-model="newFileName" aria-describedby="name-help-block" />
+        <span id="name-help-block" class="help-block">This field is required.</span>
+    </div>
+
+    <div class="form-group" v-bind:class="{'has-error': filePathError}">
+        <label class="control-label" for="new-file-path-input">File Path</label>
+        <input type="text" class="form-control" id="new-file-path-input" v-model="newFilePath" aria-describedby="file-path-help-block" />
+        <span id="file-path-help-block" class="help-block">This field is required.</span>
+    </div>
+
+    <div class="form-group" v-bind:class="{'has-error': classificationError}">
+        <label class="control-label" for="new-file-classification">Classification</label>
+        <multiselect v-model="newFileClassification" :options="classificationOptions" id="new-file-classification" aria-describedby="classification-help-block"></multiselect>
+        <span id="classification-help-block" class="help-block">This field is required.</span>
+    </div>
+
+    <template v-if="files.length > 0">
+        <label class="control-label" for="original-files">Origin Files</label>
+        <multiselect v-model="selectedFiles" :options="files" id="original-files" track-by="code" label="file_path" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+    </template>
+
+    <div class="btn-group">
+        <button class="btn btn-default" v-on:click="submitNewFile">
+            <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+        </button>
+        <button class="btn btn-default" v-on:click="cancel">
+            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+        </button>
+    </div>
+</div>
