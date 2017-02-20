@@ -1,0 +1,17 @@
+<div>
+    <div class="file-flow-name">{{ fileFlow.name }}</div>
+
+    <template v-if="fileFlow.delivering_to.length > 0">
+        <div>Delivering To:</div>
+        <ul>
+            <li v-for="platformName in fileFlow.delivering_to">{{ platformName }}</li>
+        </ul>
+    </template>
+
+    <template v-if="fileObject">
+        <div>File: </div>
+    </template>
+    <template v-else>
+        <i class="fa fa-exclamation-triangle file-not-specified-warning" aria-hidden="true"></i> No file has been specified
+    </template>
+</div>

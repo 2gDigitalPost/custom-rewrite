@@ -369,9 +369,38 @@ class FullOrder(Resource):
             else:
                 tasks_dict[task_search_code] = [task]
 
+        # Get all the files associated with this order, if any
+        # Start by getting the file to order connection objects
+        file_to_order_sobjects = server.eval("@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(
+            order_sobject.get('code')))
+
+        # Get a list of the file codes in string format
+        file_codes = [file_to_order_sobject.get('file_code') for file_to_order_sobject in file_to_order_sobjects]
+        file_codes_string = '|'.join(file_codes)
+
+        # Get the actual file sobjects
+        file_sobjects = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(file_codes_string))
+
+        # Get the file flows from the components
         file_flows = server.eval("@SOBJECT(twog/file_flow['component_code', 'in', '{0}'])".format(component_codes_string))
         file_flow_codes = [file_flow.get('code') for file_flow in file_flows]
         file_flow_codes_string = '|'.join(file_flow_codes)
+
+        # Get the actual file objects attached to the file flows, if they exist
+        file_codes_in_file_flows = [file_flow.get('file_code') for file_flow in file_flows]
+        file_codes_in_file_flows_string = '|'.join(file_codes_in_file_flows)
+
+        file_sobjects_in_file_flows = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(file_codes_in_file_flows_string))
+
+        file_sobject_in_file_flows_by_code = {}
+
+        for file_sobjects_in_file_flow in file_sobjects_in_file_flows:
+            if file_sobjects_in_file_flow.get('code') not in file_sobject_in_file_flows_by_code:
+                file_sobject_in_file_flows_by_code[file_sobjects_in_file_flow.get('code')] = file_sobjects_in_file_flow
+
+        for file_flow in file_flows:
+            file_sobject = file_sobject_in_file_flows_by_code.get(file_flow.get('file_code'))
+            file_flow['file_object'] = file_sobject
 
         file_flow_to_package_sobjects = server.eval("@SOBJECT(twog/file_flow_to_package['file_flow_code', 'in', '{0}'])".format(file_flow_codes_string))
 
@@ -468,18 +497,6 @@ class FullOrder(Resource):
                     component_sobject_full['file_flows'].append(file_flow)
 
             component_sobjects_full.append(component_sobject_full)
-
-        # Get all the files associated with this order, if any
-        # Start by getting the file to order connection objects
-        file_to_order_sobjects = server.eval("@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(
-            order_sobject.get('code')))
-
-        # Get a list of the file codes in string format
-        file_codes = [file_to_order_sobject.get('file_code') for file_to_order_sobject in file_to_order_sobjects]
-        file_codes_string = '|'.join(file_codes)
-
-        # Get the actual file sobjects
-        file_sobjects = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(file_codes_string))
 
         # Finally, return the full order object in all its glory
         return jsonify({'order': order_sobject, 'division': division_sobject, 'division_image': division_image,

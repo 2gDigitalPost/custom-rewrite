@@ -23,7 +23,8 @@
             <div class="component-files-needed">
                 <span v-if="fileFlows.length > 0">
                     <div>Files created by this component:</div>
-                    <ul class="list-group">
+                    <file-flow-editable-list v-bind:fileFlows="fileFlows"></file-flow-editable-list>
+                    <!-- <ul class="list-group">
                         <li v-for="fileFlow in fileFlows" class="list-group-item">
                             {{ fileFlow.name }}
 
@@ -34,7 +35,7 @@
                                 </ul>
                             </template>
                         </li>
-                    </ul>
+                    </ul> -->
                 </span>
                 <span v-else>
                     No File flows assigned.
