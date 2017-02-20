@@ -24,18 +24,6 @@
                 <span v-if="fileFlows.length > 0">
                     <div>Files created by this component:</div>
                     <file-flow-editable-list v-bind:fileFlows="fileFlows"></file-flow-editable-list>
-                    <!-- <ul class="list-group">
-                        <li v-for="fileFlow in fileFlows" class="list-group-item">
-                            {{ fileFlow.name }}
-
-                            <template v-if="fileFlow.delivering_to.length > 0">
-                                <div>Delivering To:</div>
-                                <ul>
-                                    <li v-for="platformName in fileFlow.delivering_to">{{ platformName }}</li>
-                                </ul>
-                            </template>
-                        </li>
-                    </ul> -->
                 </span>
                 <span v-else>
                     No File flows assigned.
