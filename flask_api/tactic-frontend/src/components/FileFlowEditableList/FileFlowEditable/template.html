@@ -12,6 +12,11 @@
         <div>File: </div>
     </template>
     <template v-else>
-        <i class="fa fa-exclamation-triangle file-not-specified-warning" aria-hidden="true"></i> No file has been specified
+        <template v-if="componentCompleteError">
+            <i class="fa fa-exclamation-triangle file-not-specified-error" aria-hidden="true"></i> <strong>No file has been specified and the Component is complete</strong>
+        </template>
+        <template v-else>
+            <i class="fa fa-exclamation-triangle file-not-specified-warning" aria-hidden="true"></i> No file has been specified
+        </template>
     </template>
 </div>

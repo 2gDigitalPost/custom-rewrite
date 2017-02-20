@@ -4,7 +4,7 @@ import FileFlowEditable from './FileFlowEditable/index.vue'
 
 export default {
   name: 'FileFlowEditableList',
-  props: ['fileFlows'],
+  props: ['fileFlows', 'componentStatus'],
   components: {
     FileFlowEditable
   }

@@ -23,7 +23,7 @@
             <div class="component-files-needed">
                 <span v-if="fileFlows.length > 0">
                     <div>Files created by this component:</div>
-                    <file-flow-editable-list v-bind:fileFlows="fileFlows"></file-flow-editable-list>
+                    <file-flow-editable-list v-bind:fileFlows="fileFlows" v-bind:componentStatus="componentObject.status"></file-flow-editable-list>
                 </span>
                 <span v-else>
                     No File flows assigned.

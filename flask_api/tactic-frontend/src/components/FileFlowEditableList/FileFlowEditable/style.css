@@ -5,3 +5,7 @@
 .file-not-specified-warning {
     color: #a7a70b;
 }
+
+.file-not-specified-error {
+    color: #ff0000;
+}
