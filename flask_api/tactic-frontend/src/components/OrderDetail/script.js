@@ -108,6 +108,7 @@ export default {
     bus.$on('order-updated', this.loadOrder)
     bus.$on('expected-completion-date-edit-cancel', this.cancelExpectedCompletionDateEdit)
     bus.$on('due-date-edit-cancel', this.cancelDueDateEdit)
+    bus.$on('file-flow-updated', this.loadOrder)
   },
   destroyed() {
     bus.$off('component-title-updated', this.loadOrder)
@@ -119,5 +120,6 @@ export default {
     bus.$off('order-updated', this.loadOrder)
     bus.$off('expected-completion-date-edit-cancel', this.cancelExpectedCompletionDateEdit)
     bus.$off('due-date-edit-cancel', this.cancelDueDateEdit)
+    bus.$off('file-flow-updated', this.loadOrder)
   }
 }

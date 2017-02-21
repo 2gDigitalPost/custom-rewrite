@@ -133,6 +133,7 @@ export default {
     bus.$on('output-file-added', this.loadTask)
     bus.$on('task-updated', this.loadTask)
     bus.$on('estimated-hours-updated', this.loadTask)
+    bus.$on('file-flow-updated', this.loadTask)
   },
   destroyed() {
     bus.$off('equipment-edit-cancel', this.cancelEquipmentEdit)
@@ -144,5 +145,6 @@ export default {
     bus.$off('output-file-added', this.loadTask)
     bus.$off('task-updated', this.loadTask)
     bus.$off('estimated-hours-updated', this.loadTask)
+    bus.$off('file-flow-updated', this.loadTask)
   },
 }

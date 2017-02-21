@@ -457,10 +457,10 @@ class FullOrder(Resource):
             package_sobject['tasks'] = tasks_list
 
         # Get the package names sorted by package code
-        package_code_to_package_name_dict = {}
+        package_code_to_package_dict = {}
 
         for package_sobject in package_sobjects:
-            package_code_to_package_name_dict[package_sobject.get('code')] = package_sobject.get('name')
+            package_code_to_package_dict[package_sobject.get('code')] = package_sobject
 
         for file_flow in file_flows:
             file_flow['delivering_to'] = []
@@ -469,7 +469,7 @@ class FullOrder(Resource):
                 packages_delivering_to = file_flows_to_package_dict.get(file_flow.get('code'))
 
                 for package_delivering_to in packages_delivering_to:
-                    file_flow['delivering_to'].append(package_code_to_package_name_dict.get(package_delivering_to.get('package_code')))
+                    file_flow['delivering_to'].append(package_code_to_package_dict.get(package_delivering_to.get('package_code')))
 
         # Get all the details of all the components
         for component_sobject in component_sobjects:
@@ -986,10 +986,10 @@ class FileFlowsByComponentCode(Resource):
         package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(component.get('order_code')))
 
         # Get the package names sorted by package code
-        package_code_to_package_name_dict = {}
+        package_code_to_package_dict = {}
 
         for package_sobject in package_sobjects:
-            package_code_to_package_name_dict[package_sobject.get('code')] = package_sobject.get('name')
+            package_code_to_package_dict[package_sobject.get('code')] = package_sobject
 
         for file_flow in file_flows:
             file_flow['delivering_to'] = []
@@ -998,7 +998,7 @@ class FileFlowsByComponentCode(Resource):
                 packages_delivering_to = file_flows_to_package_dict.get(file_flow.get('code'))
 
                 for package_delivering_to in packages_delivering_to:
-                    file_flow['delivering_to'].append(package_code_to_package_name_dict.get(package_delivering_to.get('package_code')))
+                    file_flow['delivering_to'].append(package_code_to_package_dict.get(package_delivering_to.get('package_code')))
 
         return jsonify({'file_flows': file_flows})
 
@@ -1013,6 +1013,60 @@ class FileFlow(Resource):
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
         server.insert('twog/file_flow', file_flow)
+
+        return jsonify({'status': 200})
+
+
+class FileFlowByCode(Resource):
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        update_data = json_data.get('update_data')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Need to get the search key to perform the updates
+        file_flow_search_key = server.build_search_key('twog/file_flow', code, project_code='twog')
+
+        # Filter the update data
+        name = update_data.get('name')
+        file_code = update_data.get('file_code')
+        new_package_connections = update_data.get('new_package_connections', [])
+        deleted_package_connections = update_data.get('deleted_package_connections', [])
+
+        # Name and file code can be updated directly.
+        file_flow_update_data = {}
+
+        if name:
+            file_flow_update_data['name'] = name
+        if file_code:
+            file_flow_update_data['file_code'] = file_code
+
+        # Perform the update only if there is data
+        if file_flow_update_data:
+            server.update(file_flow_search_key, file_flow_update_data)
+
+        # Now perform the updates to the package connections, if they exist
+        # Start with inserting any new connections
+        new_package_update_data = []
+
+        for new_package_connection in new_package_connections:
+            new_package_update_data.append({'file_flow_code': code, 'package_code': new_package_connection})
+
+        if new_package_update_data:
+            server.insert_multiple('twog/file_flow_to_package', new_package_update_data)
+
+        # Now delete the package connections that were removed
+        deleted_package_update_data = []
+
+        for deleted_package_connection in deleted_package_connections:
+            deleted_package_update_data.append({'file_flow_code': code, 'package_code': deleted_package_connection})
+            file_flow_package_connection = server.get_unique_sobject('twog/file_flow_to_package',
+                                                                     {'file_flow_code': code,
+                                                                      'package_code': deleted_package_connection})
+
+            server.delete_sobject(file_flow_package_connection.get('__search_key__'))
 
         return jsonify({'status': 200})
 
@@ -2586,6 +2640,114 @@ class EstimatedHours(Resource):
         return jsonify({'status': 200})
 
 
+class PackagesInOrder(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        packages = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(code))
+
+        return jsonify({'packages': packages})
+
+
+def get_order_from_file_flow_code(server, file_flow_code):
+    # Search up the chain to get the Order, then the packages
+    # Start by getting the file flow object
+    file_flow_object = server.get_by_code('twog/file_flow', file_flow_code)
+
+    # Then, get the component
+    component = server.get_by_code('twog/component', file_flow_object.get('component_code'))
+
+    # Now, get the order
+    order = server.get_by_code('twog/order', component.get('order_code'))
+
+    return order
+
+
+class FileFlowPackageOptions(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Search up the chain to get the Order, then the packages
+        # Start by getting the file flow object
+        file_flow_object = server.get_by_code('twog/file_flow', code)
+
+        # Then, get the component
+        component = server.get_by_code('twog/component', file_flow_object.get('component_code'))
+
+        # Now, get the order
+        order = server.get_by_code('twog/order', component.get('order_code'))
+
+        # Finally, search for all the packages associated with the order
+        packages = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(order.get('code')))
+
+        return jsonify({'packages': packages})
+
+
+class FileFlowDeliverableFileOptions(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the order object
+        order = get_order_from_file_flow_code(server, code)
+
+        # Get the twog/file_in_order objects, based on the order code
+        file_in_order_objects = server.eval(
+            "@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(order.get('code')))
+
+        # Get all the twog/file objects
+        file_codes = [file_in_order_object.get('file_code') for file_in_order_object in file_in_order_objects]
+        file_codes_string = '|'.join(file_codes)
+
+        # Get all the deliverable files associated with the order
+        deliverable_files = server.eval(
+            "@SOBJECT(twog/file['code', 'in', '{0}']['classification', 'deliverable'])".format(file_codes_string))
+
+        return jsonify({'files': deliverable_files})
+
+
+class DeliverableFilesInOrder(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the twog/file_in_order objects, based on the order code
+        file_in_order_objects = server.eval(
+            "@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(code))
+
+        # Get all the twog/file objects
+        file_codes = [file_in_order_object.get('file_code') for file_in_order_object in file_in_order_objects]
+        file_codes_string = '|'.join(file_codes)
+
+        # Get all the deliverable files associated with the order
+        deliverable_files = server.eval(
+            "@SOBJECT(twog/file['code', 'in', '{0}']['classification', 'deliverable'])".format(file_codes_string))
+
+        return jsonify({'files': deliverable_files})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -2641,15 +2803,20 @@ api.add_resource(Task, '/api/v1/task/<string:code>')
 api.add_resource(TaskFull, '/api/v1/task/<string:code>/full')
 api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
+api.add_resource(DeliverableFilesInOrder, '/api/v1/order/<string:code>/deliverable-files')
 api.add_resource(Equipment, '/api/v1/equipment')
 api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
 api.add_resource(EstimatedHours, '/api/v1/estimated-hours')
+api.add_resource(FileFlowByCode, '/api/v1/file-flow/<string:code>')
 api.add_resource(FileFlowsByComponentCode, '/api/v1/component/<string:code>/file-flows')
+api.add_resource(FileFlowPackageOptions, '/api/v1/file-flow/<string:code>/package-options')
+api.add_resource(FileFlowDeliverableFileOptions, '/api/v1/file-flow/<string:code>/deliverable-file-options')
 api.add_resource(FileObject, '/api/v1/file')
 api.add_resource(FileObjectByCode, '/api/v1/file/<string:code>')
 api.add_resource(FilesByDivision, '/api/v1/division/<string:code>/files')
 api.add_resource(FilesInOrder, '/api/v1/files-in-order')
 api.add_resource(Order, '/api/v1/order/<string:code>')
+api.add_resource(PackagesInOrder, '/api/v1/order/<string:code>/packages')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')

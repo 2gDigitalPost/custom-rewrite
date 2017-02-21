@@ -1,22 +1,56 @@
 <div>
-    <div class="file-flow-name">{{ fileFlow.name }}</div>
-
-    <template v-if="fileFlow.delivering_to.length > 0">
-        <div>Delivering To:</div>
-        <ul>
-            <li v-for="platformName in fileFlow.delivering_to">{{ platformName }}</li>
-        </ul>
-    </template>
-
-    <template v-if="fileObject">
-        <div>File: </div>
-    </template>
-    <template v-else>
-        <template v-if="componentCompleteError">
-            <i class="fa fa-exclamation-triangle file-not-specified-error" aria-hidden="true"></i> <strong>No file has been specified and the Component is complete</strong>
+    <div v-if="editing">
+        <template v-if="loading">
+            <i class="fa fa-spinner fa-spin"></i> Loading...
         </template>
         <template v-else>
-            <i class="fa fa-exclamation-triangle file-not-specified-warning" aria-hidden="true"></i> No file has been specified
+            <h4>Name</h4>
+            <input type="text" v-model="editName" class="form-control" /><br/>
+            
+            <h4>Packages</h4>
+            <ul>
+                <li v-for="packageOption in packageOptions">
+                    <input type="checkbox" :value="packageOption.code" v-model="editDeliveringTo">
+                    {{ packageOption.name }}
+                </li>
+            </ul>
+
+            <h4>File</h4>
+            <multiselect v-model="selectedFile" :options="deliverableFileOptions" track-by="code" label="name"></multiselect>
         </template>
-    </template>
+    </div>
+    <div v-else>
+        <div class="file-flow-name">{{ fileFlow.name }}</div>
+
+        <template v-if="fileFlow.delivering_to.length > 0">
+            <div>Delivering To:</div>
+            <ul>
+                <li v-for="platform in fileFlow.delivering_to">{{ platform.name }}</li>
+            </ul>
+        </template>
+
+        <template v-if="fileObject">
+            <div>File: {{ fileObject.name }} ({{ fileObject.file_path }})</div>
+        </template>
+        <template v-else>
+            <template v-if="componentCompleteError">
+                <i class="fa fa-exclamation-triangle file-not-specified-error" aria-hidden="true"></i> <strong>No file has been specified and the Component is complete</strong>
+            </template>
+            <template v-else>
+                <i class="fa fa-exclamation-triangle file-not-specified-warning" aria-hidden="true"></i> No file has been specified
+            </template>
+        </template>
+    </div>
+
+    <div class="btn-group">
+        <template v-if="editing">
+            <button type="submit" class="btn btn-default" v-on:click="submitChanges"><i class="fa fa-floppy-o" aria-hidden="true"></i> Submit</button>
+            <button class="btn btn-default" v-on:click="editing = false"><i class="fa fa-times" aria-hidden="true"></i> Cancel</button>
+        </template>
+        <template v-else>
+            <button class="btn btn-default" v-on:click="editing = true">
+                <i class="fa fa-edit" aria-hidden="true"></i> Edit
+            </button>
+        </template>
+    </div>
 </div>
