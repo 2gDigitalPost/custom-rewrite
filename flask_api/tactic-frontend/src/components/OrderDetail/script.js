@@ -5,6 +5,7 @@ import axios from 'axios'
 import ComponentEditableList from './ComponentEditableList/index.vue'
 import PackageEditableList from './PackageEditableList/index.vue'
 import FileEditableList from './FileEditableList/index.vue'
+import EditExpectedCompletionDate from './EditExpectedCompletionDate/index.vue'
 
 import bus from '../../bus'
 
@@ -13,7 +14,8 @@ export default {
   components: {
     ComponentEditableList,
     PackageEditableList,
-    FileEditableList
+    FileEditableList,
+    EditExpectedCompletionDate
   },
   data () {
     return {
@@ -22,6 +24,8 @@ export default {
       order_name: null,
       division: null,
       divisionImage: null,
+      editingExpectedCompletionDate: false,
+      editingDueDate: false,
       components: [],
       componentsFull: [],
       packages: [],
@@ -39,6 +43,8 @@ export default {
       self.order_name = null
       self.division = null
       self.divisionImage = null
+      self.editingExpectedCompletionDate = false
+      self.editingDueDate = false
       self.components = []
       self.componentsFull = []
       self.packages = []
@@ -71,6 +77,12 @@ export default {
       this.add_title_link = '/orders/' + this.order_code + '/titles/add'
       this.edit_components_link = '/orders/' + this.order_code + '/components'
       this.add_output_files_link = '/orders/' + this.order_code + '/file-flows/add'
+    },
+    cancelExpectedCompletionDateEdit: function () {
+      this.editingExpectedCompletionDate = false
+    },
+    cancelDueDateEdit: function () {
+      this.editingDueDate = false
     }
   },
   beforeMount: function () {
@@ -91,6 +103,9 @@ export default {
     bus.$on('file-updated', this.loadOrder)
     bus.$on('files-imported', this.loadOrder)
     bus.$on('file-removed-from-order', this.loadOrder)
+    bus.$on('order-updated', this.loadOrder)
+    bus.$on('expected-completion-date-edit-cancel', this.cancelExpectedCompletionDateEdit)
+    bus.$on('due-date-edit-cancel', this.cancelDueDateEdit)
   },
   destroyed() {
     bus.$off('component-title-updated', this.loadOrder)
@@ -99,5 +114,8 @@ export default {
     bus.$off('file-updated', this.loadOrder)
     bus.$off('files-imported', this.loadOrder)
     bus.$off('file-removed-from-order', this.loadOrder)
+    bus.$off('order-updated', this.loadOrder)
+    bus.$off('expected-completion-date-edit-cancel', this.cancelExpectedCompletionDateEdit)
+    bus.$off('due-date-edit-cancel', this.cancelDueDateEdit)
   }
 }

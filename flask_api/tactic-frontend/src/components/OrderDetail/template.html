@@ -3,9 +3,18 @@
         <div v-if="order_sobject !== null">
             <div class="col-md-12">
                 <h1>{{ order_code }}</h1>
-                <h5>Client: {{ division.name }} <img v-if="divisionImage !== null" :src="divisionImageSource" class="division-image"/></h5>
-                <h5>Expected Completion Date: {{ order_sobject.expected_completion_date }}</h5>
-                <h5>Due Date: {{ order_sobject.due_date }}</h5>
+                <h3>Client: {{ division.name }} <img v-if="divisionImage !== null" :src="divisionImageSource" class="division-image"/></h3>
+                <div v-if="editingExpectedCompletionDate">
+                    <edit-expected-completion-date v-bind:currentDate="order_sobject.expected_completion_date" v-bind:orderCode="order_sobject.code"></edit-expected-completion-date>
+                </div>
+                <div v-else>
+                    Expected Completion Date: {{ order_sobject.expected_completion_date }} <a v-on:click="editingExpectedCompletionDate = !editingExpectedCompletionDate"><i class="fa fa-edit"></i></a>
+                </div>
+                <div v-if="editingDueDate">
+                </div>
+                <div v-else>
+                    Due Date: {{ order_sobject.due_date }}
+                </div>
 
                 <router-link :to="add_title_link">Add a Title to this Order</router-link><br/>
                 <router-link :to="edit_components_link">Edit Components</router-link><br/>

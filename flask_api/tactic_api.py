@@ -625,6 +625,24 @@ class Orders(Resource):
         return {'status': 200, 'order_code': inserted_order.get('code')}
 
 
+class Order(Resource):
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        order_code = json_data.get('order_code')
+        update_data = json_data.get('update_data')
+
+        # Fetch the order object from the server
+        order = server.get_by_code('twog/order', order_code)
+
+        # Update the order with the received data
+        server.update(order.get('__search_key__'), update_data)
+
+
 class Title(Resource):
     def get(self, name):
         ticket = session.get('ticket')
@@ -2563,6 +2581,7 @@ api.add_resource(FileObject, '/api/v1/file')
 api.add_resource(FileObjectByCode, '/api/v1/file/<string:code>')
 api.add_resource(FilesByDivision, '/api/v1/division/<string:code>/files')
 api.add_resource(FilesInOrder, '/api/v1/files-in-order')
+api.add_resource(Order, '/api/v1/order/<string:code>')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')
