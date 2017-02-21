@@ -5,14 +5,12 @@ import _ from 'lodash'
 
 import bus from '../../../bus'
 
-import FileFlowInTask from './FileFlowInTask/index.vue'
 import FileFlowEditable from '../../FileFlowEditableList/FileFlowEditable/index.vue'
 
 export default {
   name: 'FileFlowInTaskList',
   props: ['component'],
   components: {
-    FileFlowInTask,
     FileFlowEditable
   },
   data () {
