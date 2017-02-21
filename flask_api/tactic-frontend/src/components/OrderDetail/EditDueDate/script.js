@@ -4,14 +4,14 @@ import DatePicker from 'vue-datepicker'
 import bus from '../../../bus'
 
 export default {
-  name: 'EditExpectedCompletionDate',
+  name: 'EditDueDate',
   props: ['currentDate', 'orderCode'],
   components: {
     DatePicker
   },
   data () {
     return {
-      expectedCompletionDate: {
+      dueDate: {
         time: this.currentDate
       },
 
@@ -65,7 +65,7 @@ export default {
         'token': localStorage.tactic_token,
         'order_code': self.orderCode,
         'update_data': {
-          'expected_completion_date': self.expectedCompletionDate.time
+          'due_date': self.dueDate.time
         }
       }
 
@@ -84,7 +84,7 @@ export default {
       })
     },
     cancel: function () {
-      bus.$emit('expected-completion-date-edit-cancel')
+      bus.$emit('due-date-edit-cancel')
     }
   }
 }

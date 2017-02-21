@@ -6,6 +6,7 @@ import ComponentEditableList from './ComponentEditableList/index.vue'
 import PackageEditableList from './PackageEditableList/index.vue'
 import FileEditableList from './FileEditableList/index.vue'
 import EditExpectedCompletionDate from './EditExpectedCompletionDate/index.vue'
+import EditDueDate from './EditDueDate/index.vue'
 
 import bus from '../../bus'
 
@@ -15,7 +16,8 @@ export default {
     ComponentEditableList,
     PackageEditableList,
     FileEditableList,
-    EditExpectedCompletionDate
+    EditExpectedCompletionDate,
+    EditDueDate
   },
   data () {
     return {

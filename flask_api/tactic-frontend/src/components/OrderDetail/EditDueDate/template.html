@@ -1,0 +1,13 @@
+<div>
+    <span>Due Date: </span>
+    <date-picker :date="dueDate" :option="option"></date-picker>
+
+    <div class="btn-group">
+        <button class="btn btn-default" v-on:click="saveChanges">
+            <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+        </button>
+        <button class="btn btn-default" v-on:click="cancel">
+            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+        </button>
+    </div>
+</div>

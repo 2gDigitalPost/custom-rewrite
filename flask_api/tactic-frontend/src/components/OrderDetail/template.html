@@ -11,9 +11,10 @@
                     Expected Completion Date: {{ order_sobject.expected_completion_date }} <a v-on:click="editingExpectedCompletionDate = !editingExpectedCompletionDate"><i class="fa fa-edit"></i></a>
                 </div>
                 <div v-if="editingDueDate">
+                    <edit-due-date v-bind:currentDate="order_sobject.due_date" v-bind:orderCode="order_sobject.code"></edit-due-date>
                 </div>
                 <div v-else>
-                    Due Date: {{ order_sobject.due_date }}
+                    Due Date: {{ order_sobject.due_date }} <a v-on:click="editingDueDate = !editingDueDate"><i class="fa fa-edit"></i></a>
                 </div>
 
                 <router-link :to="add_title_link">Add a Title to this Order</router-link><br/>
