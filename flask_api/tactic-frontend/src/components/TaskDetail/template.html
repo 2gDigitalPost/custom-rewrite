@@ -1,92 +1,100 @@
 <div>
     <div class="row">
-        <div v-if="taskObject !== null">
-            <h1>{{ taskObject.process }}</h1>
-            <h3>Parent: {{ parent.name }} ({{ parent.code }})</h3>
+        <template v-if="taskObject !== null">
+            <div class="col-md-12">
+                <h1>{{ taskObject.process }}</h1>
+                <h3>Parent: {{ parent.name }} ({{ parent.code }})</h3>
+            </div>
+            <div class="col-md-6">
+                <div>
+                    <edit-task-status v-bind:task="taskObject"></edit-task-status>    
+                </div>
 
-            <div>
-                <edit-task-status v-bind:task="taskObject"></edit-task-status>    
+                <div v-if="inputTasks.length > 0">
+                    Input Tasks:
+
+                    <ul>
+                        <li v-for="inputTaskLink in inputTaskLinks">
+                            <router-link :to="inputTaskLink.url" replace>{{ inputTaskLink.name }}</router-link>
+                        </li>
+                    </ul>
+                </div>
+                <div v-if="outputTasks.length > 0">
+                    Output Tasks:
+
+                    <ul>
+                        <li v-for="outputTaskLink in outputTaskLinks">
+                            <router-link :to="outputTaskLink.url" replace>{{ outputTaskLink.name }}</router-link>
+                        </li>
+                    </ul>
+                </div>
+                <div v-if="estimatedHours !== null">
+                    <editable-estimated-hours v-bind:currentEstimatedHours="estimatedHours" v-bind:taskDataCode="taskDataObject.code"></editable-estimated-hours>
+                </div>
+
+                <div v-if="editingEquipment">
+                    <equipment-in-task v-bind:task="taskObject" v-bind:currentEquipment="equipment"></equipment-in-task>
+                </div>
+                <div v-else>
+                    Equipment <a v-on:click="editingEquipment = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
+
+                    <ul v-if="equipment.length > 0" class="list-group">
+                        <li v-for="eachEquipment in equipment" class="list-group-item">
+                            {{ eachEquipment.name }}
+                        </li>
+                    </ul>
+                    <p v-else>No Equipment currently assigned</p>
+                </div>
+
+                <div v-if="editingInputFiles">
+                    <input-files-in-task v-bind:task="taskObject" v-bind:currentInputFiles="inputFiles"></input-files-in-task>
+                </div>
+                <div v-else>
+                    Input Files <a v-on:click="editingInputFiles = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
+
+                    <ul v-if="inputFiles.length > 0" class="list-group">
+                        <li v-for="inputFile in inputFiles" class="list-group-item">
+                            {{ inputFile.file_path }}
+                        </li>
+                    </ul>
+                    <p v-else>No Input Files currently exist</p>
+                </div>
+
+                <div v-if="addingOutputFile">
+                    <add-output-file-to-task v-bind:task="taskObject" v-bind:inputFiles="inputFiles"></output-files-in-task>
+                </div>
+                <div>
+                    Output Files <a v-on:click="addingOutputFile = true"><i class="fa fa-plus" aria-hidden="true"></i></a>
+
+                    <ul v-if="outputFiles.length > 0" class="list-group">
+                        <li 
+                            is="editable-output-file"
+                            v-for="outputFile in outputFiles"
+                            v-bind:outputFileCode="outputFile.code"
+                            v-bind:inputFiles="inputFiles"
+                            class="list-group-item"
+                        ></li>
+                    </ul>
+                    <p v-else>No Output Files currently exist</p>
+                </div>
             </div>
 
-            <div v-if="inputTasks.length > 0">
-                Input Tasks:
-
-                <ul>
-                    <li v-for="inputTaskLink in inputTaskLinks">
-                        <router-link :to="inputTaskLink.url" replace>{{ inputTaskLink.name }}</router-link>
-                    </li>
-                </ul>
-            </div>
-            <div v-if="outputTasks.length > 0">
-                Output Tasks:
-
-                <ul>
-                    <li v-for="outputTaskLink in outputTaskLinks">
-                        <router-link :to="outputTaskLink.url" replace>{{ outputTaskLink.name }}</router-link>
-                    </li>
-                </ul>
-            </div>
-            <div v-if="estimatedHours !== null">
-                <editable-estimated-hours v-bind:currentEstimatedHours="estimatedHours" v-bind:taskDataCode="taskDataObject.code"></editable-estimated-hours>
+            <div class="col-md-6">
+                <h4>Files created by this Component (pipeline)</h4>
+                <div v-if="parent !== null && parent['__search_type__'] === 'twog/component?project=twog'">
+                    <file-flow-in-task-list v-bind:component="parent"></file-flow-in-task>
+                </div>
             </div>
 
-            <div v-if="editingEquipment">
-                <equipment-in-task v-bind:task="taskObject" v-bind:currentEquipment="equipment"></equipment-in-task>
+            <div class="col-md-12">
+                <div v-if="instructions !== null">
+                    <h4>Instructions Text:</h4>
+                    <div v-html="compiledMarkdown"></div>
+                </div>
             </div>
-            <div v-else>
-                Equipment <a v-on:click="editingEquipment = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
-
-                <ul v-if="equipment.length > 0" class="list-group">
-                    <li v-for="eachEquipment in equipment" class="list-group-item">
-                        {{ eachEquipment.name }}
-                    </li>
-                </ul>
-                <p v-else>No Equipment currently assigned</p>
-            </div>
-
-            <div v-if="editingInputFiles">
-                <input-files-in-task v-bind:task="taskObject" v-bind:currentInputFiles="inputFiles"></input-files-in-task>
-            </div>
-            <div v-else>
-                Input Files <a v-on:click="editingInputFiles = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
-
-                <ul v-if="inputFiles.length > 0" class="list-group">
-                    <li v-for="inputFile in inputFiles" class="list-group-item">
-                        {{ inputFile.file_path }}
-                    </li>
-                </ul>
-                <p v-else>No Input Files currently exist</p>
-            </div>
-
-            <div v-if="addingOutputFile">
-                <add-output-file-to-task v-bind:task="taskObject" v-bind:inputFiles="inputFiles"></output-files-in-task>
-            </div>
-            <div>
-                Output Files <a v-on:click="addingOutputFile = true"><i class="fa fa-plus" aria-hidden="true"></i></a>
-
-                <ul v-if="outputFiles.length > 0" class="list-group">
-                    <li 
-                        is="editable-output-file"
-                        v-for="outputFile in outputFiles"
-                        v-bind:outputFileCode="outputFile.code"
-                        v-bind:inputFiles="inputFiles"
-                        class="list-group-item"
-                    ></li>
-                </ul>
-                <p v-else>No Output Files currently exist</p>
-            </div>
-
-            <div v-if="parent !== null && parent['__search_type__'] === 'twog/component?project=twog'">
-                <file-flow-in-task-list v-bind:component="parent"></file-flow-in-task>
-            </div>
-
-            <div v-if="instructions !== null">
-                <h4>Instructions Text:</h4>
-                <div v-html="compiledMarkdown"></div>
-            </div>
-        </div>
-        <div v-else>
+        </template>
+        <template v-else>
             <div><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading...</div>
-        </div>
+        </template>
     </div>
 </div>
