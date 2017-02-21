@@ -12,6 +12,7 @@ import AddOutputFileToTask from './AddOutputFileToTask/index.vue'
 import EditableEstimatedHours from '../EditableEstimatedHours/index.vue'
 import EditableOutputFile from './EditableOutputFile/index.vue'
 import EditTaskStatus from './EditTaskStatus/index.vue'
+import FileFlowInTaskList from './FileFlowInTaskList/index.vue'
 
 export default {
   name: 'TaskDetail',
@@ -21,7 +22,8 @@ export default {
     AddOutputFileToTask,
     EditableEstimatedHours,
     EditableOutputFile,
-    EditTaskStatus
+    EditTaskStatus,
+    FileFlowInTaskList
   },
   data () {
     return {

@@ -936,6 +936,21 @@ class FileFlowByOrderCode(Resource):
         return jsonify(file_flow_json_data)
 
 
+class FileFlowsByComponentCode(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        file_flows = server.eval("@SOBJECT(twog/file_flow['component_code', '{0}'])".format(code))
+
+        return jsonify({'file_flows': file_flows})
+
+
 class FileFlow(Resource):
     def post(self):
         json_data = request.get_json()
@@ -2577,6 +2592,7 @@ api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 api.add_resource(Equipment, '/api/v1/equipment')
 api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
 api.add_resource(EstimatedHours, '/api/v1/estimated-hours')
+api.add_resource(FileFlowsByComponentCode, '/api/v1/component/<string:code>/file-flows')
 api.add_resource(FileObject, '/api/v1/file')
 api.add_resource(FileObjectByCode, '/api/v1/file/<string:code>')
 api.add_resource(FilesByDivision, '/api/v1/division/<string:code>/files')

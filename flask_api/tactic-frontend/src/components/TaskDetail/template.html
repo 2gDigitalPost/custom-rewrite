@@ -76,6 +76,10 @@
                 <p v-else>No Output Files currently exist</p>
             </div>
 
+            <div v-if="parent !== null && parent['__search_type__'] === 'twog/component?project=twog'">
+                <file-flow-in-task-list v-bind:componentCode="parent.code"></file-flow-in-task>
+            </div>
+
             <div v-if="instructions !== null">
                 <h4>Instructions Text:</h4>
                 <div v-html="compiledMarkdown"></div>
