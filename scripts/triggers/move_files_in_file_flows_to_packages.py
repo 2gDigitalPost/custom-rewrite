@@ -24,6 +24,9 @@ def main(server=None, input_data=None):
     file_flows_search.add_filter('component_code', component_code)
     file_flows = file_flows_search.get_sobjects()
 
+    # Only keep file flows that have a file code
+    file_flows = [file_flow for file_flow in file_flows if file_flow.get('file_code')]
+
     # Only proceed if the file flows were found
     for file_flow in file_flows:
         # Get the destination packages for each file flow
@@ -43,6 +46,9 @@ def main(server=None, input_data=None):
 
             # If no tasks are attached to the package, no need to do anything
             if package_tasks:
+                # Sort the list
+                package_tasks = sorted(package_tasks, key=lambda task: task.get('code'))
+
                 first_task_in_package = package_tasks[0]
                 first_task_data = get_task_data_sobject_from_task_code(first_task_in_package.get_code())
                 first_task_data_code = first_task_data.get_code()
