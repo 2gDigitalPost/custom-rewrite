@@ -2423,6 +2423,26 @@ class FilesInOrder(Resource):
         return jsonify({'status': 200})
 
 
+class RemoveFileInOrder(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        order_code = json_data.get('order_code')
+        file_code = json_data.get('file_code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Find the entry in the twog/file_in_order table
+        file_in_order_object = server.get_unique_sobject('twog/file_in_order', {'order_code': order_code,
+                                                                                'file_code': file_code})
+
+        # Remove it
+        server.delete_sobject(file_in_order_object.get('__search_key__'))
+
+        return jsonify({'status': 200})
+
+
 class PurchaseOrdersByDivision(Resource):
     def get(self, division_code):
         parser = reqparse.RequestParser()
@@ -2546,6 +2566,7 @@ api.add_resource(FilesInOrder, '/api/v1/files-in-order')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')
+api.add_resource(RemoveFileInOrder, '/api/v1/file-in-order/delete')
 api.add_resource(TaskInputFileOptions, '/api/v1/task/<string:task_code>/input-file-options')
 api.add_resource(TaskInputFiles, '/api/v1/task/<string:task_code>/input-files')
 api.add_resource(TaskOutputFile, '/api/v1/task/<string:task_code>/output-file')

@@ -90,6 +90,7 @@ export default {
     bus.$on('new-file-added-to-order', this.loadOrder)
     bus.$on('file-updated', this.loadOrder)
     bus.$on('files-imported', this.loadOrder)
+    bus.$on('file-removed-from-order', this.loadOrder)
   },
   destroyed() {
     bus.$off('component-title-updated', this.loadOrder)
@@ -97,5 +98,6 @@ export default {
     bus.$off('new-file-added-to-order', this.loadOrder)
     bus.$off('file-updated', this.loadOrder)
     bus.$off('files-imported', this.loadOrder)
+    bus.$off('file-removed-from-order', this.loadOrder)
   }
 }

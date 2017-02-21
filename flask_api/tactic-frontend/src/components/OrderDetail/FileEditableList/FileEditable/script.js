@@ -99,8 +99,33 @@ export default {
         console.log(error)
       })
     },
-    removeFileFromOrder: function () {
+    removeFileFromOrder: function (fileObject) {
       let self = this
+
+      let confirmation = window.confirm("Are you sure you want to remove file " + fileObject.name + "?")
+
+      if (confirmation) {
+        let apiURL = '/api/v1/file-in-order/delete'
+        let jsonToSend = {
+          'token': localStorage.tactic_token,
+          'file_code': fileObject.code,
+          'order_code': self.orderCode
+        }
+
+        axios.post(apiURL, JSON.stringify(jsonToSend), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          },
+        })
+        .then(function (response) {
+          if (response.status === 200) {
+            bus.$emit('file-removed-from-order')
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+      }
     }
   },
   computed: {
