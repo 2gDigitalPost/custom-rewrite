@@ -6,12 +6,14 @@ import _ from 'lodash'
 import bus from '../../../bus'
 
 import FileFlowInTask from './FileFlowInTask/index.vue'
+import FileFlowEditable from '../../FileFlowEditableList/FileFlowEditable/index.vue'
 
 export default {
   name: 'FileFlowInTaskList',
-  props: ['componentCode'],
+  props: ['component'],
   components: {
-    FileFlowInTask
+    FileFlowInTask,
+    FileFlowEditable
   },
   data () {
     return {
@@ -24,7 +26,7 @@ export default {
       let self = this
       self.loading = true
 
-      axios.get('/api/v1/component/' + self.componentCode + '/file-flows', {
+      axios.get('/api/v1/component/' + self.component.code + '/file-flows', {
         params: {
           token: localStorage.tactic_token
         }

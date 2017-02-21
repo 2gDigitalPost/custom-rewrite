@@ -77,7 +77,7 @@
             </div>
 
             <div v-if="parent !== null && parent['__search_type__'] === 'twog/component?project=twog'">
-                <file-flow-in-task-list v-bind:componentCode="parent.code"></file-flow-in-task>
+                <file-flow-in-task-list v-bind:component="parent"></file-flow-in-task>
             </div>
 
             <div v-if="instructions !== null">

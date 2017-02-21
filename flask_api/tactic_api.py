@@ -948,6 +948,58 @@ class FileFlowsByComponentCode(Resource):
 
         file_flows = server.eval("@SOBJECT(twog/file_flow['component_code', '{0}'])".format(code))
 
+
+        # Get the file flows from the components
+        file_flow_codes = [file_flow.get('code') for file_flow in file_flows]
+        file_flow_codes_string = '|'.join(file_flow_codes)
+
+        # Get the actual file objects attached to the file flows, if they exist
+        file_codes_in_file_flows = [file_flow.get('file_code') for file_flow in file_flows]
+        file_codes_in_file_flows_string = '|'.join(file_codes_in_file_flows)
+
+        file_sobjects_in_file_flows = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(file_codes_in_file_flows_string))
+
+        file_sobject_in_file_flows_by_code = {}
+
+        for file_sobjects_in_file_flow in file_sobjects_in_file_flows:
+            if file_sobjects_in_file_flow.get('code') not in file_sobject_in_file_flows_by_code:
+                file_sobject_in_file_flows_by_code[file_sobjects_in_file_flow.get('code')] = file_sobjects_in_file_flow
+
+        for file_flow in file_flows:
+            file_sobject = file_sobject_in_file_flows_by_code.get(file_flow.get('file_code'))
+            file_flow['file_object'] = file_sobject
+
+        file_flow_to_package_sobjects = server.eval("@SOBJECT(twog/file_flow_to_package['file_flow_code', 'in', '{0}'])".format(file_flow_codes_string))
+
+        file_flows_to_package_dict = {}
+
+        for file_flow_to_package_sobject in file_flow_to_package_sobjects:
+            file_flow_code = file_flow_to_package_sobject.get('file_flow_code')
+
+            if file_flow_code in file_flows_to_package_dict:
+                file_flows_to_package_dict[file_flow_code].append(file_flow_to_package_sobject)
+            else:
+                file_flows_to_package_dict[file_flow_code] = [file_flow_to_package_sobject]
+
+        # Get all the packages associated with the order
+        component = server.get_by_code('twog/component', code)
+        package_sobjects = server.eval("@SOBJECT(twog/package['order_code', '{0}'])".format(component.get('order_code')))
+
+        # Get the package names sorted by package code
+        package_code_to_package_name_dict = {}
+
+        for package_sobject in package_sobjects:
+            package_code_to_package_name_dict[package_sobject.get('code')] = package_sobject.get('name')
+
+        for file_flow in file_flows:
+            file_flow['delivering_to'] = []
+
+            if file_flow.get('code') in file_flows_to_package_dict:
+                packages_delivering_to = file_flows_to_package_dict.get(file_flow.get('code'))
+
+                for package_delivering_to in packages_delivering_to:
+                    file_flow['delivering_to'].append(package_code_to_package_name_dict.get(package_delivering_to.get('package_code')))
+
         return jsonify({'file_flows': file_flows})
 
 
