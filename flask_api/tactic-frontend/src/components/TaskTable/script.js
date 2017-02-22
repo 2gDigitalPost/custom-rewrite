@@ -7,7 +7,6 @@ export default {
   data () {
     return {
       loading: true,
-      department: this.$route.params.department,
       tasks: [],
       timer: null,
       currentPage: 1,
@@ -59,6 +58,9 @@ export default {
     },
     displayedTasks: function () {
       return this.tasks.slice((this.currentPage - 1) * this.numberOfResultsDisplayed, (this.currentPage * this.numberOfResultsDisplayed))
+    },
+    department: function () {
+      return this.$route.params.department
     }
   },
   beforeMount: function () {
@@ -71,5 +73,10 @@ export default {
   },
   destroyed: function () {
     clearInterval(this.timer)
-  }
+  },
+  watch: {
+    '$route': function () {
+      this.loadTasks()
+    }
+  },
 }
