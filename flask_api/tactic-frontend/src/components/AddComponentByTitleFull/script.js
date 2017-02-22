@@ -15,7 +15,6 @@ export default {
       titleType: null,
       selectedTitles: [],
       titles: [],
-      searchableTitles: [],
       titleNotAvailable: false,
       titleToSearch: null,
       omdbSearched: false,
@@ -106,7 +105,6 @@ export default {
       this.titleType = null
       this.selectedTitles = []
       this.titles = []
-      this.searchableTitles = []
       this.titleNotAvailable = false
       this.titleToSearch = null
       this.omdbSearched = false
@@ -377,29 +375,19 @@ export default {
       return years;
     }
   },
-  watch: {
-    titleType: function () {
-      this.searchableTitles = []
+  computed: {
+    searchableTitles: function () {
+      let self = this
+      let titlesMatchingType = []
+      let type = _.lowerCase(self.titleType)
 
-      if (this.titleType === 'Movie') {
-        for (let i = 0; i < this.titles.length; i++) {
-          if (this.titles[i].type === 'movie') {
-            this.searchableTitles.push(this.titles[i])
-          }
+      _.each(self.titles, function (title) {
+        if (title.type === type) {
+          titlesMatchingType.push(title)
         }
-      } else if (this.titleType === 'Trailer') {
-        for (let i = 0; i < this.titles.length; i++) {
-          if (this.titles[i].type === 'trailer') {
-            this.searchableTitles.push(this.titles[i])
-          }
-        }
-      } else if (this.titleType === 'Episode') {
-        for (let i = 0; i < this.titles.length; i++) {
-          if (this.titles[i].type === 'episode') {
-            this.searchableTitles.push(this.titles[i])
-          }
-        }
-      }
+      })
+
+      return titlesMatchingType
     }
   },
   beforeMount: function () {
