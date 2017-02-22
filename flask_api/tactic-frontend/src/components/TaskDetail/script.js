@@ -30,6 +30,7 @@ export default {
       taskObject: null,
       taskDataObject: null,
       parent: null,
+      order: null,
       instructionsText: null,
       inputTasks: [],
       outputTasks: [],
@@ -52,6 +53,7 @@ export default {
       self.taskObject = null
       self.taskDataObject = null
       self.parent = null
+      self.order = null
       self.instructionsText = null
       self.inputTasks = []
       self.outputTasks = []
@@ -73,6 +75,7 @@ export default {
         self.taskObject = response.data.task
         self.taskDataObject = response.data.task_data
         self.parent = response.data.parent
+        self.order = response.data.order
         self.instructionsText = response.data.instructions_text
         self.inputTasks = response.data.input_tasks
         self.outputTasks = response.data.output_tasks
@@ -116,6 +119,14 @@ export default {
     },
     compiledMarkdown: function () {
       return marked(this.instructionsText, { sanitize: true })
+    },
+    orderLink: function () {
+      if (this.order) {
+        return '/orders/' + this.order.code
+      }
+      else {
+        return null
+      }
     }
   },
   watch: {

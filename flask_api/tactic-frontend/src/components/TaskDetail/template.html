@@ -4,6 +4,9 @@
             <div class="col-md-12">
                 <h1>{{ taskObject.process }}</h1>
                 <h3>Parent: {{ parent.name }} ({{ parent.code }})</h3>
+                <template v-if="order">
+                    <h3>Order: <router-link :to="orderLink">{{ order.code }}</router-link></h3>
+                </template>
             </div>
             <div class="col-md-6">
                 <div>

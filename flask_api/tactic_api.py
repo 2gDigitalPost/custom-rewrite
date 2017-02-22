@@ -2142,6 +2142,12 @@ class TaskFull(Resource):
         # Get the parent sobject
         parent = server.get_parent(task.get('__search_key__'))
 
+        # Also get the order, if possible
+        if parent.get('order_code'):
+            order = server.get_by_code('twog/order', parent.get('order_code'))
+        else:
+            order = None
+
         # Get the twog/instructions sobject (from the parent)
         instructions = server.get_by_code('twog/instructions', parent.get('instructions_code'))
 
@@ -2193,9 +2199,10 @@ class TaskFull(Resource):
         # Get all the output files that match the codes string
         output_files = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(output_file_codes_string))
 
-        return jsonify({'task': task, 'task_data': task_data, 'parent': parent, 'instructions_text': instructions_text,
-                        'input_tasks': input_tasks, 'output_tasks': output_tasks, 'equipment': equipment,
-                        'input_files': input_files, 'output_files': output_files})
+        return jsonify({'task': task, 'task_data': task_data, 'parent': parent, 'order': order,
+                        'instructions_text': instructions_text, 'input_tasks': input_tasks,
+                        'output_tasks': output_tasks, 'equipment': equipment, 'input_files': input_files,
+                        'output_files': output_files})
 
 
 class TaskStatusOptions(Resource):
