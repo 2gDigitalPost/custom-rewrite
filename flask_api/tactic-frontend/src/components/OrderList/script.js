@@ -52,6 +52,9 @@ export default {
       }
 
       return titlesString
+    },
+    getLoginName: function(login) {
+      return _.startCase(_.toLower(login))
     }
   },
   beforeMount: function () {

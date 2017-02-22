@@ -13,6 +13,7 @@
                 <th>Titles</th>
                 <th>Expected Completion Date</th>
                 <th>Due Date</th>
+                <th>Submitted By</th>
             </tr>
         </thead>
         <tbody>
@@ -22,6 +23,7 @@
                 <td>{{ getTitleListForOrder(order) }}</td>
                 <td>{{ order.expected_completion_date }}</td>
                 <td>{{ order.due_date }}</td>
+                <td>{{ getLoginName(order.login) }}</td>
             </tr>
         </tbody>
     </table>
