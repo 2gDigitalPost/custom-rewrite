@@ -22,5 +22,8 @@
         <div class="col-md-12">
             <task-editable-list v-bind:tasks="package.tasks"/>
         </div>
+        <div class="col-md-12">
+            <package-waiting-on-files v-bind:packageCode="package.code"></package-waiting-on-files>
+        </div>
     </div>
 </div>

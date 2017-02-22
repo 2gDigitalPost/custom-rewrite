@@ -4,12 +4,14 @@ import axios from 'axios'
 import _ from 'lodash'
 
 import TaskEditableList from '../../ComponentEditableList/ComponentEditable/TaskEditableList/index.vue'
+import PackageWaitingOnFiles from '../../../PackageWaitingOnFiles/index.vue'
 
 export default {
   name: 'PackageEditable',
   props: ['package'],
   components: {
-    TaskEditableList
+    TaskEditableList,
+    PackageWaitingOnFiles
   },
   data () {
     return {

@@ -1,0 +1,8 @@
+<div>
+    <template v-if="numberOfWaitingFiles > 0">
+        <div>
+            <i class="fa fa-exclamation-triangle waiting-on-files-warning" aria-hidden="true"></i>
+            Waiting on {{ numberOfWaitingFiles }} <template v-if="numberOfWaitingFiles === 1">file</template><template v-else>files</template>
+        </div>
+    </template>
+</div>

@@ -1,7 +1,6 @@
 from pyasm.search import Search
 
-from common_tools.utils import get_sobject_by_code, get_task_sobjects_from_component_code,\
-    get_task_data_sobject_from_task_code, get_task_data_in_files, get_task_data_out_files
+from common_tools.utils import get_sobject_by_code, get_task_data_sobject_from_task_code
 
 
 def main(server=None, input_data=None):
@@ -35,10 +34,9 @@ def main(server=None, input_data=None):
         file_flow_to_packages_search.add_filter('file_flow_code', file_flow.get('code'))
         file_flow_to_packages = file_flow_to_packages_search.get_sobjects()
 
-        # Get the package codes
-        package_codes = [file_flow_to_package.get('package_code') for file_flow_to_package in file_flow_to_packages]
+        for file_flow_to_package in file_flow_to_packages:
+            package_code = file_flow_to_package.get('package_code')
 
-        for package_code in package_codes:
             package = get_sobject_by_code('twog/package', package_code)
 
             # Get a list of all the tasks attached to a package (might be empty)
@@ -64,3 +62,6 @@ def main(server=None, input_data=None):
 
                     # Finally, insert the new twog/task_data_in_file object
                     server.insert('twog/task_data_in_file', data)
+
+                    # Also mark the move as complete in the twog/file_flow_to_package table
+                    server.update(file_flow_to_package.get_search_key(), {'complete': True})

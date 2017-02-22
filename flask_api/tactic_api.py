@@ -2655,6 +2655,31 @@ class PackagesInOrder(Resource):
         return jsonify({'packages': packages})
 
 
+class PackageWaitingOnFiles(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Start by querying the twog/file_flow_in_package table
+        # Only get the entries that have not been completed yet
+        file_flow_in_package_objects = server.eval(
+            "@SOBJECT(twog/file_flow_to_package['package_code', '{0}'])".format(code))
+
+        # Get the actual twog/file_flow objects
+        file_flow_codes = [file_flow_in_package_object.get('file_flow_code')
+                           for file_flow_in_package_object in file_flow_in_package_objects if not file_flow_in_package_object.get('complete')]
+        file_flow_codes_string = '|'.join(file_flow_codes)
+
+        file_flows = server.eval("@SOBJECT(twog/file_flow['code', 'in', '{0}'])".format(file_flow_codes_string))
+
+        return jsonify({'file_flows': file_flows})
+
+
 def get_order_from_file_flow_code(server, file_flow_code):
     # Search up the chain to get the Order, then the packages
     # Start by getting the file flow object
@@ -2817,6 +2842,7 @@ api.add_resource(FilesByDivision, '/api/v1/division/<string:code>/files')
 api.add_resource(FilesInOrder, '/api/v1/files-in-order')
 api.add_resource(Order, '/api/v1/order/<string:code>')
 api.add_resource(PackagesInOrder, '/api/v1/order/<string:code>/packages')
+api.add_resource(PackageWaitingOnFiles, '/api/v1/package/<string:code>/waiting-files')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')
