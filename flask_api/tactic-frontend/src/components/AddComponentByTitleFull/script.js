@@ -387,7 +387,7 @@ export default {
         }
       })
 
-      return titlesMatchingType
+      return _.sortyBy(titlesMatchingType, 'name')
     }
   },
   beforeMount: function () {

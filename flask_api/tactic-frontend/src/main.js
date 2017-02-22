@@ -5,7 +5,6 @@ import auth from './auth'
 import App from './App'
 import VueRouter from 'vue-router'
 import HomePage from './components/HomePage/index.vue'
-import AboutPage from './components/AboutPage/index.vue'
 import AddComponentByTitleFull from './components/AddComponentByTitleFull/index.vue'
 import AddFileFlowsToOrder from './components/AddFileFlowsToOrder/index.vue'
 import AddOutputFilesToOrder from './components/AddOutputFilesToOrder/index.vue'
@@ -36,7 +35,6 @@ Vue.use(VueRouter)
 
 const routes = [
   { path: '/', component: HomePage },
-  { path: '/about', component: AboutPage },
   { path: '/department-requests/links', component: DepartmentRequestLinks, beforeEnter: requireAuth },
   { path: '/department-requests', component: DepartmentRequestTable, beforeEnter: requireAuth },
   { path: '/department-requests/:department', component: DepartmentRequestTable, beforeEnter: requireAuth },

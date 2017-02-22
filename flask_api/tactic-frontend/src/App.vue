@@ -23,8 +23,18 @@
             <li>
               <router-link to="/orders">Orders</router-link>
             </li>
-            <li>
-              <router-link to="/tasks/links">Tasks</router-link>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+              <!--<router-link to="/tasks/links">Tasks</router-link>-->
             </li>
             <li>
               <router-link to="/department-requests/links">Department Requests</router-link>
@@ -34,9 +44,6 @@
             </li>
             <li>
               <router-link to="/instructions-templates">Instructions Templates</router-link>
-            </li>
-            <li>
-              <router-link to="/about">About</router-link>
             </li>
           </ul>
         </div><!-- /.navbar-collapse -->
@@ -63,6 +70,9 @@ export default {
   }
 }
 </script>
+
+<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
 <style src='../node_modules/bootstrap/dist/css/bootstrap.css'></style>
 <style src='../node_modules/font-awesome/css/font-awesome.min.css'></style>
