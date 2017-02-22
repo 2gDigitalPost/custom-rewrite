@@ -2773,6 +2773,59 @@ class DeliverableFilesInOrder(Resource):
         return jsonify({'files': deliverable_files})
 
 
+class RetireObject(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        search_type = json_data.get('search_type')
+        code = json_data.get('code')
+        project_code = json_data.get('project_code', 'twog')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the search key by using the given search type and code
+        search_key = server.build_search_key(search_type, code, project_code=project_code)
+
+        # Retire the object
+        server.retire_sobject(search_key)
+
+        return jsonify({'status': 200})
+
+
+class RemoveTwogComponent(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        code = json_data.get('code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the search key by using the given search type and code
+        search_key = server.build_search_key('twog/component', code, project_code='twog')
+
+        # Retire the object
+        server.retire_sobject(search_key)
+
+        # Find the child tasks and retire them as well
+        tasks = server.get_all_children(search_key, 'sthpw/task')
+
+        for task in tasks:
+            server.retire_sobject(task.get('__search_key__'))
+
+        # Also retire the file flow objects
+        file_flows = server.get_all_children(search_key, 'twog/file_flow')
+
+        for file_flow in file_flows:
+            server.retire_sobject(file_flow.get('__search_key__'))
+
+        # Also submit a deletion request for the component
+        server.insert('twog/deletion_request', {'object_code': code, 'children': True})
+
+        return jsonify({'status': 200})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -2847,6 +2900,8 @@ api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_co
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')
 api.add_resource(RemoveFileInOrder, '/api/v1/file-in-order/delete')
+api.add_resource(RetireObject, '/api/v1/retire')
+api.add_resource(RemoveTwogComponent, '/api/v1/remove/twog/component')
 api.add_resource(TaskInputFileOptions, '/api/v1/task/<string:task_code>/input-file-options')
 api.add_resource(TaskInputFiles, '/api/v1/task/<string:task_code>/input-files')
 api.add_resource(TaskOutputFile, '/api/v1/task/<string:task_code>/output-file')

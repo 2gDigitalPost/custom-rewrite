@@ -6,6 +6,8 @@ import EditableTitle from './EditableTitle/index.vue'
 import TaskEditableList from './TaskEditableList/index.vue'
 import FileFlowEditableList from '../../../FileFlowEditableList/index.vue'
 
+import bus from '../../../../bus'
+
 export default {
   name: 'ComponentEditable',
   props: ['component'],
@@ -28,6 +30,35 @@ export default {
       let instructionsPageURL = '/instructions/' + this.component.component.instructions_code
 
       this.$router.push(instructionsPageURL)
+    },
+    removeComponent: function () {
+      let self = this
+
+      let confirmation = window.confirm('Are you sure you want to remove the component "' + self.componentObject.name + '"?')
+
+      let apiURL = '/api/v1/remove/twog/component'
+      let jsonToSend = {
+        'token': localStorage.tactic_token,
+        'code': self.component.code
+      }
+
+      if (confirmation) {
+        axios.post(apiURL, JSON.stringify(jsonToSend), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
+        })
+        .then(function (response) {
+          if (response.data) {
+            if (response.data.status === 200) {
+              bus.$emit('component-removed')
+            }
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+      }
     }
   }
 }
