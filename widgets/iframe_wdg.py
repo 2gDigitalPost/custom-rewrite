@@ -21,3 +21,13 @@ class IFrameWdg(BaseRefreshWdg):
 class EnterANewOrderIFrameWdg(IFrameWdg):
     def init(self):
         self.location = 'orders/new'
+
+
+class OrderTableIFrameWdg(IFrameWdg):
+    def init(self):
+        self.location = 'orders'
+
+
+class TasksIFrameWdg(IFrameWdg):
+    def init(self):
+        self.location = 'tasks'
