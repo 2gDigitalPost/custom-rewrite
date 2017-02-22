@@ -28,7 +28,7 @@ export default {
     },
     platformImageSource: function () {
       if (this.platformImage !== null) {
-        return 'http://localhost:8081/assets/twog/platform/' + this.platformImage
+        return 'http://tactic2.2gdigital.com/assets/twog/platform/' + this.platformImage
       }
     }
   }

@@ -31,9 +31,6 @@ export default {
       components: [],
       componentsFull: [],
       packages: [],
-      add_title_link: null,
-      edit_components_link: null,
-      add_output_files_link: null,
       files: []
     }
   },
@@ -75,11 +72,6 @@ export default {
         console.log(error)
       })
     },
-    setupLinks: function () {
-      this.add_title_link = '/orders/' + this.order_code + '/titles/add'
-      this.edit_components_link = '/orders/' + this.order_code + '/components'
-      this.add_output_files_link = '/orders/' + this.order_code + '/file-flows/add'
-    },
     cancelExpectedCompletionDateEdit: function () {
       this.editingExpectedCompletionDate = false
     },
@@ -89,9 +81,13 @@ export default {
   },
   beforeMount: function () {
     this.loadOrder()
-    this.setupLinks()
   },
   computed: {
+    addTemplateLink: function () {
+      if (this.order_code) {
+        return '/orders/' + this.order_code + '/titles/add'
+      }
+    },
     divisionImageSource: function () {
       if (this.divisionImage !== null) {
         return 'http://localhost:8081/assets/twog/division/' + this.divisionImage
