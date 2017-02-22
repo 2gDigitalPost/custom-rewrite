@@ -26,6 +26,9 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tasks <span class="caret"></span></a>
               <ul class="dropdown-menu">
+                <li><router-link to="/tasks">All</router-link></li>
+                <li role="separator" class="divider"/>
+                <li class="dropdown-header">By Department</li>
                 <li><router-link to="/tasks/edel">Edel</router-link></li>
                 <li><router-link to="/tasks/compression">Compression</router-link></li>
                 <li><router-link to="/tasks/qc">QC</router-link></li>
