@@ -2,7 +2,7 @@
     <div class="row">
         <template v-if="displayedTasks.length > 0 && !loading">
             <div class="col-md-10">
-                <h1>Tasks</h1>
+                <h1>{{ pageTitle }}</h1>
             </div>
             <div class="col-md-2">
                 Page {{ currentPage }} of {{ numberOfPages }}

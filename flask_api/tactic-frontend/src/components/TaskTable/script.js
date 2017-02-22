@@ -61,6 +61,17 @@ export default {
     },
     department: function () {
       return this.$route.params.department
+    },
+    pageTitle: function () {
+      if (this.$route.path === '/tasks/user') {
+        return 'My Tasks'
+      }
+      else if (this.department) {
+        return _.startCase(this.department) + ' Tasks'
+      }
+      else {
+        return 'Tasks'
+      }
     }
   },
   beforeMount: function () {
