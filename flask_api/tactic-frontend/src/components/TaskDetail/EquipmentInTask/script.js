@@ -42,6 +42,8 @@ export default {
           self.equipmentOptions.push({name: equipmentData[i].name, code: equipmentData[i].code})
         }
 
+        self.equipmentOptions = _.sortBy(self.equipmentOptions, 'name')
+
         self.loading = false
       })
       .catch(function (error) {
