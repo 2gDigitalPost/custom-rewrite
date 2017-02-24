@@ -10,16 +10,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <router-link to="/" class="navbar-brand">Tactic</router-link>
+          <router-link to="/"><img src="~assets/2glogo_only_small.png"/></router-link>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav">
-            <li>
-              <router-link v-if="loggedIn" to="/logout">Log Out</router-link>
-              <router-link v-if="!loggedIn" to="/login">Log In</router-link>
-            </li>
+          <ul class="nav navbar-nav navbar-right">
             <li>
               <router-link to="/orders">Orders</router-link>
             </li>
@@ -44,6 +40,10 @@
             </li>
             <li>
               <router-link to="/instructions-templates">Instructions Templates</router-link>
+            </li>
+            <li>
+              <router-link v-if="loggedIn" to="/logout">Log Out</router-link>
+              <router-link v-if="!loggedIn" to="/login">Log In</router-link>
             </li>
           </ul>
         </div><!-- /.navbar-collapse -->
