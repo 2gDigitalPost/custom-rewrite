@@ -21,8 +21,8 @@
                 <td>{{ order.code }}</td>
                 <td>{{ order.division.name }}</td>
                 <td>{{ getTitleListForOrder(order) }}</td>
-                <td>{{ order.expected_completion_date }}</td>
-                <td>{{ order.due_date }}</td>
+                <td>{{ dateFormatted(order.expected_completion_date) }}</td>
+                <td>{{ dateFormatted(order.due_date) }}</td>
                 <td>{{ getLoginName(order.login) }}</td>
             </tr>
         </tbody>

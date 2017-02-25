@@ -2,6 +2,7 @@
 
 import axios from 'axios'
 import _ from 'lodash'
+import moment from 'moment'
 
 export default {
   name: 'OrderList',
@@ -55,6 +56,9 @@ export default {
     },
     getLoginName: function(login) {
       return _.startCase(_.toLower(login))
+    },
+    dateFormatted: function (date) {
+      return moment(date).format('ddd, MMM Do YYYY, h:mm A')
     }
   },
   beforeMount: function () {
