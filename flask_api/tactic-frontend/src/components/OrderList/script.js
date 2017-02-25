@@ -8,7 +8,10 @@ export default {
   name: 'OrderList',
   data () {
     return {
-      orders: []
+      orders: [],
+      displaySearch: false,
+      searchBy: "code",
+      searchQuery: null
     }
   },
   methods: {
@@ -21,8 +24,6 @@ export default {
         }
       })
       .then(function (response) {
-        let ordersData = response.data.orders
-
         self.orders = self.sortByDueDate(response.data.orders)
       })
       .catch(function (error) {
@@ -63,5 +64,22 @@ export default {
   },
   beforeMount: function () {
     this.loadOrders()
+  },
+  computed: {
+    ordersToDisplay: function () {
+      let selectedOrders = []
+
+      if (!_.isEmpty(this.orders) && this.searchQuery) {
+        for (let i = 0; i < this.orders.length; i++) {
+          if (_.includes(_.lowerCase(this.orders[i].code), this.searchQuery)) {
+            selectedOrders.push(this.orders[i])
+          }
+        }
+      } else {
+        return this.orders
+      }
+
+      return selectedOrders
+    }
   }
 }
