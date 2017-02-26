@@ -829,8 +829,49 @@ class ComponentsInOrder(Resource):
         return jsonify({'status': 200})
 
 
-class ComponentByCode(Resource):
+class Components(Resource):
+    def post(self):
+        json_data = request.get_json()
+        ticket = json_data.get('token')
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
 
+        # Get the data to create the component
+        name = json_data.get('name')
+        pipeline_code = json_data.get('pipeline_code')
+        order_code = json_data.get('order_code')
+        instructions_template_code = json_data.get('instructions_template_code')
+        instructions_code = json_data.get('instructions_code')
+        title_code = json_data.get('title_code')
+
+        if not instructions_code:
+            # If an instructions template code was given, create a new instructions document using that template
+            if instructions_template_code:
+                instructions_template = server.get_by_code('twog/instructions_template', instructions_template_code)
+
+                instructions_document = server.insert(
+                    'twog/instructions', {'name': instructions_template.get('name'),
+                                          'instructions_text': instructions_template.get('instructions_text')})
+
+                instructions_code = instructions_document.get('code')
+
+        component_data = {
+            'name': name,
+            'pipeline_code': pipeline_code,
+            'order_code': order_code
+        }
+
+        if instructions_code:
+            component_data['instructions_code'] = instructions_code
+
+        if title_code:
+            component_data['title_code'] = title_code
+
+        server.insert('twog/component', component_data)
+
+        return jsonify({'status': 200})
+
+
+class ComponentByCode(Resource):
     def post(self, code):
         json_data = request.get_json()
         component_data = json_data.get('component')
@@ -2888,6 +2929,7 @@ api.add_resource(Task, '/api/v1/task/<string:code>')
 api.add_resource(TaskFull, '/api/v1/task/<string:code>/full')
 api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
+api.add_resource(Components, '/api/v1/components')
 api.add_resource(DeliverableFilesInOrder, '/api/v1/order/<string:code>/deliverable-files')
 api.add_resource(Equipment, '/api/v1/equipment')
 api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')

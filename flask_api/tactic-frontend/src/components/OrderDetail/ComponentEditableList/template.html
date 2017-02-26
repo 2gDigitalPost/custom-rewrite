@@ -1,4 +1,12 @@
 <div>
+    <button class="btn btn-default" v-on:click="addingComponent = !addingComponent">
+        <i class="fa fa-plus"></i> Add Component
+    </button>
+
+    <div v-if="addingComponent">
+        <component-entry-form v-bind:orderCode="orderCode"></component-entry-form>
+    </div>
+
     <ul class="list-group">
         <li
             is="component-editable"

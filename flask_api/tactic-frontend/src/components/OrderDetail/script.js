@@ -106,6 +106,7 @@ export default {
     bus.$on('due-date-edit-cancel', this.cancelDueDateEdit)
     bus.$on('file-flow-updated', this.loadOrder)
     bus.$on('component-removed', this.loadOrder)
+    bus.$on('reload-page', this.loadOrder)
   },
   destroyed() {
     bus.$off('component-title-updated', this.loadOrder)
@@ -119,5 +120,6 @@ export default {
     bus.$off('due-date-edit-cancel', this.cancelDueDateEdit)
     bus.$off('file-flow-updated', this.loadOrder)
     bus.$off('component-removed', this.loadOrder)
+    bus.$off('reload-page', this.loadOrder)
   }
 }

@@ -1,11 +1,20 @@
 /* globals localStorage */
 
+import _ from 'lodash'
+
+import ComponentEntryForm from './ComponentEntryForm/index.vue'
 import ComponentEditable from './ComponentEditable/index.vue'
 
 export default {
   name: 'ComponentEditableList',
-  props: ['components'],
+  props: ['components', 'orderCode'],
   components: {
-    'component-editable': ComponentEditable
+    ComponentEntryForm,
+    ComponentEditable
+  },
+  data () {
+    return {
+      addingComponent: false,
+    }
   }
 }

@@ -1,0 +1,17 @@
+<div>
+    <h4>Name</h4>
+    <input type="text" class="form-control" v-model="name" /><br/>
+    <span v-if="nameError">Name is required</span>
+
+    <h4>Title</h4>
+    <multiselect v-model="selectedTitle" :options="titleOptions" track-by="code" label="name"></multiselect>
+
+    <h4>Pipeline</h4>
+    <multiselect v-model="selectedPipeline" :options="componentPipelineOptions" track-by="code" label="name"></multiselect>
+    <span v-if="pipelineError">Pipeline is required</span>
+
+    <h4>Instructions Template</h4>
+    <multiselect v-model="selectedInstructionsTemplate" :options="componentInstructionsTemplateOptions" track-by="code" label="name"></multiselect>
+
+    <button type="submit" class="btn btn-default" v-on:click="submit">Submit</button>
+</div>
