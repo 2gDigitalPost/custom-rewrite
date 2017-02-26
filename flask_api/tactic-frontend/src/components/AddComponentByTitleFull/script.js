@@ -11,6 +11,7 @@ export default {
   },
   data () {
     return {
+      orderCode: null,
       loading: true,
       titleType: null,
       selectedTitles: [],
@@ -38,6 +39,9 @@ export default {
     }
   },
   methods: {
+    setOrderCode: function () {
+      this.orderCode = this.$route.params.code
+    },
     loadTitles: function () {
       var self = this
 
@@ -101,6 +105,7 @@ export default {
     },
     reloadAll: function () {
       // Reset all variables to their defaults
+      this.orderCode = null
       this.loading = true
       this.titleType = null
       this.selectedTitles = []
@@ -125,6 +130,7 @@ export default {
       this.newTitleName
       this.year = null
 
+      this.setOrderCode()
       this.loadTitles()
       this.loadLanguages()
       this.loadProjectTemplates()
@@ -305,9 +311,7 @@ export default {
 
       self.submitting = true
 
-      let orderCode = self.$route.params.code
-
-      let apiURL = '/api/v1/orders/' + orderCode + '/create-from-template'
+      let apiURL = '/api/v1/orders/' + self.orderCode + '/create-from-template'
       let jsonToSend = {
         'token': localStorage.tactic_token,
         'titles': self.selectedTitles,
@@ -391,6 +395,7 @@ export default {
     }
   },
   beforeMount: function () {
+    this.setOrderCode()
     this.loadTitles()
     this.loadLanguages()
     this.loadProjectTemplates()
