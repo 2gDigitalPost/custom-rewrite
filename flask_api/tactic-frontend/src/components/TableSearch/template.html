@@ -1,21 +1,21 @@
 <div>
-    <div>
-        <button v-on:click="displaySearch = !displaySearch" class="btn btn-default">
-            <i class="fa fa-search"></i> Search
-        </button>
+    <button v-on:click="displaySearch = !displaySearch" class="btn btn-default">
+        <i class="fa fa-search"></i> Search
+    </button>
 
-        <template v-if="displaySearch">
-            <div>Searching by: {{ getOptionLabel(selectedSearchName) }}</div>
-            <select v-model="selectedSearchOption">
-                <option v-for="option in options" v-bind:value="option">{{ getOptionLabel(option.name) }}</option>
+    <template v-if="displaySearch">
+        <div class="form-group form-inline">
+            <label for="search-by">Searching by:</label>
+            <select v-model="selectedSearchOption" class="form-control">
+                <option v-for="option in options" v-bind:value="option" class="search-by">{{ getOptionLabel(option) }}</option>
             </select>
+        </div>
 
-            <template v-if="selectedSearchType === 'text'">
-                <input class="form-control" v-model="searchQueryText"/>
-            </template>
-            <template v-else-if="selectedSearchType === 'select'">
-                <multiselect v-model="selectedMultiselectOptions" :options="searchMultiselectOptions" track-by="value" label="label" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
-            </template>
+        <template v-if="selectedSearchType === 'text'">
+            <input class="form-control" v-model="searchQueryText"/>
         </template>
-    </div>
+        <template v-else-if="selectedSearchType === 'select'">
+            <multiselect v-model="selectedMultiselectOptions" :options="searchMultiselectOptions" track-by="value" label="label" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+        </template>
+    </template>
 </div>

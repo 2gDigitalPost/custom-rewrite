@@ -16,7 +16,6 @@ export default {
   data () {
     return {
       orders: [],
-      searchOptions: [],
       searchColumn: null,
       searchFilter: null
     }
@@ -32,8 +31,6 @@ export default {
       })
       .then(function (response) {
         self.orders = self.sortByDueDate(response.data.orders)
-
-        self.getSearchOptions()
       })
       .catch(function (error) {
         console.log(error)
@@ -70,20 +67,6 @@ export default {
     dateFormatted: function (date) {
       return moment(date).format('ddd, MMM Do YYYY, h:mm A')
     },
-    getSearchOptions: function () {
-      let options = [{'name': 'code', 'type': 'text'}]
-
-      let divisions = _.uniqBy(_.map(this.orders, 'division'), 'code')
-      let divisionOptions = []
-
-      _.forEach(divisions, function(division) {
-        divisionOptions.push({'label': division['name'], 'value': division['code']})
-      })
-
-      options.push({'name': 'division_code', 'type': 'select', 'options': divisionOptions})
-
-      this.searchOptions = options
-    },
     setSearchQueryValues: function (searchName, searchValue) {
       this.searchColumn = searchName
       this.searchFilter = searchValue
@@ -93,6 +76,20 @@ export default {
     this.loadOrders()
   },
   computed: {
+    searchOptions: function () {
+      let options = [{'name': 'code', 'type': 'text'}]
+
+      let divisions = _.uniqBy(_.map(this.orders, 'division'), 'code')
+      let divisionOptions = []
+
+      _.forEach(divisions, function(division) {
+        divisionOptions.push({'label': division['name'], 'value': division['code']})
+      })
+
+      options.push({'name': 'division_code', 'type': 'select', 'options': divisionOptions, 'label': 'Division'})
+
+      return options
+    },
     ordersToDisplay: function () {
       let orderList = this.orders
       let column = this.searchColumn

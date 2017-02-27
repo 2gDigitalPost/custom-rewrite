@@ -16,7 +16,6 @@ export default {
   data () {
     return {
       displaySearch: false,
-      searchOptions: [],
       selectedSearchOption: null,
       searchQueryText: null,
       selectedMultiselectOptions: null
@@ -28,8 +27,13 @@ export default {
         this.selectedSearchOption = this.options[0]
       }
     },
-    getOptionLabel: function (label) {
-      return _.startCase(_.toLower(label))
+    getOptionLabel: function (option) {
+      if (option.hasOwnProperty('label')) {
+        return option['label']
+      }
+      else {
+        return _.startCase(_.toLower(option['name']))
+      }
     }
   },
   computed: {
