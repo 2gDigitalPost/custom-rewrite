@@ -70,16 +70,15 @@ export default {
       let selectedOrders = []
 
       if (!_.isEmpty(this.orders) && this.searchQuery) {
-        for (let i = 0; i < this.orders.length; i++) {
-          if (_.includes(_.lowerCase(this.orders[i].code), this.searchQuery)) {
-            selectedOrders.push(this.orders[i])
-          }
-        }
+        let query = this.searchQuery.toLowerCase()
+
+        return _.filter(this.orders, function(order) {
+          return (_.includes(order.code.toLowerCase(), query))
+        })
+
       } else {
         return this.orders
       }
-
-      return selectedOrders
     }
   }
 }
