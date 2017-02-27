@@ -1,0 +1,15 @@
+<div>
+    <label for="new-package-name">Name</label>
+    <input type="text" v-model="name" class="new-package-name form-control" /><br/>
+    <span v-if="nameError">Name is required</span>
+
+    <label for="new-package-platform">Platform</label>
+    <multiselect v-model="selectedPlatform" :options="platformOptions" track-by="code" label="name" class="new-package-platform"></multiselect>
+    <span v-if="platformError">Platform is required</span>
+
+    <label for="new-package-pipeline">Pipeline</label>
+    <multiselect v-model="selectedPipeline" :options="pipelineOptions" track-by="code" label="name" class="new-package-pipeline"></multiselect>
+    <span v-if="pipelineError">Pipeline is required</span>
+
+    <button type="submit" class="btn btn-default" v-on:click="submit">Submit</button>
+</div>

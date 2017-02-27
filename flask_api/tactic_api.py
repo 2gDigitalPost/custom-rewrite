@@ -2688,6 +2688,20 @@ class EstimatedHours(Resource):
         return jsonify({'status': 200})
 
 
+class Packages(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        package_data = json_data.get('package')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/package', package_data)
+
+        return jsonify({'status': 200})
+
+
 class PackagesInOrder(Resource):
     def get(self, code):
         parser = reqparse.RequestParser()
@@ -2943,6 +2957,7 @@ api.add_resource(FileObjectByCode, '/api/v1/file/<string:code>')
 api.add_resource(FilesByDivision, '/api/v1/division/<string:code>/files')
 api.add_resource(FilesInOrder, '/api/v1/files-in-order')
 api.add_resource(Order, '/api/v1/order/<string:code>')
+api.add_resource(Packages, '/api/v1/packages')
 api.add_resource(PackagesInOrder, '/api/v1/order/<string:code>/packages')
 api.add_resource(PackageWaitingOnFiles, '/api/v1/package/<string:code>/waiting-files')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
