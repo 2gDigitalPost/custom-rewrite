@@ -4,14 +4,21 @@ import axios from 'axios'
 import _ from 'lodash'
 import moment from 'moment'
 
+import TableSearch from '../TableSearch/index.vue'
+
+import bus from '../../bus'
+
 export default {
   name: 'OrderList',
+  components: {
+    TableSearch
+  },
   data () {
     return {
       orders: [],
-      displaySearch: false,
-      searchBy: "code",
-      searchQuery: null
+      searchOptions: [],
+      searchColumn: null,
+      searchFilter: null
     }
   },
   methods: {
@@ -25,6 +32,8 @@ export default {
       })
       .then(function (response) {
         self.orders = self.sortByDueDate(response.data.orders)
+
+        self.getSearchOptions()
       })
       .catch(function (error) {
         console.log(error)
@@ -60,6 +69,24 @@ export default {
     },
     dateFormatted: function (date) {
       return moment(date).format('ddd, MMM Do YYYY, h:mm A')
+    },
+    getSearchOptions: function () {
+      let options = [{'name': 'code', 'type': 'text'}]
+
+      let divisions = _.uniqBy(_.map(this.orders, 'division'), 'code')
+      let divisionOptions = []
+
+      _.forEach(divisions, function(division) {
+        divisionOptions.push({'label': division['name'], 'value': division['code']})
+      })
+
+      options.push({'name': 'division_code', 'type': 'select', 'options': divisionOptions})
+
+      this.searchOptions = options
+    },
+    setSearchQueryValues: function (searchName, searchValue) {
+      this.searchColumn = searchName
+      this.searchFilter = searchValue
     }
   },
   beforeMount: function () {
@@ -67,18 +94,34 @@ export default {
   },
   computed: {
     ordersToDisplay: function () {
-      let selectedOrders = []
+      let orderList = this.orders
+      let column = this.searchColumn
+      let query = this.searchFilter
 
-      if (!_.isEmpty(this.orders) && this.searchQuery) {
-        let query = this.searchQuery.toLowerCase()
+      if (!_.isEmpty(orderList) && column && query) {
+        if (typeof(query) === 'string') {
+          query = query.toLowerCase()
 
-        return _.filter(this.orders, function(order) {
-          return (_.includes(order.code.toLowerCase(), query))
-        })
-
-      } else {
-        return this.orders
+          return _.filter(orderList, function(order) {
+            return _.includes(order[column].toLowerCase(), query)
+          })
+        }
+        else if (Array.isArray(query)) {
+          if (query.length > 0) {
+            return _.filter(orderList, function(order) {
+              return _.includes(query, order[column])
+            })
+          }
+        }
       }
+      
+      return this.orders
     }
+  },
+  created() {
+    bus.$on('search-query', this.setSearchQueryValues)
+  },
+  destroyed() {
+    bus.$off('search-query', this.setSearchQueryValues)
   }
 }

@@ -7,16 +7,7 @@
         </button>
     </div>
 
-    <div>
-        <button v-on:click="displaySearch = !displaySearch" class="btn btn-default">
-            <i class="fa fa-search"></i> Search
-        </button>
-
-        <template v-if="displaySearch">
-            <div>Searching by: {{ searchBy }}</div>
-            <input class="form-control" v-model="searchQuery"/>
-        </template>
-    </div>
+    <table-search v-bind:options="searchOptions"></table-search>
 
     <table class="table table-hover table-fixed">
         <thead>

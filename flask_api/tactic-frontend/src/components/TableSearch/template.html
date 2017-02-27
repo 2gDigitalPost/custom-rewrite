@@ -1,0 +1,21 @@
+<div>
+    <div>
+        <button v-on:click="displaySearch = !displaySearch" class="btn btn-default">
+            <i class="fa fa-search"></i> Search
+        </button>
+
+        <template v-if="displaySearch">
+            <div>Searching by: {{ getOptionLabel(selectedSearchName) }}</div>
+            <select v-model="selectedSearchOption">
+                <option v-for="option in options" v-bind:value="option">{{ getOptionLabel(option.name) }}</option>
+            </select>
+
+            <template v-if="selectedSearchType === 'text'">
+                <input class="form-control" v-model="searchQueryText"/>
+            </template>
+            <template v-else-if="selectedSearchType === 'select'">
+                <multiselect v-model="selectedMultiselectOptions" :options="searchMultiselectOptions" track-by="value" label="label" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+            </template>
+        </template>
+    </div>
+</div>
