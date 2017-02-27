@@ -1,7 +1,5 @@
 /* globals localStorage */
 
-import _ from 'lodash'
-
 import ComponentEntryForm from './ComponentEntryForm/index.vue'
 import ComponentEditable from './ComponentEditable/index.vue'
 
