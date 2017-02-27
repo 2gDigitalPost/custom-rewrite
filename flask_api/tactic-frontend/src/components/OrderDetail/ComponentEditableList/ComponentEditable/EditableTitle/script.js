@@ -38,7 +38,7 @@ export default {
         }
 
         for (let i = 0; i < self.selectableTitles.length; i++) {
-          if (self.selectableTitles[i].code === self.title.code) {
+          if (self.title && self.selectableTitles[i].code === self.title.code) {
             self.selectedTitle = self.title
           }
         }
