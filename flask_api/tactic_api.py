@@ -866,7 +866,10 @@ class Components(Resource):
         if title_code:
             component_data['title_code'] = title_code
 
-        server.insert('twog/component', component_data)
+        inserted_component = server.insert('twog/component', component_data)
+
+        # Also attach the initial tasks to the component
+        server.add_initial_tasks(inserted_component.get('__search_key__'))
 
         return jsonify({'status': 200})
 
