@@ -24,6 +24,7 @@ import NewProjectTemplateForm from './components/NewProjectTemplateForm/index.vu
 import OrderDetail from './components/OrderDetail/index.vue'
 import OrderEntryForm from './components/OrderEntryForm/index.vue'
 import OrderList from './components/OrderList/index.vue'
+import PlatformTable from './components/PlatformTable/index.vue'
 import ProjectTemplate from './components/ProjectTemplate/index.vue'
 import ProjectTemplatesList from './components/ProjectTemplatesList/index.vue'
 import SelectPipelines from './components/SelectPipelines/index.vue'
@@ -56,6 +57,7 @@ const routes = [
   { path: '/tasks/user', component: TaskTable, beforeEnter: requireAuth },
   { path: '/tasks/:department', component: TaskTable, beforeEnter: requireAuth },
   { path: '/tasks', component: TaskTable, beforeEnter: requireAuth },
+  { path: '/platforms', component: PlatformTable, beforEnter: requireAuth },
   { path: '/project-templates', component: ProjectTemplatesList, beforeEnter: requireAuth },
   { path: '/project-templates/new', component: NewProjectTemplateForm, beforeEnter: requireAuth },
   { path: '/project-templates/:code', component: ProjectTemplate, beforeEnter: requireAuth },

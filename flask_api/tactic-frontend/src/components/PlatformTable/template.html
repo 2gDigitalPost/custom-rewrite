@@ -1,0 +1,32 @@
+<div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>Platforms</h1>
+
+            <button v-on:click="showEnterPlatformForm = !showEnterPlatformForm" class="btn btn-default">
+                <i class="fa fa-plus"></i> Add a new Platform
+            </button>
+
+            <div v-if="showEnterPlatformForm">
+                <platform-entry-form></platform-entry-form>
+            </div>
+
+            <table-search v-bind:options="searchOptions"></table-search>
+
+            <table class="table table-hover table-fixed">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="platform in platformsToDisplay" v-on:click="openPlatformLink(platform.code)">
+                        <td>{{ platform.code }}</td>
+                        <td>{{ platform.name }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

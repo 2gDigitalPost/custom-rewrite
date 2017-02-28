@@ -1,0 +1,27 @@
+<div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group" v-bind:class="{'has-success': name !== '' && !nameExists, 'has-error': name !== '' && nameExists}">
+                <label for="new-platform-name">Name</label>
+                <input type="text" v-model="name" class="form-control has-feedback" id="new-platform-name"/>
+
+                <template v-if="searching">
+                    <i class="fa fa-spinner fa-spin"></i> Searcing...
+                </template>
+                <template v-else-if="name !== '' && nameExists">
+                    <p>That platform exists already!</p>
+                </template>
+                <template v-else-if="name !== '' && !nameExists">
+                    <p>Platform name okay!</p>
+                </template>
+                <template v-else-if="name === ''">
+                    <p>Enter a Platform Name. If the platform already exists, an error message will display.</p>
+                </template>
+            </div>
+
+            <button v-on:click="submit" class="btn btn-default">
+                <i class="fa fa-floppy-o"></i> Submit</button>
+            </button>
+        </div>
+    </div>
+</div>

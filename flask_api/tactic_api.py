@@ -1998,6 +1998,36 @@ class Platforms(Resource):
 
         return jsonify({'platforms': platforms})
 
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        platform_data = json_data.get('platform')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/platform', platform_data)
+
+        return jsonify({'status': 200})
+
+
+class PlatformExistsByName(Resource):
+    def get(self, name):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        platforms = server.eval("@SOBJECT(twog/platform['name', '{0}'])".format(name))
+
+        if platforms:
+            return jsonify({'exists': True})
+        else:
+            return jsonify({'exists': False})
+
 
 class PipelinesByType(Resource):
     def get(self, type):
@@ -2960,6 +2990,7 @@ api.add_resource(Order, '/api/v1/order/<string:code>')
 api.add_resource(Packages, '/api/v1/packages')
 api.add_resource(PackagesInOrder, '/api/v1/order/<string:code>/packages')
 api.add_resource(PackageWaitingOnFiles, '/api/v1/package/<string:code>/waiting-files')
+api.add_resource(PlatformExistsByName, '/api/v1/platform/name/<string:name>/exists')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')
