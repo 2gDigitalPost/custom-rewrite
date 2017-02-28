@@ -2921,6 +2921,30 @@ class RemoveTwogComponent(Resource):
         return jsonify({'status': 200})
 
 
+class RemoveTwogFileFlow(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        code = json_data.get('code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the search key by using the given search type and code
+        search_key = server.build_search_key('twog/file_flow', code, project_code='twog')
+
+        # Retire the object
+        server.retire_sobject(search_key)
+
+        # Also retire the twog/file_flow_to_package objects
+        file_flow_to_packages = server.eval("@SOBJECT(twog/file_flow_to_package['file_flow_code', '{0}'])".format(code))
+
+        for file_flow_to_package in file_flow_to_packages:
+            server.retire_sobject(file_flow_to_package.get('__search_key__'))
+
+        return jsonify({'status': 200})
+
+
 class ElementEvaluations(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -3047,6 +3071,7 @@ api.add_resource(PurchaseOrderExists,
 api.add_resource(RemoveFileInOrder, '/api/v1/file-in-order/delete')
 api.add_resource(RetireObject, '/api/v1/retire')
 api.add_resource(RemoveTwogComponent, '/api/v1/remove/twog/component')
+api.add_resource(RemoveTwogFileFlow, '/api/v1/remove/twog/file-flow')
 api.add_resource(TaskInputFileOptions, '/api/v1/task/<string:task_code>/input-file-options')
 api.add_resource(TaskInputFiles, '/api/v1/task/<string:task_code>/input-files')
 api.add_resource(TaskOutputFile, '/api/v1/task/<string:task_code>/output-file')

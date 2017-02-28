@@ -105,12 +105,38 @@ export default {
       .catch(function (error) {
         console.log(error)
       })
+    },
+    deleteFileFlow: function () {
+      let self = this
+
+      let confirmation = window.confirm('Are you sure you want to remove the file flow "' + self.fileFlow.name + '"?')
+
+      let apiURL = '/api/v1/remove/twog/file-flow'
+      let jsonToSend = {
+        'token': localStorage.tactic_token,
+        'code': self.fileFlow.code
+      }
+
+      if (confirmation) {
+        axios.post(apiURL, JSON.stringify(jsonToSend), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
+        })
+        .then(function (response) {
+          if (response.data.status === 200) {
+            bus.$emit('reload-page')
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+      }
     }
   },
   computed: {
     componentCompleteError: function () {
-      if (this.componentStatus.toLowerCase() === 'complete') return true
-      else return false
+      return (this.componentStatus.toLowerCase() === 'complete')
     }
   },
   watch: {
