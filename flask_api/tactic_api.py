@@ -34,6 +34,8 @@ url = config.get('server', 'dev')
 
 from flask_login import current_user
 
+from api_functions.qc_reports.element_evaluations import ElementEvaluations, ElementEvaluationExistsByName
+
 
 @app.route("/api/v1/login", methods=["POST"])
 def api_login():
@@ -2943,51 +2945,6 @@ class RemoveTwogFileFlow(Resource):
             server.retire_sobject(file_flow_to_package.get('__search_key__'))
 
         return jsonify({'status': 200})
-
-
-class ElementEvaluations(Resource):
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('token', required=True)
-        args = parser.parse_args()
-
-        ticket = args.get('token')
-
-        server = TacticServerStub(server=url, project=project, ticket=ticket)
-
-        element_evaluations = server.eval("@SOBJECT(twog/element_evaluation)")
-
-        return jsonify({'element_evaluations': element_evaluations})
-
-    def post(self):
-        json_data = request.get_json()
-
-        ticket = json_data.get('token')
-        element_evaluation_data = json_data.get('element_evaluation')
-
-        server = TacticServerStub(server=url, project=project, ticket=ticket)
-
-        server.insert('twog/element_evaluation', element_evaluation_data)
-
-        return jsonify({'status': 200})
-
-
-class ElementEvaluationExistsByName(Resource):
-    def get(self, name):
-        parser = reqparse.RequestParser()
-        parser.add_argument('token', required=True)
-        args = parser.parse_args()
-
-        ticket = args.get('token')
-
-        server = TacticServerStub(server=url, project=project, ticket=ticket)
-
-        element_evaluations = server.eval("@SOBJECT(twog/element_evaluation['name', '{0}'])".format(name))
-
-        if element_evaluations:
-            return jsonify({'exists': True})
-        else:
-            return jsonify({'exists': False})
 
 
 api.add_resource(DepartmentInstructions, '/department_instructions')
