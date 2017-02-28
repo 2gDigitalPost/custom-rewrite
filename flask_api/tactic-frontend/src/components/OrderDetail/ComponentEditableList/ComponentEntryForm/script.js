@@ -130,12 +130,10 @@ export default {
   },
   computed: {
     nameError: function () {
-      if (_.includes(this.errors, 'name')) return true
-      else return false
+      return _.includes(this.errors, 'name')
     },
     pipelineError: function () {
-      if (_.includes(this.errors, 'pipeline')) return true
-      else return false
+      return _.includes(this.errors, 'pipeline')
     }
   }
 }
