@@ -16,6 +16,7 @@ export default {
   data () {
     return {
       orders: [],
+      displaySearch: false,
       searchColumn: null,
       searchFilter: null
     }

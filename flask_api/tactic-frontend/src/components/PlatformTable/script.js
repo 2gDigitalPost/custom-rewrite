@@ -17,6 +17,7 @@ export default {
   data () {
     return {
       platforms: [],
+      displaySearch: false,
       searchColumn: null,
       searchFilter: null,
       showEnterPlatformForm: false
@@ -26,6 +27,7 @@ export default {
     reloadTable: function () {
       // Reset all the component values to their defaults
       this.platforms = []
+      this.displaySearch = false
       this.searchColumn = null
       this.searchFilter = null
       this.showEnterPlatformForm = false

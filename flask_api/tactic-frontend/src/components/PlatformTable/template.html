@@ -3,15 +3,20 @@
         <div class="col-xs-12">
             <h1>Platforms</h1>
 
-            <button v-on:click="showEnterPlatformForm = !showEnterPlatformForm" class="btn btn-default">
-                <i class="fa fa-plus"></i> Add a new Platform
-            </button>
+            <div class="btn-group">
+                <button v-on:click="showEnterPlatformForm = !showEnterPlatformForm" class="btn btn-default">
+                    <i class="fa fa-plus"></i> Add a new Platform
+                </button>
+                <button v-on:click="displaySearch = !displaySearch" class="btn btn-default">
+                    <i class="fa fa-search"></i> Search
+                </button>
+            </div>
 
             <div v-if="showEnterPlatformForm">
                 <platform-entry-form></platform-entry-form>
             </div>
 
-            <table-search v-bind:options="searchOptions"></table-search>
+            <table-search v-bind:options="searchOptions" v-if="displaySearch"></table-search>
 
             <table class="table table-hover table-fixed">
                 <thead>

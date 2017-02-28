@@ -15,7 +15,6 @@ export default {
   },
   data () {
     return {
-      displaySearch: false,
       selectedSearchOption: null,
       searchQueryText: null,
       selectedMultiselectOptions: null

@@ -1,13 +1,16 @@
 <div>
     <h1>Orders</h1>
 
-    <div>
+    <div class="btn-group">
         <button v-on:click="loadOrderEntryLink" class="btn btn-default">
             <i class="fa fa-plus"></i> Add a new Order
         </button>
+        <button v-on:click="displaySearch = !displaySearch" class="btn btn-default">
+            <i class="fa fa-search"></i> Search
+        </button>
     </div>
 
-    <table-search v-bind:options="searchOptions"></table-search>
+    <table-search v-bind:options="searchOptions" v-if="displaySearch"></table-search>
 
     <table class="table table-hover table-fixed">
         <thead>
