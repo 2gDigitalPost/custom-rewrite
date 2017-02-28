@@ -36,6 +36,14 @@
               <router-link to="/department-requests/links">Department Requests</router-link>
             </li>
             <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reports <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class="dropdown-header">QC Reports</li>
+                <li><router-link to="/element-evaluations">Element Evaluations</router-link></li>
+                <li><router-link to="/metadata-evaluations">MetaData Evaluations</router-link></li>
+              </ul>
+            </li>
+            <li>
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CRM <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><router-link to="/platforms">Platforms</router-link></li>

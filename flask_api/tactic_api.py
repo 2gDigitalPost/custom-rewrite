@@ -2918,6 +2918,51 @@ class RemoveTwogComponent(Resource):
         return jsonify({'status': 200})
 
 
+class ElementEvaluations(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        element_evaluations = server.eval("@SOBJECT(twog/element_evaluation)")
+
+        return jsonify({'element_evaluations': element_evaluations})
+
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        element_evaluation_data = json_data.get('element_evaluation')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/element_evaluation', element_evaluation_data)
+
+        return jsonify({'status': 200})
+
+
+class ElementEvaluationExistsByName(Resource):
+    def get(self, name):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        element_evaluations = server.eval("@SOBJECT(twog/element_evaluation['name', '{0}'])".format(name))
+
+        if element_evaluations:
+            return jsonify({'exists': True})
+        else:
+            return jsonify({'exists': False})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -2975,6 +3020,8 @@ api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
 api.add_resource(Components, '/api/v1/components')
 api.add_resource(DeliverableFilesInOrder, '/api/v1/order/<string:code>/deliverable-files')
+api.add_resource(ElementEvaluations, '/api/v1/element-evaluations')
+api.add_resource(ElementEvaluationExistsByName, '/api/v1/element-evaluation/name/<string:name>/exists')
 api.add_resource(Equipment, '/api/v1/equipment')
 api.add_resource(EquipmentInTask, '/api/v1/task/<string:task_code>/equipment')
 api.add_resource(EstimatedHours, '/api/v1/estimated-hours')

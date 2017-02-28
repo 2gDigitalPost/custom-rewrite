@@ -1,0 +1,27 @@
+<div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group" v-bind:class="{'has-success': name !== '' && !nameExists, 'has-warning': name !== '' && nameExists}">
+                <label for="new-element-evaluation-name">Name</label>
+                <input type="text" v-model="name" class="form-control has-feedback" id="new-element-evaluation-name"/>
+
+                <template v-if="searching">
+                    <i class="fa fa-spinner fa-spin"></i> Searcing...
+                </template>
+                <template v-else-if="name !== '' && nameExists">
+                    <p>A report exists with that name already. You can still give this name to the new report, but be advised that it will be more difficult to find when searching.</p>
+                </template>
+                <template v-else-if="name !== '' && !nameExists">
+                    <p>Report name okay!</p>
+                </template>
+                <template v-else-if="name === ''">
+                    <p>Enter a Report Name. If a report with that name exists, a warning message will display.</p>
+                </template>
+            </div>
+
+            <button v-on:click="submit" class="btn btn-default">
+                <i class="fa fa-floppy-o"></i> Submit</button>
+            </button>
+        </div>
+    </div>
+</div>
