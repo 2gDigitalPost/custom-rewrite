@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-inverse">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -10,7 +10,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <router-link to="/"><img src="~assets/2glogo_only_small.png"/></router-link>
+          <router-link to="/"><img class="navbar-brand" style="padding: 0px; padding-left: 15px;" src="~assets/2glogo_only_small.png"/></router-link>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
