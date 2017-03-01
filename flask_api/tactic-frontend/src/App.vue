@@ -92,3 +92,4 @@ export default {
 
 <style src='../node_modules/bootstrap/dist/css/bootstrap.css'></style>
 <style src='../node_modules/font-awesome/css/font-awesome.min.css'></style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
