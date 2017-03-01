@@ -10,6 +10,7 @@ import AddFileFlowsToOrder from './components/AddFileFlowsToOrder/index.vue'
 import AddOutputFilesToOrder from './components/AddOutputFilesToOrder/index.vue'
 import AddTitleFromIMDb from './components/AddTitleFromIMDb/index.vue'
 import AddTitleManually from './components/AddTitleManually/index.vue'
+import ClientDetail from './components/ClientDetail/index.vue'
 import ClientTable from './components/ClientTable/index.vue'
 import ComponentsInOrder from './components/ComponentsInOrder/index.vue'
 import DepartmentRequestDetail from './components/DepartmentRequestDetail/index.vue'
@@ -60,6 +61,7 @@ const routes = [
   { path: '/tasks/:department', component: TaskTable, beforeEnter: requireAuth },
   { path: '/tasks', component: TaskTable, beforeEnter: requireAuth },
   { path: '/clients', component: ClientTable, beforeEnter: requireAuth },
+  { path: '/clients/:code', component: ClientDetail, beforeEnter: requireAuth },
   { path: '/platforms', component: PlatformTable, beforEnter: requireAuth },
   { path: '/element-evaluations', component: ElementEvaluationTable, beforeEnter: requireAuth },
   { path: '/project-templates', component: ProjectTemplatesList, beforeEnter: requireAuth },

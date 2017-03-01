@@ -250,7 +250,42 @@ class Clients(Resource):
         return jsonify({'status': 200})
 
 
-class Divisions(Resource):
+class Client(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        client = server.get_by_code('twog/client', code)
+
+        return jsonify({'client': client})
+
+
+class ClientDetail(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the client
+        client = server.get_by_code('twog/client', code)
+
+        # Also get the associated divisions
+        divisions = server.eval("@SOBJECT(twog/division['client_code', '{0}'])".format(code))
+        client['divisions'] = divisions
+
+        return jsonify({'client': client})
+
+
+class DivisionByCode(Resource):
     def get(self, client_code):
         parser = reqparse.RequestParser()
         parser.add_argument('token', required=True)
@@ -263,6 +298,20 @@ class Divisions(Resource):
         division_sobjects = server.eval("@SOBJECT(twog/division['client_code', '{0}'])".format(client_code))
 
         return jsonify({'divisions': division_sobjects})
+
+
+class Divisions(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        division_data = json_data.get('division')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/division', division_data)
+
+        return jsonify({'status': 200})
 
 
 class AllTitles(Resource):
@@ -2046,6 +2095,24 @@ class ClientExistsByName(Resource):
             return jsonify({'exists': False})
 
 
+class DivisionExistsByNameAndClientCode(Resource):
+    def get(self, code, name):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        divisions = server.eval("@SOBJECT(twog/division['client_code', '{0}']['name', '{1}'])".format(code, name))
+
+        if divisions:
+            return jsonify({'exists': True})
+        else:
+            return jsonify({'exists': False})
+
+
 class PlatformExistsByName(Resource):
     def get(self, name):
         parser = reqparse.RequestParser()
@@ -2984,7 +3051,7 @@ api.add_resource(InstructionsTemplates, '/api/v1/instructions-templates')
 api.add_resource(InstructionsDocument, '/api/v1/instructions/<string:code>')
 api.add_resource(NewInstructionsForMultipleComponents, '/api/v1/instructions/components')
 api.add_resource(Clients, '/api/v1/clients')
-api.add_resource(Divisions, '/api/v1/divisions/<string:client_code>')
+api.add_resource(DivisionByCode, '/api/v1/divisions/<string:client_code>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
 api.add_resource(Orders, '/api/v1/orders')
@@ -3032,7 +3099,11 @@ api.add_resource(Task, '/api/v1/task/<string:code>')
 api.add_resource(TaskFull, '/api/v1/task/<string:code>/full')
 api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
+api.add_resource(Client, '/api/v1/client/<string:code>')
+api.add_resource(ClientDetail, '/api/v1/client/<string:code>/detail')
 api.add_resource(ClientExistsByName, '/api/v1/client/name/<string:name>/exists')
+api.add_resource(DivisionExistsByNameAndClientCode, '/api/v1/client/<string:code>/division/name/<string:name>/exists')
+api.add_resource(Divisions, '/api/v1/divisions')
 api.add_resource(Components, '/api/v1/components')
 api.add_resource(DeliverableFilesInOrder, '/api/v1/order/<string:code>/deliverable-files')
 api.add_resource(ElementEvaluations, '/api/v1/element-evaluations')

@@ -25,7 +25,7 @@ export default {
       numberOfResultsDisplayed: 50
     }
   },
- methods: {
+  methods: {
     reloadTable: function () {
       // Reset all the component values to their defaults
       this.clients = []
@@ -53,7 +53,7 @@ export default {
       })
     },
     openObjectLink: function(code) {
-      let redirectURL = '/client/' + code
+      let redirectURL = '/clients/' + code
 
       this.$router.push(redirectURL)
     },
