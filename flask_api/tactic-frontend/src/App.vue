@@ -56,8 +56,11 @@
               <router-link to="/instructions-templates">Instructions Templates</router-link>
             </li>
             <li>
-              <router-link v-if="loggedIn" to="/logout">Log Out</router-link>
-              <router-link v-if="!loggedIn" to="/login">Log In</router-link>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><router-link v-if="loggedIn" to="/logout">Log Out</router-link></li>
+                <li><router-link v-if="!loggedIn" to="/login">Log In</router-link></li>
+              </ul>
             </li>
           </ul>
         </div><!-- /.navbar-collapse -->
