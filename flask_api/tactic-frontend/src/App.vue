@@ -46,6 +46,9 @@
             <li>
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CRM <span class="caret"></span></a>
               <ul class="dropdown-menu">
+                <li class="dropdown-header">Clients</li>
+                <li><router-link to="/clients">Clients</router-link></li>
+                <li role="separator" class="divider"/>
                 <li><router-link to="/platforms">Platforms</router-link></li>
               </ul>
             </li>

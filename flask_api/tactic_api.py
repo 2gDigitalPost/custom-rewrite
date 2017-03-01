@@ -237,6 +237,18 @@ class Clients(Resource):
 
         return jsonify({'clients': client_sobjects})
 
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        client_data = json_data.get('client')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/client', client_data)
+
+        return jsonify({'status': 200})
+
 
 class Divisions(Resource):
     def get(self, client_code):
@@ -2016,6 +2028,24 @@ class Platforms(Resource):
         return jsonify({'status': 200})
 
 
+class ClientExistsByName(Resource):
+    def get(self, name):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        clients = server.eval("@SOBJECT(twog/client['name', '{0}'])".format(name))
+
+        if clients:
+            return jsonify({'exists': True})
+        else:
+            return jsonify({'exists': False})
+
+
 class PlatformExistsByName(Resource):
     def get(self, name):
         parser = reqparse.RequestParser()
@@ -3002,6 +3032,7 @@ api.add_resource(Task, '/api/v1/task/<string:code>')
 api.add_resource(TaskFull, '/api/v1/task/<string:code>/full')
 api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
+api.add_resource(ClientExistsByName, '/api/v1/client/name/<string:name>/exists')
 api.add_resource(Components, '/api/v1/components')
 api.add_resource(DeliverableFilesInOrder, '/api/v1/order/<string:code>/deliverable-files')
 api.add_resource(ElementEvaluations, '/api/v1/element-evaluations')

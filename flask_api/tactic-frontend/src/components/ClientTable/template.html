@@ -1,0 +1,42 @@
+<div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>Clients</h1>
+
+            <div class="btn-group">
+                <button v-on:click="showAddForm = !showAddForm" class="btn btn-default">
+                    <i class="fa fa-plus"></i> Add a new Client
+                </button>
+                <button v-on:click="displaySearch = !displaySearch" class="btn btn-default">
+                    <i class="fa fa-search"></i> Search
+                </button>
+            </div>
+
+            <div v-if="showAddForm">
+                <client-entry-form></client-entry-form>
+            </div>
+
+            <table-search v-bind:options="searchOptions" v-if="displaySearch"></table-search>
+
+            <table class="table table-hover table-fixed">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="object in objectsToDisplay" v-on:click="openObjectLink(object.code)">
+                        <td>{{ object.code }}</td>
+                        <td>{{ object.name }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <ul class="pager">
+                <li class="previous" v-if="currentPage > 1"><a v-on:click.stop="modifyCurrentPage(-1)">Previous</a></li>
+                <li class="next" v-if="currentPage < numberOfPages"><a v-on:click.stop="modifyCurrentPage(1)">Next</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
