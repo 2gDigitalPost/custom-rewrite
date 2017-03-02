@@ -1116,10 +1116,22 @@ class FileFlow(Resource):
 
         ticket = json_data.get('token')
         file_flow = json_data.get('file_flow')
+        package_codes = json_data.get('package_codes')
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        server.insert('twog/file_flow', file_flow)
+        inserted_file_flow = server.insert('twog/file_flow', file_flow)
+
+        # If package codes were submitted with the file flow, attach the file flow to those packages
+        if package_codes:
+            # Get a list of dictionaries, containing the file flow code and the package code to insert
+            file_flow_to_packages = []
+
+            for package_code in package_codes:
+                file_flow_to_packages.append({'file_flow_code': inserted_file_flow.get('code'),
+                                              'package_code': package_code})
+
+            server.insert_multiple('twog/file_flow_to_package', file_flow_to_packages)
 
         return jsonify({'status': 200})
 
@@ -2640,7 +2652,7 @@ class TaskOutputFiles(Resource):
         # There should be one and only one twog/task_data object associated with one task code
         task_data = server.get_unique_sobject('twog/task_data', {'task_code': task_code})
 
-        # Start by getting the existing input file in task entries.
+        # Start by getting the existing output file in task entries.
         existing_entries = server.eval("@SOBJECT(twog/task_data_out_file['task_data_code', '{0}'])".format(
             task_data.get('code')))
 

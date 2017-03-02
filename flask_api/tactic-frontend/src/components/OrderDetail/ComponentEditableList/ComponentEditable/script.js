@@ -5,6 +5,7 @@ import axios from 'axios'
 import EditableTitle from './EditableTitle/index.vue'
 import TaskEditableList from './TaskEditableList/index.vue'
 import FileFlowEditableList from '../../../FileFlowEditableList/index.vue'
+import FileFlowEntryForm from '../../../FileFlowEntryForm/index.vue'
 
 import bus from '../../../../bus'
 
@@ -14,7 +15,8 @@ export default {
   components: {
     EditableTitle,
     TaskEditableList,
-    FileFlowEditableList
+    FileFlowEditableList,
+    FileFlowEntryForm
   },
   data () {
     return {
@@ -22,7 +24,8 @@ export default {
       fileFlows: this.component.file_flows,
       tasks: this.component.tasks,
       title: this.component.title,
-      instructionsDocument: this.component
+      instructionsDocument: this.component,
+      addingFileFlow: false
     }
   },
   methods: {
@@ -59,6 +62,15 @@ export default {
           console.log(error)
         })
       }
+    },
+    cancelFileFlowEntry: function () {
+      this.addingFileFlow = false
     }
+  },
+  created() {
+    bus.$on('file-flow-entry-cancel', this.cancelFileFlowEntry)
+  },
+  destroyed() {
+    bus.$off('file-flow-entry-cancel', this.cancelFileFlowEntry)
   }
 }

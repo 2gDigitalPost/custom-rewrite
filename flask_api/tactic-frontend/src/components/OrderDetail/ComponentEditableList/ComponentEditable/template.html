@@ -30,6 +30,14 @@
                 <span v-else>
                     No File flows assigned.
                 </span>
+                
+                <button class="btn btn-default" v-on:click="addingFileFlow = !addingFileFlow">
+                    <i class="fa fa-plus"></i> Add a File Flow
+                </button>
+
+                <template v-if="addingFileFlow">
+                    <file-flow-entry-form v-bind:componentCode="componentObject.code" v-bind:orderCode="componentObject.order_code"></file-flow-entry-form>
+                </template>
             </div>
         </div>
 

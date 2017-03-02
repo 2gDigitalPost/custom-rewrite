@@ -1,0 +1,29 @@
+<div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group" v-bind:class="{'has-error': nameError}">
+                <label class="control-label" for="new-file-flow-name">Name</label>
+                <input type="text" class="form-control" id="new-file-flow-name" v-model="name" aria-describedby="name-help-block" />
+                <span id="name-help-block" class="help-block">This field is required.</span>
+            </div>
+            
+            <template v-if="packageOptions.length > 0">
+                <ul>
+                    <li v-for="packageOption in packageOptions">
+                        <input type="checkbox" :value="packageOption.code" v-model="selectedPackages" />
+                        {{ packageOption.name }}
+                    </li>
+                </ul>
+            </template>
+
+            <div class="btn-group">
+                <button class="btn btn-default" v-on:click="submit">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+                </button>
+                <button class="btn btn-default" v-on:click="cancel">
+                    <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
