@@ -2467,11 +2467,14 @@ class TaskInputFileOptions(Resource):
         # Get the actual sthpw/task sobject
         task = server.get_by_code('sthpw/task', task_code)
 
-        # Get the twog/component sobject
-        component = server.get_by_code('twog/component', task.get('search_code'))
+        # Get the parent type for the task
+        parent_type = task.get('search_type')
+
+        # Get the parent sobject
+        parent = server.get_by_code(parent_type, task.get('search_code'))
 
         # Get the twog/order sobject
-        order = server.get_by_code('twog/order', component.get('order_code'))
+        order = server.get_by_code('twog/order', parent.get('order_code'))
 
         # Get all the relevant twog/file_in_order entries
         files_in_order = server.eval("@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(order.get('code')))
