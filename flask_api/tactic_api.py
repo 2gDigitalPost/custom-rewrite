@@ -2534,6 +2534,41 @@ class TaskInputFiles(Resource):
         return jsonify({'status': 200})
 
 
+class TaskOutputFileOptions(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the actual sthpw/task sobject
+        task = server.get_by_code('sthpw/task', code)
+
+        # Get the parent type for the task
+        parent_type = task.get('search_type')
+
+        # Get the parent sobject
+        parent = server.get_by_code(parent_type, task.get('search_code'))
+
+        # Get the twog/order sobject
+        order = server.get_by_code('twog/order', parent.get('order_code'))
+
+        # Get all the relevant twog/file_in_order entries
+        files_in_order = server.eval("@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(order.get('code')))
+
+        # Get a list of the file codes for faster searching
+        file_codes = [file_in_order.get('file_code') for file_in_order in files_in_order]
+        file_codes_string = '|'.join(file_codes)
+
+        # Get the actual twog/file sobjects
+        files = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(file_codes_string))
+
+        return jsonify({'files': files})
+
+
 class TaskOutputFile(Resource):
     def post(self, task_code):
         json_data = request.get_json()
@@ -2588,6 +2623,51 @@ class TaskOutputFile(Resource):
         # Make the connection between the file and the order
         server.insert('twog/file_in_order', {'file_code': new_output_file.get('code'),
                                              'order_code': parent_object.get('order_code')})
+
+        return jsonify({'status': 200})
+
+
+class TaskOutputFiles(Resource):
+    def post(self, task_code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        file_codes = json_data.get('file_codes', [])
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the twog/task_data object associated with the task code
+        # There should be one and only one twog/task_data object associated with one task code
+        task_data = server.get_unique_sobject('twog/task_data', {'task_code': task_code})
+
+        # Start by getting the existing input file in task entries.
+        existing_entries = server.eval("@SOBJECT(twog/task_data_out_file['task_data_code', '{0}'])".format(
+            task_data.get('code')))
+
+        # Compare the submitted codes with the existing entries to get a list of what needs to be added
+        entries_to_add = []
+
+        for file_code in file_codes:
+            if file_code not in [existing_entry.get('code') for existing_entry in existing_entries]:
+                entries_to_add.append({'file_code': file_code, 'task_data_code': task_data.get('code')})
+
+        # Add the new entries to the twog/task_data_out_file table
+        server.insert_multiple('twog/task_data_out_file', entries_to_add)
+
+        # Compare the existing entries with the file codes to get a list of what needs to be removed
+        entries_to_delete = []
+
+        for existing_entry in existing_entries:
+            existing_entry_code = existing_entry.get('code')
+
+            if existing_entry_code not in file_codes:
+                entries_to_delete.append(existing_entry)
+
+        # Delete entries that exist but were not included in the submission (the user unselected them)
+        for entry_to_delete in entries_to_delete:
+            search_key = entry_to_delete.get('__search_key__')
+
+            server.delete_sobject(search_key)
 
         return jsonify({'status': 200})
 
@@ -3136,7 +3216,9 @@ api.add_resource(RemoveTwogComponent, '/api/v1/remove/twog/component')
 api.add_resource(RemoveTwogFileFlow, '/api/v1/remove/twog/file-flow')
 api.add_resource(TaskInputFileOptions, '/api/v1/task/<string:task_code>/input-file-options')
 api.add_resource(TaskInputFiles, '/api/v1/task/<string:task_code>/input-files')
+api.add_resource(TaskOutputFileOptions, '/api/v1/task/<string:code>/output-file-options')
 api.add_resource(TaskOutputFile, '/api/v1/task/<string:task_code>/output-file')
+api.add_resource(TaskOutputFiles, '/api/v1/task/<string:task_code>/output-files')
 
 
 if __name__ == '__main__':

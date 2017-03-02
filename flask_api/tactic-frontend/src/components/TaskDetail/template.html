@@ -66,9 +66,11 @@
                 <div v-if="addingOutputFile">
                     <add-output-file-to-task v-bind:task="taskObject" v-bind:inputFiles="inputFiles"></output-files-in-task>
                 </div>
-                <div>
-                    Output Files <a v-on:click="addingOutputFile = true"><i class="fa fa-plus" aria-hidden="true"></i></a>
-
+                <div v-else-if="importingOutputFiles">
+                    <output-files-in-task v-bind:task="taskObject" v-bind:currentOutputFiles="outputFiles"></output-files-in-task>
+                </div>
+                <div v-else>
+                    Output Files <a v-on:click="addingOutputFile = true"><i class="fa fa-plus" aria-hidden="true"></i></a> <a v-on:click="importingOutputFiles = true"><i class="fa fa-edit" aria-hidden="true"></i></a>
                     <ul v-if="outputFiles.length > 0" class="list-group">
                         <li 
                             is="editable-output-file"
