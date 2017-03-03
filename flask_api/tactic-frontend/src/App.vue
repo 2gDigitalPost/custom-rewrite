@@ -53,7 +53,11 @@
               </ul>
             </li>
             <li>
-              <router-link to="/project-templates">Project Templates</router-link>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Project Templates <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><router-link to="/project-templates">Existing Templates</router-link></li>
+                <li><router-link to="/project-templates/requests">New Template Requests</router-link></li>
+              </ul>
             </li>
             <li>
               <router-link to="/instructions-templates">Instructions Templates</router-link>

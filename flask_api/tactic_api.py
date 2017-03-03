@@ -3179,6 +3179,41 @@ class ProjectTemplateRequest(Resource):
         return jsonify({'project_template_request': inserted_project_template_request})
 
 
+class ProjectTemplateRequests(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        project_template_requests = server.eval("@SOBJECT(twog/project_template_request)")
+
+        return jsonify({'project_template_requests': project_template_requests})
+
+
+class ProjectTemplateRequestByCode(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        project_template_request = server.get_by_code('twog/project_template_request', code)
+
+        task = server.eval("@SOBJECT(sthpw/task['search_code', '{0}'])".format(project_template_request.get('code')))
+
+        if task:
+            project_template_request['task'] = task[0]
+
+        return jsonify({'project_template_request': project_template_request})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -3260,6 +3295,8 @@ api.add_resource(PackagesInOrder, '/api/v1/order/<string:code>/packages')
 api.add_resource(PackageWaitingOnFiles, '/api/v1/package/<string:code>/waiting-files')
 api.add_resource(PlatformExistsByName, '/api/v1/platform/name/<string:name>/exists')
 api.add_resource(ProjectTemplateRequest, '/api/v1/project-templates/request')
+api.add_resource(ProjectTemplateRequestByCode, '/api/v1/project-templates/requests/<string:code>')
+api.add_resource(ProjectTemplateRequests, '/api/v1/project-templates/requests')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')

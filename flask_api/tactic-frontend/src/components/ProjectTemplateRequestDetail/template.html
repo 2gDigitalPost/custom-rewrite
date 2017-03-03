@@ -1,0 +1,17 @@
+<div>
+    <div class="row">
+        <template v-if="loading">
+            <i class="fa fa-spinner fa-spin"></i> Loading...
+        </template>
+        <template v-else>
+            <div class="col-md-12">
+                <h1>{{ projectTemplateRequestObject.name }}</h1>
+                <p>{{ projectTemplateRequestObject.description }}</p>
+            </div>
+
+            <div>
+                <edit-task-status v-bind:task="projectTemplateRequestObject.task"></edit-task-status>
+            </div>
+        </template>
+    </div>
+</div>
