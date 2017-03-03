@@ -15,6 +15,7 @@
                 <th>Code</th>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Status</th>
                 <th>Due Date</th>
                 <th>Submitted By</th>
             </tr>
@@ -24,6 +25,7 @@
                 <td>{{ projectTemplateRequest.code }}</td>
                 <td>{{ projectTemplateRequest.name }}</td>
                 <td>{{ projectTemplateRequest.description }}</td>
+                <td>{{ projectTemplateRequest.status }}</td>
                 <td>{{ dateFormatted(projectTemplateRequest.due_date) }}</td>
                 <td>{{ getLoginName(projectTemplateRequest.login) }}</td>
             </tr>

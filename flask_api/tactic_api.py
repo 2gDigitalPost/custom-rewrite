@@ -3191,6 +3191,24 @@ class ProjectTemplateRequests(Resource):
 
         project_template_requests = server.eval("@SOBJECT(twog/project_template_request)")
 
+        # Query the tasks for each project template request's status
+        project_template_request_codes = [project_template_request.get('code') for project_template_request in project_template_requests]
+        project_template_request_codes_string = '|'.join(project_template_request_codes)
+
+        tasks = server.eval("@SOBJECT(sthpw/task['search_code', 'in', '{0}'])".format(project_template_request_codes_string))
+
+        tasks_by_project_template_request_codes = {}
+        for task in tasks:
+            print(task)
+            print(task.get('search_code'))
+            tasks_by_project_template_request_codes[task.get('search_code')] = task
+
+        for project_template_request in project_template_requests:
+            project_template_request_task = tasks_by_project_template_request_codes.get(project_template_request.get('code'))
+
+            if project_template_request_task:
+                project_template_request['status'] = project_template_request_task.get('status')
+
         return jsonify({'project_template_requests': project_template_requests})
 
 
