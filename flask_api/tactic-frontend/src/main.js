@@ -30,6 +30,7 @@ import OrderList from './components/OrderList/index.vue'
 import PlatformTable from './components/PlatformTable/index.vue'
 import ProjectTemplate from './components/ProjectTemplate/index.vue'
 import ProjectTemplatesList from './components/ProjectTemplatesList/index.vue'
+import ProjectTemplateRequest from './components/ProjectTemplateRequest/index.vue'
 import SelectPipelines from './components/SelectPipelines/index.vue'
 import TaskDetail from './components/TaskDetail/index.vue'
 import TaskLinks from './components/TaskLinks/index.vue'
@@ -65,6 +66,7 @@ const routes = [
   { path: '/platforms', component: PlatformTable, beforEnter: requireAuth },
   { path: '/element-evaluations', component: ElementEvaluationTable, beforeEnter: requireAuth },
   { path: '/project-templates', component: ProjectTemplatesList, beforeEnter: requireAuth },
+  { path: '/project-templates/request', component: ProjectTemplateRequest, beforeEnter: requireAuth },
   { path: '/project-templates/new', component: NewProjectTemplateForm, beforeEnter: requireAuth },
   { path: '/project-templates/:code', component: ProjectTemplate, beforeEnter: requireAuth },
   { path: '/instructions/:code', component: EditableInstructionsDocument, beforeEnter: requireAuth },

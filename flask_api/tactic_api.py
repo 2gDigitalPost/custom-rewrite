@@ -1,8 +1,12 @@
+import os
+import uuid
+
 from flask import Flask, jsonify, render_template, request, flash, session, abort
 from flask_cors import CORS
 from flask_restful import reqparse, Resource, Api
 
 import sys
+import json
 
 import ConfigParser
 
@@ -35,6 +39,13 @@ url = config.get('server', 'dev')
 from flask_login import current_user
 
 from api_functions.qc_reports.element_evaluations import ElementEvaluations, ElementEvaluationExistsByName
+
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = config.get('tacticpath', 'filepath')
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'xls', 'xlsx'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @app.route("/api/v1/login", methods=["POST"])
@@ -3139,6 +3150,34 @@ class RemoveTwogFileFlow(Resource):
         return jsonify({'status': 200})
 
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+class ProjectTemplateRequest(Resource):
+    def post(self):
+        file = request.files['file']
+
+        json_data = json.loads(request.form.get('json'))
+        ticket = json_data.get('token')
+        project_template_data = json_data.get('project_template_request')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        inserted_project_template_request = server.insert('twog/project_template_request', project_template_data)
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = app.config['UPLOAD_FOLDER'] + '/project_template_request/' + inserted_project_template_request.get('code')
+
+            if not os.path.exists(file_path):
+                os.makedirs(file_path)
+
+            file.save(os.path.join(file_path, filename))
+
+        return jsonify({'project_template_request': inserted_project_template_request})
+
+
 api.add_resource(DepartmentInstructions, '/department_instructions')
 api.add_resource(NewInstructionsTemplate, '/instructions_template')
 api.add_resource(InstructionsTemplate, '/api/v1/instructions-templates/<string:code>')
@@ -3219,6 +3258,7 @@ api.add_resource(Packages, '/api/v1/packages')
 api.add_resource(PackagesInOrder, '/api/v1/order/<string:code>/packages')
 api.add_resource(PackageWaitingOnFiles, '/api/v1/package/<string:code>/waiting-files')
 api.add_resource(PlatformExistsByName, '/api/v1/platform/name/<string:name>/exists')
+api.add_resource(ProjectTemplateRequest, '/api/v1/project-templates/request')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')

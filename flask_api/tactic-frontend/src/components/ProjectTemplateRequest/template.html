@@ -1,0 +1,40 @@
+<div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>Project Template Request</h1>
+            <p>
+                Fill out the following form to request a new Project Template from the Onboarding department.
+                Give the request a name and a brief description of what is needed, along with a due date.
+                If you have a spec sheet, be sure to attach it as well.
+            </p>
+            <div class="form-group" v-bind:class="{'has-error': nameError}">
+                <label class="control-label" for="new-project-template-request-name">Name</label>
+                <input type="text" class="form-control" id="new-project-template-request-name" v-model="name" aria-describedby="name-help-block" />
+                <span id="name-help-block" class="help-block">This field is required.</span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="new-project-template-request-description">Description</label>
+                <textarea class="form-control" id="new-project-template-request-description" v-model="description" />
+
+                <span>Due Date：</span>
+                <date-picker :date="dueDate" :option="option" :limit="limit"></date-picker>
+
+                <div v-if="!attachedFile">
+                    <h2>Select a file</h2>
+                </div>
+                <div v-else>
+                    <h2>File Selected</h2>
+                </div>
+
+                <input type="file" @change="onFileChange">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-default" v-on:click="submit">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
