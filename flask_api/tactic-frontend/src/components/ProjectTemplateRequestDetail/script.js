@@ -4,14 +4,14 @@ import axios from 'axios'
 import _ from 'lodash'
 import marked from 'marked'
 
-import EditTaskStatus from '../TaskDetail/EditTaskStatus/index.vue'
+import TaskStatusSelect from '../TaskStatusSelect/index.vue'
 
 import bus from '../../bus'
 
 export default {
   name: 'ProjectTemplateRequestDetail',
   components: {
-    EditTaskStatus
+    TaskStatusSelect
   },
   data () {
     return {
@@ -24,6 +24,7 @@ export default {
     loadProjectTemplateRequest: function () {
       let self = this
       self.loading = true
+      self.editingTaskStatus = false
 
       let codeParam = self.$route.params.code
 
@@ -42,8 +43,19 @@ export default {
         console.log(error)
       })
     },
+    editTaskStatusCancelled: function () {
+      this.editingTaskStatus = false
+    }
   },
   beforeMount: function () {
     this.loadProjectTemplateRequest()
-  }
+  },
+  created: function () {
+    bus.$on('task-status-edit-cancel', this.editTaskStatusCancelled)
+    bus.$on('reload-page', this.loadProjectTemplateRequest)
+  },
+  destroyed: function () {
+    bus.$off('task-status-edit-cancel', this.editTaskStatusCancelled)
+    bus.$off('reload-page', this.loadProjectTemplateRequest)
+  },
 }

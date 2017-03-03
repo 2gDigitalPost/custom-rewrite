@@ -7,10 +7,13 @@
             <div class="col-md-12">
                 <h1>{{ projectTemplateRequestObject.name }}</h1>
                 <p>{{ projectTemplateRequestObject.description }}</p>
-            </div>
 
-            <div>
-                <edit-task-status v-bind:task="projectTemplateRequestObject.task"></edit-task-status>
+                <div v-if="editingTaskStatus">
+                    <task-status-select v-bind:task="projectTemplateRequestObject.task"></task-status-select>
+                </div>
+                <div v-else>
+                    <div>Status: {{ projectTemplateRequestObject.task.status }} <a v-on:click="editingTaskStatus = true"><i class="fa fa-edit" aria-hidden="true"></i></a></div>
+                </div>
             </div>
         </template>
     </div>
