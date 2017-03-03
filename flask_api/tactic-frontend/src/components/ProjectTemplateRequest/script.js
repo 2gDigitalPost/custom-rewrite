@@ -65,7 +65,10 @@ export default {
 
       let data = new FormData()
       data.append('json', JSON.stringify(jsonData))
-      data.append('file', self.attachedFile)
+
+      if (self.attachedFile) {
+        data.append('file', self.attachedFile)
+      }
 
       axios.post('/api/v1/project-templates/request', data, {
       })

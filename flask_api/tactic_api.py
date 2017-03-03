@@ -3156,8 +3156,6 @@ def allowed_file(filename):
 
 class ProjectTemplateRequest(Resource):
     def post(self):
-        file = request.files['file']
-
         json_data = json.loads(request.form.get('json'))
         ticket = json_data.get('token')
         project_template_data = json_data.get('project_template_request')
@@ -3166,14 +3164,17 @@ class ProjectTemplateRequest(Resource):
 
         inserted_project_template_request = server.insert('twog/project_template_request', project_template_data)
 
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = app.config['UPLOAD_FOLDER'] + '/project_template_request/' + inserted_project_template_request.get('code')
+        if request.files:
+            received_file = request.files['file']
 
-            if not os.path.exists(file_path):
-                os.makedirs(file_path)
+            if received_file and allowed_file(received_file.filename):
+                filename = secure_filename(received_file.filename)
+                file_path = app.config['UPLOAD_FOLDER'] + '/project_template_request/' + inserted_project_template_request.get('code')
 
-            file.save(os.path.join(file_path, filename))
+                if not os.path.exists(file_path):
+                    os.makedirs(file_path)
+
+                received_file.save(os.path.join(file_path, filename))
 
         return jsonify({'project_template_request': inserted_project_template_request})
 
