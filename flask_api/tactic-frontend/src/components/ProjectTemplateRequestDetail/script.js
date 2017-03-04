@@ -45,6 +45,9 @@ export default {
     },
     editTaskStatusCancelled: function () {
       this.editingTaskStatus = false
+    },
+    getFileLink: function (fileName) {
+      return 'http://localhost:8081/assets/project_template_request/' + this.projectTemplateRequestObject.code + '/' + fileName
     }
   },
   beforeMount: function () {

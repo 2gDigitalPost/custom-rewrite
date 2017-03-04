@@ -3199,8 +3199,6 @@ class ProjectTemplateRequests(Resource):
 
         tasks_by_project_template_request_codes = {}
         for task in tasks:
-            print(task)
-            print(task.get('search_code'))
             tasks_by_project_template_request_codes[task.get('search_code')] = task
 
         for project_template_request in project_template_requests:
@@ -3228,6 +3226,22 @@ class ProjectTemplateRequestByCode(Resource):
 
         if task:
             project_template_request['task'] = task[0]
+
+        # Get the list of files
+        from os import listdir
+        from os.path import isfile, join
+
+        file_path = app.config['UPLOAD_FOLDER'] + '/project_template_request/' + project_template_request.get('code')
+
+        if (os.path.exists(file_path)):
+            files_in_path = [f for f in listdir(file_path) if isfile(join(file_path, f))]
+
+            if files_in_path:
+                project_template_request['files'] = files_in_path
+            else:
+                project_template_request['files'] = []
+        else:
+            project_template_request['files'] = []
 
         return jsonify({'project_template_request': project_template_request})
 
