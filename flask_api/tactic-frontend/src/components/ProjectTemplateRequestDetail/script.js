@@ -5,7 +5,7 @@ import _ from 'lodash'
 import Multiselect from 'vue-multiselect'
 
 import ProjectTemplateSelect from '../SelectWidgets/ProjectTemplateSelect'
-import TaskStatusSelect from '../TaskStatusSelect/index.vue'
+import TaskStatusSelect from '../SelectWidgets/TaskStatusSelect/index.vue'
 
 import bus from '../../bus'
 
@@ -21,7 +21,8 @@ export default {
       loading: true,
       projectTemplateRequestObject: null,
       editingTaskStatus: false,
-      statusComplete: false,
+      editingProjectTemplate: false,
+      selectedStatus: null,
       selectedProjectTemplate: null
     }
   },
@@ -30,7 +31,8 @@ export default {
       let self = this
       self.loading = true
       self.editingTaskStatus = false
-      self.statusComplete = false
+      self.editingProjectTemplate = false
+      self.selectedStatus = null
       self.selectedProjectTemplate = null
 
       let codeParam = self.$route.params.code
@@ -51,9 +53,7 @@ export default {
       })
     },
     statusChanged: function (status) {
-      if (status.toLowerCase() === 'complete') {
-        this.statusComplete = true
-      }
+      this.selectedStatus = status
     },
     projectTemplateChange: function (projectTemplate) {
       this.selectedProjectTemplate = projectTemplate
@@ -63,10 +63,60 @@ export default {
     },
     getFileLink: function (fileName) {
       return 'http://localhost:8081/assets/project_template_request/' + this.projectTemplateRequestObject.code + '/' + fileName
+    },
+    submit: function () {
+      let self = this
+
+      let apiURL = '/api/v1/project-templates/requests/' + self.projectTemplateRequestObject.code
+
+      let updateData = {}
+
+      if (self.selectedStatus) {
+        updateData['status'] = self.selectedStatus
+      }
+      if (self.selectedProjectTemplate) {
+        updateData['project_template_code'] = self.selectedProjectTemplate.code
+      }
+
+      let jsonToSend = {
+        'token': localStorage.tactic_token,
+        'update_data': updateData
+      }
+
+      axios.post(apiURL, JSON.stringify(jsonToSend), {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+      })
+      .then(function (response) {
+        if (response.status === 200) {
+          bus.$emit('reload-page')
+        }
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
     }
   },
   beforeMount: function () {
     this.loadProjectTemplateRequest()
+  },
+  computed: {
+    showSubmit: function () {
+      if (this.selectedStatus === null && this.selectedProjectTemplate === null) return false
+
+      let currentStatus = this.projectTemplateRequestObject.task.status
+      let currentProjectTemplate = this.projectTemplateRequestObject.project_template
+
+      if (currentStatus !== this.selectedStatus) {
+        if (this.selectedStatus && this.selectedStatus.toLowerCase() === 'complete') {
+          return (!(currentProjectTemplate === null && this.selectedProjectTemplate === null))
+        }
+        else {
+          return true
+        }
+      }
+    }
   },
   created: function () {
     bus.$on('task-status-edit-cancel', this.editTaskStatusCancelled)

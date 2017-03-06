@@ -3226,6 +3226,16 @@ class ProjectTemplateRequestByCode(Resource):
 
         if task:
             project_template_request['task'] = task[0]
+        else:
+            project_template_request['task'] = None
+
+        project_template_code = project_template_request.get('project_template_code')
+        if project_template_code:
+            project_template = server.get_by_code('twog/project_template', project_template_code)
+
+            project_template_request['project_template'] = project_template
+        else:
+            project_template_request['project_template'] = None
 
         # Get the list of files
         from os import listdir
@@ -3244,6 +3254,33 @@ class ProjectTemplateRequestByCode(Resource):
             project_template_request['files'] = []
 
         return jsonify({'project_template_request': project_template_request})
+
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        update_data = json_data.get('update_data')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the search key by using the given search type and code
+        search_key = server.build_search_key('twog/project_template_request', code, project_code='twog')
+
+        status = update_data.get('status')
+        project_template_code = update_data.get('project_template_code')
+
+        if status:
+            project_template_request = server.get_by_search_key(search_key)
+            task = server.eval(
+                "@SOBJECT(sthpw/task['search_code', '{0}'])".format(project_template_request.get('code')))[0]
+            task_search_key = task.get('__search_key__')
+
+            server.update(task_search_key, {'status': status})
+
+        if project_template_code:
+            server.update(search_key, {'project_template_code': project_template_code})
+
+        return jsonify({'status': 200})
 
 
 api.add_resource(DepartmentInstructions, '/department_instructions')

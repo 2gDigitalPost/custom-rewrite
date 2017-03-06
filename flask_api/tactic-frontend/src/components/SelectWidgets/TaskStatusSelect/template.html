@@ -1,0 +1,10 @@
+<div>
+    <template v-if="loading">
+        <div><i class="fa fa-spinner fa-spin"></i> Loading...</div>
+    </template>
+    <template v-else>
+        <div class="status-select">
+            <multiselect v-model="selectedStatus" :options="statusOptions" :hide-selected="true"></multiselect>
+        </div>
+    </template>
+</div>
