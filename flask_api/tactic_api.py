@@ -3207,6 +3207,9 @@ class ProjectTemplateRequests(Resource):
             if project_template_request_task:
                 project_template_request['status'] = project_template_request_task.get('status')
 
+        # Remove the project template requests that are 'Complete'
+        project_template_requests = [project_template_request for project_template_request in project_template_requests if project_template_request.get('status') != 'Complete']
+
         return jsonify({'project_template_requests': project_template_requests})
 
 
