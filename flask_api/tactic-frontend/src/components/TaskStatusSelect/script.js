@@ -34,7 +34,6 @@ export default {
         }
       })
       .then(function (response) {
-        console.log(response)
         self.statusOptions = response.data.processes
         self.loading = false
       })
@@ -73,5 +72,10 @@ export default {
   },
   beforeMount: function () {
     this.loadStatusOptions()
+  },
+  watch: {
+    selectedStatus: function () {
+      bus.$emit('selected-status-change', this.selectedStatus)
+    }
   }
 }
