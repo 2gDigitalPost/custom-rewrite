@@ -2,8 +2,9 @@
 
 import axios from 'axios'
 import _ from 'lodash'
-import marked from 'marked'
+import Multiselect from 'vue-multiselect'
 
+import ProjectTemplateSelect from '../SelectWidgets/ProjectTemplateSelect'
 import TaskStatusSelect from '../TaskStatusSelect/index.vue'
 
 import bus from '../../bus'
@@ -11,13 +12,17 @@ import bus from '../../bus'
 export default {
   name: 'ProjectTemplateRequestDetail',
   components: {
+    Multiselect,
+    ProjectTemplateSelect,
     TaskStatusSelect
   },
   data () {
     return {
       loading: true,
       projectTemplateRequestObject: null,
-      editingTaskStatus: false
+      editingTaskStatus: false,
+      statusComplete: false,
+      selectedProjectTemplate: null
     }
   },
   methods: {
@@ -25,6 +30,8 @@ export default {
       let self = this
       self.loading = true
       self.editingTaskStatus = false
+      self.statusComplete = false
+      self.selectedProjectTemplate = null
 
       let codeParam = self.$route.params.code
 
@@ -43,6 +50,14 @@ export default {
         console.log(error)
       })
     },
+    statusChanged: function (status) {
+      if (status.toLowerCase() === 'complete') {
+        this.statusComplete = true
+      }
+    },
+    projectTemplateChange: function (projectTemplate) {
+      this.selectedProjectTemplate = projectTemplate
+    },
     editTaskStatusCancelled: function () {
       this.editingTaskStatus = false
     },
@@ -55,10 +70,14 @@ export default {
   },
   created: function () {
     bus.$on('task-status-edit-cancel', this.editTaskStatusCancelled)
+    bus.$on('selected-status-change', this.statusChanged)
+    bus.$on('selected-project-template-change', this.projectTemplateChange)
     bus.$on('reload-page', this.loadProjectTemplateRequest)
   },
   destroyed: function () {
     bus.$off('task-status-edit-cancel', this.editTaskStatusCancelled)
+    bus.$off('selected-status-change', this.statusChanged)
+    bus.$off('selected-project-template-change', this.projectTemplateChange)
     bus.$off('reload-page', this.loadProjectTemplateRequest)
   },
 }

@@ -15,6 +15,14 @@
                     <div>Status: {{ projectTemplateRequestObject.task.status }} <a v-on:click="editingTaskStatus = true"><i class="fa fa-edit" aria-hidden="true"></i></a></div>
                 </div>
 
+                <div v-if="projectTemplateRequestObject.project_template_code">
+                    <div>Project Template: {{ projectTemplateRequestObject.project_template_code }}
+                </div>
+
+                <div v-if="statusComplete">
+                    <project-template-select></project-template-select>
+                </div>
+
                 <template v-if="projectTemplateRequestObject.files.length > 0">
                     <h4>Files</h4>
                     <ul class="list-group">
