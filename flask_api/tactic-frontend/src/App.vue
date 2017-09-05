@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-inverse">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -10,7 +10,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <router-link to="/"><img src="~assets/2glogo_only_small.png"/></router-link>
+          <router-link to="/"><img class="navbar-brand" style="padding: 0px; padding-left: 15px;" src="~assets/2glogo_only_small.png"/></router-link>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -46,18 +46,28 @@
             <li>
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CRM <span class="caret"></span></a>
               <ul class="dropdown-menu">
+                <li class="dropdown-header">Clients</li>
+                <li><router-link to="/clients">Clients</router-link></li>
+                <li role="separator" class="divider"/>
                 <li><router-link to="/platforms">Platforms</router-link></li>
               </ul>
             </li>
             <li>
-              <router-link to="/project-templates">Project Templates</router-link>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Project Templates <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><router-link to="/project-templates">Existing Templates</router-link></li>
+                <li><router-link to="/project-templates/requests">New Template Requests</router-link></li>
+              </ul>
             </li>
             <li>
               <router-link to="/instructions-templates">Instructions Templates</router-link>
             </li>
             <li>
-              <router-link v-if="loggedIn" to="/logout">Log Out</router-link>
-              <router-link v-if="!loggedIn" to="/login">Log In</router-link>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><router-link v-if="loggedIn" to="/logout">Log Out</router-link></li>
+                <li><router-link v-if="!loggedIn" to="/login">Log In</router-link></li>
+              </ul>
             </li>
           </ul>
         </div><!-- /.navbar-collapse -->
@@ -89,3 +99,4 @@ export default {
 
 <style src='../node_modules/bootstrap/dist/css/bootstrap.css'></style>
 <style src='../node_modules/font-awesome/css/font-awesome.min.css'></style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

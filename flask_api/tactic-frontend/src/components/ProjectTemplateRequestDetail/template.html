@@ -1,0 +1,51 @@
+<div>
+    <div class="row">
+        <template v-if="loading">
+            <i class="fa fa-spinner fa-spin"></i> Loading...
+        </template>
+        <template v-else>
+            <div class="col-md-12">
+                <h1>{{ projectTemplateRequestObject.name }}</h1>
+                <p>{{ projectTemplateRequestObject.description }}</p>
+            </div>
+            <div class="col-md-8">
+                <h4>Current Status: {{ projectTemplateRequestObject.task.status }} <a v-on:click="editingTaskStatus = !editingTaskStatus"><i class="fa fa-edit" aria-hidden="true"></i></a></h4>
+
+                <div v-if="editingTaskStatus">
+                    <task-status-select v-bind:task="projectTemplateRequestObject.task"></task-status-select>
+                </div>
+
+                <h4>
+                    <template v-if="projectTemplateRequestObject.project_template">
+                        Project Template: {{ projectTemplateRequestObject.project_template.name }} 
+                    </template>
+                    <template v-else>
+                        No Project Template Selected
+                    </template>
+                    <a v-on:click="editingProjectTemplate = !editingProjectTemplate"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                </h4>
+
+                <project-template-select v-if="editingProjectTemplate"></project-template-select>
+
+                <div v-if="showSubmit">
+                    <button v-on:click="submit" class="btn btn-default">
+                        <i class="fa fa-floppy-o"></i> Submit Changes
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <template v-if="projectTemplateRequestObject.files.length > 0">
+                    <h4>Files</h4>
+                    <ul class="list-group">
+                        <li v-for="file in projectTemplateRequestObject.files" class="list-group-item">
+                            <a v-bind:href="getFileLink(file)">{{ file }}</a>
+                        </li>
+                    </ul>
+                </template>
+                <template v-else>
+                    <h4>No files were provided</h4>
+                </template>
+            </div>
+        </template>
+    </div>
+</div>

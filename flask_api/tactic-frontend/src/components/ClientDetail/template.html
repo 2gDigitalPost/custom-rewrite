@@ -1,0 +1,27 @@
+<div>
+    <div class="row">
+        <template v-if="!loading">
+            <div class="col-xs-12">
+                <h1>{{ clientObject.name }}</h1>
+            </div>
+            <div class="col-xs-8">
+                <h4>Divisions
+                <ul class="list-group">
+                    <li v-for="division in divisions" class="list-group-item">{{ division.name }}</li>
+                </ul>
+                <div class="btn-group">
+                    <button class="btn btn-default" v-on:click="showAddDivisionForm = !showAddDivisionForm">
+                        <i class="fa fa-plus"></i> Add a Division</button>
+                    </button>
+                </div>
+
+                <div v-if="showAddDivisionForm">
+                    <division-entry-form v-bind:clientCode="clientCode"></division-entry-form>
+                </div>
+            </div>
+        </template>
+        <template v-else>
+            <i class="fa fa-spinner fa-spin"></i> Loading...
+        </template>
+    </div>
+</div>

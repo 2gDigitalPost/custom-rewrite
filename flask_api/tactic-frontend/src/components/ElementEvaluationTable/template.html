@@ -32,6 +32,11 @@
                     </tr>
                 </tbody>
             </table>
+
+            <ul class="pager">
+                <li class="previous" v-if="currentPage > 1"><a v-on:click.stop="modifyCurrentPage(-1)">Previous</a></li>
+                <li class="next" v-if="currentPage < numberOfPages"><a v-on:click.stop="modifyCurrentPage(1)">Next</a></li>
+            </ul>
         </div>
     </div>
 </div>

@@ -20,7 +20,9 @@ export default {
       displaySearch: false,
       searchColumn: null,
       searchFilter: null,
-      showEnterElementEvaluationForm: false
+      showEnterElementEvaluationForm: false,
+      currentPage: 1,
+      numberOfResultsDisplayed: 50
     }
   },
   methods: {
@@ -58,6 +60,9 @@ export default {
     setSearchQueryValues: function (searchName, searchValue) {
       this.searchColumn = searchName
       this.searchFilter = searchValue
+    },
+    modifyCurrentPage: function (modifier) {
+      this.currentPage += modifier
     }
   },
   computed: {
@@ -70,26 +75,37 @@ export default {
       let elementEvaluationsList = this.elementEvaluations
       let column = this.searchColumn
       let query = this.searchFilter
+      let numberOfResults = this.numberOfResultsDisplayed
+      let page = this.currentPage - 1
+
+      let unchunkedElementEvaluations = []
+      let chunkedElementEvaluations = []
 
       if (!_.isEmpty(elementEvaluationsList) && column && query) {
         if (typeof(query) === 'string') {
           query = query.toLowerCase()
 
-          return _.filter(elementEvaluationsList, function(elementEvaluation) {
+          chunkedElementEvaluations = _.chunk(_.filter(elementEvaluationsList, function(elementEvaluation) {
             return _.includes(elementEvaluation[column].toLowerCase(), query)
-          })
+          }), numberOfResults)
         }
         else if (Array.isArray(query)) {
           if (query.length > 0) {
-            return _.filter(elementEvaluationsList, function(elementEvaluation) {
-              return _.includes(query, elementEvaluation[column])
-            })
+             chunkedElementEvaluations = _.chunk(_.filter(elementEvaluationsList, function(elementEvaluation) {
+               return _.includes(query, elementEvaluation[column])
+            }), numberOfResults)
           }
         }
       }
+      else {
+        chunkedElementEvaluations = _.chunk(elementEvaluationsList, numberOfResults)
+      }
       
-      return this.elementEvaluations
-    }
+      return chunkedElementEvaluations[page]
+    },
+    numberOfPages: function () {
+      return Math.ceil(this.elementEvaluations.length / this.numberOfResultsDisplayed)
+    },
   },
   beforeMount: function () {
     this.loadElementEvaluations()

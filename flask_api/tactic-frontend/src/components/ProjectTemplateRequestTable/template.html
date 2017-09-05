@@ -1,0 +1,34 @@
+<div>
+    <h1>Project Template Requests</h1>
+
+    <div class="btn-group">
+        <button v-on:click="displaySearch = !displaySearch" class="btn btn-default">
+            <i class="fa fa-search"></i> Search
+        </button>
+    </div>
+
+    <table-search v-bind:options="searchOptions" v-if="displaySearch"></table-search>
+
+    <table class="table table-hover table-fixed">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Due Date</th>
+                <th>Submitted By</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="projectTemplateRequest in objectsToDisplay" v-on:click="openObjectLink(projectTemplateRequest.code)">
+                <td>{{ projectTemplateRequest.code }}</td>
+                <td>{{ projectTemplateRequest.name }}</td>
+                <td>{{ projectTemplateRequest.description }}</td>
+                <td>{{ projectTemplateRequest.status }}</td>
+                <td>{{ dateFormatted(projectTemplateRequest.due_date) }}</td>
+                <td>{{ getLoginName(projectTemplateRequest.login) }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

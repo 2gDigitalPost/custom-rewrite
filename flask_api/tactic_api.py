@@ -1,8 +1,12 @@
+import os
+import uuid
+
 from flask import Flask, jsonify, render_template, request, flash, session, abort
 from flask_cors import CORS
 from flask_restful import reqparse, Resource, Api
 
 import sys
+import json
 
 import ConfigParser
 
@@ -33,6 +37,15 @@ project = config.get('credentials', 'project')
 url = config.get('server', 'dev')
 
 from flask_login import current_user
+
+from api_functions.qc_reports.element_evaluations import ElementEvaluations, ElementEvaluationExistsByName
+
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = config.get('tacticpath', 'filepath')
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'xls', 'xlsx'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @app.route("/api/v1/login", methods=["POST"])
@@ -235,8 +248,55 @@ class Clients(Resource):
 
         return jsonify({'clients': client_sobjects})
 
+    def post(self):
+        json_data = request.get_json()
 
-class Divisions(Resource):
+        ticket = json_data.get('token')
+        client_data = json_data.get('client')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/client', client_data)
+
+        return jsonify({'status': 200})
+
+
+class Client(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        client = server.get_by_code('twog/client', code)
+
+        return jsonify({'client': client})
+
+
+class ClientDetail(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the client
+        client = server.get_by_code('twog/client', code)
+
+        # Also get the associated divisions
+        divisions = server.eval("@SOBJECT(twog/division['client_code', '{0}'])".format(code))
+        client['divisions'] = divisions
+
+        return jsonify({'client': client})
+
+
+class DivisionByCode(Resource):
     def get(self, client_code):
         parser = reqparse.RequestParser()
         parser.add_argument('token', required=True)
@@ -249,6 +309,20 @@ class Divisions(Resource):
         division_sobjects = server.eval("@SOBJECT(twog/division['client_code', '{0}'])".format(client_code))
 
         return jsonify({'divisions': division_sobjects})
+
+
+class Divisions(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        division_data = json_data.get('division')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        server.insert('twog/division', division_data)
+
+        return jsonify({'status': 200})
 
 
 class AllTitles(Resource):
@@ -866,7 +940,10 @@ class Components(Resource):
         if title_code:
             component_data['title_code'] = title_code
 
-        server.insert('twog/component', component_data)
+        inserted_component = server.insert('twog/component', component_data)
+
+        # Also attach the initial tasks to the component
+        server.add_initial_tasks(inserted_component.get('__search_key__'))
 
         return jsonify({'status': 200})
 
@@ -1050,10 +1127,22 @@ class FileFlow(Resource):
 
         ticket = json_data.get('token')
         file_flow = json_data.get('file_flow')
+        package_codes = json_data.get('package_codes')
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        server.insert('twog/file_flow', file_flow)
+        inserted_file_flow = server.insert('twog/file_flow', file_flow)
+
+        # If package codes were submitted with the file flow, attach the file flow to those packages
+        if package_codes:
+            # Get a list of dictionaries, containing the file flow code and the package code to insert
+            file_flow_to_packages = []
+
+            for package_code in package_codes:
+                file_flow_to_packages.append({'file_flow_code': inserted_file_flow.get('code'),
+                                              'package_code': package_code})
+
+            server.insert_multiple('twog/file_flow_to_package', file_flow_to_packages)
 
         return jsonify({'status': 200})
 
@@ -2011,6 +2100,42 @@ class Platforms(Resource):
         return jsonify({'status': 200})
 
 
+class ClientExistsByName(Resource):
+    def get(self, name):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        clients = server.eval("@SOBJECT(twog/client['name', '{0}'])".format(name))
+
+        if clients:
+            return jsonify({'exists': True})
+        else:
+            return jsonify({'exists': False})
+
+
+class DivisionExistsByNameAndClientCode(Resource):
+    def get(self, code, name):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        divisions = server.eval("@SOBJECT(twog/division['client_code', '{0}']['name', '{1}'])".format(code, name))
+
+        if divisions:
+            return jsonify({'exists': True})
+        else:
+            return jsonify({'exists': False})
+
+
 class PlatformExistsByName(Resource):
     def get(self, name):
         parser = reqparse.RequestParser()
@@ -2365,11 +2490,14 @@ class TaskInputFileOptions(Resource):
         # Get the actual sthpw/task sobject
         task = server.get_by_code('sthpw/task', task_code)
 
-        # Get the twog/component sobject
-        component = server.get_by_code('twog/component', task.get('search_code'))
+        # Get the parent type for the task
+        parent_type = task.get('search_type')
+
+        # Get the parent sobject
+        parent = server.get_by_code(parent_type, task.get('search_code'))
 
         # Get the twog/order sobject
-        order = server.get_by_code('twog/order', component.get('order_code'))
+        order = server.get_by_code('twog/order', parent.get('order_code'))
 
         # Get all the relevant twog/file_in_order entries
         files_in_order = server.eval("@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(order.get('code')))
@@ -2429,6 +2557,41 @@ class TaskInputFiles(Resource):
         return jsonify({'status': 200})
 
 
+class TaskOutputFileOptions(Resource):
+    def get(self, code):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token', required=True)
+        args = parser.parse_args()
+
+        ticket = args.get('token')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the actual sthpw/task sobject
+        task = server.get_by_code('sthpw/task', code)
+
+        # Get the parent type for the task
+        parent_type = task.get('search_type')
+
+        # Get the parent sobject
+        parent = server.get_by_code(parent_type, task.get('search_code'))
+
+        # Get the twog/order sobject
+        order = server.get_by_code('twog/order', parent.get('order_code'))
+
+        # Get all the relevant twog/file_in_order entries
+        files_in_order = server.eval("@SOBJECT(twog/file_in_order['order_code', '{0}'])".format(order.get('code')))
+
+        # Get a list of the file codes for faster searching
+        file_codes = [file_in_order.get('file_code') for file_in_order in files_in_order]
+        file_codes_string = '|'.join(file_codes)
+
+        # Get the actual twog/file sobjects
+        files = server.eval("@SOBJECT(twog/file['code', 'in', '{0}'])".format(file_codes_string))
+
+        return jsonify({'files': files})
+
+
 class TaskOutputFile(Resource):
     def post(self, task_code):
         json_data = request.get_json()
@@ -2483,6 +2646,51 @@ class TaskOutputFile(Resource):
         # Make the connection between the file and the order
         server.insert('twog/file_in_order', {'file_code': new_output_file.get('code'),
                                              'order_code': parent_object.get('order_code')})
+
+        return jsonify({'status': 200})
+
+
+class TaskOutputFiles(Resource):
+    def post(self, task_code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        file_codes = json_data.get('file_codes', [])
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the twog/task_data object associated with the task code
+        # There should be one and only one twog/task_data object associated with one task code
+        task_data = server.get_unique_sobject('twog/task_data', {'task_code': task_code})
+
+        # Start by getting the existing output file in task entries.
+        existing_entries = server.eval("@SOBJECT(twog/task_data_out_file['task_data_code', '{0}'])".format(
+            task_data.get('code')))
+
+        # Compare the submitted codes with the existing entries to get a list of what needs to be added
+        entries_to_add = []
+
+        for file_code in file_codes:
+            if file_code not in [existing_entry.get('code') for existing_entry in existing_entries]:
+                entries_to_add.append({'file_code': file_code, 'task_data_code': task_data.get('code')})
+
+        # Add the new entries to the twog/task_data_out_file table
+        server.insert_multiple('twog/task_data_out_file', entries_to_add)
+
+        # Compare the existing entries with the file codes to get a list of what needs to be removed
+        entries_to_delete = []
+
+        for existing_entry in existing_entries:
+            existing_entry_code = existing_entry.get('code')
+
+            if existing_entry_code not in file_codes:
+                entries_to_delete.append(existing_entry)
+
+        # Delete entries that exist but were not included in the submission (the user unselected them)
+        for entry_to_delete in entries_to_delete:
+            search_key = entry_to_delete.get('__search_key__')
+
+            server.delete_sobject(search_key)
 
         return jsonify({'status': 200})
 
@@ -2918,7 +3126,60 @@ class RemoveTwogComponent(Resource):
         return jsonify({'status': 200})
 
 
-class ElementEvaluations(Resource):
+class RemoveTwogFileFlow(Resource):
+    def post(self):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        code = json_data.get('code')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the search key by using the given search type and code
+        search_key = server.build_search_key('twog/file_flow', code, project_code='twog')
+
+        # Retire the object
+        server.retire_sobject(search_key)
+
+        # Also retire the twog/file_flow_to_package objects
+        file_flow_to_packages = server.eval("@SOBJECT(twog/file_flow_to_package['file_flow_code', '{0}'])".format(code))
+
+        for file_flow_to_package in file_flow_to_packages:
+            server.retire_sobject(file_flow_to_package.get('__search_key__'))
+
+        return jsonify({'status': 200})
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+class ProjectTemplateRequest(Resource):
+    def post(self):
+        json_data = json.loads(request.form.get('json'))
+        ticket = json_data.get('token')
+        project_template_data = json_data.get('project_template_request')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        inserted_project_template_request = server.insert('twog/project_template_request', project_template_data)
+
+        if request.files:
+            received_file = request.files['file']
+
+            if received_file and allowed_file(received_file.filename):
+                filename = secure_filename(received_file.filename)
+                file_path = app.config['UPLOAD_FOLDER'] + '/project_template_request/' + inserted_project_template_request.get('code')
+
+                if not os.path.exists(file_path):
+                    os.makedirs(file_path)
+
+                received_file.save(os.path.join(file_path, filename))
+
+        return jsonify({'project_template_request': inserted_project_template_request})
+
+
+class ProjectTemplateRequests(Resource):
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('token', required=True)
@@ -2928,25 +3189,32 @@ class ElementEvaluations(Resource):
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        element_evaluations = server.eval("@SOBJECT(twog/element_evaluation)")
+        project_template_requests = server.eval("@SOBJECT(twog/project_template_request)")
 
-        return jsonify({'element_evaluations': element_evaluations})
+        # Query the tasks for each project template request's status
+        project_template_request_codes = [project_template_request.get('code') for project_template_request in project_template_requests]
+        project_template_request_codes_string = '|'.join(project_template_request_codes)
 
-    def post(self):
-        json_data = request.get_json()
+        tasks = server.eval("@SOBJECT(sthpw/task['search_code', 'in', '{0}'])".format(project_template_request_codes_string))
 
-        ticket = json_data.get('token')
-        element_evaluation_data = json_data.get('element_evaluation')
+        tasks_by_project_template_request_codes = {}
+        for task in tasks:
+            tasks_by_project_template_request_codes[task.get('search_code')] = task
 
-        server = TacticServerStub(server=url, project=project, ticket=ticket)
+        for project_template_request in project_template_requests:
+            project_template_request_task = tasks_by_project_template_request_codes.get(project_template_request.get('code'))
 
-        server.insert('twog/element_evaluation', element_evaluation_data)
+            if project_template_request_task:
+                project_template_request['status'] = project_template_request_task.get('status')
 
-        return jsonify({'status': 200})
+        # Remove the project template requests that are 'Complete'
+        project_template_requests = [project_template_request for project_template_request in project_template_requests if project_template_request.get('status') != 'Complete']
+
+        return jsonify({'project_template_requests': project_template_requests})
 
 
-class ElementEvaluationExistsByName(Resource):
-    def get(self, name):
+class ProjectTemplateRequestByCode(Resource):
+    def get(self, code):
         parser = reqparse.RequestParser()
         parser.add_argument('token', required=True)
         args = parser.parse_args()
@@ -2955,12 +3223,67 @@ class ElementEvaluationExistsByName(Resource):
 
         server = TacticServerStub(server=url, project=project, ticket=ticket)
 
-        element_evaluations = server.eval("@SOBJECT(twog/element_evaluation['name', '{0}'])".format(name))
+        project_template_request = server.get_by_code('twog/project_template_request', code)
 
-        if element_evaluations:
-            return jsonify({'exists': True})
+        task = server.eval("@SOBJECT(sthpw/task['search_code', '{0}'])".format(project_template_request.get('code')))
+
+        if task:
+            project_template_request['task'] = task[0]
         else:
-            return jsonify({'exists': False})
+            project_template_request['task'] = None
+
+        project_template_code = project_template_request.get('project_template_code')
+        if project_template_code:
+            project_template = server.get_by_code('twog/project_template', project_template_code)
+
+            project_template_request['project_template'] = project_template
+        else:
+            project_template_request['project_template'] = None
+
+        # Get the list of files
+        from os import listdir
+        from os.path import isfile, join
+
+        file_path = app.config['UPLOAD_FOLDER'] + '/project_template_request/' + project_template_request.get('code')
+
+        if (os.path.exists(file_path)):
+            files_in_path = [f for f in listdir(file_path) if isfile(join(file_path, f))]
+
+            if files_in_path:
+                project_template_request['files'] = files_in_path
+            else:
+                project_template_request['files'] = []
+        else:
+            project_template_request['files'] = []
+
+        return jsonify({'project_template_request': project_template_request})
+
+    def post(self, code):
+        json_data = request.get_json()
+
+        ticket = json_data.get('token')
+        update_data = json_data.get('update_data')
+
+        server = TacticServerStub(server=url, project=project, ticket=ticket)
+
+        # Get the search key by using the given search type and code
+        search_key = server.build_search_key('twog/project_template_request', code, project_code='twog')
+
+        status = update_data.get('status')
+        project_template_code = update_data.get('project_template_code')
+
+        if status:
+            project_template_request = server.get_by_search_key(search_key)
+            task = server.eval(
+                "@SOBJECT(sthpw/task['search_code', '{0}'])".format(project_template_request.get('code')))[0]
+            task_search_key = task.get('__search_key__')
+
+            server.update(task_search_key, {'status': status})
+
+        if project_template_code:
+            server.update(search_key, {'project_template_code': project_template_code})
+
+        return jsonify({'status': 200})
 
 
 api.add_resource(DepartmentInstructions, '/department_instructions')
@@ -2970,7 +3293,7 @@ api.add_resource(InstructionsTemplates, '/api/v1/instructions-templates')
 api.add_resource(InstructionsDocument, '/api/v1/instructions/<string:code>')
 api.add_resource(NewInstructionsForMultipleComponents, '/api/v1/instructions/components')
 api.add_resource(Clients, '/api/v1/clients')
-api.add_resource(Divisions, '/api/v1/divisions/<string:client_code>')
+api.add_resource(DivisionByCode, '/api/v1/divisions/<string:client_code>')
 api.add_resource(AllTitles, '/titles/<string:ticket>')
 api.add_resource(OrderPriorities, '/orders/priorities')
 api.add_resource(Orders, '/api/v1/orders')
@@ -3018,6 +3341,11 @@ api.add_resource(Task, '/api/v1/task/<string:code>')
 api.add_resource(TaskFull, '/api/v1/task/<string:code>/full')
 api.add_resource(TaskStatusOptions, '/api/v1/task/<string:code>/status-options')
 
+api.add_resource(Client, '/api/v1/client/<string:code>')
+api.add_resource(ClientDetail, '/api/v1/client/<string:code>/detail')
+api.add_resource(ClientExistsByName, '/api/v1/client/name/<string:name>/exists')
+api.add_resource(DivisionExistsByNameAndClientCode, '/api/v1/client/<string:code>/division/name/<string:name>/exists')
+api.add_resource(Divisions, '/api/v1/divisions')
 api.add_resource(Components, '/api/v1/components')
 api.add_resource(DeliverableFilesInOrder, '/api/v1/order/<string:code>/deliverable-files')
 api.add_resource(ElementEvaluations, '/api/v1/element-evaluations')
@@ -3038,15 +3366,21 @@ api.add_resource(Packages, '/api/v1/packages')
 api.add_resource(PackagesInOrder, '/api/v1/order/<string:code>/packages')
 api.add_resource(PackageWaitingOnFiles, '/api/v1/package/<string:code>/waiting-files')
 api.add_resource(PlatformExistsByName, '/api/v1/platform/name/<string:name>/exists')
+api.add_resource(ProjectTemplateRequest, '/api/v1/project-templates/request')
+api.add_resource(ProjectTemplateRequestByCode, '/api/v1/project-templates/requests/<string:code>')
+api.add_resource(ProjectTemplateRequests, '/api/v1/project-templates/requests')
 api.add_resource(PurchaseOrdersByDivision, '/api/v1/division/<string:division_code>/purchase-orders')
 api.add_resource(PurchaseOrderExists,
                  '/api/v1/purchase-order/number/<string:number>/division/<string:division_code>/exists')
 api.add_resource(RemoveFileInOrder, '/api/v1/file-in-order/delete')
 api.add_resource(RetireObject, '/api/v1/retire')
 api.add_resource(RemoveTwogComponent, '/api/v1/remove/twog/component')
+api.add_resource(RemoveTwogFileFlow, '/api/v1/remove/twog/file-flow')
 api.add_resource(TaskInputFileOptions, '/api/v1/task/<string:task_code>/input-file-options')
 api.add_resource(TaskInputFiles, '/api/v1/task/<string:task_code>/input-files')
+api.add_resource(TaskOutputFileOptions, '/api/v1/task/<string:code>/output-file-options')
 api.add_resource(TaskOutputFile, '/api/v1/task/<string:task_code>/output-file')
+api.add_resource(TaskOutputFiles, '/api/v1/task/<string:task_code>/output-files')
 
 
 if __name__ == '__main__':
