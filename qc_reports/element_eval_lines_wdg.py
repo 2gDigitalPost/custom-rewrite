@@ -426,7 +426,7 @@ spt.api.load_panel(bvr.src_el.getParent('#element_eval_lines_div'), 'qc_reports.
                                  ('Approved by Production', 'approved_by_production'),
                                  ('Approved by Client', 'approved_by_client'), ('Approved as is', 'approved_as_is'),
                                  ('Approved by Territory', 'approved_by_territory'),
-                                 ('From Approved Master', 'from_approved_master')]
+                                 ('From Approved Master', 'from_approved_master'), ('Improved', 'improved')]
 
             for iterator, line in enumerate(self.lines):
                 table.add_row()
